@@ -57,7 +57,9 @@ public class ForgotPasswordActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                forgotPassword();
+                if (checkNetworkAvailableWithError()) {
+                    forgotPassword();
+                }
                 break;
             default:
                 return super.onOptionsItemSelected(item);

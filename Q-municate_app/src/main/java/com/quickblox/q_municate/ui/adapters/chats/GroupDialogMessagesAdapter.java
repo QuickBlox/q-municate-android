@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -18,9 +19,9 @@ import java.util.List;
 
 public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
-    public GroupDialogMessagesAdapter(Activity activity, List<CombinationMessage> objectsList,
+    public GroupDialogMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> objectsList,
             ChatUIHelperListener chatUIHelperListener, Dialog dialog) {
-        super(activity, objectsList);
+        super(baseActivity, objectsList);
         this.chatUIHelperListener = chatUIHelperListener;
         this.dialog = dialog;
     }
@@ -56,7 +57,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         String senderName;
 
         if (viewHolder.verticalProgressBar != null) {
-            viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
+            viewHolder.verticalProgressBar.setProgressDrawable(baseActivity.getResources().getDrawable(R.drawable.vertical_progressbar));
         }
 
         if (notificationMessage) {
@@ -87,9 +88,9 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             }
         }
 
-        if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {
+        if (!State.READ.equals(combinationMessage.getState()) && !ownMessage && baseActivity.isNetworkAvailable()) {
             combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(context,
+            QBUpdateStatusMessageCommand.start(baseActivity,
                     ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, false);
         } else if (ownMessage) {
             combinationMessage.setState(State.READ);

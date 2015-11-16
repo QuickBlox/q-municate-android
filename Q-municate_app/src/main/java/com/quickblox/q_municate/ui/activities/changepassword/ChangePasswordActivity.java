@@ -89,7 +89,9 @@ public class ChangePasswordActivity extends BaseLoggableActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                changePassword();
+                if (checkNetworkAvailableWithError()) {
+                    changePassword();
+                }
                 break;
             default:
                 super.onOptionsItemSelected(item);

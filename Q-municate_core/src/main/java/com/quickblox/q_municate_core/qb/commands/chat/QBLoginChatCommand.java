@@ -10,6 +10,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConnectivityUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 
@@ -54,7 +55,9 @@ public class QBLoginChatCommand extends ServiceCommand {
         while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT) {
             currentTime = new Date().getTime();
             try {
-                chatRestHelper.login(currentUser);
+                if (ConnectivityUtils.isNetworkAvailable(context)) {
+                    chatRestHelper.login(currentUser);
+                }
             } catch (SmackException ignore) {
                 ignore.printStackTrace();
             }

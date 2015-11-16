@@ -59,7 +59,7 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
         displayAvatarImage(user.getAvatar(), viewHolder.avatarImageView);
 
         if (!TextUtils.isEmpty(query)) {
-            TextViewHelper.changeTextColorView(context, viewHolder.nameTextView, query);
+            TextViewHelper.changeTextColorView(baseActivity, viewHolder.nameTextView, query);
         }
 
         setLabel(viewHolder, user);
@@ -107,12 +107,12 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
 
         if (online) {
             viewHolder.labelTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
-            viewHolder.labelTextView.setTextColor(context.getResources().getColor(R.color.green));
+            viewHolder.labelTextView.setTextColor(baseActivity.getResources().getColor(R.color.green));
         } else {
-            viewHolder.labelTextView.setText(context.getString(R.string.last_seen,
+            viewHolder.labelTextView.setText(baseActivity.getString(R.string.last_seen,
                     DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
                     DateUtils.formatDateSimpleTime(user.getLastLogin())));
-            viewHolder.labelTextView.setTextColor(context.getResources().getColor(R.color.dark_gray));
+            viewHolder.labelTextView.setTextColor(baseActivity.getResources().getColor(R.color.dark_gray));
         }
     }
 

@@ -1,7 +1,8 @@
 package com.quickblox.q_municate.ui.adapters.base;
 
-import android.app.Activity;
 import android.text.TextUtils;
+
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,12 +13,12 @@ public abstract class BaseFilterAdapter<T, VH extends BaseClickListenerViewHolde
     private List<T> visibleList;
     protected String query;
 
-    public BaseFilterAdapter(Activity activity) {
-        super(activity);
+    public BaseFilterAdapter(BaseActivity baseActivity) {
+        super(baseActivity);
     }
 
-    public BaseFilterAdapter(Activity activity, List<T> list) {
-        super(activity, list);
+    public BaseFilterAdapter(BaseActivity baseActivity, List<T> list) {
+        super(baseActivity, list);
         visibleList = list;
     }
 

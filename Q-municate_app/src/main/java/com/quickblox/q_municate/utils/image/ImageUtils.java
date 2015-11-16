@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,17 +17,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
-import android.view.Display;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.MimeType;
-import com.quickblox.q_municate.utils.SizeUtility;
 import com.quickblox.q_municate.utils.StorageUtil;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
@@ -41,7 +37,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,33 +50,16 @@ public class ImageUtils {
     public static final int CAMERA_REQUEST_CODE = 222;
     public static final int IMAGE_REQUEST_CODE = 333;
 
+    private static final String TAG = ImageUtils.class.getSimpleName();
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
-    private static final String CAMERA_FILE_NAME = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + ".jpg";
-
-
-
-    public static final int GALLERY_INTENT_CALLED = 1;
-    public static final int GALLERY_IMAGE_PREVIEWER_CALLED = 2;
-    public static final int CAPTURE_CALLED = 3;
-
-    private static final String TEMP_FILE_NAME = "temp.png";
+    private static final String CAMERA_FILE_EXT = ".PNG";
+    private static final String CAMERA_FILE_NAME = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_FILE_EXT;
     private static final int AVATAR_SIZE = 110;
 
     private Activity activity;
 
     public ImageUtils(Activity activity) {
         this.activity = activity;
-    }
-
-    //---
-
-
-    public static byte[] getBytesFromBitmap(Bitmap imageBitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        imageBitmap.compress(Bitmap.CompressFormat.PNG, ConstsCore.FULL_QUALITY, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        Utils.closeOutputStream(byteArrayOutputStream);
-        return byteArray;
     }
 
     public static void startImagePicker(Activity activity) {
@@ -95,7 +73,9 @@ public class ImageUtils {
     public static void startImagePicker(Fragment fragment) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType(MimeType.IMAGE_MIME);
-        fragment.startActivityForResult(Intent.createChooser(intent, fragment.getString(R.string.dlg_choose_image_from)), GALLERY_REQUEST_CODE);
+        fragment.startActivityForResult(
+                Intent.createChooser(intent, fragment.getString(R.string.dlg_choose_image_from)),
+                GALLERY_REQUEST_CODE);
     }
 
     public static void startCameraForResult(Activity activity) {
@@ -126,7 +106,7 @@ public class ImageUtils {
         try {
             file.createNewFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            ErrorUtils.logError(e);
         }
         return file;
     }
@@ -150,15 +130,15 @@ public class ImageUtils {
     }
 
     public static String saveUriToFile(Uri uri) throws Exception {
-        ParcelFileDescriptor parcelFileDescriptor = App.getInstance().getContentResolver().openFileDescriptor(
-                uri, "r");
+        ParcelFileDescriptor parcelFileDescriptor = App.getInstance().getContentResolver()
+                .openFileDescriptor(uri, "r");
         FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
 
         InputStream inputStream = new FileInputStream(fileDescriptor);
         BufferedInputStream bis = new BufferedInputStream(inputStream);
 
         File parentDir = StorageUtil.getAppExternalDataDirectoryFile();
-        String fileName = String.valueOf(System.currentTimeMillis()) + ".jpg";
+        String fileName = String.valueOf(System.currentTimeMillis()) + CAMERA_FILE_EXT;
         File resultFile = new File(parentDir, fileName);
 
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(resultFile));
@@ -195,31 +175,115 @@ public class ImageUtils {
         return file;
     }
 
-    // ---
+    private static int getExifInterfaceOrientation(String pathToFile) {
+        int orientation = ConstsCore.NOT_INITIALIZED_VALUE;
 
-    public boolean isGalleryCalled(int requestCode) {
-        return ImageUtils.GALLERY_INTENT_CALLED == requestCode;
+        try {
+            ExifInterface exifInterface = new ExifInterface(pathToFile);
+            orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ConstsCore.NOT_INITIALIZED_VALUE);
+        } catch (Exception e) {
+            ErrorUtils.logError(e);
+        }
+
+        return orientation;
     }
 
-    public boolean isCaptureCalled(int requestCode) {
-        return ImageUtils.CAPTURE_CALLED == requestCode;
+    public static void checkForRotation(String imagePath) {
+
+        //    public static void checkForRotation(String imagePath) throws IOException {
+        //        ExifInterface exifInterface = new ExifInterface(imagePath);
+        //        Log.d("test_rotation", "EXIF value " + exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION) + ", imagePath = " + imagePath);
+        //        if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")) {
+        //            Log.d("test_rotation", "EXIF value " + 90);
+        //            rotateImage(imagePath, 90);
+        //        } else if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")) {
+        //            Log.d("test_rotation", "EXIF value " + 270);
+        //            rotateImage(imagePath, 270);
+        //        } else if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")) {
+        //            Log.d("test_rotation", "EXIF value " + 180);
+        //            rotateImage(imagePath, 180);
+        //        }
+        //}
+
+        int orientation = getExifInterfaceOrientation(imagePath);
+
+        if (orientation == 0) {
+            return;
+        }
+
+        try {
+            Bitmap bitmap = getBitmapFromFile(imagePath);
+
+            Matrix matrix = new Matrix();
+
+            switch (orientation) {
+                case 2:
+                    matrix.setScale(-1, 1);
+                    break;
+                case 3:
+                    matrix.setRotate(180);
+                    break;
+                case 4:
+                    matrix.setRotate(180);
+                    matrix.postScale(-1, 1);
+                    break;
+                case 5:
+                    matrix.setRotate(90);
+                    matrix.postScale(-1, 1);
+                    break;
+                case 6:
+                    matrix.setRotate(90);
+                    break;
+                case 7:
+                    matrix.setRotate(-90);
+                    matrix.postScale(-1, 1);
+                    break;
+                case 8:
+                    matrix.setRotate(-90);
+                    break;
+                default:
+                    return;
+            }
+
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            saveFileFromBitmap(bitmap, imagePath);
+        } catch (Exception e) {
+            ErrorUtils.logError(e);
+        }
     }
 
-    public static byte[] getBytesBitmap(Bitmap imageBitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        imageBitmap.compress(Bitmap.CompressFormat.PNG, ConstsCore.FULL_QUALITY, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        Utils.closeOutputStream(byteArrayOutputStream);
-        return byteArray;
+    public static void saveFileFromBitmap(Bitmap bitmap, String fileName) {
+        File file = new File(fileName);
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        FileOutputStream fileOutputStream = null;
+        try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, ConstsCore.FULL_QUALITY, byteArrayOutputStream);
+            byte[] bitmapData = byteArrayOutputStream.toByteArray();
+            fileOutputStream = new FileOutputStream(file);
+            fileOutputStream.write(bitmapData);
+            Utils.closeOutputStream(fileOutputStream);
+            Utils.closeOutputStream(byteArrayOutputStream);
+        } catch (IOException e) {
+            ErrorUtils.logError(TAG, e);
+        } finally {
+            Utils.closeOutputStream(fileOutputStream);
+            Utils.closeOutputStream(byteArrayOutputStream);
+        }
     }
 
-    public Bitmap createScaledBitmap(Bitmap unscaledBitmap) {
-        Display display = activity.getWindowManager().getDefaultDisplay();
-        int displayWidth = display.getWidth();
+    public static Bitmap getBitmapFromFile(String filePath) {
+        return BitmapFactory.decodeFile(filePath, getBitmapOption());
+    }
 
-        Bitmap scaledBitmap = createScaledBitmap(unscaledBitmap, displayWidth, displayWidth, ScalingLogic.FIT);
-
-        return scaledBitmap;
+    private static BitmapFactory.Options getBitmapOption() {
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        bitmapOptions.inDither = false;
+        bitmapOptions.inPurgeable = true;
+        bitmapOptions.inInputShareable = true;
+        bitmapOptions.inTempStorage = new byte[32 * 1024];
+        return bitmapOptions;
     }
 
     private static Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight,
@@ -243,7 +307,8 @@ public class ImageUtils {
             if (srcAspect > dstAspect) {
                 final int srcRectWidth = (int) (srcHeight * dstAspect);
                 final int srcRectLeft = (srcWidth - srcRectWidth) / 2;
-                return new Rect(srcRectLeft, ConstsCore.ZERO_INT_VALUE, srcRectLeft + srcRectWidth, srcHeight);
+                return new Rect(srcRectLeft, ConstsCore.ZERO_INT_VALUE, srcRectLeft + srcRectWidth,
+                        srcHeight);
             } else {
                 final int srcRectHeight = (int) (srcWidth / dstAspect);
                 final int scrRectTop = (int) (srcHeight - srcRectHeight) / 2;
@@ -264,186 +329,12 @@ public class ImageUtils {
                 return new Rect(ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE, dstWidth,
                         (int) (dstWidth / srcAspect));
             } else {
-                return new Rect(ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE, (int) (dstHeight * srcAspect),
-                        dstHeight);
+                return new Rect(ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE,
+                        (int) (dstHeight * srcAspect), dstHeight);
             }
         } else {
             return new Rect(ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE, dstWidth, dstHeight);
         }
-    }
-
-    public void getCaptureImage() {
-        Intent cameraIntent=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        activity.startActivityForResult(cameraIntent, CAPTURE_CALLED);
-    }
-
-    public void getImage() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            activity.startActivityForResult(intent, GALLERY_INTENT_CALLED);
-        } else {
-            showKitKatGallery();
-        }
-    }
-
-    private void showKitKatGallery() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image/*");
-        activity.startActivityForResult(intent, GALLERY_INTENT_CALLED);
-    }
-
-    public void showFullImage(Activity activity, String absolutePath) {
-        Intent intent = new Intent();
-        intent.setAction(android.content.Intent.ACTION_VIEW);
-        Uri uri = Uri.parse("file://" + absolutePath);
-        intent.setDataAndType(uri, "image/*");
-        activity.startActivityForResult(intent, GALLERY_IMAGE_PREVIEWER_CALLED);
-    }
-
-    public Bitmap getRoundedBitmap(Bitmap bitmap) {
-        Bitmap resultBitmap;
-        int originalWidth = bitmap.getWidth();
-        int originalHeight = bitmap.getHeight();
-        float r;
-
-        if (originalWidth > originalHeight) {
-            resultBitmap = Bitmap.createBitmap(originalHeight, originalHeight, Bitmap.Config.ARGB_8888);
-            r = originalHeight / 2;
-        } else {
-            resultBitmap = Bitmap.createBitmap(originalWidth, originalWidth, Bitmap.Config.ARGB_8888);
-            r = originalWidth / 2;
-        }
-
-        Canvas canvas = new Canvas(resultBitmap);
-
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE, originalWidth, originalHeight);
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE);
-        canvas.drawCircle(r, r, r, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return resultBitmap;
-    }
-
-    public String getAbsolutePathByBitmap(Bitmap origBitmap) {
-        File tempFile = new File(activity.getExternalFilesDir(null), TEMP_FILE_NAME);
-        ByteArrayOutputStream bos = null;
-        FileOutputStream fos = null;
-        try {
-            bos = new ByteArrayOutputStream();
-            origBitmap.compress(Bitmap.CompressFormat.PNG, ConstsCore.FULL_QUALITY, bos);
-            byte[] bitmapData = bos.toByteArray();
-            fos = new FileOutputStream(tempFile);
-            fos.write(bitmapData);
-            Utils.closeOutputStream(fos);
-            Utils.closeOutputStream(bos);
-        } catch (IOException e) {
-            ErrorUtils.showError(activity, e);
-        } finally {
-            Utils.closeOutputStream(fos);
-            Utils.closeOutputStream(bos);
-        }
-        return tempFile.getAbsolutePath();
-    }
-
-//    public File getFileFromBitmapForCamera(Bitmap origBitmap) throws IOException {
-////        origBitmap = rotateImageIfRequired(App.getInstance(), origBitmap);
-//        File tempFile = getFileFromBitmap(origBitmap);
-//        return tempFile;
-//    }
-
-    public Uri getImageUri(Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(activity.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
-
-    public File getFileFromBitmap(Bitmap origBitmap) throws IOException {
-        int width = SizeUtility.dipToPixels(activity, ConstsCore.CHAT_ATTACH_WIDTH);
-        int height = SizeUtility.dipToPixels(activity, ConstsCore.CHAT_ATTACH_HEIGHT);
-        Bitmap bitmap = createScaledBitmap(origBitmap, width, height, ScalingLogic.FIT);
-        byte[] bitmapData = getBytesBitmap(bitmap);
-        File tempFile = createFile(bitmapData);
-        return tempFile;
-    }
-
-    public File createFile(byte[] bitmapData) throws IOException {
-        File tempFile = new File(activity.getCacheDir(), TEMP_FILE_NAME);
-        tempFile.createNewFile();
-        FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-        fileOutputStream.write(bitmapData);
-        Utils.closeOutputStream(fileOutputStream);
-        return tempFile;
-    }
-
-    public Bitmap getBitmap(Uri originalUri) {
-        BitmapFactory.Options bitmapOptions = getBitmapOption();
-        Bitmap selectedBitmap = null;
-        try {
-            ParcelFileDescriptor descriptor = activity.getContentResolver().openFileDescriptor(originalUri, "r");
-            selectedBitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
-        } catch (FileNotFoundException e) {
-            ErrorUtils.showError(activity, e.getMessage());
-        }
-        return selectedBitmap;
-    }
-
-    private void rotateImageIfRequired(Bitmap bitmap, Uri uri) {
-        try {
-            ExifInterface exifInterface = new ExifInterface(getRealPathFromURI(uri));
-            if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")) {
-                bitmap = rotate(bitmap, 90);
-            } else if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")) {
-                bitmap = rotate(bitmap, 270);
-            } else if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")) {
-                bitmap = rotate(bitmap, 180);
-            }
-        } catch (IOException e) {
-            ErrorUtils.logError(e);
-        }
-    }
-
-    private String getRealPathFromURI(Uri contentURI) {
-        Cursor cursor = activity.getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) {
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(columnIndex);
-        }
-    }
-
-    private Bitmap rotate(Bitmap bitmap, int degree) {
-        int w = bitmap.getWidth();
-        int h = bitmap.getHeight();
-
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degree);
-
-        return Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true);
-    }
-
-    private BitmapFactory.Options getBitmapOption() {
-        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-        bitmapOptions.inDither = false;
-        bitmapOptions.inPurgeable = true;
-        bitmapOptions.inInputShareable = true;
-        bitmapOptions.inTempStorage = new byte[32 * 1024];
-        return bitmapOptions;
-    }
-
-    public static Drawable getRoundIconDrawable(Context context, int imageResId) {
-        int actionBarHeight = getActionBarHeight(context);
-        Bitmap avatarBitmap = BitmapFactory.decodeResource(context.getResources(), imageResId);
-        return getRoundIconDrawable(avatarBitmap, actionBarHeight);
     }
 
     public static Drawable getRoundIconDrawable(Context context, Bitmap avatarBitmap) {
@@ -456,8 +347,8 @@ public class ImageUtils {
         int actionBarHeight = AVATAR_SIZE;
 
         if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
-            actionBarHeight = TypedValue.complexToDimensionPixelSize(typedValue.data,
-                    context.getResources().getDisplayMetrics());
+            actionBarHeight = TypedValue
+                    .complexToDimensionPixelSize(typedValue.data, context.getResources().getDisplayMetrics());
         }
 
         int margin = actionBarHeight / 10;
@@ -471,8 +362,8 @@ public class ImageUtils {
         Bitmap scaledBitmap = createScaledBitmap(avatarBitmap, size, size, ScalingLogic.CROP);
 
         // create rounded image avatar
-        Bitmap output = Bitmap.createBitmap(scaledBitmap.getWidth(),
-                scaledBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap output = Bitmap
+                .createBitmap(scaledBitmap.getWidth(), scaledBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
         int color = App.getInstance().getResources().getColor(R.color.gray);
         Paint paint = new Paint();

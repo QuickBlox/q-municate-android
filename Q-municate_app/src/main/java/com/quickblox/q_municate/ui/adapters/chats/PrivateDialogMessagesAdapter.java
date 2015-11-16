@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
@@ -27,12 +28,12 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     private FriendOperationListener friendOperationListener;
 
     public PrivateDialogMessagesAdapter(
-            Activity activity,
+            BaseActivity baseActivity,
             FriendOperationListener friendOperationListener,
             List<CombinationMessage> objectsList,
             ChatUIHelperListener chatUIHelperListener,
             Dialog dialog) {
-        super(activity, objectsList);
+        super(baseActivity, objectsList);
         this.friendOperationListener = friendOperationListener;
         this.chatUIHelperListener = chatUIHelperListener;
         this.dialog = dialog;
@@ -65,7 +66,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 .getNotificationType() != null && !friendsRequestMessage;
 
         if (viewHolder.verticalProgressBar != null) {
-            viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
+            viewHolder.verticalProgressBar.setProgressDrawable(baseActivity.getResources().getDrawable(R.drawable.vertical_progressbar));
         }
 
         if (friendsRequestMessage) {
@@ -107,9 +108,9 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             }
         }
 
-        if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {
+        if (!State.READ.equals(combinationMessage.getState()) && !ownMessage && baseActivity.isNetworkAvailable()) {
             combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
+            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
         }
 
         // check if last messageCombination is request messageCombination

@@ -1,9 +1,5 @@
 package com.quickblox.q_municate.ui.activities.base;
 
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +13,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -32,24 +32,30 @@ import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
+import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
+import com.quickblox.q_municate.ui.activities.call.CallActivity;
+import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
+import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
 import com.quickblox.q_municate.utils.bridges.ConnectionBridge;
 import com.quickblox.q_municate.utils.bridges.LoadingBridge;
 import com.quickblox.q_municate.utils.bridges.SnackbarBridge;
+import com.quickblox.q_municate.utils.broadcasts.NetworkChangeReceiver;
+import com.quickblox.q_municate.utils.helpers.ActivityUIHelper;
+import com.quickblox.q_municate.utils.helpers.LoginHelper;
+import com.quickblox.q_municate.utils.helpers.SharedHelper;
+import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHelper;
 import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
-import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
-import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
-import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
-import com.quickblox.q_municate.ui.activities.call.CallActivity;
-import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.helpers.SharedHelper;
-import com.quickblox.q_municate.utils.helpers.ActivityUIHelper;
-import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHelper;
+import com.quickblox.q_municate.utils.simple.SimpleGlobalLoginListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
@@ -57,6 +63,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConnectivityUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -95,6 +102,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
     private UserStatusBroadcastReceiver userStatusBroadcastReceiver;
+    private NetworkBroadcastReceiver networkBroadcastReceiver;
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
@@ -111,6 +119,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         initFields();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService();
+    }
+
     private void initFields() {
         app = App.getInstance();
         appSharedHelper = App.getInstance().getAppSharedHelper();
@@ -120,6 +134,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         broadcastReceiver = new BaseBroadcastReceiver();
         globalBroadcastReceiver = new GlobalBroadcastReceiver();
         userStatusBroadcastReceiver = new UserStatusBroadcastReceiver();
+        networkBroadcastReceiver = new NetworkBroadcastReceiver();
         broadcastCommandMap = new HashMap<>();
         fragmentsStatusChangingSet = new HashSet<>();
         fragmentsServiceConnectionSet = new HashSet<>();
@@ -207,25 +222,28 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     @Override
-    public void hideActionBarProgress() {
-        toolbarProgressBar.setVisibility(View.GONE);
-    }
-
-    @Override
     public void showActionBarProgress() {
         toolbarProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
+    public void hideActionBarProgress() {
+        toolbarProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
     public boolean checkNetworkAvailableWithError() {
-        // TODO network checking here
-        return false;
+        if (!isNetworkAvailable()) {
+            ToastUtils.longToast(R.string.dlg_fail_connection);
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
     public boolean isNetworkAvailable() {
-        // TODO network checking here
-        return false;
+        return ConnectivityUtils.isNetworkAvailable(this);
     }
 
     @Override
@@ -261,15 +279,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        connectToService();
+    protected void onPause() {
+        super.onPause();
+        unregisterBroadcastReceivers();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         registerBroadcastReceivers();
         updateBroadcastActionList();
 
@@ -278,18 +295,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         NotificationManagerHelper.clearNotificationEvent(this);
 
         checkOpeningDialog();
+
+        checkShowingConnectionError();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterBroadcastReceivers();
+    protected void onStart() {
+        super.onStart();
+        connectToService();
     }
 
     @Override
@@ -384,16 +397,19 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
         globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
-        localBroadcastManager.registerReceiver(globalBroadcastReceiver, globalActionsIntentFilter);
+        IntentFilter networkIntentFilter = new IntentFilter(NetworkChangeReceiver.ACTION_LOCAL_CONNECTIVITY);
+        IntentFilter userStatusIntentFilter = new IntentFilter(QBServiceConsts.USER_STATUS_CHANGED_ACTION);
 
-        localBroadcastManager.registerReceiver(userStatusBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.USER_STATUS_CHANGED_ACTION));
+        localBroadcastManager.registerReceiver(globalBroadcastReceiver, globalActionsIntentFilter);
+        localBroadcastManager.registerReceiver(userStatusBroadcastReceiver, userStatusIntentFilter);
+        localBroadcastManager.registerReceiver(networkBroadcastReceiver, networkIntentFilter);
     }
 
     private void unregisterBroadcastReceivers() {
         localBroadcastManager.unregisterReceiver(globalBroadcastReceiver);
         localBroadcastManager.unregisterReceiver(broadcastReceiver);
         localBroadcastManager.unregisterReceiver(userStatusBroadcastReceiver);
+        localBroadcastManager.unregisterReceiver(networkBroadcastReceiver);
     }
 
     private void navigateToParent() {
@@ -402,6 +418,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             finish();
         } else {
             NavUtils.navigateUpFromSameTask(this);
+        }
+    }
+
+    protected void checkShowingConnectionError() {
+        if (!isNetworkAvailable()) {
+            setActionBarTitle(R.string.dlg_internet_connection_is_missing);
         }
     }
 
@@ -549,6 +571,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
+    protected void loginChat() {
+        QBLoginChatCompositeCommand.start(this);
+    }
+
     protected boolean isChatServiceInitialized() {
         return QBChatService.isInitialized() && AppSession.getSession().isSessionExist();
     }
@@ -559,6 +585,30 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     public void startGroupChatActivity(Dialog dialog) {
         GroupDialogActivity.start(this, dialog);
+    }
+
+    protected void startLandingScreen() {
+        Intent intent = new Intent(this, LandingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        LandingActivity.start(this, intent);
+        finish();
+    }
+
+    private void performLoadChatsSuccessAction(Bundle bundle) {
+        appSharedHelper.saveFirstAuth(false);
+        hideSnackBar();
+    }
+
+    private void performLoginChatSuccessAction(Bundle bundle) {
+        checkLoadDialogs();
+        hideProgress();
+    }
+
+    private void checkLoadDialogs() {
+        if (appSharedHelper.isFirstAuth()) {
+            showSnackbar(R.string.dlgs_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
+            QBLoadDialogsCommand.start(this);
+        }
     }
 
     private void activateButterKnife() {
@@ -582,6 +632,59 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         public void execute(Bundle bundle) {
             hideProgress();
             onSuccessAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
+        }
+    }
+
+    private class LoginChatCompositeSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            performLoginChatSuccessAction(bundle);
+        }
+    }
+
+    private class LoadChatsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            performLoadChatsSuccessAction(bundle);
+        }
+    }
+
+    private class GlobalLoginListener extends SimpleGlobalLoginListener {
+
+        @Override
+        public void onCompleteQbChatLogin() {
+            checkLoadDialogs();
+        }
+    }
+
+    private class NetworkBroadcastReceiver extends BroadcastReceiver {
+
+        private boolean loggedIn = false;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean activeConnection = intent
+                    .getBooleanExtra(NetworkChangeReceiver.EXTRA_IS_ACTIVE_CONNECTION, false);
+
+            if (activeConnection && !loggedIn) {
+                loggedIn = true;
+
+                LoginHelper loginHelper = new LoginHelper(BaseActivity.this);
+                loginHelper.makeGeneralLogin(new GlobalLoginListener());
+
+                addActions();
+
+                hideSnackBar();
+            }
+        }
+
+        private void addActions() {
+            addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
+            addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION,
+                    new LoginChatCompositeSuccessAction());
+            updateBroadcastActionList();
         }
     }
 
@@ -628,7 +731,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                     } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
                         onReceiveContactRequestAction(intent.getExtras());
                     } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
-                        onReceiveForceReloginAction(intent.getExtras());
+                        //                        onReceiveForceReloginAction(intent.getExtras());
                     } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
                         onReceiveRefreshSessionAction(intent.getExtras());
                     }

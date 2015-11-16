@@ -99,7 +99,9 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                updateUser();
+                if (checkNetworkAvailableWithError()) {
+                    updateUser();
+                }
                 break;
             default:
                 super.onOptionsItemSelected(item);

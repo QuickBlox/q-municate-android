@@ -44,7 +44,9 @@ public abstract class BaseFriendsListActivity extends BaseLoggableActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                performDone();
+                if (checkNetworkAvailableWithError()) {
+                    performDone();
+                }
                 break;
             default:
                 super.onOptionsItemSelected(item);

@@ -1,13 +1,12 @@
 package com.quickblox.q_municate.ui.adapters.base;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.listeners.OnRecycleItemClickListener;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -20,7 +19,7 @@ import java.util.List;
 public abstract class BaseRecyclerViewAdapter<T, VH extends BaseClickListenerViewHolder> extends RecyclerView.Adapter<VH> {
 
     private List<T> objectsList;
-    protected final Context context;
+    protected final BaseActivity baseActivity;
     protected final LayoutInflater layoutInflater;
     protected final Resources resources;
     protected QBUser currentQbUser;
@@ -28,15 +27,15 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends BaseClickListenerVie
     // Package private because we need access in BaseViewHolder but not in child classes
     OnRecycleItemClickListener<T> onRecycleItemClickListener;
 
-    public BaseRecyclerViewAdapter(Activity activity) {
-        this.context = activity;
-        this.layoutInflater = LayoutInflater.from(context);
-        resources = context.getResources();
+    public BaseRecyclerViewAdapter(BaseActivity baseActivity) {
+        this.baseActivity = baseActivity;
+        this.layoutInflater = LayoutInflater.from(baseActivity);
+        resources = baseActivity.getResources();
         objectsList = new ArrayList<>();
     }
 
-    public BaseRecyclerViewAdapter(Activity activity, List<T> objectsList) {
-        this(activity);
+    public BaseRecyclerViewAdapter(BaseActivity baseActivity, List<T> objectsList) {
+        this(baseActivity);
         this.objectsList = objectsList;
         currentQbUser = AppSession.getSession().getUser();
     }

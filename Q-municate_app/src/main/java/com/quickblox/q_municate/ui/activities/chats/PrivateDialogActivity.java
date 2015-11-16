@@ -32,11 +32,10 @@ import com.quickblox.q_municate_db.models.User;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
-import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
-public class PrivateDialogActivity extends BaseDialogActivity /*implements ReceiveFileFromBitmapTask.ReceiveFileListener*/ {
+public class PrivateDialogActivity extends BaseDialogActivity {
 
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
@@ -59,7 +58,9 @@ public class PrivateDialogActivity extends BaseDialogActivity /*implements Recei
             finish();
         }
 
-        deleteTempMessages();
+        if (isNetworkAvailable()) {
+            deleteTempMessages();
+        }
 
         addObservers();
 
@@ -101,7 +102,9 @@ public class PrivateDialogActivity extends BaseDialogActivity /*implements Recei
     protected void onResume() {
         super.onResume();
 
-        startLoadDialogMessages();
+        if (isNetworkAvailable()) {
+            startLoadDialogMessages();
+        }
 
         checkMessageSendingPossibility();
     }
@@ -121,17 +124,6 @@ public class PrivateDialogActivity extends BaseDialogActivity /*implements Recei
         onConnectServiceLocally();
         setOnlineStatus(opponentUser);
     }
-
-//    @Override
-//    protected void onFileSelected(Uri originalUri, boolean fromCamera) {
-//        Bitmap bitmap = imageUtils.getBitmap(originalUri);
-//        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
-//    }
-//
-//    @Override
-//    protected void onFileSelected(Bitmap bitmap, boolean fromCamera) {
-//        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
-//    }
 
     @Override
     protected void onFileLoaded(QBFile file) {
@@ -208,15 +200,6 @@ public class PrivateDialogActivity extends BaseDialogActivity /*implements Recei
         }
     }
 
-//    @Override
-//    public void onCachedImageFileReceived(File file) {
-//        startLoadAttachFile(file);
-//    }
-//
-//    @Override
-//    public void onAbsolutePathExtFileReceived(String absolutePath) {
-//    }
-
     public void sendMessage(View view) {
         sendMessage(true);
     }
@@ -256,13 +239,6 @@ public class PrivateDialogActivity extends BaseDialogActivity /*implements Recei
 //        }
     }
 
-    private void checkMessageSendingPossibility() {
-        boolean isFriend = dataManager.getFriendDataManager().existsByUserId(opponentUser.getUserId());
-        messageEditText.setEnabled(isFriend);
-        smilePanelImageButton.setEnabled(isFriend);
-        attachButton.setEnabled(isFriend);
-    }
-
     private void acceptUser(final int userId) {
         showProgress();
         QBAcceptFriendCommand.start(this, userId);
@@ -270,6 +246,11 @@ public class PrivateDialogActivity extends BaseDialogActivity /*implements Recei
 
     private void rejectUser(final int userId) {
         showRejectUserDialog(userId);
+    }
+
+    private void checkMessageSendingPossibility() {
+        boolean enable = dataManager.getFriendDataManager().existsByUserId(opponentUser.getUserId()) && isNetworkAvailable();
+        super.checkMessageSendingPossibility(enable);
     }
 
     private void showRejectUserDialog(final int userId) {

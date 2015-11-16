@@ -2,8 +2,6 @@ package com.quickblox.q_municate.ui.activities.chats;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -24,10 +22,9 @@ import com.quickblox.q_municate_db.models.User;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
-import java.io.File;
 import java.util.ArrayList;
 
-public class GroupDialogActivity extends BaseDialogActivity /*implements ReceiveFileFromBitmapTask.ReceiveFileListener*/ {
+public class GroupDialogActivity extends BaseDialogActivity {
 
     public static void start(Context context, ArrayList<User> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
@@ -51,8 +48,9 @@ public class GroupDialogActivity extends BaseDialogActivity /*implements Receive
             finish();
         }
 
-        deleteTempMessages();
-        startLoadDialogMessages();
+        if (isNetworkAvailable()) {
+            deleteTempMessages();
+        }
 
         initMessagesRecyclerView();
     }
@@ -67,7 +65,8 @@ public class GroupDialogActivity extends BaseDialogActivity /*implements Receive
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
         messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
-        messagesRecyclerView.addItemDecoration(new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+        messagesRecyclerView.addItemDecoration(
+                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
 
         scrollMessagesToBottom();
@@ -77,17 +76,19 @@ public class GroupDialogActivity extends BaseDialogActivity /*implements Receive
     protected void onResume() {
         super.onResume();
         updateData();
-        startLoadDialogMessages();
+
+        if (isNetworkAvailable()) {
+            startLoadDialogMessages();
+        }
+
+        checkMessageSendingPossibility(isNetworkAvailable());
     }
 
-    protected void updateActionBar() {
-        setActionBarTitle(dialog.getTitle());
-
-        if (!TextUtils.isEmpty(dialog.getPhoto())) {
-            loadActionBarLogo(dialog.getPhoto());
-        } else {
-            setDefaultActionBarLogo(R.drawable.placeholder_group);
-        }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.group_dialog_menu, menu);
+        return true;
     }
 
     @Override
@@ -102,17 +103,6 @@ public class GroupDialogActivity extends BaseDialogActivity /*implements Receive
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-//    @Override
-//    protected void onFileSelected(Uri originalUri, boolean fromCamera) {
-//        Bitmap bitmap = imageUtils.getBitmap(originalUri);
-//        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
-//    }
-//
-//    @Override
-//    protected void onFileSelected(Bitmap bitmap, boolean fromCamera) {
-//        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
-//    }
 
     @Override
     protected void onFileLoaded(QBFile file) {
@@ -138,24 +128,18 @@ public class GroupDialogActivity extends BaseDialogActivity /*implements Receive
         checkForScrolling(oldMessagesCount);
     }
 
-//    @Override
-//    public void onCachedImageFileReceived(File file) {
-//        startLoadAttachFile(file);
-//    }
-//
-//    @Override
-//    public void onAbsolutePathExtFileReceived(String absolutePath) {
-//    }
+    protected void updateActionBar() {
+        setActionBarTitle(dialog.getTitle());
+
+        if (!TextUtils.isEmpty(dialog.getPhoto())) {
+            loadActionBarLogo(dialog.getPhoto());
+        } else {
+            setDefaultActionBarLogo(R.drawable.placeholder_group);
+        }
+    }
 
     public void sendMessage(View view) {
         sendMessage(false);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.group_dialog_menu, menu);
-        return true;
     }
 
     @Override

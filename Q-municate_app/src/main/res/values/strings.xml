@@ -224,6 +224,7 @@
     <string name="fdb_write_email">Write an Email</string>
 
     <!-- Dialog Messages -->
+    <string name="dlg_internet_connection_is_missing">Waiting for connection</string>
     <string name="dlg_select_image_from">Select image from…</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>

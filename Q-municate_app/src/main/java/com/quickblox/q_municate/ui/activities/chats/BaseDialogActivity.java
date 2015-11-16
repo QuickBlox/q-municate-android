@@ -530,8 +530,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
-        dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils.readAllDialogNotification(
-                dialogNotificationsList, AppSession.getSession().getUser()));
+        dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils
+                .readAllDialogNotification(dialogNotificationsList, AppSession.getSession().getUser()));
     }
 
     private void createChatLocally() {
@@ -572,6 +572,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
             showSmileLayout();
         }
+    }
+
+    protected void checkMessageSendingPossibility(boolean enable) {
+        messageEditText.setEnabled(enable);
+        smilePanelImageButton.setEnabled(enable);
+        attachButton.setEnabled(enable);
     }
 
     protected abstract void updateActionBar();

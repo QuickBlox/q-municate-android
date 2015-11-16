@@ -57,7 +57,9 @@ public class LoginActivity extends BaseAuthActivity {
                 startLandingScreen();
                 break;
             case R.id.action_done:
-                login();
+                if (checkNetworkAvailableWithError()) {
+                    login();
+                }
                 break;
             default:
                 super.onOptionsItemSelected(item);

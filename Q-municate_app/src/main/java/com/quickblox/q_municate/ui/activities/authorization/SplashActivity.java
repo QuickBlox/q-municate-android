@@ -33,8 +33,14 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
         // TODO temp. ONLY FOR TEST WITHOUT TESTERS
         //        Crashlytics.start(this);
 
-        LoginHelper loginHelper = new LoginHelper(this, this);
-        loginHelper.checkStartExistSession();
+        if (isNetworkAvailable()) {
+            LoginHelper loginHelper = new LoginHelper(this, this);
+            loginHelper.checkStartExistSession();
+        } else if (LoginHelper.isCorrectOldAppSession()) {
+            startMainActivity();
+        } else {
+            startLandingActivity();
+        }
     }
 
     @Override
@@ -54,6 +60,11 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
     @Override
     public void onStartSessionFail() {
         startLandingActivity();
+    }
+
+    @Override
+    protected void checkShowingConnectionError() {
+        // nothing. Toolbar is missing.
     }
 
     private void startLandingActivity() {

@@ -17,6 +17,7 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
@@ -56,10 +57,10 @@ public abstract class BaseDialogMessagesAdapter
 
     private FileUtils fileUtils;
 
-    public BaseDialogMessagesAdapter(Activity activity, List<CombinationMessage> objectsList) {
-        super(activity, objectsList);
+    public BaseDialogMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> objectsList) {
+        super(baseActivity, objectsList);
         dataManager = DataManager.getInstance();
-        imageUtils = new ImageUtils(activity);
+        imageUtils = new ImageUtils(baseActivity);
         colorUtils = new ColorUtils();
         fileUtils = new FileUtils();
         currentUser = AppSession.getSession().getUser();
@@ -260,7 +261,7 @@ public abstract class BaseDialogMessagesAdapter
                 @Override
                 public void onClick(View view) {
                     view.startAnimation(
-                            AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
+                            AnimationUtils.loadAnimation(baseActivity, R.anim.chat_attached_file_click));
                     //                    new ReceiveFileFromBitmapTask(BaseDialogMessagesAdapter.this).execute(imageUtils, loadedImageBitmap, false);
                 }
             };

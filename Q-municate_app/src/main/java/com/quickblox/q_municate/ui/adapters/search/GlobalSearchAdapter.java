@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.adapters.search;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseFilterAdapter;
@@ -28,15 +28,13 @@ import butterknife.Bind;
 
 public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListenerViewHolder<User>> {
 
-    private Resources resources;
     private DataManager dataManager;
     private UserType userType;
     private UserOperationListener userOperationListener;
     private QBFriendListHelper friendListHelper;
 
-    public GlobalSearchAdapter(Activity activity, List<User> list) {
-        super(activity, list);
-        resources = context.getResources();
+    public GlobalSearchAdapter(BaseActivity baseActivity, List<User> list) {
+        super(baseActivity, list);
         dataManager = DataManager.getInstance();
         userType = UserType.LOCAl;
     }
@@ -70,7 +68,7 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
         initListeners(holder, user.getUserId());
 
         if (!TextUtils.isEmpty(query)) {
-            TextViewHelper.changeTextColorView(context, holder.fullNameTextView, query);
+            TextViewHelper.changeTextColorView(baseActivity, holder.fullNameTextView, query);
         }
     }
 

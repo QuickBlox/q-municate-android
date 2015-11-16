@@ -157,7 +157,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                 startAddFriendsActivity();
                 break;
             case R.id.action_leave:
-                showLeaveGroupDialog();
+                if (checkNetworkAvailableWithError()) {
+                    showLeaveGroupDialog();
+                }
                 break;
             default:
                 super.onOptionsItemSelected(item);
@@ -496,7 +498,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         @Override
         public void onAddUserClicked(int userId) {
-            addToFriendList(userId);
+            if (checkNetworkAvailableWithError()) {
+                addToFriendList(userId);
+            }
         }
     }
 

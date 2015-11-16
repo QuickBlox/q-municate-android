@@ -93,7 +93,9 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
                 startLandingScreen();
                 break;
             case R.id.action_done:
-                signUp();
+                if (checkNetworkAvailableWithError()) {
+                    signUp();
+                }
                 break;
             default:
                 super.onOptionsItemSelected(item);

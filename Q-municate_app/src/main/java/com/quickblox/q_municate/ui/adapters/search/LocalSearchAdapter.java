@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.adapters.search;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
@@ -10,6 +9,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseFilterAdapter;
@@ -33,12 +33,10 @@ import butterknife.Bind;
 
 public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListenerViewHolder<Dialog>> {
 
-    private Resources resources;
     private DataManager dataManager;
 
-    public LocalSearchAdapter(Activity activity, List<Dialog> list) {
-        super(activity, list);
-        resources = context.getResources();
+    public LocalSearchAdapter(BaseActivity baseActivity, List<Dialog> list) {
+        super(baseActivity, list);
         dataManager = DataManager.getInstance();
     }
 
@@ -65,7 +63,7 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
         if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
             User currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
             User opponentUser = ChatUtils.getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
-            label = context.getString(R.string.last_seen,
+            label = baseActivity.getString(R.string.last_seen,
                     DateUtils.toTodayYesterdayShortDateWithoutYear2(opponentUser.getLastLogin()),
                     DateUtils.formatDateSimpleTime(opponentUser.getLastLogin()));
 
@@ -87,7 +85,7 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
         viewHolder.labelTextView.setText(label);
 
         if (!TextUtils.isEmpty(query)) {
-            TextViewHelper.changeTextColorView(context, viewHolder.titleTextView, query);
+            TextViewHelper.changeTextColorView(baseActivity, viewHolder.titleTextView, query);
         }
     }
 

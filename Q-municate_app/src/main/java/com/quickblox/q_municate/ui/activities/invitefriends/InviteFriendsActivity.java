@@ -35,6 +35,8 @@ import butterknife.Bind;
 
 import static butterknife.ButterKnife.findById;
 
+// TODO need to refactor
+@Deprecated
 public class InviteFriendsActivity extends BaseLoggableActivity implements CounterChangedListener {
 
     @Bind(R.id.friends_listview)
@@ -154,7 +156,9 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_next:
-                performActionNext();
+                if (checkNetworkAvailableWithError()) {
+                    performActionNext();
+                }
                 break;
             default:
                 return super.onOptionsItemSelected(item);

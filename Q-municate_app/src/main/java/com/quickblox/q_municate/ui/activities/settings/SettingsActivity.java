@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.changepassword.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
@@ -115,16 +114,19 @@ public class SettingsActivity extends BaseLoggableActivity {
 
     @OnClick(R.id.logout_button)
     void logout() {
-        TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dlg_logout, R.string.dlg_confirm,
-                new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                        showProgress();
-                        FacebookHelper.logout();
-                        QBLogoutCompositeCommand.start(SettingsActivity.this);
-                    }
-                });
+        if (checkNetworkAvailableWithError()) {
+            TwoButtonsDialogFragment
+                    .show(getSupportFragmentManager(), R.string.dlg_logout, R.string.dlg_confirm,
+                            new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    super.onPositive(dialog);
+                                    showProgress();
+                                    FacebookHelper.logout();
+                                    QBLogoutCompositeCommand.start(SettingsActivity.this);
+                                }
+                            });
+        }
     }
 
     @OnClick(R.id.delete_my_account_button)
@@ -164,12 +166,6 @@ public class SettingsActivity extends BaseLoggableActivity {
         removeAction(QBServiceConsts.LOGOUT_FAIL_ACTION);
 
         updateBroadcastActionList();
-    }
-
-    private void startLandingScreen() {
-        Intent intent = new Intent(this, LandingActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        LandingActivity.start(this, intent);
     }
 
     private class LogoutSuccessAction implements Command {

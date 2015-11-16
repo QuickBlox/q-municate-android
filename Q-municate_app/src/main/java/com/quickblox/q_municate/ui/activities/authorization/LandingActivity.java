@@ -49,7 +49,9 @@ public class LandingActivity extends BaseAuthActivity {
 
     @OnClick(R.id.facebook_connect_button)
     void facebookConnect(View view) {
-        facebookConnect();
+        if (checkNetworkAvailableWithError()) {
+            facebookConnect();
+        }
     }
 
     @OnClick(R.id.sign_up_email_button)
@@ -69,6 +71,11 @@ public class LandingActivity extends BaseAuthActivity {
         } else {
             startSignUpActivity();
         }
+    }
+
+    @Override
+    protected void checkShowingConnectionError() {
+        // nothing. Toolbar is missing.
     }
 
     private void startSignUpActivity() {

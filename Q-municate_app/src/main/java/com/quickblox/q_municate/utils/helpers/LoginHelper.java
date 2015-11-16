@@ -136,6 +136,11 @@ public class LoginHelper {
         LocalBroadcastManager.getInstance(context).unregisterReceiver(commandBroadcastReceiver);
     }
 
+    public static boolean isCorrectOldAppSession() {
+        AppSession.load();
+        return AppSession.getSession().getUser() != null && AppSession.getSession().getUser().getId() != 0;
+    }
+
     private void registerCommandBroadcastReceiver() {
         IntentFilter intentFilter = new IntentFilter();
 
