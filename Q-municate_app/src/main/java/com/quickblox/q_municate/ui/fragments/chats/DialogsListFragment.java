@@ -103,10 +103,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         super.initActionBar();
         actionBarBridge.setActionBarUpButtonEnabled(false);
 
-        // HACK
-        actionBarBridge.setActionBarTitle(" " + qbUser.getFullName());
-
-        checkVisibilityUserIcon();
+        if (baseActivity.isNetworkAvailable()) {
+            actionBarBridge.setActionBarTitle(" " + qbUser.getFullName());
+            checkVisibilityUserIcon();
+        }
     }
 
     private void initFields() {

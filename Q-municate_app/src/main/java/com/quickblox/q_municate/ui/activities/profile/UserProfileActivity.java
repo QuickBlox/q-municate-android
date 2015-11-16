@@ -137,14 +137,18 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
     @OnClick(R.id.delete_chat_history_button)
     void deleteChatHistory(View view) {
-        removeContactAndChatHistory = false;
-        showRemoveChatHistoryDialog();
+        if (checkNetworkAvailableWithError()) {
+            removeContactAndChatHistory = false;
+            showRemoveChatHistoryDialog();
+        }
     }
 
     @OnClick(R.id.remove_contact_and_chat_history_button)
     void removeContactAndChatHistory(View view) {
-        removeContactAndChatHistory = true;
-        showRemoveContactAndChatHistoryDialog();
+        if (checkNetworkAvailableWithError()) {
+            removeContactAndChatHistory = true;
+            showRemoveContactAndChatHistoryDialog();
+        }
     }
 
     private void addObservers() {
