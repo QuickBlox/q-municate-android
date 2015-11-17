@@ -72,7 +72,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton();
+        setUpActionBarWithUpButton(getString(R.string.profile_title));
 
         initFields();
         initData();

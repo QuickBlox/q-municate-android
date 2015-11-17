@@ -27,8 +27,7 @@ public class UserAgreementActivity extends BaseActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setUpActionBarWithUpButton();
+        setUpActionBarWithUpButton(getString(R.string.user_agreement_title));
         initUserAgreementWebView();
     }
 

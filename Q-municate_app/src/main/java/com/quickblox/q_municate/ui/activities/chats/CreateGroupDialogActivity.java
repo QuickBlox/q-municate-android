@@ -75,6 +75,12 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        setUpActionBarWithUpButton(getString(R.string.create_group_title));
+    }
+
+    @Override
     protected FriendsAdapter getFriendsAdapter() {
         return new FriendsAdapter(this, friendsList, false);
     }

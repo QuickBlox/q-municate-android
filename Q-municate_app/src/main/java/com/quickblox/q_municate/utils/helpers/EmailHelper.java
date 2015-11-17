@@ -33,14 +33,14 @@ public class EmailHelper {
     public static void sendFeedbackEmail(Context context, String feedbackType) {
         Resources resources = context.getResources();
         Intent intentEmail = new Intent(Intent.ACTION_SEND);
-        intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{resources.getText(R.string.fdb_support_email)
+        intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{resources.getText(R.string.feedback_support_email)
                 .toString()});
         intentEmail.putExtra(Intent.EXTRA_SUBJECT, feedbackType);
         intentEmail.putExtra(Intent.EXTRA_TEXT,
                 (java.io.Serializable) DeviceInfoUtils.getDeviseInfoForFeedback(context));
         intentEmail.setType(ConstsCore.TYPE_OF_EMAIL);
         context.startActivity(Intent.createChooser(intentEmail, resources.getText(
-                R.string.fdb_choose_email_provider)));
+                R.string.feedback_choose_email_provider)));
     }
 
     public static List<InviteFriend> getContactsWithEmail(Context context) {

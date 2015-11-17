@@ -130,10 +130,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setUpActionBarWithUpButton();
-
         initFields();
+
+        setUpActionBarWithUpButton(null);
+
         initCustomUI();
         initCustomListeners();
 
@@ -583,10 +583,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected abstract void updateActionBar();
 
     protected abstract void onConnectServiceLocally(QBService service);
-
-//    protected abstract void onFileSelected(Uri originalUri, boolean fromCamera);
-//
-//    protected abstract void onFileSelected(Bitmap bitmap, boolean fromCamera);
 
     protected abstract Bundle generateBundleToInitDialog();
 

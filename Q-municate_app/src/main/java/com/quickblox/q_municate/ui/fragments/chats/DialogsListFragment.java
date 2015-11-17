@@ -103,10 +103,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         super.initActionBar();
         actionBarBridge.setActionBarUpButtonEnabled(false);
 
-        if (baseActivity.isNetworkAvailable()) {
-            actionBarBridge.setActionBarTitle(" " + qbUser.getFullName());
-            checkVisibilityUserIcon();
-        }
+        checkVisibilityUserIcon();
     }
 
     private void initFields() {
@@ -192,6 +189,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         if (dialogsListAdapter != null) {
             dialogsListAdapter.notifyDataSetChanged();
         }
+
+        updateToolbarTitle();
     }
 
     @Override
@@ -217,6 +216,18 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
                 groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
             }
         }
+    }
+
+    @Override
+    protected Loader<List<Dialog>> createDataLoader() {
+        return new DialogsListLoader(getActivity(), dataManager);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Dialog>> loader, List<Dialog> dialogsList) {
+        dialogsListAdapter.setNewData(dialogsList);
+        dialogsListAdapter.notifyDataSetChanged();
+        checkEmptyList(dialogsList.size());
     }
 
     private void checkVisibilityEmptyLabel() {
@@ -310,16 +321,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         baseActivity.setCurrentFragment(SearchFragment.newInstance());
     }
 
-    @Override
-    protected Loader<List<Dialog>> createDataLoader() {
-        return new DialogsListLoader(getActivity(), dataManager);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<Dialog>> loader, List<Dialog> dialogsList) {
-        dialogsListAdapter.setNewData(dialogsList);
-        dialogsListAdapter.notifyDataSetChanged();
-        checkEmptyList(dialogsList.size());
+    private void updateToolbarTitle() {
+        actionBarBridge.setActionBarTitle(" " + qbUser.getFullName());
+        baseActivity.checkShowingConnectionError();
     }
 
     private static class DialogsListLoader extends BaseLoader<List<Dialog>> {

@@ -62,8 +62,7 @@ public class SettingsActivity extends BaseLoggableActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setUpActionBarWithUpButton();
+        setUpActionBarWithUpButton(getString(R.string.settings_title));
 
         initFields();
 

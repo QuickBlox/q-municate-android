@@ -33,7 +33,7 @@ public class FeedbackActivity extends BaseLoggableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton();
+        setUpActionBarWithUpButton(getString(R.string.feedback_title));
     }
 
     @Override

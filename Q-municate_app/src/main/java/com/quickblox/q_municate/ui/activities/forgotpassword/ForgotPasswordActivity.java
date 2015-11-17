@@ -42,7 +42,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton();
+        setUpActionBarWithUpButton(getString(R.string.forgot_password_title));
         addActions();
     }
 

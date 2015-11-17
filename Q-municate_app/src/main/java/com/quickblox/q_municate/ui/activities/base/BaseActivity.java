@@ -106,6 +106,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
+    private String toolbarTitle;
+    private String tempToolbarTitle;
 
     protected abstract int getContentResId();
 
@@ -114,9 +116,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         super.onCreate(savedInstanceState);
         setContentView(getContentResId());
 
-        activateButterKnife();
-
         initFields();
+
+        activateButterKnife();
     }
 
     @Override
@@ -142,9 +144,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
-    protected void setUpActionBarWithUpButton() {
+    protected void setUpActionBarWithUpButton(String toolbarTitle) {
         initActionBar();
         setActionBarUpButtonEnabled(true);
+        setActionBarTitle(toolbarTitle);
     }
 
     @Override
@@ -160,6 +163,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void setActionBarTitle(String title) {
+        toolbarTitle = title;
         if (actionBar != null) {
             actionBar.setTitle(title);
         }
@@ -248,7 +252,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void createSnackBar(int titleResId, int duration) {
-        snackbar = Snackbar.make(snackBarView, titleResId, duration);
+        if (snackBarView != null) {
+            snackbar = Snackbar.make(snackBarView, titleResId, duration);
+        }
     }
 
     @Override
@@ -290,7 +296,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         registerBroadcastReceivers();
         updateBroadcastActionList();
 
-        addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
+        addActions();
 
         NotificationManagerHelper.clearNotificationEvent(this);
 
@@ -412,6 +418,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         localBroadcastManager.unregisterReceiver(networkBroadcastReceiver);
     }
 
+    private void addActions() {
+        addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
+        updateBroadcastActionList();
+    }
+
     private void navigateToParent() {
         Intent intent = NavUtils.getParentActivityIntent(this);
         if (intent == null) {
@@ -421,9 +432,18 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
-    protected void checkShowingConnectionError() {
+    public void checkShowingConnectionError() {
+        String toolbarTitleWithConnectionError = getString(R.string.dlg_internet_connection_is_missing);
         if (!isNetworkAvailable()) {
-            setActionBarTitle(R.string.dlg_internet_connection_is_missing);
+            if (!toolbarTitle.equals(toolbarTitleWithConnectionError)) {
+                tempToolbarTitle = toolbarTitle;
+                setActionBarTitle(toolbarTitleWithConnectionError);
+            }
+        } else {
+            if (toolbarTitleWithConnectionError.equals(toolbarTitle)
+                    && tempToolbarTitle != null && !tempToolbarTitle.equals(toolbarTitle)) {
+                setActionBarTitle(tempToolbarTitle);
+            }
         }
     }
 
@@ -635,7 +655,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
-    private class LoginChatCompositeSuccessAction implements Command {
+    public class LoginChatCompositeSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
@@ -643,7 +663,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
-    private class LoadChatsSuccessAction implements Command {
+    public class LoadChatsSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
@@ -668,22 +688,23 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             boolean activeConnection = intent
                     .getBooleanExtra(NetworkChangeReceiver.EXTRA_IS_ACTIVE_CONNECTION, false);
 
-            if (activeConnection && !loggedIn) {
-                loggedIn = true;
+            if (activeConnection) {
+                setActionBarTitle(tempToolbarTitle);
 
-                LoginHelper loginHelper = new LoginHelper(BaseActivity.this);
-                loginHelper.makeGeneralLogin(new GlobalLoginListener());
+                if (!loggedIn && LoginHelper.isCorrectOldAppSession()) {
+                    loggedIn = true;
 
-                addActions();
+                    LoginHelper loginHelper = new LoginHelper(BaseActivity.this);
+                    loginHelper.makeGeneralLogin(new GlobalLoginListener());
 
-                hideSnackBar();
+                    addActions();
+                }
             }
         }
 
         private void addActions() {
             addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
-            addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION,
-                    new LoginChatCompositeSuccessAction());
+            addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
             updateBroadcastActionList();
         }
     }
@@ -693,7 +714,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         @Override
         public void onReceive(Context context, final Intent intent) {
             String action = intent.getAction();
-            if (intent != null && (action) != null) {
+            if (action != null) {
                 Log.d("STEPS", "executing " + action);
                 final Set<Command> commandSet = broadcastCommandMap.get(action);
 

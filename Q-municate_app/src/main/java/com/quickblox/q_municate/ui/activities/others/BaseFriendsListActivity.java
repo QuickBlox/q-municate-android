@@ -29,7 +29,6 @@ public abstract class BaseFriendsListActivity extends BaseLoggableActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        setUpActionBarWithUpButton();
         initFields();
         initRecyclerView();
     }

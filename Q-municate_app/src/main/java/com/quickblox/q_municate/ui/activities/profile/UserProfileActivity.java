@@ -73,8 +73,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setUpActionBarWithUpButton();
+        setUpActionBarWithUpButton(getString(R.string.user_profile_title));
 
         initFields();
         initUIWithUsersData();

@@ -66,8 +66,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setUpActionBarWithUpButton();
+        setUpActionBarWithUpButton(getString(R.string.invite_friends_title));
 
         initFields(savedInstanceState);
         initCustomUI();

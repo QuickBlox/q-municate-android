@@ -63,7 +63,7 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
     }
 
     @Override
-    protected void checkShowingConnectionError() {
+    public void checkShowingConnectionError() {
         // nothing. Toolbar is missing.
     }
 

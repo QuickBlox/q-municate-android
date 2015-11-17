@@ -37,6 +37,7 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
     @Override
     protected void onStart() {
         super.onStart();
+        setUpActionBarWithUpButton(getString(R.string.new_group_title));
         initCustomListeners();
     }
 

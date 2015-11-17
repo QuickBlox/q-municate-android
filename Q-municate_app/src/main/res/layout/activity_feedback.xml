@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="@string/fdb_feedback_label"
+                android:text="@string/feedback_label"
                 android:textColor="@color/dark_gray"
                 android:textSize="@dimen/text_size" />
 
@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:padding="10dp"
-                    android:text="@string/fdb_bug_type"
+                    android:text="@string/feedback_bug_type"
                     android:textSize="@dimen/text_size" />
 
                 <RadioButton
@@ -49,7 +49,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="@string/fdb_improvement_type"
+                    android:text="@string/feedback_improvement_type"
                     android:textSize="@dimen/text_size" />
 
                 <RadioButton
@@ -57,7 +57,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="@string/fdb_suggestion_type"
+                    android:text="@string/feedback_suggestion_type"
                     android:textSize="@dimen/text_size" />
 
             </RadioGroup>

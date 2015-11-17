@@ -11,7 +11,6 @@ import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.listeners.OnRecycleItemClickListener;
 import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBAddFriendsToGroupCommand;
@@ -52,6 +51,7 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        setUpActionBarWithUpButton(getString(R.string.add_friends_to_group_title));
         initCustomListeners();
     }
 

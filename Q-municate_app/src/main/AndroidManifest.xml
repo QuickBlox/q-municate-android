@@ -43,13 +43,11 @@
         <activity
             android:name=".ui.activities.authorization.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/auth_login_title"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.authorization.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/auth_sign_up_title"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
@@ -63,22 +61,18 @@
         <activity
             android:name=".ui.activities.settings.SettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/action_bar_settings"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.invitefriends.InviteFriendsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/action_bar_invite_friends"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.feedback.FeedbackActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/action_bar_feedback"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.profile.UserProfileActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/user_profile_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.call.CallActivity"
@@ -86,19 +80,16 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.chats.NewMessageActivity"
-            android:label="@string/new_message_title"
             android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ui.activities.chats.NewGroupDialogActivity"
-            android:label="@string/new_group_title"
             android:noHistory="true"
             android:screenOrientation="portrait">/>
         </activity>
         <activity
             android:name=".ui.activities.chats.CreateGroupDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/create_group_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.chats.PrivateDialogActivity"
@@ -113,31 +104,25 @@
         <activity
             android:name=".ui.activities.chats.GroupDialogDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/gdd_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.profile.MyProfileActivity"
-            android:label="@string/profile_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.chats.AddFriendsToGroupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/add_friends_to_group_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.changepassword.ChangePasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/change_password_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.forgotpassword.ForgotPasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/forgot_password_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.agreements.UserAgreementActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/user_agreement_title"
             android:screenOrientation="portrait" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 

@@ -74,8 +74,8 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setUpActionBarWithUpButton(getString(R.string.auth_sign_up_title));
 
-        setUpActionBarWithUpButton();
         initFields(savedInstanceState);
     }
 

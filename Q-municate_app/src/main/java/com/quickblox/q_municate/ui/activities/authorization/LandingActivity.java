@@ -74,7 +74,7 @@ public class LandingActivity extends BaseAuthActivity {
     }
 
     @Override
-    protected void checkShowingConnectionError() {
+    public void checkShowingConnectionError() {
         // nothing. Toolbar is missing.
     }
 

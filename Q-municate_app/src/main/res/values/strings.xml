@@ -116,7 +116,17 @@
     </string-array>
 
 
+    <!-- Group Dialog Details -->
+    <string name="dialog_details_title">Group Details</string>
+    <string name="dialog_details_leave_group">Leave group</string>
+    <string name="dialog_details_participants">%1$d participants</string>
+    <string name="dialog_details_online_participants">%1$d/%2$d online</string>
+    <string name="dialog_details_name_not_entered">Please fill group name</string>
+    <string name="dialog_details_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
+
+
     <!-- Settings -->
+    <string name="settings_title">Settings</string>
     <string name="settings_profile">Profile</string>
     <string name="settings_logout">Logout</string>
     <string name="settings_change_password">Change Password</string>
@@ -147,6 +157,20 @@
     <string name="profile_full_name_and_photo_not_changed">Full Name or Photo must be changed</string>
 
 
+    <!-- Feedback -->
+    <string name="feedback_title">Feedback Description</string>
+    <string name="feedback_label">
+        In your email please provide the steps of bug/error reproduction. Let us know how often it occurs and if it gives any error code.
+        This information will help us to find the source of the issue. Kindly give us as many details as possible. Thank you.
+    </string>
+    <string name="feedback_bug_type">Bug</string>
+    <string name="feedback_improvement_type">Improvement</string>
+    <string name="feedback_suggestion_type">Suggestion</string>
+    <string name="feedback_support_email">q-municate@quickblox.com</string>
+    <string name="feedback_choose_email_provider">Choose an email provider:</string>
+    <string name="feedback_write_email">Write an Email</string>
+
+
     // NOT REFACTORED YET
 
     <!-- Friend List -->
@@ -174,14 +198,6 @@
     <string name="dlgs_ctx_menu_remove">Delete dialog</string>
     <string name="dlgs_loading_dialogs">Checking dialogs… Please wait</string>
 
-    <!-- Group Dialog Details -->
-    <string name="gdd_title">Group Details</string>
-    <string name="gdd_leave_group">Leave group</string>
-    <string name="gdd_participants">%1$d participants</string>
-    <string name="gdd_online_participants">%1$d/%2$d online</string>
-    <string name="gdd_name_not_entered">Please fill group name</string>
-    <string name="gdd_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
-
     <!-- Dialog messages -->
     <string name="glgm_snackbar_new_message_title">%1$s\nMessage: %2$s</string>
     <string name="glgm_snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
@@ -193,6 +209,7 @@
     <string name="pref_title_media">Media</string>
 
     <!-- Invite Friends -->
+    <string name="invite_friends_title">Invite Friends</string>
     <string name="inf_header_label">Let your other friends know about \n Q-municate by sending them private invitations</string>
     <string name="inf_select_from_facebook">From Facebook</string>
     <string name="inf_select_from_contacts">From Contacts</string>
@@ -209,19 +226,6 @@
     <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
     <string name="inf_fb_wall_param_place">155021662189</string>
     <string name="inf_fb_request_canceled">Request cancelled</string>
-
-    <!-- Feedback -->
-    <string name="fdb_feedback_title">Feedback Description</string>
-    <string name="fdb_feedback_label">
-        In your email please provide the steps of bug/error reproduction. Let us know how often it occurs and if it gives any error code.
-        This information will help us to find the source of the issue. Kindly give us as many details as possible. Thank you.
-    </string>
-    <string name="fdb_bug_type">Bug</string>
-    <string name="fdb_improvement_type">Improvement</string>
-    <string name="fdb_suggestion_type">Suggestion</string>
-    <string name="fdb_support_email">q-municate@quickblox.com</string>
-    <string name="fdb_choose_email_provider">Choose an email provider:</string>
-    <string name="fdb_write_email">Write an Email</string>
 
     <!-- Dialog Messages -->
     <string name="dlg_internet_connection_is_missing">Waiting for connection</string>

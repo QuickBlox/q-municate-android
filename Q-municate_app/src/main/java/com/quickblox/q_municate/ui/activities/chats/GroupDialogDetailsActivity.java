@@ -111,8 +111,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setUpActionBarWithUpButton(getString(R.string.dialog_details_title));
 
-        setUpActionBarWithUpButton();
         initFields();
         initListView();
 
@@ -249,7 +249,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         updateCountOnlineFriends();
 
-        occupantsTextView.setText(getString(R.string.gdd_participants, qbDialog.getOccupants().size()));
+        occupantsTextView.setText(getString(R.string.dialog_details_participants, qbDialog.getOccupants().size()));
 
         if (!isNeedUpdateImage) {
             loadAvatar(qbDialog.getPhoto());
@@ -301,7 +301,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         if (friendListHelper != null) {
             countOnlineFriends = ChatUtils.getOnlineDialogOccupantsCount(friendListHelper, qbDialog.getOccupants());
         }
-        onlineOccupantsTextView.setText(getString(R.string.gdd_online_participants, countOnlineFriends,
+        onlineOccupantsTextView.setText(getString(R.string.dialog_details_online_participants, countOnlineFriends,
                 qbDialog.getOccupants().size()));
     }
 
@@ -405,7 +405,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
     private void saveChanges() {
         if (!isUserDataCorrect()) {
-            ToastUtils.longToast(R.string.gdd_name_not_entered);
+            ToastUtils.longToast(R.string.dialog_details_name_not_entered);
             return;
         }
 
