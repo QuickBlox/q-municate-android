@@ -294,8 +294,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected Message parseReceivedMessage(QBChatMessage qbChatMessage) {
-        String dateSentString = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT);
-        long dateSent = dateSentString != null ? Long.parseLong(dateSentString) : qbChatMessage.getDateSent();
+        long dateSent = ChatUtils.getMessageDateSent(qbChatMessage);
         String attachUrl = ChatUtils.getAttachUrlIfExists(qbChatMessage);
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
 

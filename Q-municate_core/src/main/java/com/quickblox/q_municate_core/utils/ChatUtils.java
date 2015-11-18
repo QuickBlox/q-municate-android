@@ -354,8 +354,14 @@ public class ChatUtils {
     }
 
     public static long getMessageDateSent(QBChatMessage qbChatMessage) {
+        long dateSent;
         String dateSentString = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT);
-        return dateSentString != null ? Long.parseLong(dateSentString) : qbChatMessage.getDateSent();
+        try {
+            dateSent = dateSentString != null ? Long.parseLong(dateSentString) : qbChatMessage.getDateSent();
+        } catch (NumberFormatException e) {
+            dateSent = DateUtilsCore.getCurrentTime();
+        }
+        return dateSent;
     }
 
     public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
