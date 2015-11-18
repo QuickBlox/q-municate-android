@@ -149,11 +149,7 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
         }
     }
 
-    private class PageChangeListener implements ViewPager.OnPageChangeListener {
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        }
+    private class PageChangeListener extends ViewPager.SimpleOnPageChangeListener {
 
         @Override
         public void onPageSelected(int position) {
@@ -165,10 +161,6 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
                     searchRadioGroup.check(R.id.global_search_radiobutton);
                     break;
             }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
         }
     }
 }

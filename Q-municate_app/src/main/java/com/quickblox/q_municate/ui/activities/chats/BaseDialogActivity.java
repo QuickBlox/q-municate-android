@@ -132,8 +132,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onCreate(savedInstanceState);
         initFields();
 
-        setUpActionBarWithUpButton(null);
-
         initCustomUI();
         initCustomListeners();
 
@@ -250,6 +248,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onScreenResetPossibilityPerformLogout(boolean canPerformLogout) {
         this.canPerformLogout.set(canPerformLogout);
+    }
+
+    @Override
+    protected void onChatsLoaded() {
+        createChatLocally();
+        checkMessageSendingPossibility();
     }
 
     private void initFields() {
@@ -535,15 +539,17 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void createChatLocally() {
-        if (service != null) {
-            baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
-            if (baseChatHelper != null && dialog != null) {
-                try {
-                    baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
-                            generateBundleToInitDialog());
-                } catch (QBResponseException e) {
-                    ErrorUtils.showError(this, e.getMessage());
-                    finish();
+        if (isNetworkAvailable()) {
+            if (service != null) {
+                baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
+                if (baseChatHelper != null && dialog != null) {
+                    try {
+                        baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+                                generateBundleToInitDialog());
+                    } catch (QBResponseException e) {
+                        ErrorUtils.showError(this, e.getMessage());
+                        finish();
+                    }
                 }
             }
         }
@@ -589,6 +595,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected abstract void updateMessagesList();
 
     protected abstract void onFileLoaded(QBFile file);
+
+    protected abstract void checkMessageSendingPossibility();
 
     public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
 
@@ -713,6 +721,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onRefresh() {
+            if (!isNetworkAvailable()) {
+                messageSwipeRefreshLayout.setRefreshing(false);
+                return;
+            }
+
             if (!loadMore) {
                 loadMore = true;
                 startLoadDialogMessages();

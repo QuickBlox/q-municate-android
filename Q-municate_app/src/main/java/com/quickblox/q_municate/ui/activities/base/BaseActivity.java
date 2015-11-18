@@ -127,29 +127,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         unbindService();
     }
 
-    private void initFields() {
-        app = App.getInstance();
-        appSharedHelper = App.getInstance().getAppSharedHelper();
-        activityUIHelper = new ActivityUIHelper(this);
-        failAction = new FailAction();
-        successAction = new SuccessAction();
-        broadcastReceiver = new BaseBroadcastReceiver();
-        globalBroadcastReceiver = new GlobalBroadcastReceiver();
-        userStatusBroadcastReceiver = new UserStatusBroadcastReceiver();
-        networkBroadcastReceiver = new NetworkBroadcastReceiver();
-        broadcastCommandMap = new HashMap<>();
-        fragmentsStatusChangingSet = new HashSet<>();
-        fragmentsServiceConnectionSet = new HashSet<>();
-        serviceConnection = new QBChatServiceConnection();
-        localBroadcastManager = LocalBroadcastManager.getInstance(this);
-    }
-
-    protected void setUpActionBarWithUpButton(String toolbarTitle) {
-        initActionBar();
-        setActionBarUpButtonEnabled(true);
-        setActionBarTitle(toolbarTitle);
-    }
-
     @Override
     public void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -321,6 +298,29 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return super.onOptionsItemSelected(item);
     }
 
+    private void initFields() {
+        app = App.getInstance();
+        appSharedHelper = App.getInstance().getAppSharedHelper();
+        activityUIHelper = new ActivityUIHelper(this);
+        failAction = new FailAction();
+        successAction = new SuccessAction();
+        broadcastReceiver = new BaseBroadcastReceiver();
+        globalBroadcastReceiver = new GlobalBroadcastReceiver();
+        userStatusBroadcastReceiver = new UserStatusBroadcastReceiver();
+        networkBroadcastReceiver = new NetworkBroadcastReceiver();
+        broadcastCommandMap = new HashMap<>();
+        fragmentsStatusChangingSet = new HashSet<>();
+        fragmentsServiceConnectionSet = new HashSet<>();
+        serviceConnection = new QBChatServiceConnection();
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+    }
+
+    protected void setUpActionBarWithUpButton(String toolbarTitle) {
+        initActionBar();
+        setActionBarUpButtonEnabled(true);
+        setActionBarTitle(toolbarTitle);
+    }
+
     public void addFragmentUserStatusChangingListener(
             UserStatusChangingListener fragmentUserStatusChangingListener) {
         if (fragmentsStatusChangingSet == null) {
@@ -435,7 +435,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     public void checkShowingConnectionError() {
         String toolbarTitleWithConnectionError = getString(R.string.dlg_internet_connection_is_missing);
         if (!isNetworkAvailable()) {
-            if (!toolbarTitle.equals(toolbarTitleWithConnectionError)) {
+            if (!toolbarTitleWithConnectionError.equals(toolbarTitle)) {
                 tempToolbarTitle = toolbarTitle;
                 setActionBarTitle(toolbarTitleWithConnectionError);
             }
@@ -614,11 +614,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         finish();
     }
 
-    private void performLoadChatsSuccessAction(Bundle bundle) {
-        appSharedHelper.saveFirstAuth(false);
-        hideSnackBar();
-    }
-
     private void performLoginChatSuccessAction(Bundle bundle) {
         checkLoadDialogs();
         hideProgress();
@@ -629,6 +624,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             showSnackbar(R.string.dlgs_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
             QBLoadDialogsCommand.start(this);
         }
+    }
+
+    protected void onChatsLoaded() {
+        // nothing by default.
     }
 
     private void activateButterKnife() {
@@ -660,14 +659,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         @Override
         public void execute(Bundle bundle) {
             performLoginChatSuccessAction(bundle);
-        }
-    }
-
-    public class LoadChatsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            performLoadChatsSuccessAction(bundle);
+            onChatsLoaded();
         }
     }
 
@@ -703,7 +695,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
 
         private void addActions() {
-            addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
             addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
             updateBroadcastActionList();
         }

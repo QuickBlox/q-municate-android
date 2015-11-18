@@ -48,17 +48,13 @@ public class GroupDialogActivity extends BaseDialogActivity {
             finish();
         }
 
+        setUpActionBarWithUpButton(dialog.getTitle());
+
         if (isNetworkAvailable()) {
             deleteTempMessages();
         }
 
         initMessagesRecyclerView();
-    }
-
-    private void initFields() {
-        chatHelperIdentifier = QBService.GROUP_CHAT_HELPER;
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        combinationMessagesList = createCombinationMessagesList();
     }
 
     @Override
@@ -81,7 +77,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
             startLoadDialogMessages();
         }
 
-        checkMessageSendingPossibility(isNetworkAvailable());
+        checkMessageSendingPossibility();
     }
 
     @Override
@@ -128,18 +124,9 @@ public class GroupDialogActivity extends BaseDialogActivity {
         checkForScrolling(oldMessagesCount);
     }
 
-    protected void updateActionBar() {
-        setActionBarTitle(dialog.getTitle());
-
-        if (!TextUtils.isEmpty(dialog.getPhoto())) {
-            loadActionBarLogo(dialog.getPhoto());
-        } else {
-            setDefaultActionBarLogo(R.drawable.placeholder_group);
-        }
-    }
-
-    public void sendMessage(View view) {
-        sendMessage(false);
+    @Override
+    protected void checkMessageSendingPossibility() {
+        checkMessageSendingPossibility(isNetworkAvailable());
     }
 
     @Override
@@ -152,5 +139,27 @@ public class GroupDialogActivity extends BaseDialogActivity {
                 super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private void initFields() {
+        chatHelperIdentifier = QBService.GROUP_CHAT_HELPER;
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        combinationMessagesList = createCombinationMessagesList();
+    }
+
+    protected void updateActionBar() {
+        if (isNetworkAvailable()) {
+            setActionBarTitle(dialog.getTitle());
+        }
+
+        if (!TextUtils.isEmpty(dialog.getPhoto())) {
+            loadActionBarLogo(dialog.getPhoto());
+        } else {
+            setDefaultActionBarLogo(R.drawable.placeholder_group);
+        }
+    }
+
+    public void sendMessage(View view) {
+        sendMessage(false);
     }
 }

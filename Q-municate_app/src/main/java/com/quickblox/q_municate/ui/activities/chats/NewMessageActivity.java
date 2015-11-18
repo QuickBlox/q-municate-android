@@ -175,13 +175,14 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     }
 
     private void checkForOpenChat(User user) {
-        showProgress();
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
             startPrivateChat(dialogOccupant.getDialog());
         } else {
-            showProgress();
-            QBCreatePrivateChatCommand.start(this, user);
+            if (checkNetworkAvailableWithError()) {
+                showProgress();
+                QBCreatePrivateChatCommand.start(this, user);
+            }
         }
     }
 

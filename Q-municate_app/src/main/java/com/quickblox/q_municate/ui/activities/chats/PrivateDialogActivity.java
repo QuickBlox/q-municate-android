@@ -51,12 +51,13 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initFields();
 
         if (dialog == null) {
             finish();
         }
+
+        setUpActionBarWithUpButton(opponentUser.getFullName());
 
         if (isNetworkAvailable()) {
             deleteTempMessages();
@@ -66,23 +67,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         fillActionBar();
         initMessagesRecyclerView();
-    }
-
-    private void initFields() {
-        chatHelperIdentifier = QBService.PRIVATE_CHAT_HELPER;
-        friendOperationAction = new FriendOperationAction();
-        friendObserver = new FriendObserver();
-        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        combinationMessagesList = createCombinationMessagesList();
-    }
-
-    private void addObservers() {
-        dataManager.getFriendDataManager().addObserver(friendObserver);
-    }
-
-    private void deleteObservers() {
-        dataManager.getFriendDataManager().deleteObserver(friendObserver);
     }
 
     @Override
@@ -164,33 +148,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         checkForScrolling(oldMessagesCount);
     }
 
-    private void findLastFriendsRequest() {
-        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
-        messagesAdapter.notifyDataSetChanged();
-    }
-
-    private void setOnlineStatus(User friend) {
-        if (friend != null) {
-            ActionBar actionBar = getActionBar();
-            if (actionBar != null && friendListHelper != null) {
-                actionBar.setSubtitle(
-                        OnlineStatusUtils.getOnlineStatus(friendListHelper.isUserOnline(friend.getUserId())));
-            }
-        }
-    }
-
-    private void fillActionBar() {
-        setActionBarTitle(opponentUser.getFullName());
-
-        setOnlineStatus(opponentUser);
-
-        if (!TextUtils.isEmpty(opponentUser.getAvatar())) {
-            loadActionBarLogo(opponentUser.getAvatar());
-        } else {
-            setDefaultActionBarLogo(R.drawable.placeholder_user);
-        }
-    }
-
     @Override
     public void notifyChangedUserStatus(int userId, boolean online) {
         super.notifyChangedUserStatus(userId, online);
@@ -198,10 +155,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         if (opponentUser != null && opponentUser.getUserId() == userId) {
             setOnlineStatus(opponentUser);
         }
-    }
-
-    public void sendMessage(View view) {
-        sendMessage(true);
     }
 
     @Override
@@ -232,6 +185,58 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         return true;
     }
 
+    @Override
+    protected void checkMessageSendingPossibility() {
+        boolean enable = dataManager.getFriendDataManager().existsByUserId(opponentUser.getUserId()) && isNetworkAvailable();
+        checkMessageSendingPossibility(enable);
+    }
+
+    private void initFields() {
+        chatHelperIdentifier = QBService.PRIVATE_CHAT_HELPER;
+        friendOperationAction = new FriendOperationAction();
+        friendObserver = new FriendObserver();
+        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        combinationMessagesList = createCombinationMessagesList();
+    }
+
+    private void addObservers() {
+        dataManager.getFriendDataManager().addObserver(friendObserver);
+    }
+
+    private void deleteObservers() {
+        dataManager.getFriendDataManager().deleteObserver(friendObserver);
+    }
+
+    private void findLastFriendsRequest() {
+        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        messagesAdapter.notifyDataSetChanged();
+    }
+
+    private void setOnlineStatus(User friend) {
+        if (friend != null) {
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null && friendListHelper != null) {
+                actionBar.setSubtitle(
+                        OnlineStatusUtils.getOnlineStatus(friendListHelper.isUserOnline(friend.getUserId())));
+            }
+        }
+    }
+
+    private void fillActionBar() {
+        setOnlineStatus(opponentUser);
+
+        if (!TextUtils.isEmpty(opponentUser.getAvatar())) {
+            loadActionBarLogo(opponentUser.getAvatar());
+        } else {
+            setDefaultActionBarLogo(R.drawable.placeholder_user);
+        }
+    }
+
+    public void sendMessage(View view) {
+        sendMessage(true);
+    }
+
     private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
         ErrorUtils.showError(this, getString(R.string.coming_soon));
 //        if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
@@ -246,11 +251,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     private void rejectUser(final int userId) {
         showRejectUserDialog(userId);
-    }
-
-    private void checkMessageSendingPossibility() {
-        boolean enable = dataManager.getFriendDataManager().existsByUserId(opponentUser.getUserId()) && isNetworkAvailable();
-        super.checkMessageSendingPossibility(enable);
     }
 
     private void showRejectUserDialog(final int userId) {

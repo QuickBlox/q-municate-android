@@ -170,8 +170,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.action_delete:
-                Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
-                deleteDialog(dialog);
+                if (baseActivity.checkNetworkAvailableWithError()) {
+                    Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
+                    deleteDialog(dialog);
+                }
                 break;
         }
         return true;

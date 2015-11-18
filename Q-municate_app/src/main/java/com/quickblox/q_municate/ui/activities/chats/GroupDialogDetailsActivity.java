@@ -538,7 +538,11 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             switch (menuItem.getItemId()) {
                 case R.id.action_done:
-                    checkForSaving();
+                    if (checkNetworkAvailableWithError()) {
+                        checkForSaving();
+                    } else {
+                        onDestroyActionMode(actionMode);
+                    }
                     actionMode.finish();
                     return true;
             }

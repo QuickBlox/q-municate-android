@@ -96,6 +96,7 @@ public class MainActivity extends BaseLoggableActivity {
     private void addActions() {
         addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, importFriendsSuccessAction);
         addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, importFriendsFailAction);
+        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
 
@@ -132,6 +133,19 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void launchDialogsListFragment() {
         setCurrentFragment(DialogsListFragment.newInstance());
+    }
+
+    private void performLoadChatsSuccessAction(Bundle bundle) {
+        appSharedHelper.saveFirstAuth(false);
+        hideSnackBar();
+    }
+
+    public class LoadChatsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            performLoadChatsSuccessAction(bundle);
+        }
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

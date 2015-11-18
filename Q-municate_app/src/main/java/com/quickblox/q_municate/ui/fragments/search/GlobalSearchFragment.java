@@ -118,6 +118,11 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     public void search(String searchQuery) {
         this.searchQuery = searchQuery;
         clearOldData();
+
+        if (!baseActivity.checkNetworkAvailableWithError()) {
+            return;
+        }
+
         startSearch();
         if (globalSearchAdapter != null && !globalSearchAdapter.getAllItems().isEmpty()) {
             globalSearchAdapter.setFilter(searchQuery);
