@@ -185,9 +185,11 @@ public abstract class BaseAuthActivity extends BaseActivity {
                 errorMessage = getString(R.string.error_bad_timestamp_from_app);
             } else if (errorMessage.equals(getString(R.string.error_login_or_email_required))) {
                 errorMessage = getString(R.string.error_login_or_email_required_from_app);
-            } else if (errorMessage.equals(getString(R.string.error_email_already_taken)) && loginType
-                    .equals(LoginType.FACEBOOK)) {
+            } else if (errorMessage.equals(getString(R.string.error_email_already_taken))
+                    && loginType.equals(LoginType.FACEBOOK)) {
                 errorMessage = getString(R.string.error_email_already_taken_from_app);
+            } else if (errorMessage.equals(getString(R.string.error_unauthorized))) {
+                errorMessage = getString(R.string.error_unauthorized_from_app);
             }
 
             ErrorUtils.showError(this, errorMessage);

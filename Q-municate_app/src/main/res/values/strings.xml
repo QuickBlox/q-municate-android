@@ -265,6 +265,8 @@
     <string name="error_login_or_email_required_from_app">Login or email required, please make sure that your FB email is public (facebook.com/settings)</string>
     <string name="error_email_already_taken">email has already been taken</string>
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogion. This email has already been taken</string>
+    <string name="error_unauthorized">Unauthorized</string>
+    <string name="error_unauthorized_from_app">Incorrect Email or Password</string>
     <string name="dlg_choose_image_from">Select image from…</string>
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
