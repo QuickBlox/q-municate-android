@@ -52,7 +52,7 @@ public class ImageUtils {
 
     private static final String TAG = ImageUtils.class.getSimpleName();
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
-    private static final String CAMERA_FILE_EXT = ".PNG";
+    private static final String CAMERA_FILE_EXT = ".jpg";
     private static final String CAMERA_FILE_NAME = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_FILE_EXT;
     private static final int AVATAR_SIZE = 110;
 
