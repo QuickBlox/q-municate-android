@@ -171,14 +171,18 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     }
 
     private void checkForCreatingGroupChat() {
-        if (friendsList != null && !friendsList.isEmpty()) {
-            showProgress();
+        if (isChatInitializedAndUserLoggedIn()) {
+            if (friendsList != null && !friendsList.isEmpty()) {
+                showProgress();
 
-            if (imageUri != null) {
-                QBLoadAttachFileCommand.start(CreateGroupDialogActivity.this, ImageUtils.getCreatedFileFromUri(imageUri));
-            } else {
-                createGroupChat();
+                if (imageUri != null) {
+                    QBLoadAttachFileCommand.start(CreateGroupDialogActivity.this, ImageUtils.getCreatedFileFromUri(imageUri));
+                } else {
+                    createGroupChat();
+                }
             }
+        } else {
+            ToastUtils.longToast(R.string.create_group_chat_service_is_initializing);
         }
     }
 

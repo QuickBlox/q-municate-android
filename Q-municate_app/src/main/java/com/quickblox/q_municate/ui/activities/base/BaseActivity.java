@@ -575,7 +575,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void checkOpeningDialog() {
-        if (appSharedHelper.needToOpenDialog() && isChatServiceInitialized()) {
+        if (appSharedHelper.needToOpenDialog() && isChatInitialized()) {
             Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
             User user = DataManager.getInstance().getUserDataManager().get(appSharedHelper.getPushUserId());
 
@@ -595,8 +595,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         QBLoginChatCompositeCommand.start(this);
     }
 
-    protected boolean isChatServiceInitialized() {
+    protected boolean isChatInitialized() {
         return QBChatService.isInitialized() && AppSession.getSession().isSessionExist();
+    }
+
+    protected boolean isChatInitializedAndUserLoggedIn() {
+        return isChatInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
     public void startPrivateChatActivity(User user, Dialog dialog) {

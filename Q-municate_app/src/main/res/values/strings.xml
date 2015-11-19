@@ -95,6 +95,7 @@
     <string name="create_group_empty_group_name">Group name can not be empty</string>
     <string name="create_group_participants">%1d participants</string>
     <string name="create_group_confirm_selecting_photo">Do you really want to load this photo?</string>
+    <string name="create_group_chat_service_is_initializing">Please, wait, connection is setting up…</string>
 
 
     <!-- Add Friends To Group Dialog -->
