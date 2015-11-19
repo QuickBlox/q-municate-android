@@ -39,7 +39,7 @@ public class QBRestHelper extends BaseHelper {
         try {
             QBUser user = QBUsers.getUser(userId);
             resultUser = UserFriendUtils.createLocalUser(user);
-            DataManager.getInstance().getUserDataManager().createOrUpdate(user);
+            DataManager.getInstance().getUserDataManager().createOrUpdate(resultUser, true);
         } catch (QBResponseException e) {
             // user not found
         }

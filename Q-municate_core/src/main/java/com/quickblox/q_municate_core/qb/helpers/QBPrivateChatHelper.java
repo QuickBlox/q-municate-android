@@ -16,6 +16,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DbUtils;
+import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -104,6 +105,11 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     private void friendRequestMessageReceived(QBChatMessage qbChatMessage, DialogNotification.Type notificationType) {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         Message message = parseReceivedMessage(qbChatMessage);
+
+        if (!dataManager.getUserDataManager().exists(qbChatMessage.getSenderId())) {
+            new QBRestHelper(context).loadAndSaveUser(qbChatMessage.getSenderId());
+        }
+
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);
         dialogNotification.setType(notificationType);
 
