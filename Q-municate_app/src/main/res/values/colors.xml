@@ -53,4 +53,6 @@
 
     <color name="invite_friends_item">#f8f8f8</color>
 
+    <color name="about_version_text">#757575</color>
+
 </resources>

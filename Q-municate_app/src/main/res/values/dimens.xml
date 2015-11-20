@@ -59,4 +59,10 @@
 
     <dimen name="friend_first_latter_width">53dp</dimen>
 
+    <dimen name="about_logo_margin_top">86dp</dimen>
+    <dimen name="about_version_margin_top">23dp</dimen>
+    <dimen name="about_version_text_size">14sp</dimen>
+    <dimen name="about_logo_vendor_margin_bottom">84dp</dimen>
+    <dimen name="about_vendor_text_margin_bottom">22dp</dimen>
+
 </resources>

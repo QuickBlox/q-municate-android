@@ -21,6 +21,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.about.AboutActivity;
 import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
@@ -149,8 +150,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
                 SettingsActivity.start(getActivity());
                 break;
             case R.id.action_start_about:
-                OneButtonDialogFragment
-                        .show(getChildFragmentManager(), R.string.coming_soon, true);
+                AboutActivity.start(getActivity());
                 break;
             default:
                 return super.onOptionsItemSelected(item);

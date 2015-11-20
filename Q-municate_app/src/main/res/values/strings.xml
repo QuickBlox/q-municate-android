@@ -172,6 +172,13 @@
     <string name="feedback_write_email">Write an Email</string>
 
 
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_vendor">&#169; 2015 QuickBlox</string>
+    <string name="about_user_agreement">User Agreement</string>
+
+
     // NOT REFACTORED YET
 
     <!-- Friend List -->

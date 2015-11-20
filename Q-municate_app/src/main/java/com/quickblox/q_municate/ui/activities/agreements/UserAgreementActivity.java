@@ -7,10 +7,11 @@ import android.webkit.WebView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 
 import butterknife.Bind;
 
-public class UserAgreementActivity extends BaseActivity {
+public class UserAgreementActivity extends BaseLoggableActivity {
 
     @Bind(R.id.user_agreement_webview)
     WebView userAgreementWebView;

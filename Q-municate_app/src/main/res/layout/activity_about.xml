@@ -1,0 +1,60 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/logo_imageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/about_logo_margin_top"
+        android:src="@drawable/about_logo" />
+
+    <TextView
+        android:id="@+id/app_version_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logo_imageview"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/about_version_margin_top"
+        android:textColor="@color/about_version_text"
+        android:textSize="@dimen/about_version_text_size"
+        tools:text="Version 1.1.1" />
+
+    <ImageView
+        android:id="@+id/logo_vendor_imageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="@dimen/about_logo_vendor_margin_bottom"
+        android:src="@drawable/about_logo_qb" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="@dimen/about_vendor_text_margin_bottom"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/vendor_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/about_vendor"
+            android:textColor="@color/text_light_dark"
+            android:textSize="@dimen/text_size_small" />
+
+        <TextView
+            style="@style/TextViewLinkStyle.Green"
+            android:id="@+id/license_button"
+            android:text="@string/about_user_agreement"
+            android:textSize="@dimen/text_size_small" />
+
+    </LinearLayout>
+
+</RelativeLayout>
