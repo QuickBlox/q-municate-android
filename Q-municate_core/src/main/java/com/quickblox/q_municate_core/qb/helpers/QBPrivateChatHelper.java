@@ -16,7 +16,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DbUtils;
-import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;

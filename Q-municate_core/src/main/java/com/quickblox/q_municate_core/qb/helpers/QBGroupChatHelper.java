@@ -130,7 +130,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throws QBResponseException {
-        QBChatMessage chatMessage = getQBChatMessage(context.getString(R.string.dlg_attached_last_message), file);
+        QBChatMessage chatMessage = getQBChatMessage(context.getString(R.string.dlg_attached_last_message),
+                file);
         sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 
@@ -241,10 +242,14 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void joinRoomChat(QBDialog dialog) throws Exception {
+        joinRoomChat(dialog, 0);
+    }
+
+    public void joinRoomChat(QBDialog dialog, int stanzas) throws Exception {
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
         if (!roomChat.isJoined()) {
             DiscussionHistory history = new DiscussionHistory();
-            history.setMaxStanzas(0);
+            history.setMaxStanzas(stanzas);
             roomChat.join(history);
         }
     }
@@ -335,7 +340,11 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
         String roomJidId = qbDialog.getRoomJid();
         if (roomJidId != null) {
-            tryJoinRoomChat(qbDialog);
+            try {
+                joinRoomChat(qbDialog, 1);
+            } catch (Exception e) {
+                ErrorUtils.logError(e);
+            }
             new FinderUnknownUsers(context, chatCreator, qbDialog).find();
         }
 
