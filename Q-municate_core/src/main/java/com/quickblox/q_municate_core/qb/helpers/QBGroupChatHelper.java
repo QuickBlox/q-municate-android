@@ -335,8 +335,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         qbDialog.getOccupants().add(chatCreator.getId());
         DbUtils.saveDialogToCache(dataManager, qbDialog);
 
-        DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(parseReceivedMessage(qbChatMessage));
-        dialogNotification.setType(notificationType);
+//        DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(parseReceivedMessage(qbChatMessage));
+//        dialogNotification.setType(notificationType);
 
         String roomJidId = qbDialog.getRoomJid();
         if (roomJidId != null) {
@@ -348,10 +348,9 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             new FinderUnknownUsers(context, chatCreator, qbDialog).find();
         }
 
-        Message message = ChatUtils.createTempLocalMessage(dialogNotification);
-        DbUtils.saveTempMessage(dataManager, message);
-
-        checkForSendingNotification(false, qbChatMessage, dialogNotification.getDialogOccupant().getUser(), false);
+//        Message message = ChatUtils.createTempLocalMessage(dialogNotification);
+//        DbUtils.saveTempMessage(dataManager, message);
+//        checkForSendingNotification(false, qbChatMessage, dialogNotification.getDialogOccupant().getUser(), false);
     }
 
     private class GroupChatNotificationListener implements QBNotificationChatListener {
