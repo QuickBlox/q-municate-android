@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.utils.simple;
+package com.quickblox.q_municate.utils.listeners.simple;
 
 import android.support.v7.view.ActionMode;
 import android.view.Menu;

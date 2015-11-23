@@ -16,7 +16,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate_core.service.QBService;

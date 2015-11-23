@@ -1,8 +1,11 @@
 package com.quickblox.q_municate.utils;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -15,9 +18,11 @@ import java.io.IOException;
 
 public class FileUtils {
 
-    private File filesFolder;
+    private static final String TAG = FileUtils.class.getSimpleName();
     private static final String folderName = "/Q-municate";
-    private static final String fileType = ".png";
+    private static final String fileType = ".jpg";
+
+    private File filesFolder;
 
     public FileUtils() {
         initFilesFolder();
@@ -30,15 +35,19 @@ public class FileUtils {
         }
     }
 
-    public void checkExsistFile(String fileUrlString, Bitmap bitmap) {
-        File file = createFileIfNotExist(fileUrlString);
-        if (!file.exists()) {
-            saveFile(file, bitmap);
+    public void checkExistsFile(String fileUrlString, Bitmap bitmap) {
+        Log.d(TAG, "+++ fileUrlString = " + fileUrlString);
+        if (!TextUtils.isEmpty(fileUrlString)) {
+            File file = createFileIfNotExist(fileUrlString);
+            if (!file.exists()) {
+                saveFile(file, bitmap);
+            }
         }
     }
 
     public File createFileIfNotExist(String fileUrlString) {
-        String fileName = fileUrlString.substring(fileUrlString.lastIndexOf('/') + 1) + fileType;
+        Uri fileUri = Uri.parse(fileUrlString);
+        String fileName = fileUri.getLastPathSegment() + fileType;
         return new File(filesFolder, fileName);
     }
 

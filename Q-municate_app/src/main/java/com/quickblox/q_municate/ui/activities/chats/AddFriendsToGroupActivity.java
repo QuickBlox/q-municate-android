@@ -11,7 +11,7 @@ import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;

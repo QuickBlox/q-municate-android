@@ -12,7 +12,7 @@ import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
 import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoration;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
-import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;

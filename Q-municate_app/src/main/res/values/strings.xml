@@ -179,6 +179,10 @@
     <string name="about_user_agreement">User Agreement</string>
 
 
+    <!-- Preview Images -->
+    <string name="preview_image_title">Preview image</string>
+
+
     // NOT REFACTORED YET
 
     <!-- Friend List -->

@@ -129,6 +129,10 @@
             android:name=".ui.activities.about.AboutActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".ui.activities.others.PreviewImageActivity"
+            android:screenOrientation="portrait">
+        </activity>
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />

@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.simple.SimpleGlobalLoginListener;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleGlobalLoginListener;
 import com.quickblox.q_municate.utils.SystemUtils;
 import com.quickblox.q_municate.utils.helpers.LoginHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;

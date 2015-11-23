@@ -50,7 +50,7 @@ import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHelper;
 import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
-import com.quickblox.q_municate.utils.simple.SimpleGlobalLoginListener;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleGlobalLoginListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;

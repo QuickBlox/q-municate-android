@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.utils.simple;
+package com.quickblox.q_municate.utils.listeners.simple;
 
 import android.view.View;
 

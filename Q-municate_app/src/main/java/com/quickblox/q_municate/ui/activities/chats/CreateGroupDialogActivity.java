@@ -20,7 +20,7 @@ import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
-import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;

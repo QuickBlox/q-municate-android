@@ -189,87 +189,18 @@ public class ImageUtils {
     }
 
     public static void checkForRotation(String imagePath) {
-
-        //    public static void checkForRotation(String imagePath) throws IOException {
-        //        ExifInterface exifInterface = new ExifInterface(imagePath);
-        //        Log.d("test_rotation", "EXIF value " + exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION) + ", imagePath = " + imagePath);
-        //        if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")) {
-        //            Log.d("test_rotation", "EXIF value " + 90);
-        //            rotateImage(imagePath, 90);
-        //        } else if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")) {
-        //            Log.d("test_rotation", "EXIF value " + 270);
-        //            rotateImage(imagePath, 270);
-        //        } else if (exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")) {
-        //            Log.d("test_rotation", "EXIF value " + 180);
-        //            rotateImage(imagePath, 180);
-        //        }
-        //}
-
-        int orientation = getExifInterfaceOrientation(imagePath);
-
-        if (orientation == 0) {
-            return;
-        }
-
-        try {
-            Bitmap bitmap = getBitmapFromFile(imagePath);
-
-            Matrix matrix = new Matrix();
-
-            switch (orientation) {
-                case 2:
-                    matrix.setScale(-1, 1);
-                    break;
-                case 3:
-                    matrix.setRotate(180);
-                    break;
-                case 4:
-                    matrix.setRotate(180);
-                    matrix.postScale(-1, 1);
-                    break;
-                case 5:
-                    matrix.setRotate(90);
-                    matrix.postScale(-1, 1);
-                    break;
-                case 6:
-                    matrix.setRotate(90);
-                    break;
-                case 7:
-                    matrix.setRotate(-90);
-                    matrix.postScale(-1, 1);
-                    break;
-                case 8:
-                    matrix.setRotate(-90);
-                    break;
-                default:
-                    return;
-            }
-
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            saveFileFromBitmap(bitmap, imagePath);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
+        Bitmap bitmap = getBitmapFromFile(imagePath);
+        if (bitmap.getHeight() > bitmap.getWidth()) {
+            rotateImage(bitmap, 90);
         }
     }
 
-    public static void saveFileFromBitmap(Bitmap bitmap, String fileName) {
-        File file = new File(fileName);
-        ByteArrayOutputStream byteArrayOutputStream = null;
-        FileOutputStream fileOutputStream = null;
-        try {
-            byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, ConstsCore.FULL_QUALITY, byteArrayOutputStream);
-            byte[] bitmapData = byteArrayOutputStream.toByteArray();
-            fileOutputStream = new FileOutputStream(file);
-            fileOutputStream.write(bitmapData);
-            Utils.closeOutputStream(fileOutputStream);
-            Utils.closeOutputStream(byteArrayOutputStream);
-        } catch (IOException e) {
-            ErrorUtils.logError(TAG, e);
-        } finally {
-            Utils.closeOutputStream(fileOutputStream);
-            Utils.closeOutputStream(byteArrayOutputStream);
-        }
+    private static Bitmap rotateImage(Bitmap bitmap, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        bitmap.recycle();
+        return rotatedImg;
     }
 
     public static Bitmap getBitmapFromFile(String filePath) {

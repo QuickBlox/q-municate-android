@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +17,7 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
+import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
@@ -216,6 +216,7 @@ public abstract class BaseDialogMessagesAdapter
 
         private ViewHolder viewHolder;
         private Bitmap loadedImageBitmap;
+        private String imageUrl;
 
         public ImageLoadingListener(ViewHolder viewHolder) {
             this.viewHolder = viewHolder;
@@ -231,12 +232,14 @@ public abstract class BaseDialogMessagesAdapter
         @Override
         public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
             updateUIAfterLoading();
+            imageUrl = null;
         }
 
         @Override
         public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
             initMaskedImageView(loadedBitmap);
-            fileUtils.checkExsistFile(imageUri, loadedBitmap);
+            fileUtils.checkExistsFile(imageUri, loadedBitmap);
+            this.imageUrl = imageUri;
         }
 
         private void initMaskedImageView(Bitmap loadedBitmap) {
@@ -260,9 +263,10 @@ public abstract class BaseDialogMessagesAdapter
 
                 @Override
                 public void onClick(View view) {
-                    view.startAnimation(
-                            AnimationUtils.loadAnimation(baseActivity, R.anim.chat_attached_file_click));
-                    //                    new ReceiveFileFromBitmapTask(BaseDialogMessagesAdapter.this).execute(imageUtils, loadedImageBitmap, false);
+                    if (imageUrl != null) {
+                        view.startAnimation(AnimationUtils.loadAnimation(baseActivity, R.anim.chat_attached_file_click));
+                        PreviewImageActivity.start(baseActivity, imageUrl);
+                    }
                 }
             };
         }

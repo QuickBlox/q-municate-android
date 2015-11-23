@@ -32,7 +32,7 @@ import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
-import com.quickblox.q_municate.utils.simple.SimpleActionModeCallback;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;

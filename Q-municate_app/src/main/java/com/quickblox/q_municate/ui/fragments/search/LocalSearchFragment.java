@@ -17,7 +17,7 @@ import com.quickblox.q_municate.utils.listeners.SearchListener;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.adapters.search.LocalSearchAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
-import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoration;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
