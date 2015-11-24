@@ -96,7 +96,6 @@ public class MainActivity extends BaseLoggableActivity {
     private void addActions() {
         addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, importFriendsSuccessAction);
         addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, importFriendsFailAction);
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
 
@@ -104,7 +103,10 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void removeActions() {
+        removeAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION);
         removeAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
 
         updateBroadcastActionList();
     }

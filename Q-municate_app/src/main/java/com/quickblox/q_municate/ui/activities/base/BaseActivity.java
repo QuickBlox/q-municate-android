@@ -624,10 +624,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void checkLoadDialogs() {
-        if (appSharedHelper.isFirstAuth()) {
-            showSnackbar(R.string.dlgs_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
-            QBLoadDialogsCommand.start(this);
-        }
+        showSnackbar(R.string.dlgs_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
+        QBLoadDialogsCommand.start(this);
     }
 
     protected void onChatsLoaded() {

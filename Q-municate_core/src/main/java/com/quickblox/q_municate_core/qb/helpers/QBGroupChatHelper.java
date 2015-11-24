@@ -91,8 +91,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             }
         }
 
-        DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage,
-                State.DELIVERED, true);
+        DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, State.DELIVERED, true);
         DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
 
         checkForSendingNotification(ownMessage, qbChatMessage, user, false);
@@ -242,14 +241,10 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void joinRoomChat(QBDialog dialog) throws Exception {
-        joinRoomChat(dialog, 0);
-    }
-
-    public void joinRoomChat(QBDialog dialog, int stanzas) throws Exception {
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
         if (!roomChat.isJoined()) {
             DiscussionHistory history = new DiscussionHistory();
-            history.setMaxStanzas(stanzas);
+            history.setMaxStanzas(0); // without getting messages
             roomChat.join(history);
         }
     }
@@ -335,22 +330,11 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         qbDialog.getOccupants().add(chatCreator.getId());
         DbUtils.saveDialogToCache(dataManager, qbDialog);
 
-//        DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(parseReceivedMessage(qbChatMessage));
-//        dialogNotification.setType(notificationType);
-
         String roomJidId = qbDialog.getRoomJid();
         if (roomJidId != null) {
-            try {
-                joinRoomChat(qbDialog, 1);
-            } catch (Exception e) {
-                ErrorUtils.logError(e);
-            }
+            tryJoinRoomChat(qbDialog);
             new FinderUnknownUsers(context, chatCreator, qbDialog).find();
         }
-
-//        Message message = ChatUtils.createTempLocalMessage(dialogNotification);
-//        DbUtils.saveTempMessage(dataManager, message);
-//        checkForSendingNotification(false, qbChatMessage, dialogNotification.getDialogOccupant().getUser(), false);
     }
 
     private class GroupChatNotificationListener implements QBNotificationChatListener {

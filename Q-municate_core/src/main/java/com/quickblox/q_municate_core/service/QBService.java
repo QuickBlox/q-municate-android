@@ -550,22 +550,6 @@ public class QBService extends Service {
         loginCommand.addCommand(initVideoChatCommand);
     }
 
-    //    private void registerReLoginCommand() {
-    //        QBReLoginCommand reLoginCommand = new QBReLoginCommand(this,
-    //                QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION,
-    //                QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
-    //        ServiceCommand logoutChatCommand = serviceCommandMap.get(
-    //                QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION);
-    //        reLoginCommand.addCommand(logoutChatCommand);
-    //
-    //        ServiceCommand loginChatCommand = serviceCommandMap.get(QBServiceConsts.LOGIN_CHAT_ACTION);
-    //        reLoginCommand.addCommand(loginChatCommand);
-    //
-    //        ServiceCommand joinChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
-    //        reLoginCommand.addCommand(joinChatCommand);
-    //        serviceCommandMap.put(QBServiceConsts.RE_LOGIN_IN_CHAT_ACTION, reLoginCommand);
-    //    }
-
     @Override
     public void onCreate() {
         IntentFilter filter = new IntentFilter();
