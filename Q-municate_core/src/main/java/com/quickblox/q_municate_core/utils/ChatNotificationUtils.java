@@ -131,19 +131,6 @@ public class ChatNotificationUtils {
         return chatMessage;
     }
 
-    public static int getNotificationTypeIfExist(QBChatMessage chatMessage) {
-        int friendsMessageTypeCode = ConstsCore.ZERO_INT_VALUE;
-        if (chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE) != null) {
-            String inputCode = (String) chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
-            if (PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(inputCode)) {
-                friendsMessageTypeCode = DialogNotification.Type.CREATE_DIALOG.getCode();
-            } else {
-                friendsMessageTypeCode = Integer.parseInt(inputCode);
-            }
-        }
-        return friendsMessageTypeCode;
-    }
-
     public static boolean isNotificationMessage(QBChatMessage chatMessage) {
         return chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE) != null;
     }
@@ -230,6 +217,7 @@ public class ChatNotificationUtils {
 
     private static QBChatMessage createChatMessageForFriendsRequests(Context context, String requestType) {
         QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setSenderId(AppSession.getSession().getUser().getId());
         chatMessage.setBody(context.getResources().getString(R.string.frl_friends_contact_request));
         chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, requestType);
