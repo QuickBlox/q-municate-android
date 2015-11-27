@@ -13,9 +13,6 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
     }
-    lintOptions {
-        abortOnError false
-    }
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

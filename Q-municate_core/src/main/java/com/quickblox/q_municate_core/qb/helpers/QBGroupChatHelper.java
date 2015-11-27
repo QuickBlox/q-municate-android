@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBGroupChat;
+import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBParticipantListener;
+import com.quickblox.chat.listeners.QBSystemMessageListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -50,13 +53,12 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     public QBGroupChatHelper(Context context) {
         super(context);
-        QBNotificationChatListener notificationChatListener = new GroupChatNotificationListener();
         participantListener = new ParticipantListener();
-        addNotificationChatListener(notificationChatListener);
     }
 
     public void init(QBUser user) {
         super.init(user);
+        addSystemMessageListener(new SystemMessageListener());
     }
 
     @Override
@@ -201,7 +203,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
                         R.string.cht_notification_message));
 
         addNecessaryPropertyForQBChatMessage(chatMessageForSending, dialog.getDialogId());
-        sendPrivateMessage(chatMessageForSending, friendId);
+        sendSystemMessage(chatMessageForSending, friendId, dialog.getDialogId());
     }
 
     public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {
@@ -337,15 +339,22 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
-    private class GroupChatNotificationListener implements QBNotificationChatListener {
+    private class SystemMessageListener implements QBSystemMessageListener {
 
         @Override
-        public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
+        public void processMessage(QBChatMessage qbChatMessage) {
+            String notificationType = (String) qbChatMessage
+                    .getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE);
             if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(notificationType)) {
-                createDialogByNotification(chatMessage, DialogNotification.Type.CREATE_DIALOG);
+                createDialogByNotification(qbChatMessage, DialogNotification.Type.CREATE_DIALOG);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(notificationType)) {
-                updateDialogByNotification(chatMessage);
+                updateDialogByNotification(qbChatMessage);
             }
+        }
+
+        @Override
+        public void processError(QBChatException e, QBChatMessage qbChatMessage) {
+            Log.d(TAG, "+++ system message error received: " + e);
         }
     }
 

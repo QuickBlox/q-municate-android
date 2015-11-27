@@ -11,11 +11,13 @@ import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
+import com.quickblox.chat.QBSystemMessagesManager;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBIsTypingListener;
 import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBMessageStatusListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.chat.listeners.QBSystemMessageListener;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
@@ -65,6 +67,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     private PrivateChatManagerListener privateChatManagerListener;
     private PrivateChatStatusListener privateChatStatusListener;
     private List<QBNotificationChatListener> notificationChatListeners;
+    private QBSystemMessagesManager systemMessagesManager;
 
     public QBBaseChatHelper(Context context) {
         super(context);
@@ -96,6 +99,12 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         chatService.getMessageStatusesManager().addMessageStatusListener(privateChatStatusListener);
 
         groupChatManager = chatService.getGroupChatManager();
+
+        systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
+    }
+
+    protected void addSystemMessageListener(QBSystemMessageListener systemMessageListener) {
+        systemMessagesManager.addSystemMessageListener(systemMessageListener);
     }
 
     protected void addNotificationChatListener(QBNotificationChatListener notificationChatListener) {
@@ -107,7 +116,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         sendPrivateMessage(qbChatMessage, opponentId);
         DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, null, true);
-        DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
+        DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage),
+                true);
     }
 
     public void sendPrivateMessage(QBChatMessage qbChatMessage, int opponentId) throws QBResponseException {
@@ -125,6 +135,16 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
         if (error != null) {
             throw new QBResponseException(error);
+        }
+    }
+
+    public void sendSystemMessage(QBChatMessage chatMessage, int opponentId, String dialogId) {
+        addNecessaryPropertyForQBChatMessage(chatMessage, dialogId);
+        chatMessage.setRecipientId(opponentId);
+        try {
+            systemMessagesManager.sendSystemMessage(chatMessage);
+        } catch (SmackException.NotConnectedException e) {
+            ErrorUtils.logError(e);
         }
     }
 
