@@ -14,6 +14,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
@@ -34,6 +35,8 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.Observable;
 import java.util.Observer;
+
+import butterknife.OnClick;
 
 public class PrivateDialogActivity extends BaseDialogActivity {
 
@@ -189,6 +192,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     protected void checkMessageSendingPossibility() {
         boolean enable = dataManager.getFriendDataManager().existsByUserId(opponentUser.getUserId()) && isNetworkAvailable();
         checkMessageSendingPossibility(enable);
+    }
+
+    @OnClick(R.id.toolbar)
+    void openProfile(View view) {
+        UserProfileActivity.start(this, opponentUser.getUserId());
     }
 
     private void initFields() {
