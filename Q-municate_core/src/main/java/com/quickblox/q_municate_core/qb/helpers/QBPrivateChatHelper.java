@@ -12,6 +12,7 @@ import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.R;
+import com.quickblox.q_municate_core.models.NotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -129,16 +130,23 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
 
         @Override
-        public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
-            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(notificationType)) {
-                friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REQUEST);
-            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT.equals(notificationType)) {
-                friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_ACCEPT);
-            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT.equals(notificationType)) {
-                friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REJECT);
-            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE.equals(notificationType)) {
-                friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REMOVE);
-                clearFriendOrUserRequestLocal(chatMessage.getSenderId());
+        public void onReceivedNotification(String notificationTypeString, QBChatMessage chatMessage) {
+            NotificationType notificationType = NotificationType.parseByValue(
+                    Integer.parseInt(notificationTypeString));
+            switch (notificationType) {
+                case FRIENDS_REQUEST:
+                    friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REQUEST);
+                    break;
+                case FRIENDS_ACCEPT:
+                    friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_ACCEPT);
+                    break;
+                case FRIENDS_REJECT:
+                    friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REJECT);
+                    break;
+                case FRIENDS_REMOVE:
+                    friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REMOVE);
+                    clearFriendOrUserRequestLocal(chatMessage.getSenderId());
+                    break;
             }
         }
 

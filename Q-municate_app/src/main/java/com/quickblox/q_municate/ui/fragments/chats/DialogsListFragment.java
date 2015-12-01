@@ -32,7 +32,6 @@ import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.fragments.search.SearchFragment;
-import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
@@ -300,8 +299,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         if (Dialog.Type.GROUP.equals(dialog.getType())) {
             if (groupChatHelper != null) {
                 try {
-                    groupChatHelper.sendNotificationToFriends(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
-                            DialogNotification.Type.LEAVE_DIALOG, null);
+                    groupChatHelper.sendGroupMessageToFriends(
+                            ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+                            DialogNotification.Type.OCCUPANTS_DIALOG, null);
                     DbUtils.deleteDialogLocal(dataManager, dialog.getDialogId());
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);

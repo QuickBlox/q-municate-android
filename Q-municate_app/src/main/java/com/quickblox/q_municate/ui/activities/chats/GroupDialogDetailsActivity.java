@@ -334,7 +334,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
     private void leaveGroup() {
         showProgress();
-        currentNotificationTypeList.add(DialogNotification.Type.LEAVE_DIALOG);
+        currentNotificationTypeList.add(DialogNotification.Type.OCCUPANTS_DIALOG);
         sendNotificationToGroup();
         QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this,
                 ChatUtils.createLocalDialog(qbDialog));
@@ -348,7 +348,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
             updateOccupantsList();
 
             try {
-                groupChatHelper.sendNotificationToPrivateChatAboutCreatingGroupChat(qbDialog, addedFriendIdsList);
+                groupChatHelper.sendSystemMessageAboutCreatingGroupChat(qbDialog, addedFriendIdsList);
             } catch (Exception e) {
                 ErrorUtils.logError(e);
             }
@@ -428,7 +428,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void sendNotificationToGroup() {
         for (DialogNotification.Type messagesNotificationType : currentNotificationTypeList) {
             try {
-                groupChatHelper.sendNotificationToFriends(qbDialog, messagesNotificationType, addedFriendIdsList);
+                groupChatHelper.sendGroupMessageToFriends(qbDialog, messagesNotificationType,
+                        addedFriendIdsList);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
                 hideProgress();

@@ -16,6 +16,7 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.R;
+import com.quickblox.q_municate_core.models.NotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
@@ -81,8 +82,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     public void acceptFriend(int userId) throws Exception {
         roster.confirmSubscription(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForAcceptFriendsRequest(
-                context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createChatMessageForFriendsRequests(context,
+                NotificationType.FRIENDS_ACCEPT);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -91,8 +92,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         clearRosterEntry(userId);
         deleteFriendOrUserRequest(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils
-                .createNotificationMessageForRejectFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createChatMessageForFriendsRequests(context,
+                NotificationType.FRIENDS_REJECT);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -101,8 +102,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         clearRosterEntry(userId);
         deleteFriendOrUserRequest(userId);
 
-        QBChatMessage qbChatMessage = ChatNotificationUtils.createNotificationMessageForRemoveFriendsRequest(
-                context);
+        QBChatMessage qbChatMessage = ChatNotificationUtils.createChatMessageForFriendsRequests(context,
+                NotificationType.FRIENDS_REMOVE);
         qbChatMessage.setRecipientId(userId);
         sendNotificationToFriend(qbChatMessage, userId);
     }
@@ -112,7 +113,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
         loadAndSaveUser(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createChatMessageForFriendsRequests(context,
+                NotificationType.FRIENDS_REQUEST);
         sendNotificationToFriend(chatMessage, userId);
     }
 

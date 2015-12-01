@@ -201,4 +201,10 @@ public class DbUtils {
                 getUpdatedDialogOccupantsList(dataManager, dialogId, dialogOccupantIdsList, status);
         dataManager.getDialogOccupantDataManager().updateAll(dialogOccupantsList);
     }
+
+    public static void updateDialogOccupant(DataManager dataManager, String dialogId,
+            int occupantId, DialogOccupant.Status status) {
+        DialogOccupant dialogOccupant = ChatUtils.getUpdatedDialogOccupant(dataManager, dialogId, status, occupantId);;
+        dataManager.getDialogOccupantDataManager().update(dialogOccupant);
+    }
 }

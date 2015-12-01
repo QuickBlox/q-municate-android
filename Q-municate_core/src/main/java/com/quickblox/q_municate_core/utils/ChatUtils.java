@@ -10,6 +10,7 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
+import com.quickblox.q_municate_core.models.NotificationType;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -306,6 +307,16 @@ public class ChatUtils {
         return idsList;
     }
 
+    public static List<Integer> getUsersIdsFromDialogOccupantsList(List<DialogOccupant> dialogOccupantsList) {
+        List<Integer> idsList = new ArrayList<>(dialogOccupantsList.size());
+
+        for (DialogOccupant dialogOccupant : dialogOccupantsList) {
+            idsList.add(dialogOccupant.getUser().getUserId());
+        }
+
+        return idsList;
+    }
+
     public static QBDialog createQBDialogFromLocalDialog(DataManager dataManager, Dialog dialog) {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
@@ -378,18 +389,33 @@ public class ChatUtils {
         dialogNotification.setDialogNotificationId(qbChatMessage.getId());
         dialogNotification.setDialogOccupant(dialogOccupant);
 
-        int friendsMessageTypeCode = Integer.parseInt(qbChatMessage.getProperty(
-                ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE).toString());
-        if (ChatNotificationUtils.isFriendsNotificationMessage(friendsMessageTypeCode)) {
-            dialogNotification.setType(DialogNotification.Type.parseByCode(friendsMessageTypeCode));
-            dialogNotification.setBody(ChatNotificationUtils.getBodyForFriendsNotificationMessage(context,
-                    dataManager, DialogNotification.Type.parseByCode(friendsMessageTypeCode), qbChatMessage));
-        } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)
-                || ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
-            dialogNotification.setBody(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context, dataManager,
-                    qbChatMessage));
-            dialogNotification.setType(ChatNotificationUtils.getUpdateChatNotificationMessageType(
-                    qbChatMessage));
+        String chatNotificationTypeString = qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE).toString();
+
+        if (chatNotificationTypeString != null) {
+
+            int chatNotificationTypeInt = Integer.parseInt(chatNotificationTypeString);
+            NotificationType chatNotificationType = NotificationType.parseByValue(chatNotificationTypeInt);
+            DialogNotification.Type dialogNotificationTypeLocal = DialogNotification.Type
+                    .parseByCode(chatNotificationTypeInt);
+
+            switch (chatNotificationType) {
+                case GROUP_CHAT_CREATE:
+                case GROUP_CHAT_UPDATE:
+                    dialogNotification.setBody(ChatNotificationUtils
+                            .getBodyForUpdateChatNotificationMessage(context, dataManager, qbChatMessage));
+                    dialogNotification.setType(
+                            ChatNotificationUtils.getUpdateChatNotificationMessageType(qbChatMessage));
+                    break;
+                case FRIENDS_REQUEST:
+                case FRIENDS_ACCEPT:
+                case FRIENDS_REJECT:
+                case FRIENDS_REMOVE:
+                    dialogNotification.setType(dialogNotificationTypeLocal);
+                    dialogNotification.setBody(ChatNotificationUtils
+                            .getBodyForFriendsNotificationMessage(context, dataManager,
+                                    dialogNotificationTypeLocal, qbChatMessage));
+                    break;
+            }
         }
 
         long dateSent = getMessageDateSent(qbChatMessage);
@@ -540,14 +566,20 @@ public class ChatUtils {
         List<DialogOccupant> updatedDialogOccupantsList = new ArrayList<>(dialogOccupantIdsList.size());
 
         for (Integer userId : dialogOccupantIdsList) {
-            DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, userId);
-            if (dialogOccupant != null) {
-                dialogOccupant.setStatus(status);
-                updatedDialogOccupantsList.add(dialogOccupant);
-            }
+            DialogOccupant dialogOccupant = getUpdatedDialogOccupant(dataManager, dialogId, status, userId);
+            updatedDialogOccupantsList.add(dialogOccupant);
         }
 
         return updatedDialogOccupantsList;
+    }
+
+    public static DialogOccupant getUpdatedDialogOccupant(DataManager dataManager, String dialogId,
+            DialogOccupant.Status status, Integer userId) {
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, userId);
+        if (dialogOccupant != null) {
+            dialogOccupant.setStatus(status);
+        }
+        return dialogOccupant;
     }
 
     public static DialogOccupant createDialogOccupant(DataManager dataManager, String dialogId, User user) {
@@ -561,5 +593,27 @@ public class ChatUtils {
         qbDialog.setOccupantsIds(new ArrayList<Integer>(2));
         qbDialog.getOccupants().add(qbChatMessage.getSenderId());
         qbDialog.getOccupants().add(qbChatMessage.getRecipientId());
+    }
+
+    public static String getNewOccupantsIds(DataManager dataManager, String dialogId, List<Integer> inputOccupantsList) {
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
+                .getDialogOccupantsListByDialogId(dialogId);
+        List<Integer> oldOccupantsList = ChatUtils
+                .getUsersIdsFromDialogOccupantsList(dialogOccupantsList);
+
+        if (oldOccupantsList != null && !oldOccupantsList.isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Integer occupantId : inputOccupantsList) {
+                if (!oldOccupantsList.contains(occupantId)) {
+                    stringBuilder.append(occupantId).append(ChatUtils.OCCUPANT_IDS_DIVIDER).append(" ");
+                }
+            }
+            if (stringBuilder.length() > 0) {
+                return stringBuilder.toString()
+                        .substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
+            }
+        }
+
+        return null;
     }
 }

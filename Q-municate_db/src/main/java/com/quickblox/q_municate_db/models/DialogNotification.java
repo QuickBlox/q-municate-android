@@ -117,7 +117,7 @@ public class DialogNotification implements Serializable {
     public enum Type {
 
         FRIENDS_REQUEST(4), FRIENDS_ACCEPT(5), FRIENDS_REJECT(6), FRIENDS_REMOVE(7),
-        CREATE_DIALOG(25), ADDED_DIALOG(21), NAME_DIALOG(22), PHOTO_DIALOG(23), LEAVE_DIALOG(24);
+        CREATE_DIALOG(25), ADDED_DIALOG(21), NAME_DIALOG(22), PHOTO_DIALOG(23), OCCUPANTS_DIALOG(24);
 
         private int code;
 
