@@ -62,6 +62,6 @@ public class DialogDataManager extends BaseManager<Dialog> {
     }
 
     public List<Dialog> getAllSorted() {
-        return super.getAllSorted(Dialog.Column.MODIFIED_DATE, false);
+        return super.getAllSorted(Dialog.Column.MODIFIED_DATE_LOCAL, false);
     }
 }

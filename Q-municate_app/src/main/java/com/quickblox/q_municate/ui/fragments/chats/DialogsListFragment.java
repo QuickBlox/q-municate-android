@@ -56,6 +56,7 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
@@ -299,9 +300,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         if (Dialog.Type.GROUP.equals(dialog.getType())) {
             if (groupChatHelper != null) {
                 try {
+                    List<Integer> occupantsIdsList = new ArrayList<>();
+                    occupantsIdsList.add(qbUser.getId());
                     groupChatHelper.sendGroupMessageToFriends(
                             ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
-                            DialogNotification.Type.OCCUPANTS_DIALOG, null);
+                            DialogNotification.Type.OCCUPANTS_DIALOG, occupantsIdsList, true);
                     DbUtils.deleteDialogLocal(dataManager, dialog.getDialogId());
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);

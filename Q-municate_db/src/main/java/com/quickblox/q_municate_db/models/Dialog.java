@@ -6,12 +6,13 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.io.Serializable;
 
 import static com.quickblox.q_municate_db.models.Dialog.Column.ID;
-import static com.quickblox.q_municate_db.models.Dialog.Column.MODIFIED_DATE;
+import static com.quickblox.q_municate_db.models.Dialog.Column.MODIFIED_DATE_LOCAL;
 import static com.quickblox.q_municate_db.models.Dialog.Column.PHOTO;
 import static com.quickblox.q_municate_db.models.Dialog.Column.ROOM_JID;
 import static com.quickblox.q_municate_db.models.Dialog.Column.TABLE_NAME;
 import static com.quickblox.q_municate_db.models.Dialog.Column.TITLE;
 import static com.quickblox.q_municate_db.models.Dialog.Column.TYPE;
+import static com.quickblox.q_municate_db.models.Dialog.Column.UPDATED_AT;
 
 @DatabaseTable(tableName = TABLE_NAME)
 public class Dialog implements Serializable {
@@ -39,8 +40,12 @@ public class Dialog implements Serializable {
     private String photo;
 
     @DatabaseField(
-            columnName = MODIFIED_DATE)
-    private long modifiedDate;
+            columnName = MODIFIED_DATE_LOCAL)
+    private long modifiedDateLocal;
+
+    @DatabaseField(
+            columnName = UPDATED_AT)
+    private long updatedAt;
 
     public Dialog() {
     }
@@ -85,18 +90,26 @@ public class Dialog implements Serializable {
         this.type = type;
     }
 
-    public long getModifiedDate() {
-        return modifiedDate;
+    public long getModifiedDateLocal() {
+        return modifiedDateLocal;
     }
 
-    public void setModifiedDate(long modifiedDate) {
-        this.modifiedDate = modifiedDate;
+    public void setModifiedDateLocal(long modifiedDateLocal) {
+        this.modifiedDateLocal = modifiedDateLocal;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
     public String toString() {
         return "Dialog [dialogId='" + dialogId
-                + "', modifiedDate='" + modifiedDate
+                + "', modifiedDateLocal='" + modifiedDateLocal
                 + "', title='" + title + "']";
     }
 
@@ -136,6 +149,7 @@ public class Dialog implements Serializable {
         String TITLE = "title";
         String PHOTO = "photo";
         String TYPE = "type";
-        String MODIFIED_DATE = "modified_date";
+        String MODIFIED_DATE_LOCAL = "modified_date_local";
+        String UPDATED_AT = "updated_at";
     }
 }

@@ -90,7 +90,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private ImagePickHelper imagePickHelper;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
     private List<DialogNotification.Type> currentNotificationTypeList;
-    private ArrayList<Integer> addedFriendIdsList;
+    private ArrayList<Integer> newFriendIdsList;
     private UserOperationAction friendOperationAction;
     private BroadcastReceiver updatingDialogDetailsBroadcastReceiver;
     private List<User> occupantsList;
@@ -335,25 +335,27 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void leaveGroup() {
         showProgress();
         currentNotificationTypeList.add(DialogNotification.Type.OCCUPANTS_DIALOG);
-        sendNotificationToGroup();
+        newFriendIdsList = new ArrayList<>();
+        newFriendIdsList.add(AppSession.getSession().getUser().getId());
+        sendNotificationToGroup(true);
         QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this,
                 ChatUtils.createLocalDialog(qbDialog));
     }
 
     private void handleAddedFriends(Intent data) {
-        addedFriendIdsList = (ArrayList<Integer>) data.getSerializableExtra(QBServiceConsts.EXTRA_FRIENDS);
-        if (addedFriendIdsList != null) {
+        newFriendIdsList = (ArrayList<Integer>) data.getSerializableExtra(QBServiceConsts.EXTRA_FRIENDS);
+        if (newFriendIdsList != null) {
 
             updateCurrentData();
             updateOccupantsList();
 
             try {
-                groupChatHelper.sendSystemMessageAboutCreatingGroupChat(qbDialog, addedFriendIdsList);
+                groupChatHelper.sendSystemMessageAboutCreatingGroupChat(qbDialog, newFriendIdsList);
             } catch (Exception e) {
                 ErrorUtils.logError(e);
             }
             currentNotificationTypeList.add(DialogNotification.Type.ADDED_DIALOG);
-            sendNotificationToGroup();
+            sendNotificationToGroup(false);
         }
     }
 
@@ -425,11 +427,15 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         showProgress();
     }
 
-    private void sendNotificationToGroup() {
+    private void sendNotificationToGroup(boolean leavedFromDialog) {
         for (DialogNotification.Type messagesNotificationType : currentNotificationTypeList) {
             try {
+                if (qbDialog != null) {
+                    qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
+                            dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
+                }
                 groupChatHelper.sendGroupMessageToFriends(qbDialog, messagesNotificationType,
-                        addedFriendIdsList);
+                        newFriendIdsList, leavedFromDialog);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
                 hideProgress();
@@ -578,7 +584,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
             updateOldGroupData();
             fillUIWithData();
 
-            sendNotificationToGroup();
+            sendNotificationToGroup(false);
             hideProgress();
         }
     }

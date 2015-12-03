@@ -121,14 +121,12 @@ public class DbUtils {
 
         if (dialogOccupant == null && qbChatMessage.getSenderId() != null) {
             saveDialogOccupantIfUserNotExists(context, dataManager, dialogId, qbChatMessage.getSenderId(),
-                    DialogOccupant.Status.LEAVED);
+                    DialogOccupant.Status.DELETED);
             dialogOccupant = dataManager.getDialogOccupantDataManager()
                     .getDialogOccupant(dialogId, qbChatMessage.getSenderId());
         }
 
-        boolean isDialogNotification = qbChatMessage
-                .getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null;
-        if (isDialogNotification) {
+        if (ChatNotificationUtils.isNotificationMessage(qbChatMessage)) {
             saveDialogNotificationToCache(context, dataManager, dialogOccupant, qbChatMessage, notify);
         } else {
             Message message = ChatUtils.createLocalMessage(qbChatMessage, dialogOccupant, state);
@@ -159,7 +157,7 @@ public class DbUtils {
     private static void updateDialogModifiedDate(DataManager dataManager, Dialog dialog, long modifiedDate,
             boolean notify) {
         if (dialog != null) {
-            dialog.setModifiedDate(modifiedDate);
+            dialog.setModifiedDateLocal(modifiedDate);
             dataManager.getDialogDataManager().update(dialog, notify);
         }
     }

@@ -27,6 +27,7 @@ import com.quickblox.users.model.QBUser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class ChatUtils {
@@ -176,7 +177,10 @@ public class ChatUtils {
         dialog.setRoomJid(qbDialog.getRoomJid());
         dialog.setTitle(qbDialog.getName());
         dialog.setPhoto(qbDialog.getPhoto());
-        dialog.setModifiedDate(qbDialog.getLastMessageDateSent());
+        if (qbDialog.getUpdatedAt() != null) {
+            dialog.setUpdatedAt(qbDialog.getUpdatedAt().getTime());
+        }
+        dialog.setModifiedDateLocal(qbDialog.getLastMessageDateSent());
 
         if (QBDialogType.PRIVATE.equals(qbDialog.getType())) {
             dialog.setType(Dialog.Type.PRIVATE);
@@ -282,7 +286,7 @@ public class ChatUtils {
                 if (dialogOccupant == null) {
                     dialogOccupant = createDialogOccupant(dataManager, qbDialog.getDialogId(), dataManager.getUserDataManager().get(userId));
                 } else {
-                    dialogOccupant.setStatus(DialogOccupant.Status.NORMAL);
+                    dialogOccupant.setStatus(DialogOccupant.Status.ACTUAL);
                 }
                 dialogOccupantsList.add(dialogOccupant);
             } else {
@@ -331,7 +335,9 @@ public class ChatUtils {
         qbDialog.setPhoto(dialog.getPhoto());
         qbDialog.setName(dialog.getTitle());
         qbDialog.setOccupantsIds(createOccupantsIdsFromDialogOccupantsList(dialogOccupantsList));
-        qbDialog.setType(Dialog.Type.PRIVATE.equals(dialog.getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
+        qbDialog.setType(
+                Dialog.Type.PRIVATE.equals(dialog.getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
+        qbDialog.setUpdatedAt(new Date(dialog.getUpdatedAt()));
         return qbDialog;
     }
 
@@ -401,10 +407,10 @@ public class ChatUtils {
             switch (chatNotificationType) {
                 case GROUP_CHAT_CREATE:
                 case GROUP_CHAT_UPDATE:
+                    dialogNotification.setType(
+                            ChatNotificationUtils.getUpdateChatLocalNotificationType(qbChatMessage));
                     dialogNotification.setBody(ChatNotificationUtils
                             .getBodyForUpdateChatNotificationMessage(context, dataManager, qbChatMessage));
-                    dialogNotification.setType(
-                            ChatNotificationUtils.getUpdateChatNotificationMessageType(qbChatMessage));
                     break;
                 case FRIENDS_REQUEST:
                 case FRIENDS_ACCEPT:
@@ -596,10 +602,7 @@ public class ChatUtils {
     }
 
     public static String getNewOccupantsIds(DataManager dataManager, String dialogId, List<Integer> inputOccupantsList) {
-        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(dialogId);
-        List<Integer> oldOccupantsList = ChatUtils
-                .getUsersIdsFromDialogOccupantsList(dialogOccupantsList);
+        List<Integer> oldOccupantsList = getOccupantsIdsListFromDialogOccupantsList(dataManager, dialogId);
 
         if (oldOccupantsList != null && !oldOccupantsList.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -615,5 +618,12 @@ public class ChatUtils {
         }
 
         return null;
+    }
+
+    public static List<Integer> getOccupantsIdsListFromDialogOccupantsList(DataManager dataManager,
+            String dialogId) {
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
+                .getDialogOccupantsListByDialogId(dialogId);
+        return ChatUtils.getUsersIdsFromDialogOccupantsList(dialogOccupantsList);
     }
 }

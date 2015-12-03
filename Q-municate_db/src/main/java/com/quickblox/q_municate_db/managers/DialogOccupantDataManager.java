@@ -89,7 +89,7 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
             Where<DialogOccupant, Long> where = queryBuilder.where();
             where.and(
                     where.in(User.Column.ID, userIdsList),
-                    where.eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.NORMAL),
+                    where.eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.ACTUAL),
                     where.eq(Dialog.Column.ID, dialogId)
             );
             PreparedQuery<DialogOccupant> preparedQuery = queryBuilder.prepare();

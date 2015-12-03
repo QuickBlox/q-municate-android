@@ -47,7 +47,7 @@ public class DialogOccupant implements Serializable {
     private Status status;
 
     public DialogOccupant() {
-        status = Status.NORMAL;
+        status = Status.ACTUAL;
     }
 
     public DialogOccupant(Dialog dialog, User user, ForeignCollection<Message> messageCollection) {
@@ -111,8 +111,8 @@ public class DialogOccupant implements Serializable {
 
     public enum Status {
 
-        NORMAL(0),
-        LEAVED(1);
+        ACTUAL(0),
+        DELETED(1);
 
         private int code;
 

@@ -81,7 +81,7 @@ public class UserDataManager extends BaseManager<User> {
             Where<DialogOccupant, Long> where = dialogOccupantQueryBuilder.where();
             where.and(
                     where.eq(Dialog.Column.ID, dialogId),
-                    where.eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.NORMAL)
+                    where.eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.ACTUAL)
             );
 
             userQueryBuilder.join(dialogOccupantQueryBuilder);

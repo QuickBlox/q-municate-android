@@ -82,7 +82,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     public void acceptFriend(int userId) throws Exception {
         roster.confirmSubscription(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createChatMessageForFriendsRequests(context,
+        QBChatMessage chatMessage = ChatNotificationUtils.createPrivateMessageAboutFriendsRequests(context,
                 NotificationType.FRIENDS_ACCEPT);
         sendNotificationToFriend(chatMessage, userId);
     }
@@ -92,7 +92,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         clearRosterEntry(userId);
         deleteFriendOrUserRequest(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createChatMessageForFriendsRequests(context,
+        QBChatMessage chatMessage = ChatNotificationUtils.createPrivateMessageAboutFriendsRequests(context,
                 NotificationType.FRIENDS_REJECT);
         sendNotificationToFriend(chatMessage, userId);
     }
@@ -102,7 +102,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         clearRosterEntry(userId);
         deleteFriendOrUserRequest(userId);
 
-        QBChatMessage qbChatMessage = ChatNotificationUtils.createChatMessageForFriendsRequests(context,
+        QBChatMessage qbChatMessage = ChatNotificationUtils.createPrivateMessageAboutFriendsRequests(context,
                 NotificationType.FRIENDS_REMOVE);
         qbChatMessage.setRecipientId(userId);
         sendNotificationToFriend(qbChatMessage, userId);
@@ -113,7 +113,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
         loadAndSaveUser(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createChatMessageForFriendsRequests(context,
+        QBChatMessage chatMessage = ChatNotificationUtils.createPrivateMessageAboutFriendsRequests(context,
                 NotificationType.FRIENDS_REQUEST);
         sendNotificationToFriend(chatMessage, userId);
     }
@@ -319,8 +319,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private void notifyContactRequest(int userId) {
         Intent intent = new Intent(QBServiceConsts.GOT_CONTACT_REQUEST);
 
-        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, context.getResources().getString(
-                R.string.frl_friends_contact_request));
+        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, context.getResources().getString(R.string.cht_notification_message));
         intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
