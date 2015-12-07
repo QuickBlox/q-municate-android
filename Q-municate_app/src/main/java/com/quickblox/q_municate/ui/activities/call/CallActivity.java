@@ -1,240 +1,184 @@
 package com.quickblox.q_municate.ui.activities.call;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Chronometer;
+import android.widget.Toast;
 
-import com.quickblox.q_municate.App;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBSignaling;
+import com.quickblox.chat.QBWebRTCSignaling;
+import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
-import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
-import com.quickblox.q_municate.ui.fragments.call.OutgoingCallFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.media.MediaPlayerManager;
-import com.quickblox.q_municate.ui.fragments.call.VideoCallFragment;
-import com.quickblox.q_municate.ui.fragments.call.VoiceCallFragment;
-import com.quickblox.q_municate_core.core.communication.SessionDescriptionWrapper;
-import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
-import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.videochat.webrtc.QBVideoChannel;
-import com.quickblox.videochat.webrtc.listener.QBVideoChatWebRTCSignalingListenerImpl;
-import com.quickblox.videochat.webrtc.model.ConnectionConfig;
-import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
-import com.quickblox.videochat.webrtc.signaling.SignalingIgnoreFilter;
+import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
+import com.quickblox.videochat.webrtc.QBRTCSession;
+import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
+import com.quickblox.videochat.webrtc.callbacks.QBRTCSessionConnectionCallbacks;
+import com.quickblox.videochat.webrtc.callbacks.QBRTCSignalingCallback;
 
-// TODO need to refactor
-@Deprecated
-public class CallActivity extends BaseLoggableActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
+import org.webrtc.VideoCapturerAndroid;
+
+import java.util.List;
+import java.util.Map;
+
+import butterknife.Bind;
+
+public class CallActivity extends BaseLoggableActivity implements QBRTCClientSessionCallbacks, QBRTCSessionConnectionCallbacks, QBRTCSignalingCallback {
 
     private static final String TAG = CallActivity.class.getSimpleName();
 
-    private User opponent;
-    private ConstsCore.CALL_DIRECTION_TYPE call_direction_type;
-    private SessionDescriptionWrapper sessionDescriptionWrapper;
-    private com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM call_type;
-    private QBVideoChannel signalingChannel;
-    private MediaPlayerManager mediaPlayer;
-    private String sessionId;
-    private QBSignalingChannel.PLATFORM remotePlatform;
-    private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
-    private ChatMessageHandler messageHandler;
-    private QBVideoChatHelper videoChatHelper;
-    private ConnectionConfig currentConfig;
+    @Bind(R.id.timer_chronometer)
+    Chronometer timerChronometer;
 
-    public static void start(Context context, User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
+    public static final String OPPONENTS_CALL_FRAGMENT = "opponents_call_fragment";
+    public static final String INCOME_CALL_FRAGMENT = "income_call_fragment";
+    public static final String CONVERSATION_CALL_FRAGMENT = "conversation_call_fragment";
+    public static final String CALLER_NAME = "caller_name";
+    public static final String SESSION_ID = "sessionID";
+    public static final String START_CONVERSATION_REASON = "start_conversation_reason";
+
+    private QBRTCSession currentSession;
+    public List<QBUser> opponentsList;
+    private Runnable showIncomingCallWindowTask;
+    private Handler showIncomingCallWindowTaskHandler;
+    private BroadcastReceiver wifiStateReceiver;
+    private boolean closeByWifiStateAllow = true;
+    private String hangUpReason;
+    private boolean isInCommingCall;
+    private boolean isInFront;
+    private QBRTCClient rtcClient;
+    private QBRTCSessionUserCallback sessionUserCallback;
+    private boolean wifiEnabled = true;
+    private SharedPreferences sharedPref;
+    private RingtonePlayer ringtonePlayer;
+    private boolean isStarted = false;
+
+    public static void start(Context context, User friend) {
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(ConstsCore.EXTRA_FRIEND, friend);
         intent.putExtra(ConstsCore.CALL_DIRECTION_TYPE_EXTRA, ConstsCore.CALL_DIRECTION_TYPE.OUTGOING);
-        intent.putExtra(ConstsCore.CALL_TYPE_EXTRA, callType);
         context.startActivity(intent);
     }
 
     @Override
-    public void onBackPressed() {
-    }
-
-    @Override
-    public void onAcceptClick() {
-        accept();
-    }
-
-    @Override
-    public void onDenyClick() {
-        reject();
-    }
-
-    @Override
-    public void onConnectionAccepted() {
-        cancelPlayer();
-    }
-
-    @Override
-    public void onConnectionRejected() {
-        unregisterListener();
-        cancelPlayer();
-        finish();
-    }
-
-    @Override
-    public void onConnectionClosed() {
-        if (videoChatHelper != null && currentConfig != null){
-            videoChatHelper.closeSignalingChannel(currentConfig);
-        }
-        unregisterListener();
-        finish();
-    }
-
-    private void unregisterListener(){
-        if (signalingChannel != null && messageHandler != null) {
-            signalingChannel.removeSignalingListener(messageHandler);
-        }
-    }
-
-    @Override
     protected int getContentResId() {
-        return R.layout.activity_main_call;
+        return R.layout.activity_call;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        canPerformLogout.set(false);
-        mediaPlayer = App.getInstance().getMediaPlayer();
-        parseIntentExtras(getIntent().getExtras());
-        addAction(QBServiceConsts.SEND_PUSH_MESSAGES_FAIL_ACTION, failAction);
+
+        if (savedInstanceState == null) {
+            addOpponentsFragment();
+        }
+
+        initFields();
+        initQBRTCClient();
+        initWiFiManagerListener();
     }
 
-    @Override
-    public void onConnectedToService(QBService service) {
-        super.onConnectedToService(service);
+    private void initFields() {
+        ringtonePlayer = new RingtonePlayer(this, R.raw.beep);
+    }
 
-        if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
-            signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
-            if (signalingChannel != null) {
-                messageHandler = new ChatMessageHandler();
-                signalingChannel.addSignalingListener(messageHandler);
-                signalingChannel.addSignalingIgnoreFilter(messageHandler, new SignalingIgnoreFilter.Equals(
-                        QBSignalingChannel.PacketType.qbvideochat_call));
-            } else {
-                ToastUtils.longToast(R.string.dlg_wrong_signaling);
-                finish();
+    private void initQBRTCClient() {
+        rtcClient = QBRTCClient.getInstance(this);
+        // Add signalling manager
+        QBChatService
+                .getInstance().getVideoChatWebRTCSignalingManager().addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
+            @Override
+            public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
+                if (!createdLocally) {
+                    rtcClient.addSignaling((QBWebRTCSignaling) qbSignaling);
+                }
             }
-        }
-    }
+        });
 
-    @Override
-    protected void onDestroy() {
-        cancelPlayer();
-        super.onDestroy();
-    }
-
-    private void cancelPlayer() {
-        if (mediaPlayer != null) {
-            mediaPlayer.stopPlaying();
-        }
-    }
-
-    private void reject() {
-        if (signalingChannel != null && opponent != null) {
-            QBUser userOpponent = Utils.friendToUser(opponent);
-            currentConfig = new ConnectionConfig(userOpponent, sessionId);
-            signalingChannel.sendReject(currentConfig);
-        }
-        onConnectionClosed();
-    }
-
-    private void accept() {
-        cancelPlayer();
-        showOutgoingFragment(sessionDescriptionWrapper, opponent, call_type, sessionId);
-    }
-
-    private void parseIntentExtras(Bundle extras) {
-        call_direction_type = (ConstsCore.CALL_DIRECTION_TYPE) extras.getSerializable(
-                ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
-        call_type = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM) extras.getSerializable(ConstsCore.CALL_TYPE_EXTRA);
-        remotePlatform = (QBSignalingChannel.PLATFORM) extras.getSerializable(
-                com.quickblox.videochat.webrtc.Consts.PLATFORM_EXTENSION);
-        deviceOrientation = (QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION) extras.getSerializable(
-                com.quickblox.videochat.webrtc.Consts.ORIENTATION_EXTENSION);
-        Log.i(TAG, "call_direction_type=" + call_direction_type);
-        Log.i(TAG, "call_type=" + call_type);
-        sessionId = extras.getString(com.quickblox.videochat.webrtc.Consts.SESSION_ID_EXTENSION, "");
-        opponent = (User) extras.getSerializable(ConstsCore.EXTRA_FRIEND);
-        if (call_direction_type != null) {
-            if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-                sessionDescriptionWrapper = extras.getParcelable(ConstsCore.REMOTE_DESCRIPTION);
-                showIncomingFragment();
-            } else {
-                notifyFriendOnCall(opponent);
-                showOutgoingFragment();
+        rtcClient.setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
+            @Override
+            public void onCameraError(final String s) {
+                CallActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(CallActivity.this, s, Toast.LENGTH_LONG).show();
+                    }
+                });
             }
-        }
-        Log.i(TAG, "opponentId=" + opponent);
+        });
+
+        // Configure
+        //
+        QBRTCConfig.setMaxOpponentsCount(6);
+        QBRTCConfig.setDisconnectTime(30);
+        QBRTCConfig.setAnswerTimeInterval(30l);
+        QBRTCConfig.setDebugEnabled(true);
+
+        // Add activity as callback to RTCClient
+        rtcClient.addSessionCallbacksListener(this);
+        // Start mange QBRTCSessions according to VideoCall parser's callbacks
+        rtcClient.prepareToProcessCalls();
     }
 
-    private void notifyFriendOnCall(User friend) {
-        // TODO temp
-        //        if (!friend.isOnline()) {
-        //            String callMsg = getString(R.string.dlg_offline_call,
-        //                    AppSession.getSession().getUser().getFullName());
-        //            QBSendPushCommand.start(this, callMsg, friend.getUserId());
-        //        }
+    private void initWiFiManagerListener() {
+        wifiStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "WIFI was changed");
+                processCurrentWifiState(context);
+            }
+        };
     }
 
-    private void showOutgoingFragment() {
-        playOutgoingRingtone();
-        OutgoingCallFragment outgoingCallFragment = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO.equals(
-                call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA, call_direction_type);
-        bundle.putSerializable(ConstsCore.EXTRA_FRIEND, opponent);
-        bundle.putSerializable(ConstsCore.CALL_TYPE_EXTRA, call_type);
-        outgoingCallFragment.setArguments(bundle);
-        setCurrentFragment(outgoingCallFragment);
-    }
-
-    private void playOutgoingRingtone() {
-        if (mediaPlayer != null) {
-            mediaPlayer.playSound("calling.mp3", true);
-        }
-    }
-
-    private void playIncomingRingtone() {
-        if (mediaPlayer != null) {
-            mediaPlayer.playDefaultRingTone();
+    private void processCurrentWifiState(Context context) {
+        WifiManager wifi = (WifiManager) context.getSystemService(WIFI_SERVICE);
+        if (wifiEnabled != wifi.isWifiEnabled()) {
+            wifiEnabled = wifi.isWifiEnabled();
+            ToastUtils.longToast("Wifi " + (wifiEnabled ? "enabled" : "disabled"));
         }
     }
 
-    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, User opponentId,
-            com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType, String sessionId) {
-        Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
-                call_direction_type, callType, sessionId, remotePlatform, deviceOrientation);
-        OutgoingCallFragment outgoingCallFragment = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO.equals(
-                call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
-        outgoingCallFragment.setArguments(bundle);
-        setCurrentFragment(outgoingCallFragment);
+    public void addOpponentsFragment() {
+        setCurrentFragment(new OpponentsFragment());
     }
 
-    private void showIncomingFragment() {
-        playIncomingRingtone();
-        IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type,
-                opponent);
-        setCurrentFragment(incomingCallFragment);
-    }
-
-    private class ChatMessageHandler extends QBVideoChatWebRTCSignalingListenerImpl {
-
-        @Override
-        public void onStop(ConnectionConfig connectionConfig) {
-            currentConfig = connectionConfig;
-            onConnectionClosed();
+    private void startTimer() {
+        if (!isStarted) {
+            timerChronometer.setBase(SystemClock.elapsedRealtime());
+            timerChronometer.start();
+            isStarted = true;
         }
+    }
+
+    private void stopTimer(){
+        if (timerChronometer != null){
+            timerChronometer.stop();
+            isStarted = false;
+        }
+    }
+
+    public interface QBRTCSessionUserCallback {
+
+        void onUserNotAnswer(QBRTCSession session, Integer userId);
+
+        void onCallRejectByUser(QBRTCSession session, Integer userId, Map<String, String> userInfo);
+
+        void onCallAcceptByUser(QBRTCSession session, Integer userId, Map<String, String> userInfo);
+
+        void onReceiveHangUpFromUser(QBRTCSession session, Integer userId);
     }
 }

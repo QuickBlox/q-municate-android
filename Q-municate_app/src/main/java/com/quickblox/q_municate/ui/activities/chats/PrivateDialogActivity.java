@@ -177,10 +177,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         }
         switch (item.getItemId()) {
             case R.id.action_audio_call:
-                callToUser(opponentUser, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
+                callToUser(opponentUser);
                 break;
             case R.id.action_video_call:
-                callToUser(opponentUser, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
+                callToUser(opponentUser);
                 break;
             default:
                 super.onOptionsItemSelected(item);
@@ -245,7 +245,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         sendMessage(true);
     }
 
-    private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
+    private void callToUser(User friend) {
         ErrorUtils.showError(this, getString(R.string.coming_soon));
 //        if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
 //            CallActivity.start(PrivateDialogActivity.this, friend, callType);

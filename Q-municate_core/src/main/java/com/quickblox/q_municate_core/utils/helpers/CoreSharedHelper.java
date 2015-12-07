@@ -9,26 +9,33 @@ import static com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper.Const
 
 public class CoreSharedHelper {
 
-    public interface Constants {
+    public class Constants {
 
-        String NAME = "Q-municate";
+        public static final String NAME = "Q-municate";
 
-        String LOGIN_TYPE = "login_type";
-        String IMPORT_INITIALIZED = "import_initialized";
-        String FIRST_AUTH = "first_auth";
-        String QB_TOKEN = "qb_token";
-        String FB_TOKEN = "fb_token";
+        public static final String LOGIN_TYPE = "login_type";
+        public static final String IMPORT_INITIALIZED = "import_initialized";
+        public static final String FIRST_AUTH = "first_auth";
+        public static final String QB_TOKEN = "qb_token";
+        public static final String FB_TOKEN = "fb_token";
 
-        String USER_ID = "user_id";
-        String USER_EMAIL = "user_email";
-        String USER_PASSWORD = "user_password";
-        String USER_FULL_NAME = "full_name";
+        public static final String USER_ID = "user_id";
+        public static final String USER_EMAIL = "user_email";
+        public static final String USER_PASSWORD = "user_password";
+        public static final String USER_FULL_NAME = "full_name";
 
-        String PUSH_NEED_TO_OPEN_DIALOG = "push_need_to_open_dialog";
-        String PUSH_DIALOG_ID = "push_dialog_id";
-        String PUSH_USER_ID = "push_user_id";
-        String PUSH_REGISTRATION_ID = "push_registration_id";
-        String PUSH_APP_VERSION = "push_app_version";
+        public static final String PUSH_NEED_TO_OPEN_DIALOG = "push_need_to_open_dialog";
+        public static final String PUSH_DIALOG_ID = "push_dialog_id";
+        public static final String PUSH_USER_ID = "push_user_id";
+        public static final String PUSH_REGISTRATION_ID = "push_registration_id";
+        public static final String PUSH_APP_VERSION = "push_app_version";
+
+        public static final String CALL_HW_CODEC = "call_hw_codec";
+        public static final String CALL_RESOLUTION = "call_resolution";
+        public static final String CALL_STARTBITRATE = "call_startbitrate";
+        public static final String CALL_STARTBITRATE_VALUE = "call_startbitrate_value";
+        public static final String CALL_VIDEO_CODEC = "call_video_codec";
+        public static final String CALL_AUDIO_CODEC = "call_audio_codec";
     }
 
     protected final SharedPreferences sharedPreferences;
@@ -37,6 +44,9 @@ public class CoreSharedHelper {
     private static CoreSharedHelper instance;
 
     public static CoreSharedHelper getInstance() {
+        if (instance == null) {
+            throw new NullPointerException("CoreSharedHelper was not initialized!");
+        }
         return instance;
     }
 
@@ -204,5 +214,53 @@ public class CoreSharedHelper {
 
     public void savePushAppVersion(int appVersion) {
         savePref(Constants.PUSH_APP_VERSION, appVersion);
+    }
+
+    public boolean getCallHwCodec(boolean defValue) {
+        return getPref(Constants.CALL_HW_CODEC, defValue);
+    }
+
+    public void saveCallHwCodec(boolean value) {
+        savePref(Constants.CALL_HW_CODEC, value);
+    }
+
+    public int getCallResolution(int defValue) {
+        return getPref(Constants.CALL_RESOLUTION, defValue);
+    }
+
+    public void saveCallResolution(int value) {
+        savePref(Constants.CALL_RESOLUTION, value);
+    }
+
+    public String getCallStartbitrate(String defValue) {
+        return getPref(Constants.CALL_STARTBITRATE, defValue);
+    }
+
+    public void saveCallStartbitrate(String value) {
+        savePref(Constants.CALL_STARTBITRATE, value);
+    }
+
+    public int getCallStartbitrateValue(int defValue) {
+        return getPref(Constants.CALL_STARTBITRATE_VALUE, defValue);
+    }
+
+    public void saveCallStartbitrateValue(int value) {
+        savePref(Constants.CALL_STARTBITRATE_VALUE, value);
+    }
+
+    public int getCallVideoCodec(int defValue) {
+        return getPref(Constants.CALL_VIDEO_CODEC, defValue);
+    }
+
+    public void saveCallVideoCodec(int value) {
+        savePref(Constants.CALL_VIDEO_CODEC, value);
+    }
+
+    public String getCallAudioCodec(String defValue) {
+        return getPref(Constants.CALL_AUDIO_CODEC, defValue);
+    }
+
+    public void saveCallAudioCodec(String value) {
+        savePref(Constants.CALL_AUDIO_CODEC, value);
     }
 }

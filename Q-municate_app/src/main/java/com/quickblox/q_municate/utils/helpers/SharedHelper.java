@@ -6,11 +6,11 @@ import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 
 public class SharedHelper extends CoreSharedHelper {
 
-    public interface Constants {
+    public class Constants {
 
-        String USER_AGREEMENT = "user_agreement";
-        String REMEMBER_ME = "remember_me";
-        String ENABLING_PUSH_NOTIFICATIONS = "enabling_push_notifications";
+        public static final String USER_AGREEMENT = "user_agreement";
+        public static final String REMEMBER_ME = "remember_me";
+        public static final String ENABLING_PUSH_NOTIFICATIONS = "enabling_push_notifications";
     }
 
     public SharedHelper(Context context) {

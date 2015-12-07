@@ -18,4 +18,11 @@
         <attr name="mask" format="integer" />
     </declare-styleable>
 
+    <declare-styleable name="RTCGlView">
+        <attr name="mainMirror" format="boolean" />
+        <attr name="secondMirror" format="boolean" />
+        <attr name="mainCoords" format="reference" />
+        <attr name="secondCoords" format="reference"/>
+    </declare-styleable>
+
 </resources>
