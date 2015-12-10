@@ -64,6 +64,14 @@ public class UserFriendUtils {
         return createLocalUser(qbUser, User.Role.SIMPLE_ROLE);
     }
 
+    public static QBUser createQbUser(User user) {
+        QBUser qbUser = new QBUser();
+        qbUser.setId(user.getUserId());
+        qbUser.setLogin(user.getLogin());
+        qbUser.setFullName(user.getFullName());
+        return qbUser;
+    }
+
     public static boolean isOutgoingFriend(QBRosterEntry rosterEntry) {
         return RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus());
     }
@@ -130,5 +138,26 @@ public class UserFriendUtils {
             friendsList.add(new Friend(dialogOccupant.getUser()));
         }
         return friendsList;
+    }
+
+    public static String getUserNameByID(Integer userId, List<QBUser> usersList) {
+        for (QBUser user : usersList) {
+            if (user.getId().equals(userId)) {
+                return user.getFullName();
+            }
+        }
+        return userId.toString();
+    }
+
+    public static List<QBUser> getUsersByIDs(Integer[] ids, List<QBUser> usersList) {
+        ArrayList<QBUser> result = new ArrayList<>();
+        for (Integer userId : ids) {
+            for (QBUser user : usersList) {
+                if (userId.equals(user.getId())){
+                    result.add(user);
+                }
+            }
+        }
+        return result;
     }
 }

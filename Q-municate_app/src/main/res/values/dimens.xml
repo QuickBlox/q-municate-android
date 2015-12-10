@@ -67,4 +67,6 @@
     <dimen name="about_logo_vendor_margin_bottom">84dp</dimen>
     <dimen name="about_vendor_text_margin_bottom">22dp</dimen>
 
+    <dimen name="grid_item_divider">4dp</dimen>
+
 </resources>

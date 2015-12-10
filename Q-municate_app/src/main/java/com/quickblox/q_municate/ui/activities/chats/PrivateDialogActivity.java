@@ -14,25 +14,32 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.users.model.QBUser;
+import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -177,10 +184,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         }
         switch (item.getItemId()) {
             case R.id.action_audio_call:
-                callToUser(opponentUser);
+                callToUser(opponentUser, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
                 break;
             case R.id.action_video_call:
-                callToUser(opponentUser);
+                callToUser(opponentUser, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
                 break;
             default:
                 super.onOptionsItemSelected(item);
@@ -245,11 +252,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         sendMessage(true);
     }
 
-    private void callToUser(User friend) {
-        ErrorUtils.showError(this, getString(R.string.coming_soon));
-//        if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
-//            CallActivity.start(PrivateDialogActivity.this, friend, callType);
-//        }
+    private void callToUser(User user, QBRTCTypes.QBConferenceType qbConferenceType) {
+        List<QBUser> qbUserList = new ArrayList<>(1);
+        qbUserList.add(UserFriendUtils.createQbUser(user));
+        CallActivity.start(PrivateDialogActivity.this, qbUserList, qbConferenceType, null);
     }
 
     private void acceptUser(final int userId) {

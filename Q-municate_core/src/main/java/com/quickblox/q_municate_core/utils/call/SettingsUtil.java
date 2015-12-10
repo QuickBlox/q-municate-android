@@ -31,12 +31,11 @@ public class SettingsUtil {
         }
     }
 
-    public static void setSettingsStrategy(List<QBUser> users, SharedPreferences sharedPref,
-            Context context) {
-        if (users.size() == 1) {
+    public static void setSettingsStrategy(Context context, List<QBUser> usersList) {
+        if (usersList.size() == 1) {
             setSettingsFromPreferences(context);
         } else {
-            setSettingsForMultiCall(users);
+            setSettingsForMultiCall(usersList);
         }
     }
 

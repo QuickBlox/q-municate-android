@@ -1,10 +1,10 @@
 package com.quickblox.q_municate.ui.fragments.call;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +13,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.sample.groupchatwebrtc.R;
-import com.quickblox.sample.groupchatwebrtc.activities.CallActivity;
-import com.quickblox.sample.groupchatwebrtc.activities.ListUsersActivity;
-import com.quickblox.sample.groupchatwebrtc.definitions.Consts;
-import com.quickblox.sample.groupchatwebrtc.holder.DataHolder;
-import com.quickblox.sample.groupchatwebrtc.util.RingtonePlayer;
+import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.call.CallActivity;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
@@ -29,12 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * QuickBlox team
- */
-public class IncomeCallFragment extends Fragment implements Serializable, View.OnClickListener {
+public class IncomingCallFragment extends Fragment implements Serializable, View.OnClickListener {
 
-    private static final String TAG = IncomeCallFragment.class.getSimpleName();
+    public static final String TAG = IncomingCallFragment.class.getSimpleName();
+
     private static final long CLICK_DELAY = TimeUnit.SECONDS.toMillis(2);
     private TextView incVideoCall;
     private TextView incAudioCall;
@@ -50,18 +46,23 @@ public class IncomeCallFragment extends Fragment implements Serializable, View.O
     private QBRTCTypes.QBConferenceType conferenceType;
     private int qbConferenceType;
     private View view;
-    private long lastCliclTime = 0l;
+    private long lastClickTime = 0l;
     private RingtonePlayer ringtonePlayer;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        setRetainInstance(true);
+
+        Log.d(TAG, "onCreate() from IncomeCallFragment");
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         if (getArguments() != null) {
-            opponents = getArguments().getIntegerArrayList("opponents");
-            sessionDescription = (QBRTCSessionDescription) getArguments().getSerializable("sessionDescription");
-            qbConferenceType = getArguments().getInt(Consts.CONFERENCE_TYPE);
-
-
+            opponents = getArguments().getIntegerArrayList(QBServiceConsts.EXTRA_OPPONENTS);
+            sessionDescription = (QBRTCSessionDescription) getArguments().getSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION);
+            qbConferenceType = getArguments().getInt(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
             conferenceType =
                     qbConferenceType == 1 ? QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO :
                             QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO;
@@ -80,22 +81,22 @@ public class IncomeCallFragment extends Fragment implements Serializable, View.O
             initButtonsListener();
 
         }
+
         ringtonePlayer = new RingtonePlayer(getActivity());
+
         return view;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        setRetainInstance(true);
-
-        Log.d(TAG, "onCreate() from IncomeCallFragment");
-        super.onCreate(savedInstanceState);
     }
 
     @Override
     public void onStart() {
         super.onStart();
         startCallNotification();
+    }
+
+    public void onStop() {
+        stopCallNotification();
+        super.onDestroy();
+        Log.d(TAG, "onDestroy() from IncomeCallFragment");
     }
 
     private void initButtonsListener() {
@@ -109,10 +110,7 @@ public class IncomeCallFragment extends Fragment implements Serializable, View.O
         incVideoCall = (TextView) view.findViewById(R.id.incVideoCall);
 
         callerName = (TextView) view.findViewById(R.id.callerName);
-        callerName.setText(getCallerName(((CallActivity) getActivity()).getCurrentSession()));
-        callerName.setBackgroundResource(
-                ListUsersActivity.selectBackgrounForOpponent((DataHolder.getUserIndexByID((
-                        ((CallActivity) getActivity()).getCurrentSession().getCallerID()))) + 1));
+//        callerName.setText(getCallerName(((CallActivity) getActivity()).getCurrentSession()));
 
         otherIncUsers = (TextView) view.findViewById(R.id.otherIncUsers);
         otherIncUsers.setText(getOtherIncUsersNames(opponents));
@@ -172,7 +170,7 @@ public class IncomeCallFragment extends Fragment implements Serializable, View.O
         String s = new String();
         int i = session.getCallerID();
 
-        opponentsFromCall.addAll(DataHolder.getUsers());
+        opponentsFromCall.addAll(((CallActivity) getActivity()).getOpponentsList());
 
         for (QBUser usr : opponentsFromCall) {
             if (usr.getId().equals(i)) {
@@ -192,19 +190,13 @@ public class IncomeCallFragment extends Fragment implements Serializable, View.O
         }
     }
 
-    public void onStop() {
-        stopCallNotification();
-        super.onDestroy();
-        Log.d(TAG, "onDestroy() from IncomeCallFragment");
-    }
-
     @Override
     public void onClick(View v) {
 
-        if ((SystemClock.uptimeMillis() - lastCliclTime) < CLICK_DELAY) {
+        if ((SystemClock.uptimeMillis() - lastClickTime) < CLICK_DELAY) {
             return;
         }
-        lastCliclTime = SystemClock.uptimeMillis();
+        lastClickTime = SystemClock.uptimeMillis();
         switch (v.getId()) {
             case R.id.rejectBtn:
                 reject();
@@ -234,7 +226,6 @@ public class IncomeCallFragment extends Fragment implements Serializable, View.O
         stopCallNotification();
 
         ((CallActivity) getActivity()).rejectCurrentSession();
-        ((CallActivity) getActivity()).removeIncomeCallFragment();
-        ((CallActivity) getActivity()).addOpponentsFragment();
+        getActivity().finish();
     }
 }

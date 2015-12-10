@@ -183,7 +183,20 @@
     <string name="preview_image_title">Preview image</string>
 
 
+    <!-- Call -->
+    <string name="call_incoming_audio_call">Incoming Audio Call</string>
+    <string name="call_incoming_video_call">Incoming Video Call</string>
+    <string name="call_accepted">Accepted</string>
+    <string name="call_rejected">Rejected</string>
+    <string name="call_no_answer">No answer</string>
+    <string name="call_hung_up">Hung up</string>
+
+
+
     // NOT REFACTORED YET
+
+
+
 
     <!-- Friend List -->
     <string name="frl_global_search">Global Search</string>
@@ -285,14 +298,9 @@
         <item>Camera</item>
     </string-array>
 
-    <!-- Facebook -->
-    <string name="facebook_exception">Facebook exception: </string>
-
-    <!-- Calls -->
-    <string name="cll_incoming_call_audio">Incoming Call</string>
-    <string name="cll_incoming_call_video">Incoming Video Call</string>
 
     <!-- Other -->
+    <string name="facebook_exception">Facebook exception: </string>
     <string name="comming_soon">Will be implemented soon</string>
     <string name="search_hint">Search</string>
     <string name="push_title">QMUN: Missed messages</string>
@@ -315,6 +323,16 @@
     <string name="minutes_short">%1$dm</string>
     <string name="date_ago">ago</string>
     <string name="last_seen">Last seen %1$s at %2$s</string>
+    <string name="dlg_signal_error">Disconnected… Please check your Internet connection!</string>
+    <string name="also_on_call">Also on call:</string>
+    <string name="connect">Connect…</string>
+    <string name="checking">Checking…</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="closed">Closed</string>
+    <string name="time_out">Time Out</string>
+    <string name="failed">Failed</string>
+    <string name="wifi_disabled">Call was stopped because connection was lost</string>
 
     <plurals name="days">
         <item quantity="one">%1$d day</item>

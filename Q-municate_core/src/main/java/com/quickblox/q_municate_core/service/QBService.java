@@ -28,7 +28,7 @@ import com.quickblox.q_municate_core.qb.commands.friend.QBImportFriendsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitChatServiceCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitChatsCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBInitFriendListCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBInitVideoChatCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBJoinGroupChatsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -61,7 +61,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -79,7 +79,7 @@ public class QBService extends Service {
     public static final int PRIVATE_CHAT_HELPER = 2;
     public static final int GROUP_CHAT_HELPER = 3;
     public static final int FRIEND_LIST_HELPER = 4;
-    public static final int VIDEO_CHAT_HELPER = 5;
+    public static final int CALL_CHAT_HELPER = 5;
     public static final int CHAT_REST_HELPER = 6;
     public static final int REST_HELPER = 7;
 
@@ -120,13 +120,13 @@ public class QBService extends Service {
         helpersMap.put(PRIVATE_CHAT_HELPER, new QBPrivateChatHelper(this));
         helpersMap.put(GROUP_CHAT_HELPER, new QBGroupChatHelper(this));
         helpersMap.put(FRIEND_LIST_HELPER, new QBFriendListHelper(this));
-        helpersMap.put(VIDEO_CHAT_HELPER, new QBVideoChatHelper(this));
+        helpersMap.put(CALL_CHAT_HELPER, new QBCallChatHelper(this));
         helpersMap.put(REST_HELPER, new QBRestHelper(this));
     }
 
     private void initCommands() {
         // first call init
-        registerInitCallClassCommand();
+        registerInitCallChatCommand();
 
         // login/signUp commands
         registerLoginRestCommand();
@@ -479,14 +479,14 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.SEND_PUSH_ACTION, sendPushCommand);
     }
 
-    private void registerInitCallClassCommand() {
-        QBVideoChatHelper videoChatHelper = (QBVideoChatHelper) getHelper(VIDEO_CHAT_HELPER);
+    private void registerInitCallChatCommand() {
+        QBCallChatHelper qbCallChatHelper = (QBCallChatHelper) getHelper(CALL_CHAT_HELPER);
 
-        QBInitVideoChatCommand initVideoChatCommand = new QBInitVideoChatCommand(this, videoChatHelper,
+        QBInitCallChatCommand qbInitCallChatCommand = new QBInitCallChatCommand(this, qbCallChatHelper,
                 QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION,
                 QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION);
 
-        serviceCommandMap.put(QBServiceConsts.INIT_VIDEO_CHAT_ACTION, initVideoChatCommand);
+        serviceCommandMap.put(QBServiceConsts.INIT_CALL_CHAT_ACTION, qbInitCallChatCommand);
     }
 
     // ------------------ logout commands
@@ -540,7 +540,7 @@ public class QBService extends Service {
         QBLoadFriendListCommand loadFriendListCommand = new QBLoadFriendListCommand(this, friendListHelper,
                 QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
-        QBInitVideoChatCommand initVideoChatCommand = (QBInitVideoChatCommand) serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
+        QBInitCallChatCommand initVideoChatCommand = (QBInitCallChatCommand) serviceCommandMap.get(QBServiceConsts.INIT_CALL_CHAT_ACTION);
 
         loginCommand.addCommand(initChatServiceCommand);
         loginCommand.addCommand(loginChatCommand);
@@ -636,7 +636,7 @@ public class QBService extends Service {
             if (action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)) {
                 ((QBBaseChatHelper) getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
                 ((QBBaseChatHelper) getHelper(GROUP_CHAT_HELPER)).init(AppSession.getSession().getUser());
-                ((QBVideoChatHelper) getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
+                ((QBCallChatHelper) getHelper(CALL_CHAT_HELPER)).init(QBChatService.getInstance());
             }
         }
     }

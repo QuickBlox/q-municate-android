@@ -46,7 +46,7 @@ public class QBServiceConsts {
     public static final String INIT_FRIEND_LIST_ACTION = "init friend list action";
     public static final String INIT_CHATS_ACTION = "init_chats_action";
     public static final String INIT_CHAT_SERVICE_ACTION = "init_chat_service_action";
-    public static final String INIT_VIDEO_CHAT_ACTION = "init_video_chat_action";
+    public static final String INIT_CALL_CHAT_ACTION = "init_video_chat_action";
     public static final String SIGNUP_REST_ACTION = "signup_rest_action";
     public static final String CREATE_GROUP_CHAT_ACTION = "create_group_chat_action";
     public static final String CREATE_PRIVATE_CHAT_ACTION = "create_private_chat_action";
@@ -212,6 +212,15 @@ public class QBServiceConsts {
     public static final String EXTRA_USER_STATUS = "user_status";
     public static final String EXTRA_REGISTRATION_ID = "registration_id";
     public static final String EXTRA_IS_PUSH_SUBSCRIBED_ON_SERVER = "is_push_subscribed_on_server";
+    public static final String EXTRA_OPPONENTS = "opponents";
+    public static final String EXTRA_WIFI_DISABLED = "wifi_disabled";
+    public static final String EXTRA_CONFERENCE_TYPE = "conference_type";
+    public static final String EXTRA_CALL_TYPE = "call_type";
+    public static final String EXTRA_CALLER_NAME = "caller_name";
+    public static final String EXTRA_SESSION_ID = "session_id";
+    public static final String EXTRA_START_CONVERSATION_REASON = "start_conversation_reason";
+    public static final String EXTRA_SESSION_DESCRIPTION = "session_description";
+
 
     public static final String UPDATE_DIALOG = "update_dialog";
     public static final String UPDATE_DIALOG_DETAILS = "update_dialog_details";

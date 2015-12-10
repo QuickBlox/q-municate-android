@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
@@ -54,6 +55,7 @@ import com.quickblox.q_municate.utils.listeners.simple.SimpleGlobalLoginListener
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
@@ -298,6 +300,16 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == CallActivity.CALL_ACTIVITY_CLOSE){
+            if (resultCode == CallActivity.CALL_ACTIVITY_CLOSE_WIFI_DISABLED) {
+                ToastUtils.longToast(R.string.wifi_disabled);
+            }
+        }
+    }
+
     private void initFields() {
         app = App.getInstance();
         appSharedHelper = App.getInstance().getAppSharedHelper();
@@ -453,11 +465,20 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void setCurrentFragment(Fragment fragment) {
+        setCurrentFragment(fragment, null);
+    }
+
+    public void setCurrentFragment(Fragment fragment, String tag) {
         currentFragment = fragment;
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction transaction = buildTransaction();
-        transaction.replace(R.id.container_fragment, fragment, null);
+        transaction.replace(R.id.container_fragment, fragment, tag);
         transaction.commit();
+    }
+
+    public void removeFragment() {
+        getSupportFragmentManager().beginTransaction().remove(
+                getSupportFragmentManager().findFragmentById(R.id.container_fragment)).commit();
     }
 
     private FragmentTransaction buildTransaction() {
@@ -619,6 +640,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void performLoginChatSuccessAction(Bundle bundle) {
+        QBInitCallChatCommand.start(this, CallActivity.class);
         checkLoadDialogs();
         hideProgress();
     }

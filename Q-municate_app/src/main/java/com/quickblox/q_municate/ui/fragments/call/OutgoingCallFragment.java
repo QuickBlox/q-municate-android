@@ -1,6 +1,6 @@
 package com.quickblox.q_municate.ui.fragments.call;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +29,10 @@ import android.widget.ToggleButton;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
+import com.quickblox.q_municate.ui.adapters.call.OpponentsFromCallAdapter;
 import com.quickblox.q_municate_core.models.StartConversationReason;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.call.CameraUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBMediaStreamManager;
 import com.quickblox.videochat.webrtc.QBRTCSession;
@@ -47,20 +50,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ConversationFragment extends Fragment implements Serializable, QBRTCClientVideoTracksCallbacks, QBRTCSessionConnectionCallbacks, CallActivity.QBRTCSessionUserCallback, OpponentsFromCallAdapter.OnAdapterEventListener {
+public class OutgoingCallFragment extends Fragment implements Serializable, QBRTCClientVideoTracksCallbacks,
+        QBRTCSessionConnectionCallbacks, CallActivity.QBRTCSessionUserCallback, OpponentsFromCallAdapter.OnAdapterEventListener {
 
-    public static final String CALLER_NAME = "caller_name";
-    public static final String SESSION_ID = "sessionID";
-    public static final String START_CONVERSATION_REASON = "start_conversation_reason";
-    public static final String CONFERENCE_TYPE = "conference_type";
-    public static final String OPPONENTS = "opponents";
+    public String TAG = OutgoingCallFragment.class.getSimpleName();
 
     private static final int DEFAULT_ROWS_COUNT = 2;
     private static final int DEFAULT_COLS_COUNT = 3;
     private static final long TOGGLE_CAMERA_DELAY = 1000;
     private static final long LOCAL_TRACk_INITIALIZE_DELAY = 500;
 
-    private String TAG = ConversationFragment.class.getSimpleName();
     private ArrayList<QBUser> opponents;
     private int qbConferenceType;
     private int startReason;
@@ -91,25 +90,19 @@ public class ConversationFragment extends Fragment implements Serializable, QBRT
     private QBRTCVideoTrack localVideoTrack;
     private Handler mainHandler;
 
-    public static ConversationFragment newInstance(List<QBUser> opponents, String callerName,
-            QBRTCTypes.QBConferenceType qbConferenceType, Map<String, String> userInfo,
+    public static OutgoingCallFragment newInstance(List<QBUser> opponents, String callerName,
+            QBRTCTypes.QBConferenceType qbConferenceType,
             StartConversationReason reason, String sessionId) {
 
-        ConversationFragment fragment = new ConversationFragment();
+        OutgoingCallFragment fragment = new OutgoingCallFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt(CONFERENCE_TYPE, qbConferenceType.getValue());
-        bundle.putString(CALLER_NAME, callerName);
-        bundle.putSerializable(OPPONENTS, (Serializable) opponents);
+        bundle.putInt(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType.getValue());
+        bundle.putString(QBServiceConsts.EXTRA_CALLER_NAME, callerName);
+        bundle.putSerializable(QBServiceConsts.EXTRA_OPPONENTS, (Serializable) opponents);
 
-        if (userInfo != null) {
-            for (String key : userInfo.keySet()) {
-                bundle.putString("UserInfo:" + key, userInfo.get(key));
-            }
-        }
-
-        bundle.putInt(START_CONVERSATION_REASON, reason.ordinal());
+        bundle.putInt(QBServiceConsts.EXTRA_START_CONVERSATION_REASON, reason.ordinal());
         if (sessionId != null) {
-            bundle.putString(SESSION_ID, sessionId);
+            bundle.putString(QBServiceConsts.EXTRA_SESSION_ID, sessionId);
         }
 
         fragment.setArguments(bundle);
@@ -165,11 +158,11 @@ public class ConversationFragment extends Fragment implements Serializable, QBRT
         Log.d(TAG, "Fragment. Thread id: " + Thread.currentThread().getId());
 
         if (getArguments() != null) {
-            opponents = (ArrayList<QBUser>) getArguments().getSerializable(Consts.OPPONENTS);
-            qbConferenceType = getArguments().getInt(Consts.CONFERENCE_TYPE);
-            startReason = getArguments().getInt(CallActivity.START_CONVERSATION_REASON);
-            sessionID = getArguments().getString(CallActivity.SESSION_ID);
-            callerName = getArguments().getString(CallActivity.CALLER_NAME);
+            opponents = (ArrayList<QBUser>) getArguments().getSerializable(QBServiceConsts.EXTRA_OPPONENTS);
+            qbConferenceType = getArguments().getInt(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
+            startReason = getArguments().getInt(QBServiceConsts.EXTRA_START_CONVERSATION_REASON);
+            sessionID = getArguments().getString(QBServiceConsts.EXTRA_SESSION_ID);
+            callerName = getArguments().getString(QBServiceConsts.EXTRA_CALLER_NAME);
 
             isPeerToPeerCall = opponents.size() == 1;
             isVideoEnabled = (qbConferenceType == QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO
@@ -194,8 +187,8 @@ public class ConversationFragment extends Fragment implements Serializable, QBRT
 
         super.onStart();
         QBRTCSession session = ((CallActivity) getActivity()).getCurrentSession();
-        if (!isMessageProcessed) {
-            if (startReason == CallActivity.StartConversetionReason.INCOME_CALL_FOR_ACCEPTION.ordinal()) {
+        if (session != null && !isMessageProcessed) {
+            if (startReason == StartConversationReason.INCOME_CALL_FOR_ACCEPTION.ordinal()) {
                 session.acceptCall(session.getUserInfo());
             } else {
                 session.startCall(session.getUserInfo());
@@ -233,7 +226,7 @@ public class ConversationFragment extends Fragment implements Serializable, QBRT
         super.onStop();
         getActivity().unregisterReceiver(audioStreamReceiver);
         ((CallActivity) getActivity()).removeRTCClientConnectionCallback(this);
-        ((CallActivity) getActivity()).removeRTCSessionUserCallback(this);
+        ((CallActivity) getActivity()).removeRTCSessionUserCallback();
     }
 
     private void initViews(View view) {
@@ -267,8 +260,6 @@ public class ConversationFragment extends Fragment implements Serializable, QBRT
         handUpVideoCall = (ImageButton) view.findViewById(R.id.handUpVideoCall);
         incUserName = (TextView) view.findViewById(R.id.incUserName);
         incUserName.setText(callerName);
-        incUserName.setBackgroundResource(ListUsersActivity
-                .selectBackgrounForOpponent((DataHolder.getUserIndexByFullName(callerName)) + 1));
 
         actionButtonsEnabled(false);
     }
@@ -282,7 +273,7 @@ public class ConversationFragment extends Fragment implements Serializable, QBRT
 
         OpponentsFromCallAdapter opponentsAdapter = new OpponentsFromCallAdapter(getActivity(), opponents,
                 cellSize, cellSize, gridWidth, columnsCount, (int) itemMargin, isVideoEnabled);
-        opponentsAdapter.setAdapterListener(ConversationFragment.this);
+        opponentsAdapter.setAdapterListener(OutgoingCallFragment.this);
         recyclerView.setAdapter(opponentsAdapter);
     }
 
@@ -402,7 +393,7 @@ public class ConversationFragment extends Fragment implements Serializable, QBRT
         toggleCameraOnUiThread(false);
         int currentCameraId = mediaStreamManager.getCurrentCameraId();
         Log.d(TAG, "Camera was switched!");
-        RendererConfig config = new RendererConfig();
+        RTCGLVideoView.RendererConfig config = new RTCGLVideoView.RendererConfig();
         config.mirror = CameraUtils.isCameraFront(currentCameraId);
         localVideoView.updateRenderer(
                 isPeerToPeerCall ? RTCGLVideoView.RendererSurface.SECOND : RTCGLVideoView.RendererSurface.MAIN,
@@ -590,22 +581,22 @@ public class ConversationFragment extends Fragment implements Serializable, QBRT
 
     @Override
     public void onUserNotAnswer(QBRTCSession session, Integer userId) {
-        setStatusForOpponent(userId, getString(R.string.noAnswer));
+        setStatusForOpponent(userId, getString(R.string.call_no_answer));
     }
 
     @Override
     public void onCallRejectByUser(QBRTCSession session, Integer userId, Map<String, String> userInfo) {
-        setStatusForOpponent(userId, getString(R.string.rejected));
+        setStatusForOpponent(userId, getString(R.string.call_rejected));
     }
 
     @Override
     public void onCallAcceptByUser(QBRTCSession session, Integer userId, Map<String, String> userInfo) {
-        setStatusForOpponent(userId, getString(R.string.accepted));
+        setStatusForOpponent(userId, getString(R.string.call_accepted));
     }
 
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession session, Integer userId) {
-        setStatusForOpponent(userId, getString(R.string.hungUp));
+        setStatusForOpponent(userId, getString(R.string.call_hung_up));
     }
 
     private enum CameraState {
