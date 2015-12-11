@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.QBSettings;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ChatNotificationType;
@@ -26,7 +27,6 @@ public class ChatNotificationUtils {
 
     public static final String PROPERTY_DIALOG_ID = "dialog_id";
     public static final String PROPERTY_ROOM_NAME = "room_name";
-    public static final String PROPERTY_ROOM_JID = "room_jid";
     public static final String PROPERTY_ROOM_PHOTO = "room_photo";
     public static final String PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS = "current_occupant_ids";
     public static final String PROPERTY_ROOM_ADDED_OCCUPANTS_IDS = "added_occupant_ids";
@@ -35,7 +35,7 @@ public class ChatNotificationUtils {
     public static final String PROPERTY_ROOM_UPDATE_INFO = "dialog_update_info";
 
     public static final String PROPERTY_MODULE_IDENTIFIER = "moduleIdentifier";
-    public static final String PROPERTY_NOTIFICATION_TYPE = "dialog_update_info";
+    public static final String PROPERTY_NOTIFICATION_TYPE = "notification_type";
     public static final String PROPERTY_CHAT_TYPE = "type";
     public static final String PROPERTY_DATE_SENT = "date_sent";
     public static final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
@@ -46,13 +46,13 @@ public class ChatNotificationUtils {
 
     public static QBDialog parseDialogFromQBMessage(Context context, QBChatMessage qbChatMessage, QBDialogType qbDialogType) {
         String dialogId = (String) qbChatMessage.getProperty(PROPERTY_DIALOG_ID);
-        String roomJid = (String) qbChatMessage.getProperty(PROPERTY_ROOM_JID);
         String currentOccupantsIdsString = (String) qbChatMessage.getProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS);
         String addedOccupantsIdsString = (String) qbChatMessage.getProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS);
         String dialogName = (String) qbChatMessage.getProperty(PROPERTY_ROOM_NAME);
         String photoUrl = (String) qbChatMessage.getProperty(PROPERTY_ROOM_PHOTO);
         long dateSent = ChatUtils.getMessageDateSent(qbChatMessage);
         String updatedAtString = (String) qbChatMessage.getProperty(PROPERTY_ROOM_UPDATED_AT);
+        String roomJid = ChatUtils.getRoomJid(dialogId);
 
         QBDialog qbDialog = new QBDialog(dialogId);
         qbDialog.setRoomJid(roomJid);
@@ -166,7 +166,6 @@ public class ChatNotificationUtils {
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
                 String.valueOf(NotificationType.GROUP_CHAT_CREATE.getValue()));
         qbChatMessage.setProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS, addedOccupantsIdsString);
-        qbChatMessage.setProperty(PROPERTY_ROOM_JID, qbDialog.getRoomJid());
         qbChatMessage.setProperty(PROPERTY_ROOM_NAME, qbDialog.getName());
         qbChatMessage.setProperty(PROPERTY_ROOM_UPDATED_AT, String.valueOf(qbDialog.getUpdatedAt().getTime()));
 
@@ -253,10 +252,13 @@ public class ChatNotificationUtils {
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
                 String.valueOf(NotificationType.GROUP_CHAT_CREATE.getValue()));
         qbChatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
+        qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
+                ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
         qbChatMessage.setProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS,
                 ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
-        qbChatMessage.setProperty(PROPERTY_ROOM_UPDATED_AT, String.valueOf(
-                qbDialog.getUpdatedAt().getTime()));
+        qbChatMessage.setProperty(PROPERTY_ROOM_UPDATED_AT, String.valueOf(qbDialog.getUpdatedAt().getTime()));
+        qbChatMessage.setProperty(PROPERTY_ROOM_UPDATE_INFO, String.valueOf(
+                ChatNotificationType.CHAT_OCCUPANTS.getValue()));
         if (photoUrl != null) {
             qbChatMessage.setProperty(PROPERTY_ROOM_PHOTO, photoUrl);
         }
@@ -270,8 +272,6 @@ public class ChatNotificationUtils {
         qbChatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
                 String.valueOf(NotificationType.GROUP_CHAT_UPDATE.getValue()));
-        qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
-                ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
         qbChatMessage.setProperty(PROPERTY_ROOM_UPDATED_AT, String.valueOf(qbDialog.getUpdatedAt().getTime()));
         qbChatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
 
@@ -279,12 +279,15 @@ public class ChatNotificationUtils {
 
         switch (notificationType) {
             case CREATE_DIALOG: {
-                qbChatMessage.removeProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS);
+                qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
+                        ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
                 qbChatMessage.setProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS,
                         ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
                 break;
             }
             case ADDED_DIALOG: {
+                qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
+                        ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
                 qbChatMessage.setProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS,
                         ChatUtils.getOccupantsIdsStringFromList(occupantsIdsList));
                 chatNotificationType = ChatNotificationType.CHAT_OCCUPANTS;
@@ -308,6 +311,8 @@ public class ChatNotificationUtils {
                     qbChatMessage.setProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS,
                             ChatUtils.getOccupantsIdsStringFromList(occupantsIdsList));
                 }
+                qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
+                        ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
                 chatNotificationType = ChatNotificationType.CHAT_OCCUPANTS;
                 break;
             }

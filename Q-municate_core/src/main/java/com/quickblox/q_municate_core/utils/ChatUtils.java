@@ -7,6 +7,7 @@ import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.QBSettings;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -379,6 +380,14 @@ public class ChatUtils {
             dateSent = DateUtilsCore.getCurrentTime();
         }
         return dateSent;
+    }
+
+    public static String getRoomJid(String dialogId) {
+        return QBSettings.getInstance().getApplicationId()
+                .concat("_")
+                .concat(dialogId)
+                .concat("@muc.")
+                .concat(QBSettings.getInstance().getChatServerDomain());
     }
 
     public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
