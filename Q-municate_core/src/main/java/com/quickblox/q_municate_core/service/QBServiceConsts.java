@@ -215,10 +215,9 @@ public class QBServiceConsts {
     public static final String EXTRA_OPPONENTS = "opponents";
     public static final String EXTRA_WIFI_DISABLED = "wifi_disabled";
     public static final String EXTRA_CONFERENCE_TYPE = "conference_type";
-    public static final String EXTRA_CALL_TYPE = "call_type";
+    public static final String EXTRA_START_CONVERSATION_REASON_TYPE = "start_conversation_reason";
     public static final String EXTRA_CALLER_NAME = "caller_name";
     public static final String EXTRA_SESSION_ID = "session_id";
-    public static final String EXTRA_START_CONVERSATION_REASON = "start_conversation_reason";
     public static final String EXTRA_SESSION_DESCRIPTION = "session_description";
 
 

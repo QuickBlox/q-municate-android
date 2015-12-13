@@ -168,6 +168,8 @@ public class ChatNotificationUtils {
         qbChatMessage.setProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS, addedOccupantsIdsString);
         qbChatMessage.setProperty(PROPERTY_ROOM_NAME, qbDialog.getName());
         qbChatMessage.setProperty(PROPERTY_ROOM_UPDATED_AT, String.valueOf(qbDialog.getUpdatedAt().getTime()));
+        qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
+                ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
 
         if (qbDialog.getPhoto() != null) {
             qbChatMessage.setProperty(PROPERTY_ROOM_PHOTO, qbDialog.getPhoto());
@@ -267,7 +269,6 @@ public class ChatNotificationUtils {
 
     public static QBChatMessage createGroupMessageAboutUpdateChat(Context context, QBDialog qbDialog,
             DialogNotification.Type notificationType, Collection<Integer> occupantsIdsList, boolean leavedFromChat) {
-        QBUser user = AppSession.getSession().getUser();
         QBChatMessage qbChatMessage = new QBChatMessage();
         qbChatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,

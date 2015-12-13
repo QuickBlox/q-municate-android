@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.quickblox.sample.groupchatwebrtc.view.RTCGLVideoView
-    android:id="@+id/localViewForGroupCall"
+<com.quickblox.q_municate.ui.views.RTCGLVideoView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/localViewForGroupCall"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     custom:mainCoords="@array/local_view_coordinates"

@@ -468,7 +468,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         setCurrentFragment(fragment, null);
     }
 
-    public void setCurrentFragment(Fragment fragment, String tag) {
+    private void setCurrentFragment(Fragment fragment, String tag) {
         currentFragment = fragment;
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction transaction = buildTransaction();

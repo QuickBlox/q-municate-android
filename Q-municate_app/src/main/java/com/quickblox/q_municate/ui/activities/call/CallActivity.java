@@ -18,10 +18,9 @@ import android.widget.Chronometer;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
-import com.quickblox.q_municate.ui.fragments.call.OutgoingCallFragment;
+import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate_core.models.CallType;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -52,9 +51,6 @@ import butterknife.Bind;
 
 public class CallActivity extends BaseLoggableActivity implements QBRTCClientSessionCallbacks, QBRTCSessionConnectionCallbacks, QBRTCSignalingCallback {
 
-    public static final String EXTRA_INCOMING_CALL_FRAGMENT = "incoming_call_fragment";
-    public static final String EXTRA_OUTGOING_CALL_FRAGMENT = "outgoing_call_fragment";
-
     public static final int CALL_ACTIVITY_CLOSE = 1000;
     public static final int CALL_ACTIVITY_CLOSE_WIFI_DISABLED = 1001;
 
@@ -79,7 +75,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     private QBRTCSessionUserCallback qbRtcSessionUserCallback;
     private QBCallChatHelper qbCallChatHelper;
-    private CallType callType;
+    private StartConversationReason startConversationReason;
     private QBRTCSessionDescription qbRtcSessionDescription;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
@@ -87,7 +83,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         Intent intent = new Intent(activity, CallActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENTS, (Serializable) qbUsersList);
         intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType);
-        intent.putExtra(QBServiceConsts.EXTRA_CALL_TYPE, CallType.OUTGOING);
+        intent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE, StartConversationReason.OUTCOME_CALL_MADE);
         intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
         activity.startActivityForResult(intent, CALL_ACTIVITY_CLOSE);
     }
@@ -106,16 +102,16 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void initCallFragment() {
-        switch (callType) {
-            case INCOMING:
+        switch (startConversationReason) {
+            case INCOME_CALL_FOR_ACCEPTION:
                 if (qbRtcSessionDescription != null) {
                     addIncomingCallFragment(qbRtcSessionDescription);
                     isInComingCall = true;
                     initIncomingCallTask();
                 }
                 break;
-            case OUTGOING:
-                addOutgoingCallFragment();
+            case OUTCOME_CALL_MADE:
+                addConversationCallFragment();
                 break;
         }
     }
@@ -287,7 +283,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                     if (isInComingCall) {
                         stopIncomeCallTimer();
                         if (currentFragment instanceof IncomingCallFragment) {
-                            removeIncomeCallFragment();
+                            removeFragment();
                         }
                     }
 
@@ -310,10 +306,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                OutgoingCallFragment fragment = (OutgoingCallFragment) getSupportFragmentManager()
-                        .findFragmentByTag(EXTRA_OUTGOING_CALL_FRAGMENT);
-                if (fragment != null && session.equals(getCurrentSession())) {
-                    fragment.actionButtonsEnabled(false);
+                if (currentFragment instanceof ConversationCallFragment && session.equals(getCurrentSession())) {
+                    ((ConversationCallFragment) currentFragment).actionButtonsEnabled(false);
                 }
             }
         });
@@ -387,7 +381,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private void initFields() {
         opponentsList = (List<QBUser>) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENTS);
         qbConferenceType = (QBRTCTypes.QBConferenceType) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
-        callType = (CallType) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CALL_TYPE);
+        startConversationReason = (StartConversationReason) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE);
         qbRtcSessionDescription = (QBRTCSessionDescription) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION);
 
         ringtonePlayer = new RingtonePlayer(this, R.raw.beep);
@@ -414,10 +408,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void disableConversationFragmentButtons() {
-        OutgoingCallFragment fragment = (OutgoingCallFragment) getSupportFragmentManager()
-                .findFragmentByTag(EXTRA_OUTGOING_CALL_FRAGMENT);
-        if (fragment != null) {
-            fragment.actionButtonsEnabled(false);
+        if (currentFragment instanceof ConversationCallFragment) {
+            ((ConversationCallFragment) currentFragment).actionButtonsEnabled(false);
         }
     }
 
@@ -426,19 +418,14 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         showIncomingCallWindowTask = new Runnable() {
             @Override
             public void run() {
-                IncomingCallFragment incomingCallFragment = (IncomingCallFragment) getSupportFragmentManager()
-                        .findFragmentByTag(EXTRA_INCOMING_CALL_FRAGMENT);
-                if (incomingCallFragment == null) {
-                    OutgoingCallFragment outgoingCallFragment = (OutgoingCallFragment) getSupportFragmentManager()
-                            .findFragmentByTag(EXTRA_OUTGOING_CALL_FRAGMENT);
-                    if (outgoingCallFragment != null) {
-                        disableConversationFragmentButtons();
-                        ringtonePlayer.stop();
-                        hangUpCurrentSession();
-                    }
+                if (currentFragment instanceof ConversationCallFragment) {
+                    disableConversationFragmentButtons();
+                    ringtonePlayer.stop();
+                    hangUpCurrentSession();
                 } else {
                     rejectCurrentSession();
                 }
+
                 ToastUtils.longToast("Call was stopped by timer");
             }
         };
@@ -475,15 +462,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         return getSupportFragmentManager().findFragmentById(R.id.container_fragment);
     }
 
-    public void removeIncomeCallFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentByTag(EXTRA_INCOMING_CALL_FRAGMENT);
-
-        if (fragment != null) {
-            removeFragment();
-        }
-    }
-
     private void addIncomingCallFragment(QBRTCSessionDescription qbRtcSessionDescription) {
         Log.d(TAG, "QBRTCSession in addIncomingCallFragment is " + qbRtcSessionDescription);
         if (isInFront) {
@@ -491,16 +469,17 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             Bundle bundle = new Bundle();
             bundle.putSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
             bundle.putIntegerArrayList(QBServiceConsts.EXTRA_OPPONENTS, new ArrayList<>(qbRtcSessionDescription.getOpponents()));
-            bundle.putInt(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbRtcSessionDescription.getConferenceType().getValue());
+            bundle.putSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE,
+                    qbRtcSessionDescription.getConferenceType());
             fragment.setArguments(bundle);
-            setCurrentFragment(fragment, IncomingCallFragment.TAG);
+            setCurrentFragment(fragment);
         } else {
             Log.d(TAG, "SKIP addIncomingCallFragment method");
         }
     }
 
-    public void addOutgoingCallFragment() {
-        Log.d(TAG, "addOutgoingCallFragment()");
+    public void addConversationCallFragment() {
+        Log.d(TAG, "addConversationCallFragment()");
 
         QBRTCSession newSessionWithOpponents = qbRtcClient.createNewSessionWithOpponents(
                 UserFriendUtils.getFriendIdsList(opponentsList), qbConferenceType);
@@ -509,12 +488,12 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (qbCallChatHelper != null) {
             qbCallChatHelper.initCurrentSession(newSessionWithOpponents, this, this);
 
-            OutgoingCallFragment fragment = OutgoingCallFragment
+            ConversationCallFragment fragment = ConversationCallFragment
                     .newInstance(opponentsList, opponentsList.get(0).getFullName(), qbConferenceType,
                             StartConversationReason.OUTCOME_CALL_MADE,
                             qbCallChatHelper.getCurrentRtcSession().getSessionID());
 
-            setCurrentFragment(fragment, EXTRA_OUTGOING_CALL_FRAGMENT);
+            setCurrentFragment(fragment);
             ringtonePlayer.play(true);
         } else {
             throw new NullPointerException("qbCallChatHelper is not initialized");
@@ -543,12 +522,12 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                         .getUsersByIDs(opponentsWithoutMe.toArray(new Integer[opponentsWithoutMe.size()]),
                                 opponentsList);
                 SettingsUtil.setSettingsStrategy(this, newOpponents);
-                OutgoingCallFragment fragment = OutgoingCallFragment.newInstance(newOpponents,
+                ConversationCallFragment fragment = ConversationCallFragment.newInstance(newOpponents,
                         UserFriendUtils.getUserNameByID(session.getCallerID(), newOpponents),
                         session.getConferenceType(), StartConversationReason.INCOME_CALL_FOR_ACCEPTION,
                         session.getSessionID());
                 // Start conversation fragment
-                setCurrentFragment(fragment, EXTRA_OUTGOING_CALL_FRAGMENT);
+                setCurrentFragment(fragment);
             }
         }
     }

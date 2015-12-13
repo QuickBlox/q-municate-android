@@ -10,8 +10,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.views.RTCGLVideoView;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.videochat.webrtc.view.RTCGLVideoView;
 
 import java.util.List;
 

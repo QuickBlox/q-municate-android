@@ -9,7 +9,7 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
-import com.quickblox.q_municate_core.models.CallType;
+import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -34,26 +34,26 @@ public class QBCallChatHelper extends BaseHelper {
     private static final String TAG = QBCallChatHelper.class.getSimpleName();
 
     private static final int ANSWER_INTERVAL = 30;
+    private static final int DISCONNECT_TIME = 30;
+    private static final int ANSWER_TIME_INTERVAL = 30;
 
-    private QBChatService qbChatService;
     private QBRTCClient qbRtcClient;
     private Class<? extends Activity> activityClass;
 
     private QBRTCSession currentQbRtcSession;
-    private boolean isClientClosed;
     private QBRTCClientSessionCallbacks qbRtcClientSessionCallbacks;
 
     public QBCallChatHelper(Context context) {
         super(context);
     }
 
-    public void init(QBChatService chatService) {
+    public void init(QBChatService qbChatService) {
         Log.d(TAG, "init()");
 
-        this.qbChatService = chatService;
         qbRtcClient = QBRTCClient.getInstance(context);
 
-        this.qbChatService.getVideoChatWebRTCSignalingManager().addSignalingManagerListener(new QBVideoChatSignalingManagerListenerImpl());
+        qbChatService.getVideoChatWebRTCSignalingManager()
+                .addSignalingManagerListener(new QBVideoChatSignalingManagerListenerImpl());
 
         qbRtcClient.addSessionCallbacksListener(new QBRTCClientSessionCallbacksImpl());
 
@@ -88,8 +88,6 @@ public class QBCallChatHelper extends BaseHelper {
     private void setUpCallClient() {
         Log.d(TAG, "setUpCallClient()");
 
-        isClientClosed = false;
-
         QBRTCConfig.setAnswerTimeInterval(ANSWER_INTERVAL);
 
         qbRtcClient.setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
@@ -100,8 +98,8 @@ public class QBCallChatHelper extends BaseHelper {
         });
 
         QBRTCConfig.setMaxOpponentsCount(6);
-        QBRTCConfig.setDisconnectTime(30);
-        QBRTCConfig.setAnswerTimeInterval(30l);
+        QBRTCConfig.setDisconnectTime(DISCONNECT_TIME);
+        QBRTCConfig.setAnswerTimeInterval(ANSWER_TIME_INTERVAL);
         QBRTCConfig.setDebugEnabled(true);
 
         qbRtcClient.prepareToProcessCalls();
@@ -117,7 +115,7 @@ public class QBCallChatHelper extends BaseHelper {
 
         Intent intent = new Intent(context, activityClass);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENTS, (Serializable) qbUsersList);
-        intent.putExtra(QBServiceConsts.EXTRA_CALL_TYPE, CallType.INCOMING);
+        intent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE, StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
         intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbRtcSession.getConferenceType());
         intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSession.getSessionDescription());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -140,15 +138,7 @@ public class QBCallChatHelper extends BaseHelper {
         @Override
         public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
             if (!createdLocally) {
-                Log.d(TAG, "SimpleSignallingManagerListener. QBCallChatHelper. New QBSignaling was created " + qbSignaling);
-                if (isClientClosed) {
-                    Log.d(TAG, "ReInit RTCClient");
-                    setUpCallClient();
-                }
                 qbRtcClient.addSignaling((QBWebRTCSignaling) qbSignaling);
-            } else {
-                Log.d(TAG,
-                        "SimpleSignallingManagerListener. QBCallChatHelper. New QBSignaling was not created " + qbSignaling);
             }
         }
     }
@@ -160,7 +150,7 @@ public class QBCallChatHelper extends BaseHelper {
         @Override
         public void onReceiveNewSession(QBRTCSession qbRtcSession) {
             Log.d(TAG, "onReceiveNewSession(), qbRtcSession.getSession() = " + qbRtcSession.getSessionID());
-            if (getCurrentRtcSession() != null) {
+            if (currentQbRtcSession != null) {
                 Log.d(TAG, "onReceiveNewSession(). Stop new session. Device now is busy");
                 qbRtcSession.rejectCall(null);
             } else {

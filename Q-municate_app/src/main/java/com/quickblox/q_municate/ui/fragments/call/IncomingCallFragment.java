@@ -43,8 +43,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
     private List<QBUser> opponentsFromCall = new ArrayList<>();
     private QBRTCSessionDescription sessionDescription;
     private Vibrator vibrator;
-    private QBRTCTypes.QBConferenceType conferenceType;
-    private int qbConferenceType;
+    private QBRTCTypes.QBConferenceType qbConferenceType;
     private View view;
     private long lastClickTime = 0l;
     private RingtonePlayer ringtonePlayer;
@@ -62,12 +61,9 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         if (getArguments() != null) {
             opponents = getArguments().getIntegerArrayList(QBServiceConsts.EXTRA_OPPONENTS);
             sessionDescription = (QBRTCSessionDescription) getArguments().getSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION);
-            qbConferenceType = getArguments().getInt(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
-            conferenceType =
-                    qbConferenceType == 1 ? QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO :
-                            QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO;
+            qbConferenceType = (QBRTCTypes.QBConferenceType) getArguments().getSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
 
-            Log.d(TAG, conferenceType.toString() + "From onCreateView()");
+            Log.d(TAG, qbConferenceType.toString() + "From onCreateView()");
         }
 
         if (savedInstanceState == null) {
@@ -77,7 +73,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
             ((CallActivity) getActivity()).initActionBar();
 
             initUI(view);
-            setDisplayedTypeCall(conferenceType);
+            setDisplayedTypeCall(qbConferenceType);
             initButtonsListener();
 
         }
@@ -110,7 +106,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         incVideoCall = (TextView) view.findViewById(R.id.incVideoCall);
 
         callerName = (TextView) view.findViewById(R.id.callerName);
-//        callerName.setText(getCallerName(((CallActivity) getActivity()).getCurrentSession()));
+        callerName.setText(getCallerName(((CallActivity) getActivity()).getCurrentSession()));
 
         otherIncUsers = (TextView) view.findViewById(R.id.otherIncUsers);
         otherIncUsers.setText(getOtherIncUsersNames(opponents));
@@ -119,13 +115,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         takeBtn = (ImageButton) view.findViewById(R.id.takeBtn);
     }
 
-    private void enableButtons(boolean enable){
-        takeBtn.setEnabled(enable);
-        rejectBtn.setEnabled(enable);
-    }
-
     public void startCallNotification() {
-
         ringtonePlayer.play(false);
 
         vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
@@ -134,7 +124,6 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         if (vibrator.hasVibrator()) {
             vibrator.vibrate(vibrationCycle, 1);
         }
-
     }
 
     private void stopCallNotification() {
@@ -181,10 +170,10 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
     }
 
     private void setDisplayedTypeCall(QBRTCTypes.QBConferenceType conferenceType) {
-        if (conferenceType == QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO) {
+        if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(conferenceType)) {
             incVideoCall.setVisibility(View.VISIBLE);
             incAudioCall.setVisibility(View.INVISIBLE);
-        } else if (conferenceType == QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO) {
+        } else if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO.equals(conferenceType)) {
             incVideoCall.setVisibility(View.INVISIBLE);
             incAudioCall.setVisibility(View.VISIBLE);
         }
