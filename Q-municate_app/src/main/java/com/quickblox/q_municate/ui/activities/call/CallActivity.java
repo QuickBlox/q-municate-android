@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Chronometer;
 
@@ -261,6 +260,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                             R.string.call_hung_up) + " conversation");
                 }
             });
+
+            finish();
         }
     }
 
@@ -284,6 +285,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                         stopIncomeCallTimer();
                         if (currentFragment instanceof IncomingCallFragment) {
                             removeFragment();
+                            finish();
                         }
                     }
 
@@ -340,11 +342,11 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             @Override
             public void run() {
                 // Close app after session close of network was disabled
-//                if (hangUpReason != null && hangUpReason.equals(QBServiceConsts.EXTRA_WIFI_DISABLED)) {
+                if (hangUpReason != null && hangUpReason.equals(QBServiceConsts.EXTRA_WIFI_DISABLED)) {
                     Intent returnIntent = new Intent();
                     setResult(CALL_ACTIVITY_CLOSE_WIFI_DISABLED, returnIntent);
-                    finish();
-//                }
+                }
+                finish();
             }
         });
     }
@@ -435,6 +437,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (qbCallChatHelper != null && qbCallChatHelper.getCurrentRtcSession() != null) {
             qbCallChatHelper.getCurrentRtcSession().rejectCall(new HashMap<String, String>());
         }
+        finish();
     }
 
     public void hangUpCurrentSession() {
@@ -442,6 +445,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (qbCallChatHelper != null && qbCallChatHelper.getCurrentRtcSession() != null) {
             qbCallChatHelper.getCurrentRtcSession().hangUp(new HashMap<String, String>());
         }
+        finish();
     }
 
     private void startIncomeCallTimer(long time) {

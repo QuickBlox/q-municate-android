@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.core.QBSettings;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ChatNotificationType;
@@ -157,25 +156,27 @@ public class ChatNotificationUtils {
     }
 
     public static QBChatMessage createSystemMessageAboutCreatingGroupChat(Context context, QBDialog qbDialog) {
-        String addedOccupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants());
-
         QBChatMessage qbChatMessage = new QBChatMessage();
-        qbChatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
-        qbChatMessage.setProperty(PROPERTY_MODULE_IDENTIFIER, VALUE_MODULE_IDENTIFIER);
-        qbChatMessage.setProperty(PROPERTY_CHAT_TYPE, VALUE_GROUP_CHAT_TYPE);
-        qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
-                String.valueOf(NotificationType.GROUP_CHAT_CREATE.getValue()));
-        qbChatMessage.setProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS, addedOccupantsIdsString);
-        qbChatMessage.setProperty(PROPERTY_ROOM_NAME, qbDialog.getName());
-        qbChatMessage.setProperty(PROPERTY_ROOM_UPDATED_AT, String.valueOf(qbDialog.getUpdatedAt().getTime()));
-        qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
-                ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
+        addNecessaryPropertyForCreatingMessage(context, qbChatMessage, qbDialog);
 
         if (qbDialog.getPhoto() != null) {
             qbChatMessage.setProperty(PROPERTY_ROOM_PHOTO, qbDialog.getPhoto());
         }
 
         return qbChatMessage;
+    }
+
+    private static void addNecessaryPropertyForCreatingMessage(Context context, QBChatMessage qbChatMessage, QBDialog qbDialog) {
+        qbChatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
+        qbChatMessage.setProperty(PROPERTY_MODULE_IDENTIFIER, VALUE_MODULE_IDENTIFIER);
+        qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
+                String.valueOf(NotificationType.GROUP_CHAT_CREATE.getValue()));
+        qbChatMessage.setProperty(PROPERTY_CHAT_TYPE, VALUE_GROUP_CHAT_TYPE);
+
+        qbChatMessage.setProperty(PROPERTY_ROOM_NAME, qbDialog.getName());
+        qbChatMessage.setProperty(PROPERTY_ROOM_UPDATED_AT, String.valueOf(qbDialog.getUpdatedAt().getTime()));
+        qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
+                ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
     }
 
     public static boolean isNotificationMessage(QBChatMessage qbChatMessage) {

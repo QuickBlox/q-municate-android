@@ -527,15 +527,16 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void readAllMessages() {
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(
-                dialog.getDialogId());
-        dataManager.getMessageDataManager().createOrUpdateAll(
-                ChatUtils.readAllMessages(messagesList, AppSession.getSession().getUser()));
+        if (dialog != null) {
+            List<Message> messagesList = dataManager.getMessageDataManager()
+                    .getMessagesByDialogId(dialog.getDialogId());
+            dataManager.getMessageDataManager().createOrUpdateAll(ChatUtils.readAllMessages(messagesList, AppSession.getSession().getUser()));
 
-        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogId(dialog.getDialogId());
-        dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils
-                .readAllDialogNotification(dialogNotificationsList, AppSession.getSession().getUser()));
+            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                    .getDialogNotificationsByDialogId(dialog.getDialogId());
+            dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils
+                    .readAllDialogNotification(dialogNotificationsList, AppSession.getSession().getUser()));
+        }
     }
 
     private void createChatLocally() {

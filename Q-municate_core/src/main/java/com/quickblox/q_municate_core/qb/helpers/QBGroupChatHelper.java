@@ -341,6 +341,10 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         dialogNotification.setType(notificationType);
         Message message = ChatUtils.createTempLocalMessage(dialogNotification);
         DbUtils.saveTempMessage(dataManager, message);
+
+        boolean ownMessage = !message.isIncoming(chatCreator.getId());
+        User user = DataManager.getInstance().getUserDataManager().get(qbChatMessage.getSenderId());
+        checkForSendingNotification(ownMessage, qbChatMessage, user, false);
     }
 
     private class SystemMessageListener implements QBSystemMessageListener {

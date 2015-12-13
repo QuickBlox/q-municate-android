@@ -63,6 +63,7 @@
             android:textStyle="bold"
             android:text="@string/also_on_call"
             android:layout_below="@+id/callerName"
+            android:visibility="gone"
             android:layout_marginTop="5dp"
             android:layout_centerHorizontal="true" />
 

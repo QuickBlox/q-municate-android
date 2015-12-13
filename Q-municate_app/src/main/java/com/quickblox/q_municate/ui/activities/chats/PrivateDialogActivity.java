@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -95,6 +96,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        checkForCorrectChat();
 
         if (isNetworkAvailable()) {
             startLoadDialogMessages();
@@ -282,7 +285,20 @@ public class PrivateDialogActivity extends BaseDialogActivity {
                         showProgress();
                         QBRejectFriendCommand.start(PrivateDialogActivity.this, userId);
                     }
-        });
+                });
+    }
+
+    private void checkForCorrectChat() {
+        Dialog updatedDialog = null;
+        if (dialog != null) {
+            updatedDialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
+        } else {
+            finish();
+        }
+
+        if (updatedDialog == null) {
+            finish();
+        }
     }
 
     private class FriendOperationAction implements FriendOperationListener {

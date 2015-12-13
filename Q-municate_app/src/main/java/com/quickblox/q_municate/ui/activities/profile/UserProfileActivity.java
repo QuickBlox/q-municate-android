@@ -11,6 +11,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
+import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
@@ -23,13 +24,17 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.users.model.QBUser;
+import com.quickblox.videochat.webrtc.QBRTCTypes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -126,12 +131,12 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
     @OnClick(R.id.audio_call_button)
     void audioCall(View view) {
-        ErrorUtils.showError(this, getString(R.string.coming_soon));
+        callToUser(QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
     }
 
     @OnClick(R.id.video_call_button)
     void videoCall(View view) {
-        ErrorUtils.showError(this, getString(R.string.coming_soon));
+        callToUser(QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
     }
 
     @OnClick(R.id.delete_chat_history_button)
@@ -265,6 +270,12 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
     private boolean isChatExists() {
         return dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId()) != null;
+    }
+
+    private void callToUser(QBRTCTypes.QBConferenceType qbConferenceType) {
+        List<QBUser> qbUserList = new ArrayList<>(1);
+        qbUserList.add(UserFriendUtils.createQbUser(user));
+        CallActivity.start(this, qbUserList, qbConferenceType, null);
     }
 
     private class UserObserver implements Observer {

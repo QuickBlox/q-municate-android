@@ -196,7 +196,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
             default:
                 break;
         }
-    };
+    }
 
     private void accept() {
         takeBtn.setClickable(false);
@@ -215,6 +215,5 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         stopCallNotification();
 
         ((CallActivity) getActivity()).rejectCurrentSession();
-        getActivity().finish();
     }
 }

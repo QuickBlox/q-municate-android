@@ -105,6 +105,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         actionBarBridge.setActionBarUpButtonEnabled(false);
 
         checkVisibilityUserIcon();
+
+        loadingBridge.hideActionBarProgress();
     }
 
     private void initFields() {
