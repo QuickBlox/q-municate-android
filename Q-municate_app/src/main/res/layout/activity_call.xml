@@ -11,7 +11,8 @@
         android:layout_gravity="center"
         android:layout_margin="@dimen/padding_large"
         android:textColor="@color/dark_gray"
-        android:textSize="@dimen/text_size" />
+        android:textSize="@dimen/text_size"
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/container_fragment"

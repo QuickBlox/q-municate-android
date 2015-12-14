@@ -69,20 +69,25 @@ public class QBCallChatHelper extends BaseHelper {
         return currentQbRtcSession;
     }
 
-    public void initCurrentSession(QBRTCSession qbRtcSession, QBRTCSignalingCallback qbRtcSignalingCallback, QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+    public void initCurrentSession(QBRTCSession qbRtcSession, QBRTCSignalingCallback qbRtcSignalingCallback,
+            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         this.currentQbRtcSession = qbRtcSession;
         initCurrentSession(qbRtcSignalingCallback, qbRtcSessionConnectionCallbacks);
     }
 
-    public void initCurrentSession(QBRTCSignalingCallback qbRtcSignalingCallback, QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+    public void initCurrentSession(QBRTCSignalingCallback qbRtcSignalingCallback,
+            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         this.currentQbRtcSession.addSignalingCallback(qbRtcSignalingCallback);
         this.currentQbRtcSession.addSessionCallbacksListener(qbRtcSessionConnectionCallbacks);
     }
 
-    public void releaseCurrentSession(QBRTCSignalingCallback qbRtcSignalingCallback, QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
-        this.currentQbRtcSession.removeSignalingCallback(qbRtcSignalingCallback);
-        this.currentQbRtcSession.removeSessionnCallbacksListener(qbRtcSessionConnectionCallbacks);
-        this.currentQbRtcSession = null;
+    public void releaseCurrentSession(QBRTCSignalingCallback qbRtcSignalingCallback,
+            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+        if (currentQbRtcSession != null) {
+            currentQbRtcSession.removeSignalingCallback(qbRtcSignalingCallback);
+            currentQbRtcSession.removeSessionnCallbacksListener(qbRtcSessionConnectionCallbacks);
+            currentQbRtcSession = null;
+        }
     }
 
     private void setUpCallClient() {
@@ -106,21 +111,33 @@ public class QBCallChatHelper extends BaseHelper {
     }
 
     private void startCallActivity(QBRTCSession qbRtcSession) {
-        User user = DataManager.getInstance().getUserDataManager().get(qbRtcSession.getSessionDescription().getCallerID());
+        User user = DataManager.getInstance().getUserDataManager()
+                .get(qbRtcSession.getSessionDescription().getCallerID());
 
-        Log.d(TAG, "startCallActivity(), user = " + user);
+        if (activityClass == null) {
+            throw new NullPointerException("activityClass is not initialised!");
+        }
 
-        List<QBUser> qbUsersList = new ArrayList<>(1);
-        qbUsersList.add(UserFriendUtils.createQbUser(user));
+        if (user != null) {
+            Log.d(TAG, "startCallActivity(), user = " + user);
+            Log.d(TAG, "startCallActivity(), qbRtcSession.getConferenceType() = " + qbRtcSession
+                    .getConferenceType());
+            Log.d(TAG, "startCallActivity(), qbRtcSession.getSessionDescription() = " + qbRtcSession
+                    .getSessionDescription());
 
-        Intent intent = new Intent(context, activityClass);
-        intent.putExtra(QBServiceConsts.EXTRA_OPPONENTS, (Serializable) qbUsersList);
-        intent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE, StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
-        intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbRtcSession.getConferenceType());
-        intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSession.getSessionDescription());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        context.getApplicationContext().startActivity(intent);
+            List<QBUser> qbUsersList = new ArrayList<>(1);
+            qbUsersList.add(UserFriendUtils.createQbUser(user));
+            Intent intent = new Intent(context, activityClass);
+            intent.putExtra(QBServiceConsts.EXTRA_OPPONENTS, (Serializable) qbUsersList);
+            intent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE,
+                    StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
+            intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbRtcSession.getConferenceType());
+            intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSession.getSessionDescription());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.getApplicationContext().startActivity(intent);
+        } else {
+            throw new NullPointerException("user is not initialised!");
+        }
     }
 
     public void addRTCSessionUserCallback(QBRTCClientSessionCallbacks qbRtcClientSessionCallbacks) {
@@ -189,7 +206,8 @@ public class QBCallChatHelper extends BaseHelper {
 
         @Override
         public void onReceiveHangUpFromUser(QBRTCSession qbRtcSession, Integer integer) {
-            Log.d(TAG, "onReceiveHangUpFromUser(), qbRtcSession.getSession() = " + qbRtcSession.getSessionID());
+            Log.d(TAG,
+                    "onReceiveHangUpFromUser(), qbRtcSession.getSession() = " + qbRtcSession.getSessionID());
 
             if (qbRtcClientSessionCallbacks != null) {
                 qbRtcClientSessionCallbacks.onReceiveHangUpFromUser(qbRtcSession, integer);

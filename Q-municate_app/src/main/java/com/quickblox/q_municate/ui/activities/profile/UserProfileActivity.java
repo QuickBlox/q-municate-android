@@ -273,6 +273,10 @@ public class UserProfileActivity extends BaseLoggableActivity {
     }
 
     private void callToUser(QBRTCTypes.QBConferenceType qbConferenceType) {
+        if (!isChatInitializedAndUserLoggedIn()) {
+            ToastUtils.longToast(R.string.call_chat_service_is_initializing);
+            return;
+        }
         List<QBUser> qbUserList = new ArrayList<>(1);
         qbUserList.add(UserFriendUtils.createQbUser(user));
         CallActivity.start(this, qbUserList, qbConferenceType, null);

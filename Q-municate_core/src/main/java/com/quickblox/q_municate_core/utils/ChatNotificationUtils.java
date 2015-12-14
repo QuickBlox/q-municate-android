@@ -313,8 +313,10 @@ public class ChatNotificationUtils {
                     qbChatMessage.setProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS,
                             ChatUtils.getOccupantsIdsStringFromList(occupantsIdsList));
                 }
+                List<Integer> occupantsList = qbDialog.getOccupants();
+                occupantsList.remove(AppSession.getSession().getUser().getId());
                 qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
-                        ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
+                        ChatUtils.getOccupantsIdsStringFromList(occupantsList));
                 chatNotificationType = ChatNotificationType.CHAT_OCCUPANTS;
                 break;
             }

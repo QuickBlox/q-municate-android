@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.View;
 import android.widget.Chronometer;
 
 import com.quickblox.chat.QBChatService;
@@ -149,6 +150,9 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     protected void onDestroy() {
         super.onDestroy();
         opponentsList = null;
+        if (qbCallChatHelper != null) {
+            qbCallChatHelper.releaseCurrentSession(CallActivity.this, CallActivity.this);
+        }
     }
 
     @Override
@@ -536,8 +540,9 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
     }
 
-    private void startTimer() {
+    public void startTimer() {
         if (!isStarted) {
+            timerChronometer.setVisibility(View.VISIBLE);
             timerChronometer.setBase(SystemClock.elapsedRealtime());
             timerChronometer.start();
             isStarted = true;
@@ -545,7 +550,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void stopTimer(){
-        if (timerChronometer != null){
+        if (timerChronometer != null) {
             timerChronometer.stop();
             isStarted = false;
         }

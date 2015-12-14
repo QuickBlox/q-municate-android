@@ -256,6 +256,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void callToUser(User user, QBRTCTypes.QBConferenceType qbConferenceType) {
+        if (!isChatInitializedAndUserLoggedIn()) {
+            ToastUtils.longToast(R.string.call_chat_service_is_initializing);
+            return;
+        }
         List<QBUser> qbUserList = new ArrayList<>(1);
         qbUserList.add(UserFriendUtils.createQbUser(user));
         CallActivity.start(PrivateDialogActivity.this, qbUserList, qbConferenceType, null);
