@@ -124,7 +124,7 @@
     <string name="dialog_details_online_participants">%1$d/%2$d online</string>
     <string name="dialog_details_name_not_entered">Please fill group name</string>
     <string name="dialog_details_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
-
+    <string name="dialog_details_service_is_initializing">Please, wait, connection is setting up…</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>

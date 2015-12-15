@@ -217,6 +217,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (!session.equals(getCurrentSession())) {
             return;
         }
+
         if (qbRtcSessionUserCallback != null) {
             qbRtcSessionUserCallback.onCallRejectByUser(session, userID, userInfo);
         }
@@ -276,7 +277,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     @Override
     public void onSessionClosed(final QBRTCSession session) {
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

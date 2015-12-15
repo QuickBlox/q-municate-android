@@ -157,8 +157,12 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                 startAddFriendsActivity();
                 break;
             case R.id.action_leave:
-                if (checkNetworkAvailableWithError()) {
-                    showLeaveGroupDialog();
+                if (isChatInitializedAndUserLoggedIn()) {
+                    if (checkNetworkAvailableWithError()) {
+                        showLeaveGroupDialog();
+                    }
+                } else {
+                    ToastUtils.longToast(R.string.dialog_details_service_is_initializing);
                 }
                 break;
             default:
@@ -171,12 +175,13 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Crop.REQUEST_CROP) {
             handleCrop(resultCode, data);
+            canPerformLogout.set(true);
         } else if (requestCode == AddFriendsToGroupActivity.RESULT_ADDED_FRIENDS) {
             if (data != null) {
                 handleAddedFriends(data);
             }
+            canPerformLogout.set(true);
         }
-        canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -216,7 +221,6 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
     @Override
     public void onImagePicked(int requestCode, File file) {
-        canPerformLogout.set(true);
         startCropActivity(Uri.fromFile(file));
     }
 

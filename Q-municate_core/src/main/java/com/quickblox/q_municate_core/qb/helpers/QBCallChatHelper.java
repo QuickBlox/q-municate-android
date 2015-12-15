@@ -169,7 +169,9 @@ public class QBCallChatHelper extends BaseHelper {
             Log.d(TAG, "onReceiveNewSession(), qbRtcSession.getSession() = " + qbRtcSession.getSessionID());
             if (currentQbRtcSession != null) {
                 Log.d(TAG, "onReceiveNewSession(). Stop new session. Device now is busy");
-                qbRtcSession.rejectCall(null);
+                if (!qbRtcSession.equals(currentQbRtcSession)) {
+                    qbRtcSession.rejectCall(null);
+                }
             } else {
                 Log.d(TAG, "onReceiveNewSession(). init session.");
                 currentQbRtcSession = qbRtcSession;

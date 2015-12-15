@@ -179,7 +179,7 @@ public class ChatUtils {
         dialog.setTitle(qbDialog.getName());
         dialog.setPhoto(qbDialog.getPhoto());
         if (qbDialog.getUpdatedAt() != null) {
-            dialog.setUpdatedAt(qbDialog.getUpdatedAt().getTime());
+            dialog.setUpdatedAt(DateUtilsCore.getTime(qbDialog.getUpdatedAt()));
         }
         dialog.setModifiedDateLocal(qbDialog.getLastMessageDateSent());
 
