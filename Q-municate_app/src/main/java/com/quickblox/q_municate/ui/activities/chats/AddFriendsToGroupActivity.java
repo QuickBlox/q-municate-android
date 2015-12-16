@@ -78,7 +78,7 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
         if (!friendsList.isEmpty()) {
             List<Integer> actualFriendIdsList = UserFriendUtils.getFriendIdsListFromList(friendsList);
             List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
-                    .getNormalDialogOccupantsByIds(qbDialog.getDialogId(), actualFriendIdsList);
+                    .getActualDialogOccupantsByIds(qbDialog.getDialogId(), actualFriendIdsList);
             if (!dialogOccupantsList.isEmpty()) {
                 friendsList.removeAll(UserFriendUtils.getFriendsListFromDialogOccupantsList(dialogOccupantsList));
             }

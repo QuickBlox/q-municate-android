@@ -310,6 +310,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         ChatNotificationUtils.updateDialogFromQBMessage(context, dataManager, qbChatMessage, qbDialog);
         DbUtils.saveDialogToCache(dataManager, qbDialog);
 
+        DbUtils.updateDialogOccupantsStatusesIfNeeded(dataManager, qbDialog);
+
         notifyUpdatingDialog();
     }
 
@@ -326,6 +328,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     private void createDialogByNotification(QBChatMessage qbChatMessage, DialogNotification.Type notificationType) {
+        qbChatMessage.setBody(context.getString(R.string.cht_notification_message));
+
         QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, qbChatMessage.getBody(), QBDialogType.GROUP);
 
         qbDialog.getOccupants().add(chatCreator.getId());

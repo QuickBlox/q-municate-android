@@ -81,7 +81,7 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
         return dialogOccupant;
     }
 
-    public List<DialogOccupant> getNormalDialogOccupantsByIds(String dialogId, List<Integer> userIdsList) {
+    public List<DialogOccupant> getActualDialogOccupantsByIds(String dialogId, List<Integer> userIdsList) {
         List<DialogOccupant> dialogOccupantsList = Collections.emptyList();
 
         try {

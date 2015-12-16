@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
@@ -647,11 +646,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void checkLoadDialogs() {
         showSnackbar(R.string.dlgs_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
-        QBLoadDialogsCommand.start(this);
+        loadDialogs();
     }
 
-    protected void onChatsLoaded() {
-        // nothing by default.
+    protected void loadDialogs() {
+        QBLoadDialogsCommand.start(this);
     }
 
     private void activateButterKnife() {
@@ -683,7 +682,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         @Override
         public void execute(Bundle bundle) {
             performLoginChatSuccessAction(bundle);
-            onChatsLoaded();
         }
     }
 

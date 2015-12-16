@@ -251,7 +251,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    protected void onChatsLoaded() {
+    protected void loadDialogs() {
         createChatLocally();
         checkMessageSendingPossibility();
     }

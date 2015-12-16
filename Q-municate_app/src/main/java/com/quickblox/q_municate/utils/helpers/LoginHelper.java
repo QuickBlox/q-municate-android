@@ -13,6 +13,7 @@ import com.quickblox.q_municate.utils.listeners.ExistingQbSessionListener;
 import com.quickblox.q_municate.utils.listeners.GlobalLoginListener;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
@@ -115,6 +116,10 @@ public class LoginHelper {
         QBLoginChatCompositeCommand.start(context);
     }
 
+    private void loadDialogs() {
+        QBLoadDialogsCommand.start(context);
+    }
+
     private boolean needToClearAllData() {
         if (DataManager.getInstance().getUserDataManager().getAll().isEmpty()) {
             App.getInstance().getAppSharedHelper().clearAll();
@@ -153,6 +158,9 @@ public class LoginHelper {
         intentFilter.addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
         intentFilter.addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
 
+        intentFilter.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
+        intentFilter.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
+
         LocalBroadcastManager.getInstance(context).registerReceiver(commandBroadcastReceiver, intentFilter);
     }
 
@@ -170,10 +178,13 @@ public class LoginHelper {
                 AppSession.getSession().updateUser(qbUser);
                 loginChat();
             } else if (intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION)) {
+                loadDialogs();
+            } else if (intent.getAction().equals(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION)) {
                 unregisterBroadcastReceiver();
                 globalLoginListener.onCompleteQbChatLogin();
             } else if (intent.getAction().equals(QBServiceConsts.LOGIN_FAIL_ACTION)
                     || intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION)
+                    || intent.getAction().equals(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION)
                     || intent.getAction().equals(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION)) {
                 unregisterBroadcastReceiver();
                 globalLoginListener.onCompleteWithError("Login was finished with error!");

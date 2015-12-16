@@ -47,6 +47,7 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -163,6 +164,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         new FinderUnknownUsers(context, chatCreator, qbDialogsList).find();
 
         DbUtils.saveDialogsToCache(dataManager, qbDialogsList);
+
+        DbUtils.updateDialogsOccupantsStatusesIfNeeded(dataManager, qbDialogsList);
 
         return qbDialogsList;
     }

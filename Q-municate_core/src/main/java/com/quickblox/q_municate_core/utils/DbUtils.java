@@ -202,7 +202,32 @@ public class DbUtils {
 
     public static void updateDialogOccupant(DataManager dataManager, String dialogId,
             int occupantId, DialogOccupant.Status status) {
-        DialogOccupant dialogOccupant = ChatUtils.getUpdatedDialogOccupant(dataManager, dialogId, status, occupantId);;
+        DialogOccupant dialogOccupant = ChatUtils.getUpdatedDialogOccupant(dataManager, dialogId, status,
+                occupantId);
         dataManager.getDialogOccupantDataManager().update(dialogOccupant);
+    }
+
+    public static void updateDialogsOccupantsStatusesIfNeeded(DataManager dataManager, List<QBDialog> qbDialogsList) {
+        for (QBDialog qbDialog : qbDialogsList) {
+            updateDialogOccupantsStatusesIfNeeded(dataManager, qbDialog);
+        }
+    }
+
+    public static void updateDialogOccupantsStatusesIfNeeded(DataManager dataManager, QBDialog qbDialog) {
+        List<DialogOccupant> oldDialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(qbDialog.getDialogId());
+        List<DialogOccupant> updatedDialogOccupantsList = new ArrayList<>();
+        List<DialogOccupant> newDialogOccupantsList = dataManager.getDialogOccupantDataManager().getActualDialogOccupantsByIds(
+                qbDialog.getDialogId(), qbDialog.getOccupants());
+
+        for (DialogOccupant oldDialogOccupant : oldDialogOccupantsList) {
+            if (!newDialogOccupantsList.contains(oldDialogOccupant)) {
+                oldDialogOccupant.setStatus(DialogOccupant.Status.DELETED);
+                updatedDialogOccupantsList.add(oldDialogOccupant);
+            }
+        }
+
+        if (!updatedDialogOccupantsList.isEmpty()) {
+            dataManager.getDialogOccupantDataManager().updateAll(updatedDialogOccupantsList);
+        }
     }
 }

@@ -105,6 +105,20 @@ public class DialogOccupant implements Serializable {
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof DialogOccupant)) {
+            return false;
+        }
+
+        DialogOccupant dialogOccupant = (DialogOccupant) object;
+
+        return dialogOccupantId == dialogOccupant.getDialogOccupantId();
+    }
+
+    @Override
     public String toString() {
         return "DialogOccupant [id='" + dialogOccupantId + "', dialog='" + dialog + "', user='" + user + "']";
     }
