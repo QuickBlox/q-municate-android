@@ -31,8 +31,13 @@ public class AboutActivity extends BaseLoggableActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.about_title));
+        initFields();
+        setUpActionBarWithUpButton();
         fillUI();
+    }
+
+    private void initFields() {
+        title = getString(R.string.about_title);
     }
 
     private void fillUI() {

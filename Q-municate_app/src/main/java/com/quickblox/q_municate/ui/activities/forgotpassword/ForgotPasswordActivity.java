@@ -42,7 +42,8 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.forgot_password_title));
+        initFields();
+        setUpActionBarWithUpButton();
         addActions();
     }
 
@@ -76,6 +77,10 @@ public class ForgotPasswordActivity extends BaseActivity {
     @OnTextChanged(R.id.email_edittext)
     void onTextChangedEmail(CharSequence text) {
         emailTextInputLayout.setError(null);
+    }
+
+    private void initFields() {
+        title = getString(R.string.forgot_password_title);
     }
 
     private void forgotPassword() {

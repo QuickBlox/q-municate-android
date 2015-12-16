@@ -78,14 +78,15 @@ public class UserProfileActivity extends BaseLoggableActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.user_profile_title));
-
         initFields();
+        setUpActionBarWithUpButton();
+
         initUIWithUsersData();
         addActions();
     }
 
     private void initFields() {
+        title = getString(R.string.user_profile_title);
         dataManager = DataManager.getInstance();
         canPerformLogout.set(true);
         userId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);

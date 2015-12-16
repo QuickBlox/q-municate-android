@@ -50,7 +50,6 @@ import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHelper;
 import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
-import com.quickblox.q_municate.utils.listeners.simple.SimpleGlobalLoginListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -91,6 +90,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected QBGroupChatHelper groupChatHelper;
     protected QBService service;
     protected LocalBroadcastManager localBroadcastManager;
+    protected String title;
 
     private ProgressBar toolbarProgressBar;
     private View snackBarView;
@@ -107,8 +107,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
-    private String toolbarTitle;
-    private String tempToolbarTitle;
 
     protected abstract int getContentResId();
 
@@ -141,7 +139,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void setActionBarTitle(String title) {
-        toolbarTitle = title;
         if (actionBar != null) {
             actionBar.setTitle(title);
         }
@@ -266,13 +263,13 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void onPause() {
         super.onPause();
         unregisterBroadcastReceivers();
+        removeActions();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         registerBroadcastReceivers();
-        updateBroadcastActionList();
 
         addActions();
 
@@ -326,10 +323,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
-    protected void setUpActionBarWithUpButton(String toolbarTitle) {
+    protected void setUpActionBarWithUpButton() {
         initActionBar();
         setActionBarUpButtonEnabled(true);
-        setActionBarTitle(toolbarTitle);
+        setActionBarTitle(title);
     }
 
     public void addFragmentUserStatusChangingListener(
@@ -431,6 +428,15 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
+        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
+        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
+        updateBroadcastActionList();
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
+
         updateBroadcastActionList();
     }
 
@@ -443,18 +449,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
-    public void checkShowingConnectionError() {
-        String toolbarTitleWithConnectionError = getString(R.string.dlg_internet_connection_is_missing);
+    protected void checkShowingConnectionError() {
         if (!isNetworkAvailable()) {
-            if (!toolbarTitleWithConnectionError.equals(toolbarTitle)) {
-                tempToolbarTitle = toolbarTitle;
-                setActionBarTitle(toolbarTitleWithConnectionError);
-            }
+            setActionBarTitle(getString(R.string.dlg_internet_connection_is_missing));
         } else {
-            if (toolbarTitleWithConnectionError.equals(toolbarTitle)
-                    && tempToolbarTitle != null && !tempToolbarTitle.equals(toolbarTitle)) {
-                setActionBarTitle(tempToolbarTitle);
-            }
+            setActionBarTitle(title);
         }
     }
 
@@ -640,11 +639,15 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void performLoginChatSuccessAction(Bundle bundle) {
         QBInitCallChatCommand.start(this, CallActivity.class);
-        checkLoadDialogs();
+        checkLoadDialogsWithSnakbar();
         hideProgress();
     }
 
     private void checkLoadDialogs() {
+        loadDialogs();
+    }
+
+    private void checkLoadDialogsWithSnakbar() {
         showSnackbar(R.string.dlgs_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
         loadDialogs();
     }
@@ -655,6 +658,18 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void activateButterKnife() {
         ButterKnife.bind(this);
+    }
+
+    private void performLoadChatsSuccessAction(Bundle bundle) {
+        hideSnackBar();
+    }
+
+    public class LoadChatsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            performLoadChatsSuccessAction(bundle);
+        }
     }
 
     public class FailAction implements Command {
@@ -685,14 +700,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
-    private class GlobalLoginListener extends SimpleGlobalLoginListener {
-
-        @Override
-        public void onCompleteQbChatLogin() {
-            checkLoadDialogs();
-        }
-    }
-
     private class NetworkBroadcastReceiver extends BroadcastReceiver {
 
         private boolean loggedIn = false;
@@ -703,22 +710,15 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                     .getBooleanExtra(NetworkChangeReceiver.EXTRA_IS_ACTIVE_CONNECTION, false);
 
             if (activeConnection) {
-                setActionBarTitle(tempToolbarTitle);
+                checkShowingConnectionError();
 
                 if (!loggedIn && LoginHelper.isCorrectOldAppSession()) {
                     loggedIn = true;
 
                     LoginHelper loginHelper = new LoginHelper(BaseActivity.this);
-                    loginHelper.makeGeneralLogin(new GlobalLoginListener());
-
-                    addActions();
+                    loginHelper.makeGeneralLogin(null);
                 }
             }
-        }
-
-        private void addActions() {
-            addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
-            updateBroadcastActionList();
         }
     }
 

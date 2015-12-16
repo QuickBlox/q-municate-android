@@ -55,9 +55,9 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.new_message_title));
-
         initFields();
+        setUpActionBarWithUpButton();
+
         initRecyclerView();
         initCustomListeners();
 
@@ -137,6 +137,7 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     }
 
     private void initFields() {
+        title = getString(R.string.new_message_title);
         dataManager = DataManager.getInstance();
     }
 

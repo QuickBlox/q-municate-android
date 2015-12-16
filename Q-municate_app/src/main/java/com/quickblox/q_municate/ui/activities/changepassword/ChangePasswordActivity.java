@@ -55,10 +55,8 @@ public class ChangePasswordActivity extends BaseLoggableActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.change_password_title));
-
         initFields();
-
+        setUpActionBarWithUpButton();
         addActions();
     }
 
@@ -109,6 +107,7 @@ public class ChangePasswordActivity extends BaseLoggableActivity {
     }
 
     private void initFields() {
+        title = getString(R.string.change_password_title);
         canPerformLogout.set(false);
         qbUser = AppSession.getSession().getUser();
     }

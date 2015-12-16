@@ -111,9 +111,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.dialog_details_title));
-
         initFields();
+        setUpActionBarWithUpButton();
+
         initListView();
 
         addActions();
@@ -236,6 +236,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void initFields() {
+        title = getString(R.string.dialog_details_title);
         dataManager = DataManager.getInstance();
         String dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
         qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,

@@ -2,12 +2,18 @@ package com.quickblox.q_municate.ui.activities.main;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.gcm.GSMHelper;
@@ -15,8 +21,13 @@ import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.Utils;
 
 public class MainActivity extends BaseLoggableActivity {
 
@@ -42,9 +53,8 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.app_name));
-
         initFields(savedInstanceState);
+        setUpActionBarWithUpButton();
 
         checkGCMRegistration();
 
@@ -56,6 +66,7 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void initFields(Bundle savedInstanceState) {
+        title = " " + AppSession.getSession().getUser().getFullName();
         gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
@@ -93,11 +104,20 @@ public class MainActivity extends BaseLoggableActivity {
         removeActions();
     }
 
+    @Override
+    protected void checkShowingConnectionError() {
+        if (!isNetworkAvailable()) {
+            setActionBarTitle(getString(R.string.dlg_internet_connection_is_missing));
+            setActionBarIcon(null);
+        } else {
+            setActionBarTitle(title);
+            checkVisibilityUserIcon();
+        }
+    }
+
     private void addActions() {
         addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, importFriendsSuccessAction);
         addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, importFriendsFailAction);
-        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
 
         updateBroadcastActionList();
     }
@@ -109,6 +129,27 @@ public class MainActivity extends BaseLoggableActivity {
         removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
 
         updateBroadcastActionList();
+    }
+
+    private void checkVisibilityUserIcon() {
+        UserCustomData userCustomData = Utils.customDataToObject(AppSession.getSession().getUser().getCustomData());
+        if (!TextUtils.isEmpty(userCustomData.getAvatar_url())) {
+            loadLogoActionBar(userCustomData.getAvatar_url());
+        } else {
+            setActionBarIcon(ImageUtils.getRoundIconDrawable(this,
+                            BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));
+        }
+    }
+
+    private void loadLogoActionBar(String logoUrl) {
+        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+                new SimpleImageLoadingListener() {
+
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
+                        setActionBarIcon(ImageUtils.getRoundIconDrawable(MainActivity.this, loadedBitmap));
+                    }
+                });
     }
 
     private void performImportFriendsSuccessAction() {
@@ -135,19 +176,6 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void launchDialogsListFragment() {
         setCurrentFragment(DialogsListFragment.newInstance());
-    }
-
-    private void performLoadChatsSuccessAction(Bundle bundle) {
-        appSharedHelper.saveFirstAuth(false);
-        hideSnackBar();
-    }
-
-    public class LoadChatsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            performLoadChatsSuccessAction(bundle);
-        }
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

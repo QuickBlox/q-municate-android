@@ -66,9 +66,8 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.invite_friends_title));
-
         initFields(savedInstanceState);
+        setUpActionBarWithUpButton();
         initCustomUI();
         initCustomListeners();
         initFriendsList();
@@ -99,6 +98,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
     }
 
     private void initFields(Bundle savedInstanceState) {
+        title = getString(R.string.invite_friends_title);
         FacebookSessionStatusCallback facebookSessionStatusCallback = new FacebookSessionStatusCallback();
         facebookHelper = new FacebookHelper(this, savedInstanceState, facebookSessionStatusCallback);
     }

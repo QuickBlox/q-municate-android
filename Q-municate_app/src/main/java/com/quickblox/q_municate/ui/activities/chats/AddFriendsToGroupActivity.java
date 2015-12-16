@@ -51,18 +51,9 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        setUpActionBarWithUpButton(getString(R.string.add_friends_to_group_title));
+        initFields();
+        setUpActionBarWithUpButton();
         initCustomListeners();
-    }
-
-    private void initCustomListeners() {
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
-
-            @Override
-            public void onItemClicked(View view, User entity, int position) {
-                ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
-            }
-        });
     }
 
     @Override
@@ -101,6 +92,20 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
         } else {
             ToastUtils.longToast(R.string.add_friends_to_group_no_friends_for_adding);
         }
+    }
+
+    private void initFields() {
+        title = getString(R.string.add_friends_to_group_title);
+    }
+
+    private void initCustomListeners() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+
+            @Override
+            public void onItemClicked(View view, User entity, int position) {
+                ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
+            }
+        });
     }
 
     private void addActions() {

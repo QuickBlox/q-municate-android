@@ -33,7 +33,8 @@ public class FeedbackActivity extends BaseLoggableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.feedback_title));
+        initFields();
+        setUpActionBarWithUpButton();
     }
 
     @Override
@@ -53,6 +54,10 @@ public class FeedbackActivity extends BaseLoggableActivity {
                 super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private void initFields() {
+        title = getString(R.string.feedback_title);
     }
 
     private String getSelectedFeedbackType() {

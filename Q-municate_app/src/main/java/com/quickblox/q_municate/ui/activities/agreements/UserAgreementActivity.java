@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.webkit.WebView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 
 import butterknife.Bind;
@@ -28,8 +27,13 @@ public class UserAgreementActivity extends BaseLoggableActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.user_agreement_title));
+        initFields();
+        setUpActionBarWithUpButton();
         initUserAgreementWebView();
+    }
+
+    private void initFields() {
+        title = getString(R.string.user_agreement_title);
     }
 
     private void initUserAgreementWebView() {

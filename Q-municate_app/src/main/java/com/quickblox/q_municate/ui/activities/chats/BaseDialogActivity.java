@@ -256,6 +256,17 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         checkMessageSendingPossibility();
     }
 
+    @Override
+    protected void checkShowingConnectionError() {
+        if (!isNetworkAvailable()) {
+            setActionBarTitle(getString(R.string.dlg_internet_connection_is_missing));
+            setActionBarIcon(null);
+        } else {
+            setActionBarTitle(title);
+            updateActionBar();
+        }
+    }
+
     private void initFields() {
         mainThreadHandler = new Handler(Looper.getMainLooper());
         resources = getResources();
@@ -374,6 +385,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 setSmilePanelIcon(R.drawable.ic_keyboard_dark);
             }
         }, DELAY_SHOWING_SMILE_PANEL);
+    }
+
+    protected void checkActionBarLogo(String url, int resId) {
+        if (!TextUtils.isEmpty(url)) {
+            loadActionBarLogo(url);
+        } else {
+            setDefaultActionBarLogo(resId);
+        }
     }
 
     protected void loadActionBarLogo(String logoUrl) {

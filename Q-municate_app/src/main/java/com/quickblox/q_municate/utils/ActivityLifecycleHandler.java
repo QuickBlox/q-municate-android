@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.core.helper.Lo;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLogoutAndDestroyChatCommand;
@@ -28,7 +29,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         chatDestroyed = chatDestroyed && !isLoggedIn();
         if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
             boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
-            if (canLogin) {
+            if (canLogin && ((BaseActivity) activity).isNetworkAvailable()) {
                 QBLoginChatCompositeCommand.start(activity);
             }
         }

@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
@@ -35,20 +36,16 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        setUpActionBarWithUpButton(getString(R.string.new_group_title));
-        initCustomListeners();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initFields();
     }
 
-    private void initCustomListeners() {
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
-
-            @Override
-            public void onItemClicked(View view, User entity, int position) {
-                ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
-            }
-        });
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setUpActionBarWithUpButton();
+        initCustomListeners();
     }
 
     @Override
@@ -76,5 +73,19 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
     @Override
     public void onSelectedUsersChanged(int count, String fullNames) {
         membersEditText.setText(fullNames);
+    }
+
+    private void initFields() {
+        title = getString(R.string.new_group_title);
+    }
+
+    private void initCustomListeners() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+
+            @Override
+            public void onItemClicked(View view, User entity, int position) {
+                ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
+            }
+        });
     }
 }

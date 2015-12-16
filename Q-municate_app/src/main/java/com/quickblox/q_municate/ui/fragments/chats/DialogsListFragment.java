@@ -1,8 +1,6 @@
 package com.quickblox.q_municate.ui.fragments.chats;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
@@ -17,8 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
@@ -33,10 +29,7 @@ import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.fragments.search.SearchFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -44,7 +37,6 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DbUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogOccupantDataManager;
@@ -103,8 +95,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     public void initActionBar() {
         super.initActionBar();
         actionBarBridge.setActionBarUpButtonEnabled(false);
-
-        checkVisibilityUserIcon();
 
         loadingBridge.hideActionBarProgress();
     }
@@ -193,8 +183,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         if (dialogsListAdapter != null) {
             dialogsListAdapter.notifyDataSetChanged();
         }
-
-        updateToolbarTitle();
     }
 
     @Override
@@ -236,29 +224,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
 
     private void checkVisibilityEmptyLabel() {
         emptyListTextView.setVisibility(dialogsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
-    }
-
-    private void checkVisibilityUserIcon() {
-        UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
-        if (!TextUtils.isEmpty(userCustomData.getAvatar_url())) {
-            loadLogoActionBar(userCustomData.getAvatar_url());
-        } else {
-            actionBarBridge.setActionBarIcon(
-                    ImageUtils.getRoundIconDrawable(getActivity(),
-                            BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));
-        }
-    }
-
-    private void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
-                new SimpleImageLoadingListener() {
-
-                    @Override
-                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
-                        actionBarBridge.setActionBarIcon(
-                                ImageUtils.getRoundIconDrawable(getActivity(), loadedBitmap));
-                    }
-                });
     }
 
     private void addObservers() {
@@ -326,11 +291,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
 
     private void launchContactsFragment() {
         baseActivity.setCurrentFragment(SearchFragment.newInstance());
-    }
-
-    private void updateToolbarTitle() {
-        actionBarBridge.setActionBarTitle(" " + qbUser.getFullName());
-        baseActivity.checkShowingConnectionError();
     }
 
     private static class DialogsListLoader extends BaseLoader<List<Dialog>> {

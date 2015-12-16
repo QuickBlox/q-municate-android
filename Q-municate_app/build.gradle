@@ -33,6 +33,7 @@ android {
         multiDexEnabled = true
     }
 
+    // before release need to enable Crashlytics
     signingConfigs {
         release {
             storeFile file('keystore/qmun.jks')

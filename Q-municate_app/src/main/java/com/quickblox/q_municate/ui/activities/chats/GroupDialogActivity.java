@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,7 +47,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
             finish();
         }
 
-        setUpActionBarWithUpButton(dialog.getTitle());
+        setUpActionBarWithUpButton();
 
         if (isNetworkAvailable()) {
             deleteTempMessages();
@@ -141,22 +140,19 @@ public class GroupDialogActivity extends BaseDialogActivity {
         return true;
     }
 
+    @Override
+    protected void updateActionBar() {
+        if (isNetworkAvailable()) {
+            setActionBarTitle(dialog.getTitle());
+            checkActionBarLogo(dialog.getPhoto(), R.drawable.placeholder_group);
+        }
+    }
+
     private void initFields() {
         chatHelperIdentifier = QBService.GROUP_CHAT_HELPER;
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
-    }
-
-    protected void updateActionBar() {
-        if (isNetworkAvailable()) {
-            setActionBarTitle(dialog.getTitle());
-        }
-
-        if (!TextUtils.isEmpty(dialog.getPhoto())) {
-            loadActionBarLogo(dialog.getPhoto());
-        } else {
-            setDefaultActionBarLogo(R.drawable.placeholder_group);
-        }
+        title = dialog.getTitle();
     }
 
     public void sendMessage(View view) {

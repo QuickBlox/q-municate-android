@@ -36,9 +36,14 @@ public class PreviewImageActivity extends BaseLoggableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.preview_image_title));
+        initFields();
+        setUpActionBarWithUpButton();
         initTouchImageView();
         displayImage();
+    }
+
+    private void initFields() {
+        title = getString(R.string.preview_image_title);
     }
 
     private void displayImage() {

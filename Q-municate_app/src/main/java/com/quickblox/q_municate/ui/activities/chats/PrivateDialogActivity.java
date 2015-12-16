@@ -4,14 +4,12 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -22,7 +20,6 @@ import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragme
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
@@ -68,7 +65,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
             finish();
         }
 
-        setUpActionBarWithUpButton(opponentUser.getFullName());
+        setUpActionBarWithUpButton();
 
         if (isNetworkAvailable()) {
             deleteTempMessages();
@@ -76,7 +73,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         addObservers();
 
-        fillActionBar();
         initMessagesRecyclerView();
     }
 
@@ -114,6 +110,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateActionBar() {
+        setOnlineStatus(opponentUser);
+
+        checkActionBarLogo(opponentUser.getAvatar(), R.drawable.placeholder_user);
     }
 
     @Override
@@ -216,6 +215,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
+        title = opponentUser.getFullName();
     }
 
     private void addObservers() {
@@ -238,16 +238,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
                 actionBar.setSubtitle(
                         OnlineStatusUtils.getOnlineStatus(friendListHelper.isUserOnline(friend.getUserId())));
             }
-        }
-    }
-
-    private void fillActionBar() {
-        setOnlineStatus(opponentUser);
-
-        if (!TextUtils.isEmpty(opponentUser.getAvatar())) {
-            loadActionBarLogo(opponentUser.getAvatar());
-        } else {
-            setDefaultActionBarLogo(R.drawable.placeholder_user);
         }
     }
 

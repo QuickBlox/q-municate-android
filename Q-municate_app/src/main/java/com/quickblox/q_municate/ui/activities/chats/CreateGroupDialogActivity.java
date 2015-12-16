@@ -77,7 +77,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     @Override
     protected void onStart() {
         super.onStart();
-        setUpActionBarWithUpButton(getString(R.string.create_group_title));
+        setUpActionBarWithUpButton();
     }
 
     @Override
@@ -145,6 +145,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     }
 
     private void initFields() {
+        title = getString(R.string.create_group_title);
         friendsList = (List<User>) getIntent().getExtras().getSerializable(EXTRA_FRIENDS_LIST);
         participantsCountTextView.setText(getString(R.string.create_group_participants, friendsList.size()));
         imagePickHelper = new ImagePickHelper();

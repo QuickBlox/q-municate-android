@@ -62,9 +62,8 @@ public class SettingsActivity extends BaseLoggableActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpActionBarWithUpButton(getString(R.string.settings_title));
-
         initFields();
+        setUpActionBarWithUpButton();
 
         addActions();
     }
@@ -134,6 +133,7 @@ public class SettingsActivity extends BaseLoggableActivity {
     }
 
     private void initFields() {
+        title = getString(R.string.settings_title);
         user = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
     }
 

@@ -96,7 +96,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initFields();
         initWiFiManagerListener();
     }
@@ -168,30 +167,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     public void onReceiveNewSession(final QBRTCSession session) {
         Log.d(TAG, "Session " + session.getSessionID() + " are income");
-
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.d(TAG, "Session " + session.getSessionID() + " are income");
-//                String curSession = (getCurrentSession() == null) ? null : getCurrentSession().getSessionID();
-//
-//                if (getCurrentSession() == null) {
-//                    Log.d(TAG, "Start new session");
-//
-//                    if (qbCallChatHelper != null) {
-//                        qbCallChatHelper.initCurrentSession(session, CallActivity.this, CallActivity.this);
-//
-//                        addIncomingCallFragment(session.getSessionDescription());
-//
-//                        isInComingCall = true;
-//                        initIncomingCallTask();
-//                    }
-//                } else {
-//                    Log.d(TAG, "Stop new session. Device now is busy");
-//                    session.rejectCall(null);
-//                }
-//            }
-//        });
     }
 
     @Override
