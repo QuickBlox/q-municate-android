@@ -157,10 +157,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                 startAddFriendsActivity();
                 break;
             case R.id.action_leave:
-                if (isChatInitializedAndUserLoggedIn()) {
-                    if (checkNetworkAvailableWithError()) {
-                        showLeaveGroupDialog();
-                    }
+                boolean joined = groupChatHelper != null && groupChatHelper.isDialogJoined(qbDialog);
+                if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError() && joined) {
+                    showLeaveGroupDialog();
                 } else {
                     ToastUtils.longToast(R.string.dialog_details_service_is_initializing);
                 }
@@ -504,6 +503,14 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
             }
         }
         return null;
+    }
+
+    @Override
+    protected void performLoginChatSuccessAction(Bundle bundle) {
+        super.performLoginChatSuccessAction(bundle);
+        if (groupChatHelper != null) {
+            groupChatHelper.tryJoinRoomChat(qbDialog);
+        }
     }
 
     private class UserOperationAction implements UserOperationListener {

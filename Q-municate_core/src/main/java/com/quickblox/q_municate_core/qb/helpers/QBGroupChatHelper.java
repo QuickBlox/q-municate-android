@@ -242,6 +242,18 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         return groupChat;
     }
 
+    public boolean isDialogJoined(QBDialog dialog) {
+        QBGroupChat roomChat;
+        boolean joined = false;
+        try {
+            roomChat = createGroupChatIfNotExist(dialog);
+            joined = roomChat.isJoined();
+        } catch (QBResponseException e) {
+            ErrorUtils.logError(e);
+        }
+        return joined;
+    }
+
     public void joinRoomChat(QBDialog dialog) throws Exception {
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
         if (!roomChat.isJoined()) {
@@ -251,7 +263,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
-    protected void tryJoinRoomChat(QBDialog dialog) {
+    public void tryJoinRoomChat(QBDialog dialog) {
         try {
             joinRoomChat(dialog);
         } catch (Exception e) {

@@ -33,9 +33,9 @@ public class QBCallChatHelper extends BaseHelper {
 
     private static final String TAG = QBCallChatHelper.class.getSimpleName();
 
-    private static final int ANSWER_INTERVAL = 30;
+    private static final int ANSWER_INTERVAL = 60;
     private static final int DISCONNECT_TIME = 30;
-    private static final int ANSWER_TIME_INTERVAL = 30;
+    private static final int ANSWER_TIME_INTERVAL = 60;
 
     private QBRTCClient qbRtcClient;
     private Class<? extends Activity> activityClass;
@@ -63,6 +63,7 @@ public class QBCallChatHelper extends BaseHelper {
     public void initActivityClass(Class<? extends Activity> activityClass) {
         Log.d(TAG, "initActivityClass()");
         this.activityClass = activityClass;
+        Log.d("test_crash_1", "initActivityClass(), activityClass = " + activityClass);
     }
 
     public QBRTCSession getCurrentRtcSession() {
@@ -114,10 +115,6 @@ public class QBCallChatHelper extends BaseHelper {
         User user = DataManager.getInstance().getUserDataManager()
                 .get(qbRtcSession.getSessionDescription().getCallerID());
 
-        if (activityClass == null) {
-            throw new NullPointerException("activityClass is not initialised!");
-        }
-
         if (user != null) {
             Log.d(TAG, "startCallActivity(), user = " + user);
             Log.d(TAG, "startCallActivity(), qbRtcSession.getConferenceType() = " + qbRtcSession
@@ -136,7 +133,7 @@ public class QBCallChatHelper extends BaseHelper {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.getApplicationContext().startActivity(intent);
         } else {
-            throw new NullPointerException("user is not initialised!");
+            throw new NullPointerException("user is null!");
         }
     }
 
@@ -174,8 +171,10 @@ public class QBCallChatHelper extends BaseHelper {
                 }
             } else {
                 Log.d(TAG, "onReceiveNewSession(). init session.");
-                currentQbRtcSession = qbRtcSession;
-                startCallActivity(qbRtcSession);
+                if (activityClass != null) {
+                    startCallActivity(qbRtcSession);
+                    currentQbRtcSession = qbRtcSession;
+                }
             }
         }
 

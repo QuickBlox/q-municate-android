@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
@@ -31,8 +32,10 @@ public class QBInitCallChatCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         if (extras == null || extras.getSerializable(QBServiceConsts.EXTRA_CALL_ACTIVITY) == null) { // global init
             qbCallChatHelper.init(QBChatService.getInstance());
+            Log.d("test_crash_1", "+++ perform 1 +++");
         } else {
             // init call activity
+            Log.d("test_crash_1", "+++ perform 2 +++");
             qbCallChatHelper.initActivityClass((Class<? extends Activity>) extras.getSerializable(
                     QBServiceConsts.EXTRA_CALL_ACTIVITY));
         }
