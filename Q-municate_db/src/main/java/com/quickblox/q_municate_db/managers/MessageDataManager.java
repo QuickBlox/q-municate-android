@@ -143,6 +143,12 @@ public class MessageDataManager extends BaseManager<Message> {
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
             messageQueryBuilder.join(dialogOccupantQueryBuilder);
 
+            Where<Message, Long> where = messageQueryBuilder.where();
+            where.and(
+                    where.ne(Message.Column.STATE, State.TEMP_LOCAL),
+                    where.ne(Message.Column.STATE, State.TEMP_LOCAL_UNREAD)
+            );
+
             PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
             messagesList = dao.query(preparedQuery);
         } catch (SQLException e) {

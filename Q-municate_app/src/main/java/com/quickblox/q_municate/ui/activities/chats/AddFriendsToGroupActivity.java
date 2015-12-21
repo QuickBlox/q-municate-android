@@ -22,6 +22,8 @@ import com.quickblox.q_municate_db.models.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
@@ -73,6 +75,9 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
             if (!dialogOccupantsList.isEmpty()) {
                 friendsList.removeAll(UserFriendUtils.getFriendsListFromDialogOccupantsList(dialogOccupantsList));
             }
+        }
+        if (!friendsList.isEmpty()) {
+            Collections.sort(friendsList, new FriendsComparator());
         }
         return UserFriendUtils.getUsersFromFriends(friendsList);
     }
@@ -127,6 +132,16 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
             intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, (Serializable) friendIdsList);
             setResult(RESULT_ADDED_FRIENDS, intent);
             finish();
+        }
+    }
+
+    private class FriendsComparator implements Comparator<Friend> {
+
+        @Override
+        public int compare(Friend friend1, Friend friend2) {
+            String firstName = friend1.getUser().getFullName();
+            String secondName = friend2.getUser().getFullName();
+            return firstName.compareToIgnoreCase(secondName);
         }
     }
 }

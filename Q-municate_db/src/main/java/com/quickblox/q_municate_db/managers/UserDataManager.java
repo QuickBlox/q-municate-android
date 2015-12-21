@@ -87,6 +87,8 @@ public class UserDataManager extends BaseManager<User> {
             userQueryBuilder.join(dialogOccupantQueryBuilder);
             userQueryBuilder.distinct();
 
+            userQueryBuilder.orderBy(User.Column.FULL_NAME, true);
+
             PreparedQuery<User> preparedQuery = userQueryBuilder.prepare();
             usersList = dao.query(preparedQuery);
         } catch (SQLException e) {
