@@ -107,7 +107,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         Message message = parseReceivedMessage(qbChatMessage);
 
         if (!dataManager.getUserDataManager().exists(qbChatMessage.getSenderId())) {
-            new QBRestHelper(context).loadAndSaveUser(qbChatMessage.getSenderId());
+            QBRestHelper.loadAndSaveUser(qbChatMessage.getSenderId());
         }
 
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);

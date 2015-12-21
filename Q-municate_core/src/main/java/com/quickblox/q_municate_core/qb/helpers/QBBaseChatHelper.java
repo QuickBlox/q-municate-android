@@ -26,6 +26,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.R;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
@@ -155,17 +156,15 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         qbChatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
     }
 
-    public List<QBDialog> getDialogs() throws Exception {
-        Bundle bundle = new Bundle();
-        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
-        List<QBDialog> qbDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
+    public List<QBDialog> getDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
+        List<QBDialog> qbDialogsList = QBChatService.getChatDialogs(null, qbRequestGetBuilder, returnedBundle);
 
-        new FinderUnknownUsers(context, chatCreator, qbDialogsList).find();
-
-        DbUtils.saveDialogsToCache(dataManager, qbDialogsList);
-
-        DbUtils.updateDialogsOccupantsStatusesIfNeeded(dataManager, qbDialogsList);
+        if (qbDialogsList != null && !qbDialogsList.isEmpty()) {
+            FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbDialogsList);
+            finderUnknownUsers.find();
+            DbUtils.saveDialogsToCache(dataManager, qbDialogsList);
+            DbUtils.updateDialogsOccupantsStatusesIfNeeded(dataManager, qbDialogsList);
+        }
 
         return qbDialogsList;
     }

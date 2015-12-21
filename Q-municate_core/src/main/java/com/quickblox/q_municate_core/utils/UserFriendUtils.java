@@ -160,4 +160,11 @@ public class UserFriendUtils {
         }
         return result;
     }
+
+    public static User createDeletedUser(int userId) {
+        User user = new User();
+        user.setUserId(userId);
+        user.setFullName(String.valueOf(userId));
+        return user;
+    }
 }

@@ -64,10 +64,8 @@ public class FinderUnknownUsers {
         try {
             if (loadIdsSet.size() == oneElement) {
                 int userId = loadIdsSet.iterator().next();
-                User user = restHelper.loadUser(userId);
-                if (user != null) {
-                    dataManager.getUserDataManager().createOrUpdate(user);
-                }
+                User user = QBRestHelper.loadUser(userId);
+                dataManager.getUserDataManager().createOrUpdate(user);
             } else {
                 Collection<User> userCollection = restHelper.loadUsers(loadIdsSet);
                 if (userCollection != null) {

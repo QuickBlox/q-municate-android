@@ -21,9 +21,9 @@ import java.util.List;
 
 public class DbUtils {
 
-    public static DialogOccupant saveDialogOccupantIfUserNotExists(Context context, DataManager dataManager,
+    public static DialogOccupant saveDialogOccupantIfUserNotExists(DataManager dataManager,
             String dialogId, int userId, DialogOccupant.Status status) {
-        new QBRestHelper(context).loadAndSaveUser(userId);
+        QBRestHelper.loadAndSaveUser(userId);
 
         User user = DataManager.getInstance().getUserDataManager().get(userId);
         DialogOccupant dialogOccupant = ChatUtils.createDialogOccupant(dataManager, dialogId, user);
@@ -120,7 +120,7 @@ public class DbUtils {
         }
 
         if (dialogOccupant == null && qbChatMessage.getSenderId() != null) {
-            saveDialogOccupantIfUserNotExists(context, dataManager, dialogId, qbChatMessage.getSenderId(),
+            saveDialogOccupantIfUserNotExists(dataManager, dialogId, qbChatMessage.getSenderId(),
                     DialogOccupant.Status.DELETED);
             dialogOccupant = dataManager.getDialogOccupantDataManager()
                     .getDialogOccupant(dialogId, qbChatMessage.getSenderId());
@@ -197,7 +197,7 @@ public class DbUtils {
             List<Integer> dialogOccupantIdsList, DialogOccupant.Status status) {
         List<DialogOccupant> dialogOccupantsList = ChatUtils.
                 getUpdatedDialogOccupantsList(dataManager, dialogId, dialogOccupantIdsList, status);
-        dataManager.getDialogOccupantDataManager().updateAll(dialogOccupantsList);
+        dataManager.getDialogOccupantDataManager().createOrUpdateAll(dialogOccupantsList);
     }
 
     public static void updateDialogOccupant(DataManager dataManager, String dialogId,

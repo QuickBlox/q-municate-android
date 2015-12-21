@@ -19,7 +19,7 @@ ext {
     minSdkVersion = 14
     targetSdkVersion = 22
     versionName = '1.2.0.22'
-    versionCode = 1
+    versionCode = 35
 
     prodDebug = true
 

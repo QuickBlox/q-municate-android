@@ -96,6 +96,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private List<User> occupantsList;
     private int countOnlineFriends;
     private DataManager dataManager;
+    private String dialogId;
 
     public static void start(Activity context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -237,18 +238,17 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void initFields() {
         title = getString(R.string.dialog_details_title);
         dataManager = DataManager.getInstance();
-        String dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
-                dataManager.getDialogDataManager().getByDialogId(dialogId));
+        dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
         imagePickHelper = new ImagePickHelper();
         friendOperationAction = new UserOperationAction();
         currentNotificationTypeList = new ArrayList<>();
         updatingDialogDetailsBroadcastReceiver = new UpdatingDialogDetailsBroadcastReceiver();
-        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
-        qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
+        occupantsList = new ArrayList<>();
     }
 
     private void fillUIWithData() {
+        updateDialog();
+
         groupNameEditText.setText(qbDialog.getName());
 
         updateCountOnlineFriends();
@@ -260,6 +260,14 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         }
 
         updateOldGroupData();
+    }
+
+    private void updateDialog() {
+        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
+                dataManager.getDialogDataManager().getByDialogId(dialogId));
+        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
+        qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
+        groupDialogOccupantsAdapter.setNewData(occupantsList);
     }
 
     private void registerBroadcastManagers() {
@@ -434,11 +442,12 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void sendNotificationToGroup(boolean leavedFromDialog) {
         for (DialogNotification.Type messagesNotificationType : currentNotificationTypeList) {
             try {
+                QBDialog localDialog = qbDialog;
                 if (qbDialog != null) {
-                    qbDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,
+                    localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,
                             dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
                 }
-                groupChatHelper.sendGroupMessageToFriends(qbDialog, messagesNotificationType,
+                groupChatHelper.sendGroupMessageToFriends(localDialog, messagesNotificationType,
                         newFriendIdsList, leavedFromDialog);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);

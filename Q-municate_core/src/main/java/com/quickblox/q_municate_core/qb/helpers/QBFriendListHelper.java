@@ -286,7 +286,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
     @Nullable
     private User loadAndSaveUser(int userId) {
-        User user = restHelper.loadUser(userId);
+        User user = QBRestHelper.loadUser(userId);
 
         if (user == null) {
             return null;

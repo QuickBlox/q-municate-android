@@ -41,7 +41,7 @@ public class QBLoadUserCommand extends ServiceCommand {
             restHelper.loadUsers(userIdsList);
         } else if (extras.containsKey(QBServiceConsts.EXTRA_USER_ID)) {
             int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-            restHelper.loadUser(userId);
+            QBRestHelper.loadUser(userId);
         }
         return null;
     }

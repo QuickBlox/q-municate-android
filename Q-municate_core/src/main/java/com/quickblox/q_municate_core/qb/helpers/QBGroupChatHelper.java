@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBGroupChat;
@@ -206,10 +205,6 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         sendSystemMessage(chatMessageForSending, friendId, dialog.getDialogId());
     }
 
-    public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {
-        return new ArrayList<Integer>(groupChatManager.getGroupChat(roomJid).getOnlineUsers());
-    }
-
     public void leaveDialogs() throws XMPPException, SmackException.NotConnectedException {
         if (groupDialogsList != null) {
             for (QBDialog dialog : groupDialogsList) {
@@ -322,8 +317,6 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         ChatNotificationUtils.updateDialogFromQBMessage(context, dataManager, qbChatMessage, qbDialog);
         DbUtils.saveDialogToCache(dataManager, qbDialog);
 
-        DbUtils.updateDialogOccupantsStatusesIfNeeded(dataManager, qbDialog);
-
         notifyUpdatingDialog();
     }
 
@@ -373,14 +366,12 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
                     Integer.parseInt(notificationTypeString));
             if (NotificationType.GROUP_CHAT_CREATE.equals(notificationType)) {
                 createDialogByNotification(qbChatMessage, DialogNotification.Type.CREATE_DIALOG);
-            } else if (NotificationType.GROUP_CHAT_UPDATE.equals(notificationType)) {
-                updateDialogByNotification(qbChatMessage);
             }
         }
 
         @Override
         public void processError(QBChatException e, QBChatMessage qbChatMessage) {
-            Log.d(TAG, "+++ system message error received: " + e);
+            ErrorUtils.logError(e);
         }
     }
 

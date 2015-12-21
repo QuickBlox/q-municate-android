@@ -20,29 +20,32 @@ public class QBRestHelper extends BaseHelper {
         super(context);
     }
 
-    public User loadUser(int userId) {
-        User resultUser = null;
+    public static User loadUser(int userId) {
+        User resultUser;
 
         try {
             QBUser user = QBUsers.getUser(userId);
             resultUser = UserFriendUtils.createLocalUser(user);
         } catch (QBResponseException e) {
             // user not found
+            resultUser = UserFriendUtils.createDeletedUser(userId);
         }
 
         return resultUser;
     }
 
-    public User loadAndSaveUser(int userId) {
+    public static User loadAndSaveUser(int userId) {
         User resultUser = null;
 
         try {
             QBUser user = QBUsers.getUser(userId);
             resultUser = UserFriendUtils.createLocalUser(user);
-            DataManager.getInstance().getUserDataManager().createOrUpdate(resultUser, true);
         } catch (QBResponseException e) {
             // user not found
+            resultUser = UserFriendUtils.createDeletedUser(userId);
         }
+
+        DataManager.getInstance().getUserDataManager().createOrUpdate(resultUser, true);
 
         return resultUser;
     }

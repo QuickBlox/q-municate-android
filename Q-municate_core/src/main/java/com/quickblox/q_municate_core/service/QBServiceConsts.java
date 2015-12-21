@@ -219,6 +219,7 @@ public class QBServiceConsts {
     public static final String EXTRA_CALLER_NAME = "caller_name";
     public static final String EXTRA_SESSION_ID = "session_id";
     public static final String EXTRA_SESSION_DESCRIPTION = "session_description";
+    public static final String EXTRA_LAST_MESSAGE_DATE_SENT = "last_message_date_sent";
 
 
     public static final String UPDATE_DIALOG = "update_dialog";
