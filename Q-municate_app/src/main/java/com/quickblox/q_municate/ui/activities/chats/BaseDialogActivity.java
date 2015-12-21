@@ -378,7 +378,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void deleteTempMessages() {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+        List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
         dataManager.getMessageDataManager().deleteTempMessages(dialogOccupantsIdsList);
     }
 
@@ -534,7 +534,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         showActionBarProgress();
 
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(dialog.getDialogId());
-        List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+        List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
 
         Message message;
         DialogNotification dialogNotification;

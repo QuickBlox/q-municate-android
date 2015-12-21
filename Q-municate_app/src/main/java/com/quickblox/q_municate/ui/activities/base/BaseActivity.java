@@ -234,22 +234,28 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void showSnackbar(int titleResId, int duration) {
-        createSnackBar(titleResId, duration);
-        snackbar.show();
+        if (snackbar != null) {
+            createSnackBar(titleResId, duration);
+            snackbar.show();
+        }
     }
 
     @Override
     public void showSnackbar(int titleResId, int duration, int buttonTitleResId, View.OnClickListener onClickListener) {
-        createSnackBar(titleResId, duration);
-        snackbar.setAction(buttonTitleResId, onClickListener);
-        snackbar.show();
+        if (snackbar != null) {
+            createSnackBar(titleResId, duration);
+            snackbar.setAction(buttonTitleResId, onClickListener);
+            snackbar.show();
+        }
     }
 
     @Override
     public void showSnackbar(String title, int duration, int buttonTitleResId, View.OnClickListener onClickListener) {
-        snackbar = Snackbar.make(snackBarView, title, duration);
-        snackbar.setAction(buttonTitleResId, onClickListener);
-        snackbar.show();
+        if (snackbar != null) {
+            snackbar = Snackbar.make(snackBarView, title, duration);
+            snackbar.setAction(buttonTitleResId, onClickListener);
+            snackbar.show();
+        }
     }
 
     @Override

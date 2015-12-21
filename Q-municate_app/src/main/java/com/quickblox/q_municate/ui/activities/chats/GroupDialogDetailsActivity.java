@@ -435,7 +435,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         for (DialogNotification.Type messagesNotificationType : currentNotificationTypeList) {
             try {
                 if (qbDialog != null) {
-                    qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
+                    qbDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,
                             dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
                 }
                 groupChatHelper.sendGroupMessageToFriends(qbDialog, messagesNotificationType,

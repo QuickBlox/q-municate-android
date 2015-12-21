@@ -46,7 +46,7 @@ public class MessageDataManager extends BaseManager<Message> {
         return message;
     }
 
-    public Message getLastMessageWithTempByDialogId(List<Integer> dialogOccupantsList) {
+    public Message getLastMessageWithTempByDialogId(List<Long> dialogOccupantsList) {
         Message message = null;
 
         try {
@@ -62,7 +62,7 @@ public class MessageDataManager extends BaseManager<Message> {
         return message;
     }
 
-    public Message getMessageByDialogId(boolean firstMessage, List<Integer> dialogOccupantsList) {
+    public Message getMessageByDialogId(boolean firstMessage, List<Long> dialogOccupantsList) {
         Message message = null;
 
         try {
@@ -82,7 +82,7 @@ public class MessageDataManager extends BaseManager<Message> {
         return message;
     }
 
-    public long getCountUnreadMessages(List<Integer> dialogOccupantsIdsList, int currentUserId) {
+    public long getCountUnreadMessages(List<Long> dialogOccupantsIdsList, int currentUserId) {
         long count = 0;
 
         try {
@@ -112,7 +112,7 @@ public class MessageDataManager extends BaseManager<Message> {
         return count;
     }
 
-    public Message getLastMessageByDialogId(List<Integer> dialogOccupantsList) {
+    public Message getLastMessageByDialogId(List<Long> dialogOccupantsList) {
         Message message = null;
 
         try {
@@ -152,7 +152,7 @@ public class MessageDataManager extends BaseManager<Message> {
         return messagesList;
     }
 
-    public void deleteTempMessages(List<Integer> dialogOccupantsIdsList) {
+    public void deleteTempMessages(List<Long> dialogOccupantsIdsList) {
         try {
             DeleteBuilder<Message, Long> deleteBuilder = dao.deleteBuilder();
 

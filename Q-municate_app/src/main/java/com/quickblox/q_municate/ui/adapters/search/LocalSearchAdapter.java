@@ -69,7 +69,7 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
 
             displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
         } else {
-            List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+            List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
             Message message = dataManager.getMessageDataManager().getLastMessageWithTempByDialogId(dialogOccupantsIdsList);
             DialogNotification dialogNotification = dataManager.getDialogNotificationDataManager()
                     .getLastDialogNotificationByDialogId(dialogOccupantsIdsList);

@@ -18,7 +18,7 @@ public class DialogOccupant implements Serializable {
             generatedId = true,
             unique = true,
             columnName = ID)
-    private int dialogOccupantId;
+    private long dialogOccupantId;
 
     @DatabaseField(
             foreign = true,
@@ -88,11 +88,11 @@ public class DialogOccupant implements Serializable {
         this.messageCollection = messageCollection;
     }
 
-    public int getDialogOccupantId() {
+    public long getDialogOccupantId() {
         return dialogOccupantId;
     }
 
-    public void setDialogOccupantId(int dialogOccupantId) {
+    public void setDialogOccupantId(long dialogOccupantId) {
         this.dialogOccupantId = dialogOccupantId;
     }
 

@@ -302,8 +302,8 @@ public class ChatUtils {
         return dialogOccupantsList;
     }
 
-    public static List<Integer> getIdsFromDialogOccupantsList(List<DialogOccupant> dialogOccupantsList) {
-        List<Integer> idsList = new ArrayList<>(dialogOccupantsList.size());
+    public static List<Long> getIdsFromDialogOccupantsList(List<DialogOccupant> dialogOccupantsList) {
+        List<Long> idsList = new ArrayList<>(dialogOccupantsList.size());
 
         for (DialogOccupant dialogOccupant : dialogOccupantsList) {
             idsList.add(dialogOccupant.getDialogOccupantId());
@@ -325,6 +325,13 @@ public class ChatUtils {
     public static QBDialog createQBDialogFromLocalDialog(DataManager dataManager, Dialog dialog) {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
+        QBDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
+        return qbDialog;
+    }
+
+    public static QBDialog createQBDialogFromLocalDialogWithoutLeaved(DataManager dataManager, Dialog dialog) {
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
+                .getActualDialogOccupantsByDialog(dialog.getDialogId());
         QBDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
         return qbDialog;
     }
@@ -599,6 +606,9 @@ public class ChatUtils {
 
     public static DialogOccupant createDialogOccupant(DataManager dataManager, String dialogId, User user) {
         DialogOccupant dialogOccupant = new DialogOccupant();
+        if (dialogId!= null && user != null) {
+            dialogOccupant.setDialogOccupantId(dialogId.concat(String.valueOf(user.getUserId())).hashCode());
+        }
         dialogOccupant.setUser(user);
         dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(dialogId));
         return dialogOccupant;

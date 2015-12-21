@@ -68,10 +68,7 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
         try {
             QueryBuilder<DialogOccupant, Long> queryBuilder = dao.queryBuilder();
             Where<DialogOccupant, Long> where = queryBuilder.where();
-            where.and(
-                    where.eq(Dialog.Column.ID, dialogId),
-                    where.eq(User.Column.ID, userId)
-            );
+            where.and(where.eq(Dialog.Column.ID, dialogId), where.eq(User.Column.ID, userId));
             PreparedQuery<DialogOccupant> preparedQuery = queryBuilder.prepare();
             dialogOccupant = dao.queryForFirst(preparedQuery);
         } catch (SQLException e) {
@@ -89,6 +86,25 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
             Where<DialogOccupant, Long> where = queryBuilder.where();
             where.and(
                     where.in(User.Column.ID, userIdsList),
+                    where.eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.ACTUAL),
+                    where.eq(Dialog.Column.ID, dialogId)
+            );
+            PreparedQuery<DialogOccupant> preparedQuery = queryBuilder.prepare();
+            dialogOccupantsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogOccupantsList;
+    }
+
+    public List<DialogOccupant> getActualDialogOccupantsByDialog(String dialogId) {
+        List<DialogOccupant> dialogOccupantsList = Collections.emptyList();
+
+        try {
+            QueryBuilder<DialogOccupant, Long> queryBuilder = dao.queryBuilder();
+            Where<DialogOccupant, Long> where = queryBuilder.where();
+            where.and(
                     where.eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.ACTUAL),
                     where.eq(Dialog.Column.ID, dialogId)
             );

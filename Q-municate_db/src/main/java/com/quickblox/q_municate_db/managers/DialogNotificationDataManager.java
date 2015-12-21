@@ -55,7 +55,7 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         return dialogNotificationsList;
     }
 
-    public DialogNotification getLastDialogNotificationByDialogId(List<Integer> dialogOccupantsList) {
+    public DialogNotification getLastDialogNotificationByDialogId(List<Long> dialogOccupantsList) {
         DialogNotification dialogNotification = null;
 
         try {
@@ -72,7 +72,7 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         return dialogNotification;
     }
 
-    public DialogNotification getDialogNotificationByDialogId(boolean firstMessage, List<Integer> dialogOccupantsList) {
+    public DialogNotification getDialogNotificationByDialogId(boolean firstMessage, List<Long> dialogOccupantsList) {
         DialogNotification dialogNotification = null;
 
         try {
@@ -92,7 +92,7 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         return dialogNotification;
     }
 
-    public long getCountUnreadDialogNotifications(List<Integer> dialogOccupantsIdsList, int currentUserId) {
+    public long getCountUnreadDialogNotifications(List<Long> dialogOccupantsIdsList, int currentUserId) {
         long count = 0;
 
         try {

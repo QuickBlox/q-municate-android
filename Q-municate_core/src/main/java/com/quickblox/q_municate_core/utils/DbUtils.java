@@ -165,7 +165,7 @@ public class DbUtils {
     public static long getDialogModifiedDate(DataManager dataManager, String dialogId) {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialogId);
-        List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+        List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
 
         Message message = dataManager.getMessageDataManager()
                 .getLastMessageByDialogId(dialogOccupantsIdsList);
