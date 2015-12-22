@@ -22,6 +22,12 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     private QBGroupChatHelper multiChatHelper;
 
+    // TODO: HACK!
+    // This is temporary value,
+    // by default MAX count of Dialogs should be !> (DIALOGS_PARTS * ConstsCore.CHATS_DIALOGS_PER_PAGE)
+    // it is 200 Dialogs
+    private final static int DIALOGS_PARTS = 10; // TODO: need to fix in the second release.
+
     public QBLoadDialogsCommand(Context context, QBGroupChatHelper multiChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
@@ -47,11 +53,9 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         dialogsList = multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
         parseLoadedDialogsAndJoin(dialogsList, parcelableQBDialog);
 
-        int totalEntries = returnedBundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-        boolean needToLoadByPart = dialogsList != null && !dialogsList.isEmpty()
-                && totalEntries > ConstsCore.CHATS_DIALOGS_PER_PAGE;
+        boolean needToLoadByPart = dialogsList != null && !dialogsList.isEmpty();
         if (needToLoadByPart) {
-            loadByParts(parcelableQBDialog, dialogsList, returnedBundle, qbRequestGetBuilder, totalEntries);
+            loadByParts(parcelableQBDialog, dialogsList, returnedBundle, qbRequestGetBuilder);
         }
 
         Bundle bundle = new Bundle();
@@ -61,12 +65,14 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     }
 
     private void loadByParts(ArrayList<ParcelableQBDialog> parcelableQBDialog, List<QBDialog> dialogsList,
-            Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, float totalEntries) throws QBResponseException {
-        int partsCount = (int) Math.ceil((totalEntries / ConstsCore.CHATS_DIALOGS_PER_PAGE));
-        for (int i = 0; i < partsCount - 1; i++) {
+            Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
+        boolean needToLoadMore = true;
+        for (int i = 0; i < DIALOGS_PARTS && needToLoadMore; i++) {
             qbRequestGetBuilder.setPagesSkip(dialogsList.size());
-            dialogsList.addAll(multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle));
+            List<QBDialog> newDialogsList = multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
+            dialogsList.addAll(newDialogsList);
             parseLoadedDialogsAndJoin(dialogsList, parcelableQBDialog);
+            needToLoadMore = !newDialogsList.isEmpty();
         }
     }
 
