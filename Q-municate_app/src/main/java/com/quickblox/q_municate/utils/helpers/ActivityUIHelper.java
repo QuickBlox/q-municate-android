@@ -32,7 +32,7 @@ public class ActivityUIHelper {
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
         if (isMessagesDialogCorrect(dialogId) && senderUser != null) {
-            message = baseActivity.getString(R.string.glgm_snackbar_new_message_title, senderUser.getFullName(), message);
+            message = baseActivity.getString(R.string.snackbar_new_message_title, senderUser.getFullName(), message);
             if (!TextUtils.isEmpty(message)) {
                 showNewNotification();
             }
@@ -54,7 +54,7 @@ public class ActivityUIHelper {
             String dialogId = dialogOccupant.getDialog().getDialogId();
             isPrivateMessage = true;
             if (isMessagesDialogCorrect(dialogId)) {
-                message = baseActivity.getString(R.string.glgm_snackbar_new_contact_request_title, senderUser.getFullName());
+                message = baseActivity.getString(R.string.snackbar_new_contact_request_title, senderUser.getFullName());
                 if (!TextUtils.isEmpty(message)) {
                     showNewNotification();
                 }

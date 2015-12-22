@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.adapters.search;
 
-import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,7 +122,7 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
 
         if (pendingUser != null) {
             viewHolder.onlineImageView.setVisibility(View.GONE);
-            status = resources.getString(R.string.frl_pending_request_status);
+            status = resources.getString(R.string.search_pending_request_status);
         } else {
             status = resources.getString(OnlineStatusUtils.getOnlineStatus(online));
         }

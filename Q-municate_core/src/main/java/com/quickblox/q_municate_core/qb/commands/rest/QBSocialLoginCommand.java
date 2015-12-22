@@ -55,7 +55,7 @@ public class QBSocialLoginCommand extends ServiceCommand {
     }
 
     private QBUser getUserWithAvatar(QBUser user) {
-        String avatarUrl = context.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId());
+        String avatarUrl = context.getString(R.string.url_to_facebook_avatar, user.getFacebookId());
         QBUser newUser = new QBUser();
         newUser.setId(user.getId());
         newUser.setPassword(user.getPassword());
@@ -64,7 +64,7 @@ public class QBSocialLoginCommand extends ServiceCommand {
     }
 
     private UserCustomData getUserCustomData(String avatarUrl) {
-        String isImport = "1"; // first FB login
+        String isImport = "1"; // TODO: temp, first FB login
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
 }

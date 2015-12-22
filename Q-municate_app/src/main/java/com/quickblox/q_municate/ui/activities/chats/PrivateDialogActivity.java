@@ -271,7 +271,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         }
 
         TwoButtonsDialogFragment.show(getSupportFragmentManager(),
-                getString(R.string.frl_dlg_reject_friend, user.getFullName()),
+                getString(R.string.dialog_message_reject_friend, user.getFullName()),
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {

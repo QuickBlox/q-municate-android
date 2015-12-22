@@ -18,12 +18,10 @@ import java.util.List;
 public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
 
     private CounterChangedListener counterChangedListener;
-    private String selectedFriendFromContacts;
     private int counterContacts;
 
     public InviteFriendsAdapter(BaseActivity activity, List<InviteFriend> objects) {
         super(activity, objects);
-        selectedFriendFromContacts = activity.getString(R.string.inf_from_contacts);
     }
 
     public void setCounterChangedListener(CounterChangedListener listener) {
@@ -47,20 +45,16 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
                     R.id.contentRelativeLayout);
             viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
             viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-            viewHolder.viaTextView = (TextView) convertView.findViewById(R.id.via_textview);
             viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.select_user_checkbox);
 
             convertView.setTag(viewHolder);
 
-            final ViewHolder finalHolder = viewHolder;
             viewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     CheckBox checkBox = (CheckBox) view;
                     InviteFriend inviteFriend = (InviteFriend) checkBox.getTag();
                     inviteFriend.setSelected(checkBox.isChecked());
                     notifyCounterChanged(checkBox.isChecked());
-                    finalHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(
-                            checkBox.isChecked()));
                 }
             });
         } else {
@@ -68,13 +62,10 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
         }
 
         viewHolder.nameTextView.setText(data.getName());
-        viewHolder.viaTextView.setText(selectedFriendFromContacts);
         viewHolder.checkBox.setChecked(data.isSelected());
         viewHolder.checkBox.setTag(data);
 
         String uri = data.getUri().toString();
-
-        viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(viewHolder.checkBox.isChecked()));
 
         displayAvatarImage(uri, viewHolder.avatarImageView);
         return convertView;
@@ -94,17 +85,11 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
         return counter;
     }
 
-    private int getBackgroundColorItem(boolean isSelect) {
-        return isSelect ? resources.getColor(R.color.button_general_pressed) : resources.getColor(
-                R.color.invite_friends_item);
-    }
-
     private static class ViewHolder {
 
         RelativeLayout contentRelativeLayout;
         RoundedImageView avatarImageView;
         TextView nameTextView;
-        TextView viaTextView;
         CheckBox checkBox;
     }
 }

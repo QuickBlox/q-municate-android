@@ -94,8 +94,8 @@ public class FacebookHelper {
 
     private Bundle getBundleForFriendsRequest() {
         Bundle postParams = new Bundle();
-        postParams.putString(ConstsCore.FB_REQUEST_PARAM_TITLE, resources.getString(R.string.inf_subject_of_invitation));
-        postParams.putString(ConstsCore.FB_REQUEST_PARAM_MESSAGE, resources.getString(R.string.inf_body_of_invitation));
+        postParams.putString(ConstsCore.FB_REQUEST_PARAM_TITLE, resources.getString(R.string.invite_friends_subject_of_invitation));
+        postParams.putString(ConstsCore.FB_REQUEST_PARAM_MESSAGE, resources.getString(R.string.invite_friends_body_of_invitation));
         return postParams;
     }
 
@@ -119,12 +119,12 @@ public class FacebookHelper {
     private void parseFacebookRequestError(Bundle values, FacebookException facebookException) {
         if (facebookException != null) {
             if (facebookException instanceof FacebookOperationCanceledException) {
-                ToastUtils.longToast(R.string.inf_fb_request_canceled);
+                ToastUtils.longToast(R.string.invite_friends_fb_request_canceled);
             } else if (facebookException instanceof FacebookServiceException) {
                 final int errorCodeCancel = 4201;
                 FacebookServiceException facebookServiceException = (FacebookServiceException) facebookException;
                 if (errorCodeCancel == facebookServiceException.getRequestError().getErrorCode()) {
-                    ToastUtils.longToast(R.string.inf_fb_request_canceled);
+                    ToastUtils.longToast(R.string.invite_friends_fb_request_canceled);
                 } else {
                     ErrorUtils.showError(activity,
                             facebookServiceException.getRequestError().getErrorMessage());
@@ -137,7 +137,7 @@ public class FacebookHelper {
             if (requestId != null) {
                 ToastUtils.longToast(R.string.dlg_success_request_facebook);
             } else {
-                ToastUtils.longToast(R.string.inf_fb_request_canceled);
+                ToastUtils.longToast(R.string.invite_friends_fb_request_canceled);
             }
         }
     }

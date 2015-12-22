@@ -110,6 +110,13 @@
     <string name="dialog_user_is_not_friend">User is not your friend</string>
     <string name="dialog_confirm_sending_attach">Do you really want to send attachment?</string>
     <string name="dialog_now_typing">Typing…</string>
+    <string name="dialog_message_reject_friend">Do you really want to reject contact request from %1$s?</string>
+    <string name="dialog_ctx_menu_reply">Reply</string>
+    <string name="dialog_ctx_menu_prv_message">Private Message</string>
+    <string name="dialog_ctx_menu_video_call">Video Call</string>
+    <string name="dialog_ctx_menu_profile">View Profile</string>
+    <string name="dialog_ctx_menu_remove">Delete dialog</string>
+    <string name="dialog_loading_dialogs">Updating dialogs list… Please wait</string>
 
     <string-array name="dialog_attach_types_array">
         <item>Take Photo</item>
@@ -125,6 +132,7 @@
     <string name="dialog_details_name_not_entered">Please fill group name</string>
     <string name="dialog_details_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
     <string name="dialog_details_service_is_initializing">Please, wait, connection is setting up…</string>
+
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -193,98 +201,37 @@
     <string name="call_chat_service_is_initializing">Please, wait, connection is setting up…</string>
 
 
-
-    // NOT REFACTORED YET
-
-
-
-
-    <!-- Friend List -->
-    <string name="frl_global_search">Global Search</string>
-    <string name="frl_friends">Friends</string>
-    <string name="frl_all_users">All Users</string>
-    <string name="frl_no_friends">Oops…\nYou don\'t have any friends,\ntap search icon to find them \nor invite new ones.</string>
-    <string name="frl_not_found_users">Sorry… no users</string>
-    <string name="frl_pending_status">Waiting…</string>
-    <string name="frl_pending_request_status">Pending contact request</string>
-    <string name="frl_column_header_name_requests">Requests</string>
-    <string name="frl_column_header_name_my_contacts">My Contacts</string>
-    <string name="frl_column_header_name_all_users">All Users</string>
-    <string name="frl_dlg_reject_friend">Do you really want to reject contact request from %1$s?</string>
-    <string name="frl_local_list">Local</string>
-    <string name="frl_global_list">Global</string>
-
-    <!-- Group Dialog -->
-    <string name="gdl_ctx_menu_reply">Reply</string>
-    <string name="gdl_ctx_menu_prv_message">Private Message</string>
-    <string name="gdl_ctx_menu_video_call">Video Call</string>
-    <string name="gdl_ctx_menu_profile">View Profile</string>
-
-    <!-- Dialogs -->
-    <string name="dlgs_ctx_menu_remove">Delete dialog</string>
-    <string name="dlgs_loading_dialogs">Updating dialogs list… Please wait</string>
-
-    <!-- Dialog messages -->
-    <string name="glgm_snackbar_new_message_title">%1$s\nMessage: %2$s</string>
-    <string name="glgm_snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
-
-    <!-- Preferences -->
-    <string name="pref_title_profile_and_details">Profile and details</string>
-    <string name="pref_title_presence">Presence</string>
-    <string name="pref_title_push_notifications">Push Notifications</string>
-    <string name="pref_title_media">Media</string>
-
     <!-- Invite Friends -->
     <string name="invite_friends_title">Invite Friends</string>
-    <string name="inf_header_label">Let your other friends know about \n Q-municate by sending them private invitations</string>
-    <string name="inf_select_from_facebook">From Facebook</string>
-    <string name="inf_select_from_contacts">From Contacts</string>
-    <string name="inf_from_facebook">(invite via Facebook)</string>
-    <string name="inf_from_contacts">(invite via Email)</string>
-    <string name="inf_send">Send</string>
-    <string name="inf_choose_email_provider">Choose an email provider:</string>
-    <string name="inf_subject_of_invitation">Q-municate</string>
-    <string name="inf_body_of_invitation">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
-    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=large</string>
-    <string name="inf_fb_wall_param_name">Q-municate</string>
-    <string name="inf_fb_wall_param_description">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
-    <string name="inf_fb_wall_param_link">http://q-municate.com/</string>
-    <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
-    <string name="inf_fb_wall_param_place">155021662189</string>
-    <string name="inf_fb_request_canceled">Request cancelled</string>
+    <string name="invite_friends_send">Send</string>
+    <string name="invite_friends_select_all">Select All</string>
+    <string name="invite_friends_choose_email_provider">Choose an email provider:</string>
+    <string name="invite_friends_subject_of_invitation">Q-municate</string>
+    <string name="invite_friends_body_of_invitation">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
+    <string name="invite_friends_fb_request_canceled">Request cancelled</string>
 
-    <!-- Dialog Messages -->
+
+    <!-- Local/Global Search -->
+    <string name="search_users_not_found">Sorry… no users</string>
+    <string name="search_pending_request_status">Pending contact request</string>
+    <string name="search_local_list">Local</string>
+    <string name="search_global_list">Global</string>
+
+
+    <!-- Others -->
     <string name="dlg_internet_connection_is_missing">Waiting for connection</string>
-    <string name="dlg_select_image_from">Select image from…</string>
     <string name="dlg_wait_please">Please, wait</string>
-    <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
-    <string name="dlg_old_password_wrong">Wrong old password</string>
-    <string name="dlg_empty_email">Email can\'t be empty</string>
     <string name="dlg_ok">OK</string>
     <string name="dlg_cancel">Cancel</string>
     <string name="dlg_done">Done</string>
-    <string name="dlg_user_updated">User saved</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
     <string name="dlg_password_changed">Password changed</string>
-    <string name="dlg_no_facebook_friends">No Facebook friends</string>
-    <string name="dlg_no_contacts_friends">No Contacts friends</string>
-    <string name="dlg_no_friends">No friends</string>
-    <string name="dlg_success_posted_to_facebook">Post was added to wall</string>
     <string name="dlg_success_request_facebook">Request sent</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
-    <string name="dlg_get_file_failed">Failed to get file from gallery</string>
-    <string name="dlg_no_friends_for_import">There are no friends in Q-municate app</string>
-    <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
     <string name="dlg_leave_group">Leave Group</string>
-    <string name="dlg_offline_call"> %1$s is calling you !</string>
-    <string name="dlg_attached_last_message">Attachment</string>
-    <string name="dlg_no_message_yet">No message yet</string>
-    <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
     <string name="dlg_force_relogin_on_token_required">Token error is occurred in application. Relogin will be executed now</string>
     <string name="dlg_refresh_session">QB Session expired. Update session will be executed now</string>
-    <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
-    <string name="dlg_microphone_muted">Please, pay attention microphone is muted now</string>
     <string name="error_bad_timestamp">base Bad timestamp</string>
     <string name="error_bad_timestamp_from_app">Please go to phone system settings, choose date and time and make sure, that auto synchronization is on.</string>
     <string name="error_login_or_email_required">base Login or email required</string>
@@ -294,29 +241,13 @@
     <string name="error_unauthorized">Unauthorized</string>
     <string name="error_unauthorized_from_app">Incorrect Email or Password</string>
     <string name="dlg_choose_image_from">Select image from…</string>
-    <string-array name="dlg_image_pick">
-        <item>Gallery</item>
-        <item>Camera</item>
-    </string-array>
-
-
-    <!-- Other -->
+    <string name="snackbar_new_message_title">%1$s\nMessage: %2$s</string>
+    <string name="snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
     <string name="facebook_exception">Facebook exception: </string>
-    <string name="comming_soon">Will be implemented soon</string>
-    <string name="search_hint">Search</string>
-    <string name="push_title">QMUN: Missed messages</string>
-    <string name="frd_offline_user">User must be online</string>
-    <string name="uploading_file">Uploading… Please wait</string>
-    <string name="user_read_message">%1$s read message</string>
-    <string name="label_done">Done</string>
-    <string name="go">Go</string>
     <string name="error_playing_ringtone">Error during playing ringtone</string>
-    <string name="error_playing_wrong_source">Wrong sound resource</string>
-    <string name="ignore_content_description">ignored</string>
     <string name="coming_soon">Coming soon…</string>
     <string name="search_at_last_items">Enter more symbols, not less than 3</string>
     <string name="deleted_user">DELETED USER</string>
-    <string name="loading">Loading…</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="days_short">%1$dd</string>
@@ -349,5 +280,10 @@
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>
     </plurals>
+
+    <string-array name="dlg_image_pick">
+        <item>Gallery</item>
+        <item>Camera</item>
+    </string-array>
 
 </resources>

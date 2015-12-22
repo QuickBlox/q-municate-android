@@ -315,7 +315,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 
         @Override
         public void execute(Bundle bundle) {
-            OneButtonDialogFragment.show(getChildFragmentManager(), R.string.frl_not_found_users, true);
+            OneButtonDialogFragment.show(getChildFragmentManager(), R.string.search_users_not_found, true);
             usersList.clear();
 
             swipyRefreshLayout.setRefreshing(false);

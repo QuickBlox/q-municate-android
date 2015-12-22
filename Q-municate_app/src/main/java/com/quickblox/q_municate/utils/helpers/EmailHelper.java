@@ -23,11 +23,11 @@ public class EmailHelper {
         Resources resources = context.getResources();
         Intent intentEmail = new Intent(Intent.ACTION_SEND);
         intentEmail.putExtra(Intent.EXTRA_EMAIL, selectedFriends);
-        intentEmail.putExtra(Intent.EXTRA_SUBJECT, resources.getText(R.string.inf_subject_of_invitation));
-        intentEmail.putExtra(Intent.EXTRA_TEXT, resources.getText(R.string.inf_body_of_invitation));
+        intentEmail.putExtra(Intent.EXTRA_SUBJECT, resources.getText(R.string.invite_friends_subject_of_invitation));
+        intentEmail.putExtra(Intent.EXTRA_TEXT, resources.getText(R.string.invite_friends_body_of_invitation));
         intentEmail.setType(ConstsCore.TYPE_OF_EMAIL);
         context.startActivity(Intent.createChooser(intentEmail, resources.getText(
-                R.string.inf_choose_email_provider)));
+                R.string.invite_friends_choose_email_provider)));
     }
 
     public static void sendFeedbackEmail(Context context, String feedbackType) {
@@ -51,7 +51,7 @@ public class EmailHelper {
 
         String[] PROJECTION = new String[]{ContactsContract.RawContacts._ID, ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.PHOTO_ID, ContactsContract.CommonDataKinds.Email.DATA, ContactsContract.CommonDataKinds.Photo.CONTACT_ID};
 
-        String order = "CASE WHEN " + ContactsContract.Contacts.DISPLAY_NAME + " NOT LIKE '%@%' THEN 1 ELSE 2 END, " + ContactsContract.CommonDataKinds.Phone.CONTACT_ID + ", " + ContactsContract.Contacts.DISPLAY_NAME + ", " + ContactsContract.CommonDataKinds.Email.DATA + " COLLATE NOCASE";
+        String order = "upper("+ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + ") ASC";
 
         String filter = ContactsContract.CommonDataKinds.Email.DATA + " NOT LIKE ''";
 

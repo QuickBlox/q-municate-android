@@ -655,7 +655,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void checkLoadDialogsWithSnakbar() {
-        showSnackbar(R.string.dlgs_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
+        showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
         loadDialogs();
     }
 

@@ -13,12 +13,12 @@
         <RadioButton
             style="@style/SearchRadioButtonStyle"
             android:id="@+id/local_search_radiobutton"
-            android:text="@string/frl_local_list" />
+            android:text="@string/search_local_list" />
 
         <RadioButton
             style="@style/SearchRadioButtonStyle"
             android:id="@+id/global_search_radiobutton"
-            android:text="@string/frl_global_list" />
+            android:text="@string/search_global_list" />
 
     </RadioGroup>
 

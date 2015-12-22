@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <style name="ToolbarStyle">
         <item name="android:minHeight">?actionBarSize</item>
@@ -24,11 +24,6 @@
         <item name="android:layout_gravity">center|top</item>
         <item name="android:scaleType">centerCrop</item>
         <item name="android:src">@drawable/placeholder_user</item>
-    </style>
-
-    <style name="ToggleButtonStyle">
-        <item name="android:textOff"></item>
-        <item name="android:textOn"></item>
     </style>
 
     <style name="SearchRadioButtonStyle">
