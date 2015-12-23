@@ -60,6 +60,8 @@ public class MainActivity extends BaseLoggableActivity {
 
         if (!isLoggedInChat()) {
             loginChat();
+        } else {
+            checkImportFriends();
         }
 
         launchDialogsListFragment();
@@ -153,6 +155,7 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void performImportFriendsSuccessAction() {
         appSharedHelper.saveUsersImportInitialized(true);
+        hideProgress();
     }
 
     private void checkGCMRegistration() {
