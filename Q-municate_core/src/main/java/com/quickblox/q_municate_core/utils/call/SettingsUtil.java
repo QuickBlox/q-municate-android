@@ -1,11 +1,10 @@
 package com.quickblox.q_municate_core.utils.call;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.quickblox.q_municate_core.R;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCMediaConfig;
 

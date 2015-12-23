@@ -2,7 +2,7 @@ package com.quickblox.q_municate_core.utils.call;
 
 import android.hardware.Camera;
 
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 public class CameraUtils {
 

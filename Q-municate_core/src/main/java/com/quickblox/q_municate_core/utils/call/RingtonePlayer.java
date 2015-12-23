@@ -5,7 +5,7 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 public class RingtonePlayer {
 

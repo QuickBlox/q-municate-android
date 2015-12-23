@@ -28,12 +28,10 @@ import com.quickblox.q_municate.utils.MimeType;
 import com.quickblox.q_municate.utils.StorageUtil;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;

@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.DialogFragment;
 
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -25,7 +25,6 @@ public abstract class BaseErrorAsyncTask<Params, Progress, Result> extends BaseA
 
         if (e instanceof QBResponseException) {
             ErrorUtils.showError(parentActivity, e);
-            ErrorUtils.showError(parentActivity, e.getMessage());
         }
     }
 

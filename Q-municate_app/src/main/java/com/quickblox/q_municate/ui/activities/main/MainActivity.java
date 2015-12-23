@@ -70,12 +70,7 @@ public class MainActivity extends BaseLoggableActivity {
         gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
-
-        if (!appSharedHelper.isUsersImportInitialized()) {
-            showProgress();
-            facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
-            importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
-        }
+        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
     }
 
     @Override
@@ -115,6 +110,12 @@ public class MainActivity extends BaseLoggableActivity {
         }
     }
 
+    @Override
+    protected void performLoginChatSuccessAction(Bundle bundle) {
+        super.performLoginChatSuccessAction(bundle);
+        checkImportFriends();
+    }
+
     private void addActions() {
         addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, importFriendsSuccessAction);
         addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, importFriendsFailAction);
@@ -125,8 +126,6 @@ public class MainActivity extends BaseLoggableActivity {
     private void removeActions() {
         removeAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION);
         removeAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION);
-        removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
 
         updateBroadcastActionList();
     }
@@ -176,6 +175,13 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void launchDialogsListFragment() {
         setCurrentFragment(DialogsListFragment.newInstance());
+    }
+
+    private void checkImportFriends() {
+        if (!appSharedHelper.isUsersImportInitialized()) {
+            showProgress();
+            importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
+        }
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

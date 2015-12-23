@@ -18,7 +18,7 @@ import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,8 +156,8 @@ public class FacebookHelper {
                 if (errorCodeCancel == facebookServiceException.getRequestError().getErrorCode()) {
                     ToastUtils.longToast(R.string.invite_friends_fb_request_canceled);
                 } else {
-                    ErrorUtils.showError(activity,
-                            facebookServiceException.getRequestError().getErrorMessage());
+                    ErrorUtils
+                            .showError(activity, facebookServiceException.getRequestError().getErrorMessage());
                 }
             } else if (!TextUtils.isEmpty(facebookException.getMessage())) {
                 ErrorUtils.showError(activity, facebookException);

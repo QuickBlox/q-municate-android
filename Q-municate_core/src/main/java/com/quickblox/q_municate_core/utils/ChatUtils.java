@@ -23,6 +23,7 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 

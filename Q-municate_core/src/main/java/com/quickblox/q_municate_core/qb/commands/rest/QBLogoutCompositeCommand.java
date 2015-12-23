@@ -7,9 +7,9 @@ import android.os.Bundle;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 public class QBLogoutCompositeCommand extends CompositeServiceCommand {
 

@@ -19,7 +19,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.util.Log;
 import android.widget.ImageView.ScaleType;
 
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 @SuppressWarnings("UnusedDeclaration")
 public class RoundedDrawable extends Drawable {

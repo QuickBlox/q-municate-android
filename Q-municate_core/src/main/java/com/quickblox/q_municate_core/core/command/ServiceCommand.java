@@ -7,7 +7,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 public abstract class ServiceCommand implements Command {
 

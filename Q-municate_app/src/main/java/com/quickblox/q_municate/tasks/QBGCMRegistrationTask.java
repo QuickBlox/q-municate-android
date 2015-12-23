@@ -14,9 +14,9 @@ import com.quickblox.messages.model.QBSubscription;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.concurrency.BaseErrorAsyncTask;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;

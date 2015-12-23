@@ -10,7 +10,7 @@ import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
@@ -46,7 +46,8 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
             }
         } catch (Exception e) {
             ErrorUtils.logError(TAG,
-                    e + " --- dialogId = " + dialog.getDialogId() + ", messageId = " + combinationMessage.getMessageId());
+                    e + " --- dialogId = " + dialog.getDialogId() + ", messageId = " + combinationMessage
+                            .getMessageId());
         }
 
         return null;
