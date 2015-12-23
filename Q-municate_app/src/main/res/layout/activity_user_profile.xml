@@ -34,7 +34,7 @@
                     app:border_width="@dimen/avatar_border_width"
                     app:oval="true" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -61,13 +61,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:layout_below="@+id/name_textview"
                         android:singleLine="true"
-                        android:text="Last seen Timestamp"
                         android:textColor="@color/text_light_dark"
                         android:textSize="@dimen/text_size_small"
                         tools:text="Subtitle" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
             </RelativeLayout>
 

@@ -25,6 +25,7 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -108,10 +109,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     public void prepareSearch() {
         clearOldData();
 
-        if (globalSearchAdapter != null) {
-            globalSearchAdapter.setUserType(GlobalSearchAdapter.UserType.GLOBAL);
-            updateList();
-        }
+//в
     }
 
     @Override
@@ -146,6 +144,20 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
             page++;
             searchUsers();
         }
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+        if (friendListHelper != null && globalSearchAdapter != null) {
+            globalSearchAdapter.setFriendListHelper(friendListHelper);
+        }
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+        globalSearchAdapter.notifyDataSetChanged();
     }
 
     private void initFields() {

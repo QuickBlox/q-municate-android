@@ -11,6 +11,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseFilterAdapter;
+import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.helpers.TextViewHelper;
@@ -28,14 +29,12 @@ import butterknife.Bind;
 public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListenerViewHolder<User>> {
 
     private DataManager dataManager;
-    private UserType userType;
     private UserOperationListener userOperationListener;
     private QBFriendListHelper friendListHelper;
 
     public GlobalSearchAdapter(BaseActivity baseActivity, List<User> list) {
         super(baseActivity, list);
         dataManager = DataManager.getInstance();
-        userType = UserType.LOCAl;
     }
 
     @Override
@@ -80,10 +79,6 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
         });
     }
 
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
-
     public void setUserOperationListener(UserOperationListener userOperationListener) {
         this.userOperationListener = userOperationListener;
     }
@@ -94,45 +89,33 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
     }
 
     private void checkVisibilityItems(ViewHolder viewHolder, User user) {
-        if (UserType.GLOBAL.equals(userType)) {
-            checkVisibilityItemsAllUsers(viewHolder, user);
-        } else if (UserType.LOCAl.equals(userType)) {
+        if (isFriendOrPending(user)) {
             checkVisibilityItemsMyContacts(viewHolder, user);
+        } else {
+            checkVisibilityItemsAllUsers(viewHolder, user);
         }
     }
 
     private void checkVisibilityItemsAllUsers(ViewHolder viewHolder, User user) {
         boolean me = AppSession.getSession().getUser().getId() == user.getUserId();
-        boolean friendOrPending = isFriendOrPending(user);
-        viewHolder.addFriendImageView.setVisibility(me || friendOrPending ? View.GONE : View.VISIBLE);
-        viewHolder.onlineImageView.setVisibility(View.GONE);
+        viewHolder.addFriendImageView.setVisibility(me ? View.GONE : View.VISIBLE);
         viewHolder.statusTextView.setVisibility(View.GONE);
     }
 
     private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, User user) {
-        Friend friend = dataManager.getFriendDataManager().getByUserId(user.getUserId());
+        String status;
         User pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getUserId());
 
-        if (friend == null && pendingUser == null) {
-            return;
-        }
-
-        String status;
-        boolean online = friendListHelper != null && friendListHelper.isUserOnline(user.getUserId());
-
         if (pendingUser != null) {
-            viewHolder.onlineImageView.setVisibility(View.GONE);
             status = resources.getString(R.string.search_pending_request_status);
+            viewHolder.statusTextView.setTextColor(resources.getColor(R.color.dark_gray));
+            viewHolder.statusTextView.setText(status);
         } else {
-            status = resources.getString(OnlineStatusUtils.getOnlineStatus(online));
+            setOnlineStatus(viewHolder, user);
         }
-
-        viewHolder.addFriendImageView.setVisibility(View.GONE);
-        viewHolder.statusTextView.setText(status);
 
         viewHolder.statusTextView.setVisibility(View.VISIBLE);
-
-        setStatusVisibility(viewHolder, online);
+        viewHolder.addFriendImageView.setVisibility(View.GONE);
     }
 
     private boolean isFriendOrPending(User user) {
@@ -141,16 +124,18 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
         return friend != null || pendingUser != null;
     }
 
-    private void setStatusVisibility(ViewHolder viewHolder, boolean status) {
-        if (status) {
-            viewHolder.onlineImageView.setVisibility(View.VISIBLE);
-        } else {
-            viewHolder.onlineImageView.setVisibility(View.INVISIBLE);
-        }
-    }
+    private void setOnlineStatus(ViewHolder viewHolder, User user) {
+        boolean online = friendListHelper != null && friendListHelper.isUserOnline(user.getUserId());
 
-    public enum UserType {
-        LOCAl, GLOBAL
+        if (online) {
+            viewHolder.statusTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
+            viewHolder.statusTextView.setTextColor(resources.getColor(R.color.green));
+        } else {
+            viewHolder.statusTextView.setText(resources.getString(R.string.last_seen,
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
+                    DateUtils.formatDateSimpleTime(user.getLastLogin())));
+            viewHolder.statusTextView.setTextColor(resources.getColor(R.color.dark_gray));
+        }
     }
 
     protected static class ViewHolder extends BaseViewHolder<User> {
@@ -166,9 +151,6 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
 
         @Bind(R.id.add_friend_imagebutton)
         ImageView addFriendImageView;
-
-        @Bind(R.id.online_imageview)
-        ImageView onlineImageView;
 
         public ViewHolder(GlobalSearchAdapter adapter, View view) {
             super(adapter, view);

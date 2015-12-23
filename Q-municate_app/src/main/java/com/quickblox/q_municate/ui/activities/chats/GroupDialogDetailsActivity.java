@@ -253,7 +253,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         updateCountOnlineFriends();
 
-        occupantsTextView.setText(getString(R.string.dialog_details_participants, qbDialog.getOccupants().size()));
+        occupantsTextView.setText(
+                getString(R.string.dialog_details_participants, qbDialog.getOccupants().size()));
 
         if (!isNeedUpdateImage) {
             loadAvatar(qbDialog.getPhoto());
@@ -313,8 +314,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         if (friendListHelper != null) {
             countOnlineFriends = ChatUtils.getOnlineDialogOccupantsCount(friendListHelper, qbDialog.getOccupants());
         }
-        onlineOccupantsTextView.setText(getString(R.string.dialog_details_online_participants, countOnlineFriends,
-                qbDialog.getOccupants().size()));
+        onlineOccupantsTextView.setText(
+                getString(R.string.dialog_details_online_participants, countOnlineFriends,
+                        qbDialog.getOccupants().size()));
     }
 
     private void loadAvatar(String photoUrl) {
@@ -486,8 +488,12 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void addToFriendList(final int userId) {
-        showProgress();
-        QBAddFriendCommand.start(this, userId);
+        if (isChatInitializedAndUserLoggedIn()) {
+            showProgress();
+            QBAddFriendCommand.start(this, userId);
+        } else {
+            ToastUtils.longToast(R.string.chat_service_is_initializing);
+        }
     }
 
     public void updateUserStatus(int userId, boolean status) {

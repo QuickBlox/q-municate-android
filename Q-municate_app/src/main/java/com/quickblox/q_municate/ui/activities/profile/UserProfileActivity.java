@@ -22,8 +22,10 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRemoveFriendCommand;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.UserDataManager;
@@ -97,7 +99,6 @@ public class UserProfileActivity extends BaseLoggableActivity {
     private void initUIWithUsersData() {
         loadAvatar();
         setName();
-        setTimestamp();
         setPhone();
     }
 
@@ -105,6 +106,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
     protected void onResume() {
         super.onResume();
         addObservers();
+        setOnlineStatus();
     }
 
     @Override
@@ -156,6 +158,20 @@ public class UserProfileActivity extends BaseLoggableActivity {
         }
     }
 
+    @Override
+    public void notifyChangedUserStatus(int userId, boolean online) {
+        super.notifyChangedUserStatus(userId, online);
+        if (user.getUserId() == userId) {
+            setOnlineStatus(online);
+        }
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+        setOnlineStatus();
+    }
+
     private void addObservers() {
         dataManager.getUserDataManager().addObserver(userObserver);
     }
@@ -190,13 +206,17 @@ public class UserProfileActivity extends BaseLoggableActivity {
         updateBroadcastActionList();
     }
 
-    private void setTimestamp() {
-        if (user.getLastLogin() != 0) {
-            String timestamp = getString(R.string.last_seen,
-                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
-                    DateUtils.formatDateSimpleTime(user.getLastLogin()));
-            timestampTextView.setText(timestamp);
+    private void setOnlineStatus() {
+        if (friendListHelper != null) {
+            setOnlineStatus(friendListHelper.isUserOnline(user.getUserId()));
         }
+    }
+
+    private void setOnlineStatus(boolean online) {
+        String offlineStatus = getString(R.string.last_seen,
+                DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
+                DateUtils.formatDateSimpleTime(user.getLastLogin()));
+        timestampTextView.setText(OnlineStatusUtils.getOnlineStatus(this, online, offlineStatus));
     }
 
     private void setName() {

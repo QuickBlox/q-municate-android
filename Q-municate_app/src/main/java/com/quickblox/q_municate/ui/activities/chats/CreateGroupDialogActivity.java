@@ -183,7 +183,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
                 }
             }
         } else {
-            ToastUtils.longToast(R.string.create_group_chat_service_is_initializing);
+            ToastUtils.longToast(R.string.chat_service_is_initializing);
         }
     }
 

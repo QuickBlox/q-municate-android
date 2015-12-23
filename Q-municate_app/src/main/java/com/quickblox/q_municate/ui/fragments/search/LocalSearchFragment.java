@@ -22,6 +22,7 @@ import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoratio
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -114,12 +115,6 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     }
 
     @Override
-    public void onChangedUserStatus(int userId, boolean online) {
-        super.onChangedUserStatus(userId, online);
-        localSearchAdapter.notifyDataSetChanged();
-    }
-
-    @Override
     protected Loader<List<Dialog>> createDataLoader() {
         return new DialogsListLoader(getActivity(), dataManager);
     }
@@ -130,6 +125,20 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         updateLocal();
     }
 
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+        if (friendListHelper != null && localSearchAdapter != null) {
+            localSearchAdapter.setFriendListHelper(friendListHelper);
+        }
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+        localSearchAdapter.notifyDataSetChanged();
+    }
+
     private void initFields() {
         dataManager = DataManager.getInstance();
         commonObserver = new CommonObserver();
@@ -138,6 +147,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
 
     private void initDialogsList() {
         localSearchAdapter = new LocalSearchAdapter(baseActivity, dialogsList);
+        localSearchAdapter.setFriendListHelper(friendListHelper);
         dialogsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         dialogsRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));;
         dialogsRecyclerView.setAdapter(localSearchAdapter);

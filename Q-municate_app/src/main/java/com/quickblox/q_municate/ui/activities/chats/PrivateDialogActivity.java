@@ -17,6 +17,7 @@ import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
+import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -231,12 +232,13 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         messagesAdapter.notifyDataSetChanged();
     }
 
-    private void setOnlineStatus(User friend) {
-        if (friend != null) {
-            ActionBar actionBar = getActionBar();
-            if (actionBar != null && friendListHelper != null) {
-                actionBar.setSubtitle(
-                        OnlineStatusUtils.getOnlineStatus(friendListHelper.isUserOnline(friend.getUserId())));
+    private void setOnlineStatus(User user) {
+        if (user != null) {
+            if (friendListHelper != null) {
+                String offlineStatus = getString(R.string.last_seen, DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
+                        DateUtils.formatDateSimpleTime(user.getLastLogin()));
+                setActionBarSubtitle(
+                        OnlineStatusUtils.getOnlineStatus(this, friendListHelper.isUserOnline(user.getUserId()), offlineStatus));
             }
         }
     }

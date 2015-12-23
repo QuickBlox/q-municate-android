@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.adapters.search;
 
-import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,9 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.helpers.TextViewHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -34,6 +35,7 @@ import butterknife.Bind;
 public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListenerViewHolder<Dialog>> {
 
     private DataManager dataManager;
+    private QBFriendListHelper qbFriendListHelper;
 
     public LocalSearchAdapter(BaseActivity baseActivity, List<Dialog> list) {
         super(baseActivity, list);
@@ -63,10 +65,7 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
         if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
             User currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
             User opponentUser = ChatUtils.getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
-            label = baseActivity.getString(R.string.last_seen,
-                    DateUtils.toTodayYesterdayShortDateWithoutYear2(opponentUser.getLastLogin()),
-                    DateUtils.formatDateSimpleTime(opponentUser.getLastLogin()));
-
+            setOnlineStatus(viewHolder, opponentUser);
             displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
         } else {
             List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
@@ -78,19 +77,40 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
                     message,
                     dialogNotification);
 
+            viewHolder.labelTextView.setText(label);
+            viewHolder.labelTextView.setTextColor(resources.getColor(R.color.dark_gray));
             displayGroupPhotoImage(dialog.getPhoto(), viewHolder.avatarImageView);
         }
 
         viewHolder.titleTextView.setText(dialog.getTitle());
-        viewHolder.labelTextView.setText(label);
 
         if (!TextUtils.isEmpty(query)) {
             TextViewHelper.changeTextColorView(baseActivity, viewHolder.titleTextView, query);
         }
     }
 
+    public void setFriendListHelper(QBFriendListHelper qbFriendListHelper) {
+        this.qbFriendListHelper = qbFriendListHelper;
+        notifyDataSetChanged();
+    }
+
+    private void setOnlineStatus(ViewHolder viewHolder, User user) {
+        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getUserId());
+
+        if (online) {
+            viewHolder.labelTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
+            viewHolder.labelTextView.setTextColor(resources.getColor(R.color.green));
+        } else {
+            viewHolder.labelTextView.setText(resources.getString(R.string.last_seen,
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
+                    DateUtils.formatDateSimpleTime(user.getLastLogin())));
+            viewHolder.labelTextView.setTextColor(resources.getColor(R.color.dark_gray));
+        }
+    }
+
     private void displayGroupPhotoImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, ImageLoaderUtils.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(uri, imageView,
+                ImageLoaderUtils.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
     }
 
     protected static class ViewHolder extends BaseViewHolder<Dialog> {
