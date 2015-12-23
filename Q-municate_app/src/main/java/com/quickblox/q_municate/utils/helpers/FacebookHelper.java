@@ -11,6 +11,7 @@ import com.facebook.FacebookOperationCanceledException;
 import com.facebook.FacebookServiceException;
 import com.facebook.LoggingBehavior;
 import com.facebook.Session;
+import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.widget.WebDialog;
@@ -19,9 +20,14 @@ import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FacebookHelper {
+
+    private static final String PERMISSION_EMAIL = "email";
+    private static final String PERMISSION_USER_FRIENDS = "user_friends";
+    private static final String PERMISSION_PUBLISH_STREAM = "publish_stream";
 
     private Activity activity;
     private Session.StatusCallback facebookStatusCallback;
@@ -70,12 +76,36 @@ public class FacebookHelper {
     }
 
     public void loginWithFacebook() {
-        Session session = Session.getActiveSession();
-        if (!session.isOpened() && !session.isClosed()) {
-            session.openForRead(new Session.OpenRequest(activity).setPermissions(Arrays.asList("user_friends")).setCallback(facebookStatusCallback));
-        } else {
-            Session.openActiveSession(activity, true, facebookStatusCallback);
+        Session currentSession = Session.getActiveSession();
+        if (currentSession == null || currentSession.getState().isClosed()) {
+            Session session = new Session.Builder(activity).build();
+            Session.setActiveSession(session);
+            currentSession = session;
         }
+
+        if (currentSession.isOpened()) {
+            Session.openActiveSession(activity, true, facebookStatusCallback);
+        } else {
+            Session.OpenRequest openRequest = new Session.OpenRequest(activity);
+
+            openRequest.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
+            openRequest.setCallback(facebookStatusCallback);
+
+            List<String> permissionsList = generatePermissionsList();
+            openRequest.setPermissions(permissionsList);
+
+            Session session = new Session.Builder(activity).build();
+            Session.setActiveSession(session);
+            session.openForPublish(openRequest);
+        }
+    }
+
+    private List<String> generatePermissionsList() {
+        List<String> permissionsList = new ArrayList<String>();
+        permissionsList.add(PERMISSION_EMAIL);
+        permissionsList.add(PERMISSION_PUBLISH_STREAM);
+        permissionsList.add(PERMISSION_USER_FRIENDS);
+        return permissionsList;
     }
 
     public void onActivityStart() {

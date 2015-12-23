@@ -7,16 +7,13 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBSettings;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.media.MediaPlayerManager;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
-import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 
 public class App extends MultiDexApplication {
 
     private static App instance;
-    private MediaPlayerManager soundPlayer;
     private SharedHelper appSharedHelper;
 
     public static App getInstance() {
@@ -50,12 +47,6 @@ public class App extends MultiDexApplication {
 
     private void initImageLoader(Context context) {
         ImageLoader.getInstance().init(ImageLoaderUtils.getImageLoaderConfiguration(context));
-    }
-
-    public synchronized MediaPlayerManager getMediaPlayer() {
-        return soundPlayer == null
-                ? soundPlayer = new MediaPlayerManager(this)
-                : soundPlayer;
     }
 
     public synchronized SharedHelper getAppSharedHelper() {
