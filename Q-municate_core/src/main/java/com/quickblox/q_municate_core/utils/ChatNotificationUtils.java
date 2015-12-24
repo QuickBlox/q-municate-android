@@ -157,7 +157,7 @@ public class ChatNotificationUtils {
 
     public static QBChatMessage createSystemMessageAboutCreatingGroupChat(Context context, QBDialog qbDialog) {
         QBChatMessage qbChatMessage = new QBChatMessage();
-        addNecessaryPropertyForCreatingMessage(context, qbChatMessage, qbDialog);
+        addNecessaryPropertyForCreatingSystemMessage(context, qbChatMessage, qbDialog);
 
         if (qbDialog.getPhoto() != null) {
             qbChatMessage.setProperty(PROPERTY_ROOM_PHOTO, qbDialog.getPhoto());
@@ -166,7 +166,8 @@ public class ChatNotificationUtils {
         return qbChatMessage;
     }
 
-    private static void addNecessaryPropertyForCreatingMessage(Context context, QBChatMessage qbChatMessage, QBDialog qbDialog) {
+    private static void addNecessaryPropertyForCreatingSystemMessage(Context context,
+            QBChatMessage qbChatMessage, QBDialog qbDialog) {
         qbChatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
         qbChatMessage.setProperty(PROPERTY_MODULE_IDENTIFIER, VALUE_MODULE_IDENTIFIER);
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
@@ -253,7 +254,7 @@ public class ChatNotificationUtils {
         QBChatMessage qbChatMessage = new QBChatMessage();
         qbChatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
-                String.valueOf(NotificationType.GROUP_CHAT_CREATE.getValue()));
+                String.valueOf(NotificationType.GROUP_CHAT_UPDATE.getValue()));
         qbChatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
         qbChatMessage.setProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS,
                 ChatUtils.getOccupantsIdsStringFromList(qbDialog.getOccupants()));
