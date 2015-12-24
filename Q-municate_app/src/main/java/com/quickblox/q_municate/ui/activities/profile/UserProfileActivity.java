@@ -298,6 +298,13 @@ public class UserProfileActivity extends BaseLoggableActivity {
             ToastUtils.longToast(R.string.call_chat_service_is_initializing);
             return;
         }
+
+        boolean isFriend = DataManager.getInstance().getFriendDataManager().existsByUserId(user.getUserId());
+        if (!isFriend) {
+            ToastUtils.longToast(R.string.dialog_user_is_not_friend);
+            return;
+        }
+
         List<QBUser> qbUserList = new ArrayList<>(1);
         qbUserList.add(UserFriendUtils.createQbUser(user));
         CallActivity.start(this, qbUserList, qbConferenceType, null);

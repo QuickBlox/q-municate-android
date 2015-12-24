@@ -91,9 +91,15 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     protected void performDone() {
         List<User> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
         if (!selectedFriendsList.isEmpty()) {
-            showProgress();
-            friendIdsList = UserFriendUtils.getFriendIds(selectedFriendsList);
-            QBAddFriendsToGroupCommand.start(this, qbDialog.getDialogId(), (ArrayList<Integer>) friendIdsList);
+            boolean joined = groupChatHelper != null && groupChatHelper.isDialogJoined(qbDialog);
+            if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError() && joined) {
+                showProgress();
+                friendIdsList = UserFriendUtils.getFriendIds(selectedFriendsList);
+                QBAddFriendsToGroupCommand.start(this, qbDialog.getDialogId(),
+                        (ArrayList<Integer>) friendIdsList);
+            } else {
+                ToastUtils.longToast(R.string.chat_service_is_initializing);
+            }
         } else {
             ToastUtils.longToast(R.string.add_friends_to_group_no_friends_for_adding);
         }
