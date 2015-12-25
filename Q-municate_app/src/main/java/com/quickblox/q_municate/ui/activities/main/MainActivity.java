@@ -58,7 +58,7 @@ public class MainActivity extends BaseLoggableActivity {
 
         checkGCMRegistration();
 
-        if (!isLoggedInChat()) {
+        if (!isChatInitializedAndUserLoggedIn()) {
             loginChat();
         } else {
             checkImportFriends();
@@ -170,10 +170,6 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void performImportFriendsFailAction(Bundle bundle) {
         performImportFriendsSuccessAction();
-    }
-
-    private boolean isLoggedInChat() {
-        return QBChatService.isInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
     private void launchDialogsListFragment() {

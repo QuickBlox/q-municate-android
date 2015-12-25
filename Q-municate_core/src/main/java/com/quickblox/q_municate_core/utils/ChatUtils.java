@@ -213,10 +213,16 @@ public class ChatUtils {
         return 0;
     }
 
-    public static List<Message> createTempLocalMessagesList(DataManager dataManager, List<QBDialog> qbDialogsList) {
+    public static List<Message> createTempLocalMessagesList(DataManager dataManager,
+            List<QBDialog> qbDialogsList, QBDialog currentDialog) {
         List<Message> messagesList = new ArrayList<>();
 
         for (QBDialog qbDialog : qbDialogsList) {
+            // dialog is opened
+            if (currentDialog != null && qbDialog.getDialogId().equals(currentDialog.getDialogId())) {
+                continue;
+            }
+
             int randomUserId = getRandomUserFromOccupantsList(qbDialog.getOccupants());
             DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager()
                     .getDialogOccupant(qbDialog.getDialogId(), randomUserId);

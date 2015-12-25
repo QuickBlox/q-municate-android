@@ -147,7 +147,7 @@ public class QBService extends Service {
         registerLoadChatsDialogsCommand();
         registerLoadDialogMessagesCommand();
         registerJoinGroupChatsCommand();
-        registerLoginChatWithJoinGroupChatsCommand();
+        registerLoginChatCommand();
 
         // users/friends commands
         registerLoadUsersCommand();
@@ -191,15 +191,12 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.SOCIAL_LOGIN_ACTION, loginRestCommand);
     }
 
-    private void registerLoginChatWithJoinGroupChatsCommand() {
+    private void registerLoginChatCommand() {
         CompositeServiceCommand loginChatCommand = new QBLoginChatCompositeCommand(this,
                 QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION,
                 QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
 
         addLoginChatAndInitCommands(loginChatCommand);
-
-        ServiceCommand joinGroupChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
-        loginChatCommand.addCommand(joinGroupChatCommand);
 
         serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_COMPOSITE_ACTION, loginChatCommand);
     }

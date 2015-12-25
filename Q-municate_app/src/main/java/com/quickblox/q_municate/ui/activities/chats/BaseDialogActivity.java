@@ -49,6 +49,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
 import com.quickblox.q_municate_db.managers.MessageDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -117,6 +118,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private LoadDialogMessagesFailAction loadDialogMessagesFailAction;
     private Timer typingTimer;
     private boolean isTypingNow;
+    private Observer dialogObserver;
     private Observer messageObserver;
     private Observer dialogNotificationObserver;
     private BroadcastReceiver typingMessageBroadcastReceiver;
@@ -253,6 +255,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @Override
     protected void loadDialogs() {
+        super.loadDialogs();
         createChatLocally();
         checkMessageSendingPossibility();
     }
@@ -286,6 +289,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
         typingTimer = new Timer();
+        dialogObserver = new DialogObserver();
         messageObserver = new MessageObserver();
         dialogNotificationObserver = new DialogNotificationObserver();
         typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
@@ -346,11 +350,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void addObservers() {
+        dataManager.getDialogDataManager().addObserver(dialogObserver);
         dataManager.getMessageDataManager().addObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().addObserver(dialogNotificationObserver);
     }
 
     private void deleteObservers() {
+        dataManager.getDialogDataManager().deleteObserver(dialogObserver);
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
     }
@@ -666,6 +672,17 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         public void update(Observable observable, Object data) {
             if (data != null && data.equals(DialogNotificationDataManager.OBSERVE_KEY)) {
                 updateMessagesList();
+            }
+        }
+    }
+
+    private class DialogObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(DialogDataManager.OBSERVE_KEY)) {
+                dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
+                updateActionBar();
             }
         }
     }

@@ -644,17 +644,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     protected void performLoginChatSuccessAction(Bundle bundle) {
-        Log.d("test_crash_1", "+++ performLoginChatSuccessAction +++");
         QBInitCallChatCommand.start(this, CallActivity.class);
-        checkLoadDialogsWithSnakbar();
+        showSnackbarUpdatingDialogs();
         hideProgress();
     }
 
-    private void checkLoadDialogs() {
-        loadDialogs();
-    }
-
-    private void checkLoadDialogsWithSnakbar() {
+    private void showSnackbarUpdatingDialogs() {
         showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
         loadDialogs();
     }

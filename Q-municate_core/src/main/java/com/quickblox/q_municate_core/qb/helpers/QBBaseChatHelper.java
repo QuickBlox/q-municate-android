@@ -161,7 +161,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         if (qbDialogsList != null && !qbDialogsList.isEmpty()) {
             FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbDialogsList);
             finderUnknownUsers.find();
-            DbUtils.saveDialogsToCache(dataManager, qbDialogsList);
+            DbUtils.saveDialogsToCache(dataManager, qbDialogsList, currentDialog);
             DbUtils.updateDialogsOccupantsStatusesIfNeeded(dataManager, qbDialogsList);
         }
 

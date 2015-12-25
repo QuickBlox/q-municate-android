@@ -43,17 +43,19 @@ public class DbUtils {
         }
     }
 
-    public static void saveDialogsToCache(DataManager dataManager, List<QBDialog> qbDialogsList) {
+    public static void saveDialogsToCache(DataManager dataManager, List<QBDialog> qbDialogsList,
+            QBDialog currentDialog) {
         dataManager.getDialogDataManager().createOrUpdateAll(ChatUtils.createLocalDialogsList(qbDialogsList));
 
         saveDialogsOccupants(dataManager, qbDialogsList);
 
-        saveTempMessages(dataManager, qbDialogsList);
+        saveTempMessages(dataManager, qbDialogsList, currentDialog);
     }
 
-    public static void saveTempMessages(DataManager dataManager, List<QBDialog> qbDialogsList) {
+    public static void saveTempMessages(DataManager dataManager, List<QBDialog> qbDialogsList,
+            QBDialog currentDialog) {
         dataManager.getMessageDataManager()
-                .createOrUpdateAll(ChatUtils.createTempLocalMessagesList(dataManager, qbDialogsList));
+                .createOrUpdateAll(ChatUtils.createTempLocalMessagesList(dataManager, qbDialogsList, currentDialog));
     }
 
     public static void saveTempMessage(DataManager dataManager, Message message) {
