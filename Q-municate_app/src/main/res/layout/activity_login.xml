@@ -27,8 +27,7 @@
                 android:hint="@string/auth_hint_email"
                 android:inputType="textEmailAddress"
                 android:maxLength="128"
-                android:text="sergey1@ser.com"
-                tools:text="sergey1@ser.com" />
+                tools:text="000" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -45,8 +44,7 @@
                 android:hint="@string/auth_hint_password"
                 android:inputType="textPassword"
                 android:maxLength="256"
-                android:text="serik111"
-                tools:text="serik111" />
+                tools:text="111" />
 
         </android.support.design.widget.TextInputLayout>
 
