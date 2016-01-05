@@ -35,5 +35,8 @@ local.properties
 *~
 *.swp
 
+# Keystore
+cert/
+
 # Mac
 .DS_Store
