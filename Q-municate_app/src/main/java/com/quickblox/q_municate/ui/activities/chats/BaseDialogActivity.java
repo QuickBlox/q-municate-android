@@ -600,6 +600,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected List<CombinationMessage> createCombinationMessagesList() {
+        if (dialog == null) {
+            return null;
+        }
+
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
@@ -680,7 +684,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(DialogDataManager.OBSERVE_KEY)) {
+            if (data != null && data.equals(DialogDataManager.OBSERVE_KEY) && dialog != null) {
                 dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
                 updateActionBar();
             }
