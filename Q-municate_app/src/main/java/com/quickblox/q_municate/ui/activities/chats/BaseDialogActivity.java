@@ -592,7 +592,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void closeChatLocally() {
-        if (baseChatHelper != null) {
+        if (baseChatHelper != null && dialog != null) {
             baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
                     generateBundleToInitDialog());
         }

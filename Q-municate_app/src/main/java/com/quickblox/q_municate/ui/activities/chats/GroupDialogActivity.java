@@ -142,7 +142,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateActionBar() {
-        if (isNetworkAvailable()) {
+        if (isNetworkAvailable() && dialog != null) {
             setActionBarTitle(dialog.getTitle());
             checkActionBarLogo(dialog.getPhoto(), R.drawable.placeholder_group);
         }
@@ -152,6 +152,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
         chatHelperIdentifier = QBService.GROUP_CHAT_HELPER;
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
+        if (dialog != null)
         title = dialog.getTitle();
     }
 
