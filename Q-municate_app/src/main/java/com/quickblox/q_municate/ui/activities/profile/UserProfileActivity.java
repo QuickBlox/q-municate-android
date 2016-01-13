@@ -275,8 +275,12 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
     private void deleteChat() {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
-        String dialogId = dialogOccupant.getDialog().getDialogId();
-        QBDeleteChatCommand.start(this, dialogId, Dialog.Type.PRIVATE);
+        if (dialogOccupant == null){
+            finish();
+        } else {
+            String dialogId = dialogOccupant.getDialog().getDialogId();
+            QBDeleteChatCommand.start(this, dialogId, Dialog.Type.PRIVATE);
+        }
     }
 
     private void startPrivateChat(QBDialog qbDialog) {

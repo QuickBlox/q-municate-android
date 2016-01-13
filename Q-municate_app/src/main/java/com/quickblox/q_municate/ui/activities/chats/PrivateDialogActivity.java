@@ -151,6 +151,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
+        checkForCorrectChat();
+
         int oldMessagesCount = messagesAdapter.getAllItems().size();
 
         this.combinationMessagesList = createCombinationMessagesList();
