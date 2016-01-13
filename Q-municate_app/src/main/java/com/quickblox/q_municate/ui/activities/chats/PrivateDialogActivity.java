@@ -338,6 +338,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         @Override
         public void update(Observable observable, Object data) {
             if (data != null && data.equals(FriendDataManager.OBSERVE_KEY)) {
+                checkForCorrectChat();
                 checkMessageSendingPossibility();
             }
         }
