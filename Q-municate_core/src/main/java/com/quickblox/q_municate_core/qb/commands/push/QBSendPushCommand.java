@@ -18,8 +18,6 @@ import java.util.ArrayList;
 
 public class QBSendPushCommand extends ServiceCommand {
 
-    private QBFriendListHelper friendListHelper;
-
     public QBSendPushCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
@@ -32,12 +30,9 @@ public class QBSendPushCommand extends ServiceCommand {
     }
 
     public static void start(Context context, String message, Integer friendId) {
-        Intent intent = new Intent(QBServiceConsts.SEND_PUSH_ACTION, null, context, QBService.class);
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
         friendIdsList.add(friendId);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friendIdsList);
-        intent.putExtra(ConstsCore.PUSH_MESSAGE, message);
-        context.startService(intent);
+        start(context, message, friendIdsList);
     }
 
     @Override

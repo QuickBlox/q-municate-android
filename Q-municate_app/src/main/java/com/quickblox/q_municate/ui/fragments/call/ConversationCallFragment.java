@@ -31,7 +31,10 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.adapters.call.OpponentsFromCallAdapter;
 import com.quickblox.q_municate.ui.views.RTCGLVideoView;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.StartConversationReason;
+import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.call.CameraUtils;
 import com.quickblox.users.model.QBUser;
@@ -183,12 +186,26 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
             if (startConversationReason == StartConversationReason.INCOME_CALL_FOR_ACCEPTION) {
                 session.acceptCall(session.getUserInfo());
             } else {
+                sendPushAboutCall();
                 session.startCall(session.getUserInfo());
             }
             isMessageProcessed = true;
         }
         ((CallActivity) getActivity()).addTCClientConnectionCallback(this);
         ((CallActivity) getActivity()).addRTCSessionUserCallback(this);
+    }
+
+    private void sendPushAboutCall() {
+        if (isPeerToPeerCall) {
+            QBFriendListHelper qbFriendListHelper = new QBFriendListHelper(getActivity());
+            QBUser qbUser = opponents.get(0);
+
+            if (!qbFriendListHelper.isUserOnline(qbUser.getId())) {
+                String callMsg = getString(R.string.dlg_offline_call,
+                        AppSession.getSession().getUser().getFullName());
+                QBSendPushCommand.start(getActivity(), callMsg, qbUser.getId());
+            }
+        }
     }
 
 
