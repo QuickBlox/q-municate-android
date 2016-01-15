@@ -88,7 +88,8 @@ public class FacebookHelper {
         } else {
             Session.OpenRequest openRequest = new Session.OpenRequest(activity);
 
-            openRequest.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
+//            openRequest.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
+//            openRequest.setLoginBehavior(SessionLoginBehavior.SSO_ONLY);
             openRequest.setCallback(facebookStatusCallback);
 
             List<String> permissionsList = generatePermissionsList();

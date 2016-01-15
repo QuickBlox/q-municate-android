@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.activities.main;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,7 +15,6 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
@@ -78,8 +78,10 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (facebookHelper != null) {
+        if (facebookHelper != null && resultCode != Activity.RESULT_CANCELED) {
             facebookHelper.onActivityResult(requestCode, resultCode, data);
+        } else {
+            FacebookHelper.logout();
         }
     }
 

@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.utils.helpers;
 
 import android.app.Activity;
+import android.util.Log;
 
 import com.facebook.Request;
 import com.facebook.Response;
