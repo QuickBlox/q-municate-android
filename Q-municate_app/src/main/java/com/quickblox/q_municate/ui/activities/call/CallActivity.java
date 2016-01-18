@@ -276,6 +276,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
                     stopTimer();
                     closeByWifiStateAllow = true;
+                    finish();
                 }
             }
         });

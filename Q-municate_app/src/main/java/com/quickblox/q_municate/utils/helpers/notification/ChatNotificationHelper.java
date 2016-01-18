@@ -62,6 +62,9 @@ public class ChatNotificationHelper {
                 loginHelper.makeGeneralLogin(new GlobalLoginListener());
                 return;
             }
+        } else {
+            // push about call
+            sendNotification(message);
         }
 
         saveOpeningDialog(false);
