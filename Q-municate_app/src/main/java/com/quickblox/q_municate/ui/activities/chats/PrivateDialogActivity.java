@@ -259,12 +259,32 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void acceptUser(final int userId) {
-        showProgress();
-        QBAcceptFriendCommand.start(this, userId);
+        if (isNetworkAvailable()) {
+            if (!isChatInitializedAndUserLoggedIn()) {
+                ToastUtils.longToast(R.string.call_chat_service_is_initializing);
+                return;
+            }
+
+            showProgress();
+            QBAcceptFriendCommand.start(this, userId);
+        } else {
+            ToastUtils.longToast(R.string.dlg_fail_connection);
+            return;
+        }
     }
 
     private void rejectUser(final int userId) {
-        showRejectUserDialog(userId);
+        if (isNetworkAvailable()) {
+            if (!isChatInitializedAndUserLoggedIn()) {
+                ToastUtils.longToast(R.string.call_chat_service_is_initializing);
+                return;
+            }
+
+            showRejectUserDialog(userId);
+        } else {
+            ToastUtils.longToast(R.string.dlg_fail_connection);
+            return;
+        }
     }
 
     private void showRejectUserDialog(final int userId) {

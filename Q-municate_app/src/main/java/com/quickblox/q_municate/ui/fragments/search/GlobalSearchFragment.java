@@ -264,6 +264,10 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     }
 
     private void addToFriendList(final int userId) {
+        if (!baseActivity.checkNetworkAvailableWithError()) {
+            return;
+        }
+
         baseActivity.showProgress();
         QBAddFriendCommand.start(baseActivity, userId);
         KeyboardUtils.hideKeyboard(baseActivity);

@@ -251,7 +251,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
         User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
+        boolean isFirstOpenDialog = !dataManager.getMessageDataManager()
+                .getTempMessagesByDialogId(dialog.getDialogId()).isEmpty();
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
+            if (!baseActivity.checkNetworkAvailableWithError() && isFirstOpenDialog) {
+                return;
+            }
+
             PrivateDialogActivity.start(baseActivity, occupant, dialog);
         }
     }
