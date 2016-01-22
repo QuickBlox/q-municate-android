@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands.rest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
@@ -42,7 +43,8 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String accessToken = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN);
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
-        if (user.getCustomData() == null) {
+        UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
+        if (TextUtils.isEmpty(userCustomData.getAvatar_url())) {
             CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));
@@ -56,11 +58,8 @@ public class QBSocialLoginCommand extends ServiceCommand {
 
     private QBUser getUserWithAvatar(QBUser user) {
         String avatarUrl = context.getString(R.string.url_to_facebook_avatar, user.getFacebookId());
-        QBUser newUser = new QBUser();
-        newUser.setId(user.getId());
-        newUser.setPassword(user.getPassword());
-        newUser.setCustomData(Utils.customDataToString(getUserCustomData(avatarUrl)));
-        return newUser;
+        user.setCustomData(Utils.customDataToString(getUserCustomData(avatarUrl)));
+        return user;
     }
 
     private UserCustomData getUserCustomData(String avatarUrl) {

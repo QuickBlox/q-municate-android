@@ -22,6 +22,7 @@ import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -264,6 +265,9 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) throws Exception {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            QBUpdateUserCommand.start(BaseAuthActivity.this, user, null);
+
             performLoginSuccessAction(bundle);
         }
     }
