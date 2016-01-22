@@ -256,6 +256,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
 
         @Override
         public void execute(Bundle bundle) throws Exception {
+            appSharedHelper.saveUsersImportInitialized(false);
             performSignUpSuccessAction(bundle);
         }
     }

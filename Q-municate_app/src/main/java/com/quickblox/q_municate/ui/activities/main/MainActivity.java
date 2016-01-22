@@ -78,10 +78,11 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (facebookHelper != null && resultCode != Activity.RESULT_CANCELED) {
+
+        if (facebookHelper != null /*&& resultCode != Activity.RESULT_CANCELED*/) {
             facebookHelper.onActivityResult(requestCode, resultCode, data);
         } else {
-            FacebookHelper.logout();
+//            FacebookHelper.logout();
         }
     }
 
@@ -179,6 +180,7 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void checkImportFriends() {
+        Log.d("IMPORT_FRIENDS", "checkImportFriends()");
         if (!appSharedHelper.isUsersImportInitialized()) {
             showProgress();
             importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
@@ -189,10 +191,12 @@ public class MainActivity extends BaseLoggableActivity {
 
         @Override
         public void call(Session session, SessionState state, Exception exception) {
+
             if (session.isOpened()) {
                 importFriendsHelper.startGetFriendsListTask(true);
             } else if (!session.isClosed() && !appSharedHelper.isUsersImportInitialized()) {
                 importFriendsHelper.startGetFriendsListTask(false);
+                appSharedHelper.saveUsersImportInitialized(true);
                 hideProgress();
             }
         }
