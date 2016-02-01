@@ -86,7 +86,7 @@
             android:name=".ui.activities.call.CallActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTop" />
         <activity
             android:name=".ui.activities.chats.NewMessageActivity"
             android:screenOrientation="portrait">

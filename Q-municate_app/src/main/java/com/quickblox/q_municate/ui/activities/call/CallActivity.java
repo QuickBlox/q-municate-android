@@ -85,6 +85,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType);
         intent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE, StartConversationReason.OUTCOME_CALL_MADE);
         intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         activity.startActivityForResult(intent, CALL_ACTIVITY_CLOSE);
     }
 
@@ -564,6 +565,11 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     public void removeRTCSessionUserCallback() {
         this.qbRtcSessionUserCallback = null;
+    }
+
+    @Override
+    public boolean isCanPerformLogoutInOnStop() {
+        return false;
     }
 
     public interface QBRTCSessionUserCallback {
