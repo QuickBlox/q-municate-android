@@ -195,11 +195,20 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     @OnItemClick(R.id.chats_listview)
     void startChat(int position) {
         Dialog dialog = dialogsListAdapter.getItem(position);
+
+        if (!baseActivity.checkNetworkAvailableWithError() && isFirstOpeningDialog(dialog.getDialogId())) {
+            return;
+        }
+
         if (dialog.getType() == Dialog.Type.PRIVATE) {
             startPrivateChatActivity(dialog);
         } else {
             startGroupChatActivity(dialog);
         }
+    }
+
+    private boolean isFirstOpeningDialog(String dialogId){
+        return !dataManager.getMessageDataManager().getTempMessagesByDialogId(dialogId).isEmpty();
     }
 
     @Override
@@ -250,15 +259,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     private void startPrivateChatActivity(Dialog dialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
-        boolean isFirstOpenDialog = !dataManager.getMessageDataManager()
-                .getTempMessagesByDialogId(dialog.getDialogId()).isEmpty();
-        if (!TextUtils.isEmpty(dialog.getDialogId())) {
-            if (!baseActivity.checkNetworkAvailableWithError() && isFirstOpenDialog) {
-                return;
-            }
+        User opponent = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
 
-            PrivateDialogActivity.start(baseActivity, occupant, dialog);
+        if (!TextUtils.isEmpty(dialog.getDialogId())) {
+            PrivateDialogActivity.start(baseActivity, opponent, dialog);
         }
     }
 
