@@ -11,7 +11,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Chronometer;
 
@@ -77,6 +81,9 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private QBCallChatHelper qbCallChatHelper;
     private StartConversationReason startConversationReason;
     private QBRTCSessionDescription qbRtcSessionDescription;
+    private ActionBar actionBar;
+    private boolean isSpeakerEnabled;
+    private boolean isFrontCameraSelected;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
             QBRTCSessionDescription qbRtcSessionDescription) {
@@ -92,6 +99,22 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     protected int getContentResId() {
         return R.layout.activity_call;
+    }
+
+    public void initActionBar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar_call);
+        if (toolbar != null) {
+            toolbar.setVisibility(View.VISIBLE);
+            setSupportActionBar(toolbar);
+        }
+
+        actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    public void setCallActionBarTitle(String title){
+        actionBar.setTitle(title);
     }
 
     @Override
@@ -144,6 +167,54 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         registerReceiver(wifiStateReceiver, intentFilter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.call_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem itemSpeakerToggle = menu.findItem(R.id.switch_speaker_toggle);
+        if (itemSpeakerToggle != null){
+           itemSpeakerToggle.setIcon(isSpeakerEnabled ? R.drawable.ic_phonelink_ring : R.drawable.ic_speaker_phone);
+        }
+
+        MenuItem itemCameraToggle = menu.findItem(R.id.switch_camera_toggle);
+        if (itemCameraToggle != null){
+            if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(getCurrentSession().getConferenceType())) {
+
+                itemCameraToggle.setIcon(isFrontCameraSelected ? R.drawable.ic_camera_front_white : R.drawable.ic_camera_rear_white);
+            } else {
+                itemCameraToggle.setEnabled(false);
+                itemCameraToggle.setVisible(false);
+            }
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.switch_speaker_toggle:
+                if (isSpeakerEnabled) {
+                    getCurrentSession().getMediaStreamManager().switchAudioOutput();
+                    isSpeakerEnabled = false;
+                    invalidateOptionsMenu();
+                } else {
+                    getCurrentSession().getMediaStreamManager().switchAudioOutput();
+                    isSpeakerEnabled = true;
+                    invalidateOptionsMenu();
+                }
+                return true;
+            case R.id.switch_camera_toggle:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

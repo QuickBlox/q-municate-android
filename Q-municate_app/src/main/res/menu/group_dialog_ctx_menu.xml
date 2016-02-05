@@ -9,7 +9,7 @@
         android:title="@string/dialog_ctx_menu_prv_message" />
 
     <item
-        android:id="@+id/action_video_call"
+        android:id="@+id/switch_camera_toggle"
         android:title="@string/dialog_ctx_menu_video_call"/>
 
     <item

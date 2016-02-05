@@ -198,6 +198,8 @@
     <string name="call_no_answer">No answer</string>
     <string name="call_hung_up">Hung up</string>
     <string name="call_chat_service_is_initializing">Please, wait, connection is setting up…</string>
+    <string name="switch_speaker">Switch speaker</string>
+    <string name="switch_camera">Switch camera</string>
 
 
     <!-- Invite Friends -->

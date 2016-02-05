@@ -70,7 +70,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
 
             view = inflater.inflate(R.layout.fragment_income_call, container, false);
 
-            ((CallActivity) getActivity()).initActionBar();
+//            ((CallActivity) getActivity()).initActionBar();
 
             initUI(view);
             setDisplayedTypeCall(qbConferenceType);

@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="top"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        style="@style/ToolbarStyleCall"
+        android:id="@+id/toolbar_call"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/call_toolbar_background"
+        android:visibility="invisible"
+        >
+
+        <Chronometer
+            android:id="@+id/timer_chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/padding_large"
+            android:textColor="@color/light_gray"
+            android:textSize="@dimen/text_size_large"
+            android:visibility="invisible"
+            />
+
+        <!--<ToggleButton
+            android:id="@+id/switch_speaker_toggle"
+            android:layout_width="@dimen/action_bar_height"
+            android:layout_height="@dimen/action_bar_height"
+            android:background="@drawable/selector_toggle_dynamic"
+            android:layout_gravity="center"
+            android:padding="@dimen/abc_action_bar_icon_vertical_padding_material"
+            android:textOff=""
+            android:textOn=""/>
+
+        <ToggleButton
+            android:id="@+id/switch_camera_toggle"
+            android:layout_width="@dimen/action_bar_height"
+            android:layout_height="@dimen/action_bar_height"
+            android:background="@drawable/selector_switch_camera"
+            android:layout_gravity="center"
+            android:textOff=""
+            android:textOn=""/>-->
+
+
+    </android.support.v7.widget.Toolbar>
+
+</LinearLayout>

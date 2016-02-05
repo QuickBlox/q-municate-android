@@ -85,7 +85,7 @@ public class OpponentsFromCallAdapter extends RecyclerView.Adapter<OpponentsFrom
     public void onBindViewHolder(ViewHolder holder, int position) {
         final QBUser user = opponents.get(position);
 
-        holder.opponentsName.setText(user.getFullName());
+//        holder.opponentsName.setText(user.getFullName());
         holder.setUserId(user.getId());
         if (position == (opponents.size() -1 )) {
             adapterListener.OnBindLastViewHolder(holder, position);
@@ -102,14 +102,14 @@ public class OpponentsFromCallAdapter extends RecyclerView.Adapter<OpponentsFrom
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView opponentsName;
+//        TextView opponentsName;
         TextView connectionStatus;
         RTCGLVideoView opponentView;
         private int userId;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            opponentsName = (TextView) itemView.findViewById(R.id.opponentName);
+//            opponentsName = (TextView) itemView.findViewById(R.id.opponentName);
             connectionStatus = (TextView) itemView.findViewById(R.id.connectionStatus);
             opponentView = (RTCGLVideoView) itemView.findViewById(R.id.opponentView);
         }

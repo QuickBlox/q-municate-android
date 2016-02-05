@@ -8,7 +8,7 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_video_call"
+        android:id="@+id/switch_camera_toggle"
         android:icon="@drawable/ic_user_video_call_dark"
         android:title="@string/user_profile_video_call"
         app:showAsAction="ifRoom" />

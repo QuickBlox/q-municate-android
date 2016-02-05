@@ -190,7 +190,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
             case R.id.action_audio_call:
                 callToUser(opponentUser, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
                 break;
-            case R.id.action_video_call:
+            case R.id.switch_camera_toggle:
                 callToUser(opponentUser, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
                 break;
             default:

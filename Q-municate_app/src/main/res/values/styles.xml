@@ -7,6 +7,12 @@
         <item name="theme">@style/ToolbarTheme</item>
     </style>
 
+    <style name="ToolbarStyleCall">
+        <item name="android:minHeight">?actionBarSize</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat</item>
+        <item name="theme">@style/ToolbarThemeCall</item>
+    </style>
+
     <style name="ButtonStyle" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/selector_button_general</item>
         <item name="android:layout_width">wrap_content</item>
