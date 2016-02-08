@@ -204,8 +204,8 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
 
         ((CallActivity) getActivity())
                 .addConversationFragmentReceiveCall();
-        ((CallActivity) getActivity())
-                .startTimer();
+//        ((CallActivity) getActivity())
+//                .startTimer();
 
         Log.d(TAG, "Call is started");
     }

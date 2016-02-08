@@ -25,26 +25,6 @@
             android:visibility="invisible"
             />
 
-        <!--<ToggleButton
-            android:id="@+id/switch_speaker_toggle"
-            android:layout_width="@dimen/action_bar_height"
-            android:layout_height="@dimen/action_bar_height"
-            android:background="@drawable/selector_toggle_dynamic"
-            android:layout_gravity="center"
-            android:padding="@dimen/abc_action_bar_icon_vertical_padding_material"
-            android:textOff=""
-            android:textOn=""/>
-
-        <ToggleButton
-            android:id="@+id/switch_camera_toggle"
-            android:layout_width="@dimen/action_bar_height"
-            android:layout_height="@dimen/action_bar_height"
-            android:background="@drawable/selector_switch_camera"
-            android:layout_gravity="center"
-            android:textOff=""
-            android:textOn=""/>-->
-
-
     </android.support.v7.widget.Toolbar>
 
 </LinearLayout>

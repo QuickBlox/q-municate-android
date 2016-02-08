@@ -13,7 +13,7 @@
         android:layout_width="@dimen/call_buttons_diameter"
         android:layout_height="@dimen/call_buttons_diameter"
         android:background="@drawable/call_mic_toggle_background"
-        android:checked="false"
+        android:checked="true"
         android:textOn=""
         android:textOff=""
         />
@@ -35,7 +35,7 @@
         android:layout_width="@dimen/call_buttons_diameter"
         android:layout_height="@dimen/call_buttons_diameter"
         android:background="@drawable/call_camera_toggle_background"
-        android:checked="false"
+        android:checked="true"
         android:textOff=""
         android:textOn=""
         />

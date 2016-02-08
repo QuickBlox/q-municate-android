@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,9 +31,11 @@ import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_core.utils.call.CameraUtils;
 import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
 import com.quickblox.q_municate_core.utils.call.SettingsUtil;
 import com.quickblox.users.model.QBUser;
+import com.quickblox.videochat.webrtc.QBMediaStreamManager;
 import com.quickblox.videochat.webrtc.QBRTCClient;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
@@ -83,7 +86,9 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private QBRTCSessionDescription qbRtcSessionDescription;
     private ActionBar actionBar;
     private boolean isSpeakerEnabled;
-    private boolean isFrontCameraSelected;
+    private boolean isFrontCameraSelected = true;
+    private boolean isVideoEnabled;
+    private AudioStreamReceiver audioStreamReceiver;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
             QBRTCSessionDescription qbRtcSessionDescription) {
@@ -109,18 +114,19 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
 
         actionBar = getSupportActionBar();
-        actionBar.setHomeButtonEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     public void setCallActionBarTitle(String title){
-        actionBar.setTitle(title);
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initFields();
+        audioStreamReceiver = new AudioStreamReceiver();
         initWiFiManagerListener();
     }
 
@@ -143,6 +149,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     protected void onStop() {
         super.onStop();
         unregisterReceiver(wifiStateReceiver);
+        unregisterReceiver(audioStreamReceiver);
         if (qbCallChatHelper != null) {
             qbCallChatHelper.removeRTCSessionUserCallback();
         }
@@ -166,7 +173,10 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        intentFilter.addAction(AudioManager.ACTION_HEADSET_PLUG);
+        intentFilter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
         registerReceiver(wifiStateReceiver, intentFilter);
+        registerReceiver(audioStreamReceiver, intentFilter);
     }
 
     @Override
@@ -184,9 +194,13 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
         MenuItem itemCameraToggle = menu.findItem(R.id.switch_camera_toggle);
         if (itemCameraToggle != null){
-            if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(getCurrentSession().getConferenceType())) {
+            if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(getCurrentSession().getConferenceType())){
+                    if (isVideoEnabled()) {
+                        itemCameraToggle.setIcon(isFrontCameraSelected() ? R.drawable.ic_camera_front_white : R.drawable.ic_camera_rear_white);
+                    }
 
-                itemCameraToggle.setIcon(isFrontCameraSelected ? R.drawable.ic_camera_front_white : R.drawable.ic_camera_rear_white);
+                itemCameraToggle.setVisible(true);
+                itemCameraToggle.setEnabled(isVideoEnabled());
             } else {
                 itemCameraToggle.setEnabled(false);
                 itemCameraToggle.setVisible(false);
@@ -195,22 +209,60 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         return super.onPrepareOptionsMenu(menu);
     }
 
+    public boolean isFrontCameraSelected() {
+        QBRTCSession currentSession = getCurrentSession();
+        QBMediaStreamManager mediaStreamManager;
+        if (currentSession != null) {
+            mediaStreamManager = currentSession.getMediaStreamManager();
+        } else {
+            return false;
+        }
+
+        if (mediaStreamManager != null){
+            return CameraUtils.isCameraFront(mediaStreamManager.getCurrentCameraId());
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isVideoEnabled(){
+        QBRTCSession currentSession = getCurrentSession();
+        QBMediaStreamManager mediaStreamManager;
+        if (currentSession != null) {
+            mediaStreamManager = currentSession.getMediaStreamManager();
+        } else {
+            return false;
+        }
+
+        if (mediaStreamManager != null){
+            return mediaStreamManager.isVideoEnabled();
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (getCurrentSession() == null){
+            return false;
+        }
+
+        QBMediaStreamManager mediaStreamManager = getCurrentSession().getMediaStreamManager();
+        if (mediaStreamManager == null){
+            return false;
+        }
 
         switch (item.getItemId()) {
             case R.id.switch_speaker_toggle:
                 if (isSpeakerEnabled) {
-                    getCurrentSession().getMediaStreamManager().switchAudioOutput();
+                    mediaStreamManager.switchAudioOutput();
                     isSpeakerEnabled = false;
                     invalidateOptionsMenu();
                 } else {
-                    getCurrentSession().getMediaStreamManager().switchAudioOutput();
+                    mediaStreamManager.switchAudioOutput();
                     isSpeakerEnabled = true;
                     invalidateOptionsMenu();
                 }
-                return true;
-            case R.id.switch_camera_toggle:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -641,6 +693,21 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return false;
+    }
+
+    private class AudioStreamReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().equals(AudioManager.ACTION_HEADSET_PLUG)) {
+                Log.d(TAG, "ACTION_HEADSET_PLUG " + intent.getIntExtra("state", -1));
+            } else if (intent.getAction().equals(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)) {
+                Log.d(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED " + intent.getIntExtra("EXTRA_SCO_AUDIO_STATE", -2));
+            }
+            isSpeakerEnabled = (intent.getIntExtra("state", -1) == 1);
+            invalidateOptionsMenu();
+        }
     }
 
     public interface QBRTCSessionUserCallback {
