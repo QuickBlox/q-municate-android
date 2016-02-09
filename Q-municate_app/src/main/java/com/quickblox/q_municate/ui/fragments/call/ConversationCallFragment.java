@@ -410,6 +410,8 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
             @Override
             public void run() {
                 actionButtonsEnabled(true);
+                ((CallActivity) getActivity()).startTimer();
+                getActivity().invalidateOptionsMenu();
             }
         });
 //        setStatusForOpponent(userId, getString(R.string.connected));
