@@ -26,14 +26,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Chronometer;
+import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -42,6 +46,9 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.call.CameraUtils;
 import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
 import com.quickblox.q_municate_core.utils.call.SettingsUtil;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Friend;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBMediaStreamManager;
 import com.quickblox.videochat.webrtc.QBRTCClient;
@@ -94,8 +101,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private QBRTCSessionDescription qbRtcSessionDescription;
     private ActionBar actionBar;
     private boolean isSpeakerEnabled;
-    private boolean isFrontCameraSelected = true;
-    private boolean isVideoEnabled;
     private AudioStreamReceiver audioStreamReceiver;
     private String ACTION_ANSWER_CALL = "action_answer_call";
 
@@ -146,8 +151,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         switch (startConversationReason) {
             case INCOME_CALL_FOR_ACCEPTION:
                 if (qbRtcSessionDescription != null) {
-                    notifyAboutCall(qbRtcSessionDescription.getCallerID(), createNotificationAboutCall(qbRtcSessionDescription));
-//                    addIncomingCallFragment(qbRtcSessionDescription);
+                    addIncomingCallFragment(qbRtcSessionDescription);
                     isInComingCall = true;
                     initIncomingCallTask();
                 }
@@ -257,12 +261,12 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (getCurrentSession() == null){
-            return false;
+            return super.onOptionsItemSelected(item);
         }
 
         QBMediaStreamManager mediaStreamManager = getCurrentSession().getMediaStreamManager();
         if (mediaStreamManager == null){
-            return false;
+            return super.onOptionsItemSelected(item);
         }
 
         switch (item.getItemId()) {
@@ -446,8 +450,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                 if (isInComingCall) {
                     stopIncomeCallTimer();
                 }
-
-//                startTimer();
                 Log.d(TAG, "onConnectedToUser() is started");
             }
         });
@@ -518,6 +520,12 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         };
     }
 
+    public User getOpponentAsUserFromDB(int opponentId){
+        DataManager dataManager = DataManager.getInstance();
+        Friend friend = dataManager.getFriendDataManager().getByUserId(opponentId);
+        return friend.getUser();
+    }
+
     private void processCurrentWifiState(Context context) {
         WifiManager wifi = (WifiManager) context.getSystemService(WIFI_SERVICE);
         if (wifiEnabled != wifi.isWifiEnabled()) {
@@ -585,63 +593,18 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     private void addIncomingCallFragment(QBRTCSessionDescription qbRtcSessionDescription) {
         Log.d(TAG, "QBRTCSession in addIncomingCallFragment is " + qbRtcSessionDescription);
-//        if (isInFront) {
-//            Fragment fragment = new IncomingCallFragment();
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
-//            bundle.putIntegerArrayList(QBServiceConsts.EXTRA_OPPONENTS, new ArrayList<>(qbRtcSessionDescription.getOpponents()));
-//            bundle.putSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE,
-//                    qbRtcSessionDescription.getConferenceType());
-//            fragment.setArguments(bundle);
-//            setCurrentFragment(fragment);
-//        } else {
-//            Log.d(TAG, "SKIP addIncomingCallFragment method");
-//        }
-    }
-
-    private void notifyAboutCall (int notificationId, Notification notification){
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(notificationId, notification);
-    }
-
-    private Notification createNotificationAboutCall(QBRTCSessionDescription qbRtcSessionDescription){
-        Intent dismissIntent = new Intent();
-//        dismissIntent.setAction(ACTION_DISMISS);
-        PendingIntent piDismiss = PendingIntent.getService(this, 0, dismissIntent, 0);
-
-        Intent answerIntent = new Intent(this, CallActivity.class);
-//        answerIntent.putExtra(QBServiceConsts.EXTRA_OPPONENTS, (Serializable) qbUsersList);
-//        answerIntent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType);
-//        answerIntent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE, StartConversationReason.OUTCOME_CALL_MADE);
-//        answerIntent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
-//        answerIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-
-        answerIntent.setAction(ACTION_ANSWER_CALL);
-        PendingIntent piAnswer = PendingIntent.getActivity(this, 0, answerIntent, 0);
-
-//        qbRtcSessionDescription.getCallerID()
-        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(),
-                R.drawable.ic_launcher);
-
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(getApplicationContext())
-                        .setDefaults(NotificationCompat.DEFAULT_VIBRATE | NotificationCompat.DEFAULT_LIGHTS) // must requires VIBRATE permission
-                        .setCategory(NotificationCompat.CATEGORY_CALL)
-                        .setSmallIcon(R.drawable.ic_launcher)
-//                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
-
-                        .setLargeIcon(largeIcon)
-                        .setContentTitle(opponentsList.get(0).getFullName())
-                        .setContentText(getString(qbConferenceType.equals(QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO) ?
-                                R.string.call_incoming_video_call : R.string.call_incoming_audio_call))
-                        .setPriority(NotificationCompat.PRIORITY_MAX) //must give priority to High, Max which will considered as heads-up notification
-                        .addAction(R.drawable.ic_close_dark,
-                                getString(R.string.decline_call), piDismiss)
-                        .addAction(R.drawable.ic_done_dark,
-                                getString(R.string.answer_call), piAnswer);
-
-        return builder.build();
+        if (isInFront) {
+            Fragment fragment = new IncomingCallFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
+            bundle.putIntegerArrayList(QBServiceConsts.EXTRA_OPPONENTS, new ArrayList<>(qbRtcSessionDescription.getOpponents()));
+            bundle.putSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE,
+                    qbRtcSessionDescription.getConferenceType());
+            fragment.setArguments(bundle);
+            setCurrentFragment(fragment);
+        } else {
+            Log.d(TAG, "SKIP addIncomingCallFragment method");
+        }
     }
 
     public void addConversationCallFragment() {
@@ -660,7 +623,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                             qbCallChatHelper.getCurrentRtcSession().getSessionID());
 
             setCurrentFragment(fragment);
-//            ringtonePlayer.play(true); //TODO надо раскаментить в релизной версии
+            ringtonePlayer.play(true);
         } else {
             throw new NullPointerException("qbCallChatHelper is not initialized");
         }

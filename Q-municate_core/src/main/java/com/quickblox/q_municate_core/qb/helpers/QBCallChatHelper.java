@@ -33,7 +33,7 @@ public class QBCallChatHelper extends BaseHelper {
 
     private static final String TAG = QBCallChatHelper.class.getSimpleName();
 
-    private static final int ANSWER_INTERVAL = 60;
+    private static final int MAX_OPPONENTS_COUNT = 1;
     private static final int DISCONNECT_TIME = 30;
     private static final int ANSWER_TIME_INTERVAL = 60;
 
@@ -94,8 +94,6 @@ public class QBCallChatHelper extends BaseHelper {
     private void setUpCallClient() {
         Log.d(TAG, "setUpCallClient()");
 
-        QBRTCConfig.setAnswerTimeInterval(ANSWER_INTERVAL);
-
         qbRtcClient.setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
             @Override
             public void onCameraError(String error) {
@@ -103,7 +101,7 @@ public class QBCallChatHelper extends BaseHelper {
             }
         });
 
-        QBRTCConfig.setMaxOpponentsCount(6);
+        QBRTCConfig.setMaxOpponentsCount(MAX_OPPONENTS_COUNT);
         QBRTCConfig.setDisconnectTime(DISCONNECT_TIME);
         QBRTCConfig.setAnswerTimeInterval(ANSWER_TIME_INTERVAL);
         QBRTCConfig.setDebugEnabled(true);

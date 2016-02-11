@@ -15,4 +15,11 @@
         <item>30</item>
     </integer-array>
 
+    <integer-array name="local_view_coordinates_full_screen">
+        <item>50</item>
+        <item>50</item>
+        <item>30</item>
+        <item>30</item>
+    </integer-array>
+
 </resources>

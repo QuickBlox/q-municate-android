@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/view_avatar_and_name_vertical"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:layout_marginTop="@dimen/action_bar_height">
+
+    <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+        style="@style/AvatarImageViewStyle"
+        android:id="@+id/avatar_imageview"
+        android:layout_width="@dimen/call_opponent_avatar_diameter"
+        android:layout_height="@dimen/call_opponent_avatar_diameter"
+        android:layout_marginTop="@dimen/call_avatar_top_margin"
+        app:border_color="@color/dark_gray"
+        app:border_width="@dimen/avatar_border_width"
+        app:oval="true"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/calling_to_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/light_gray"
+        android:textSize="@dimen/text_size_large"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="@dimen/call_caller_name_top_avatar_margin"
+        />
+
+</LinearLayout>

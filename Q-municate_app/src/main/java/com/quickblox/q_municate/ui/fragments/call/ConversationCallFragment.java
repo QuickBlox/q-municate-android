@@ -1,43 +1,42 @@
 package com.quickblox.q_municate.ui.fragments.call;
 
 import android.support.v4.app.Fragment;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Rect;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
-import com.quickblox.q_municate.ui.adapters.call.OpponentsFromCallAdapter;
 import com.quickblox.q_municate.ui.views.RTCGLVideoView;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.call.CameraUtils;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBMediaStreamManager;
 import com.quickblox.videochat.webrtc.exception.QBRTCException;
@@ -85,12 +84,14 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     private boolean isMessageProcessed;
     private RTCGLVideoView localVideoView;
     private RTCGLVideoView remoteVideoView;
-    private IntentFilter intentFilter;
     private CameraState cameraState = CameraState.NONE;
     private boolean isPeerToPeerCall;
     private QBRTCVideoTrack localVideoTrack;
     private QBRTCVideoTrack remoteVideoTrack;
     private Handler mainHandler;
+    private ImageView avatarImageview;
+    private TextView callingToTextView;
+    private FrameLayout avatarAndNameView;
 
     public static ConversationCallFragment newInstance(List<QBUser> opponents, String callerName,
             QBRTCTypes.QBConferenceType qbConferenceType,
@@ -137,6 +138,11 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         initSessionListener();
         setUpUiByCallType();
 
+        if (StartConversationReason.OUTCOME_CALL_MADE
+                .equals(startConversationReason)) {
+            displayOpponentAvatar();
+        }
+
         mainHandler = new FragmentLifeCycleHandler();
         return view;
 
@@ -148,17 +154,46 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
 
     private void setUpUiByCallType() {
         if (!isVideoCall) {
-            cameraToggle.setVisibility(View.GONE);
+            remoteVideoView.setVisibility(View.INVISIBLE);
+            localVideoView.setVisibility(View.INVISIBLE);
+            cameraToggle.setEnabled(false);
+            cameraToggle.setChecked(false);
+        }
+    }
+
+    private void displayOpponentAvatar() {
+        User opponent = ((CallActivity) getActivity()).getOpponentAsUserFromDB(opponents.get(0).getId());
+        ImageLoader.getInstance().displayImage(opponent.getAvatar(), avatarImageview, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        callingToTextView.setText(getString(R.string.calling_to, opponent.getFullName()));
+    }
+
+
+    private void actionsByConnectedToUser(){
+        actionButtonsEnabled(true);
+        ((CallActivity) getActivity()).startTimer();
+        getActivity().invalidateOptionsMenu();
+        hideAvatarIfNeed();
+    }
+
+    private void hideAvatarIfNeed() {
+        callingToTextView.setVisibility(View.INVISIBLE);
+
+        if (isVideoCall) {
+            avatarAndNameView.setVisibility(View.INVISIBLE);
         }
     }
 
     public void actionButtonsEnabled(boolean enability) {
 
-        cameraToggle.setEnabled(enability);
+        if (isVideoCall){
+            cameraToggle.setEnabled(enability);
+        }
         micToggleVideoCall.setEnabled(enability);
 
         // inactivate toggle buttons
-        cameraToggle.setActivated(enability);
+        if (isVideoCall) {
+            cameraToggle.setActivated(enability);
+        }
         micToggleVideoCall.setActivated(enability);
     }
 
@@ -204,14 +239,14 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     private void initViews(View view) {
 
         localVideoView = (RTCGLVideoView) ((ViewStub) view.findViewById(R.id.localViewStub)).inflate();
-        if (localVideoTrack != null) {
-            fillVideoView(localVideoView, localVideoTrack, !isPeerToPeerCall);
-        }
+//        if (localVideoTrack != null) {
+//            fillVideoView(localVideoView, localVideoTrack, !isPeerToPeerCall);
+//        }
 
         remoteVideoView = (RTCGLVideoView) ((ViewStub) view.findViewById(R.id.remoteViewStub)).inflate();
-        if (remoteVideoTrack != null) {
-            fillVideoView(remoteVideoView, remoteVideoTrack, isPeerToPeerCall);
-        }
+//        if (remoteVideoTrack != null) {
+//            fillVideoView(remoteVideoView, remoteVideoTrack, isPeerToPeerCall);
+//        }
 
         cameraToggle = (ToggleButton) view.findViewById(R.id.cameraToggle);
 
@@ -220,6 +255,19 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         actionVideoButtonsLayout = (LinearLayout) view.findViewById(R.id.element_set_video_buttons);
 
         handUpVideoCall = (ImageButton) view.findViewById(R.id.handUpVideoCall);
+
+        avatarAndNameView = (FrameLayout) view.findViewById(R.id.avatar_and_name);
+
+        avatarAndNameView.addView(getActivity().getLayoutInflater().inflate(isVideoCall ?
+                        R.layout.view_avatar_and_name_horizontal : R.layout.view_avatar_and_name_vertical,
+                avatarAndNameView, false));
+
+        avatarAndNameView.setVisibility(StartConversationReason.OUTCOME_CALL_MADE
+                .equals(startConversationReason) ? View.VISIBLE : View.INVISIBLE);
+
+        avatarImageview = (ImageView) avatarAndNameView.findViewById(R.id.avatar_imageview);
+
+        callingToTextView = (TextView) avatarAndNameView.findViewById(R.id.calling_to_text_view);
 
         actionButtonsEnabled(false);
     }
@@ -295,6 +343,18 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         });
     }
 
+    void toggleFullScreen(boolean goFullScreen, View view){
+        if(goFullScreen){
+            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        }else{
+            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+        view.requestLayout();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         QBRTCSession currentSession = ((CallActivity) getActivity()).getCurrentSession();
@@ -332,8 +392,8 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         Log.d(TAG, "Camera was switched!");
         RTCGLVideoView.RendererConfig config = new RTCGLVideoView.RendererConfig();
         config.mirror = CameraUtils.isCameraFront(currentCameraId);
-        localVideoView.updateRenderer(isPeerToPeerCall ? RTCGLVideoView.RendererSurface.SECOND :
-                RTCGLVideoView.RendererSurface.MAIN, config);
+//        localVideoView.updateRenderer(isPeerToPeerCall ? RTCGLVideoView.RendererSurface.SECOND :
+//                RTCGLVideoView.RendererSurface.MAIN, config);
         mainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -360,31 +420,34 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         if (currentSession != null && currentSession.getMediaStreamManager() != null){
             currentSession.getMediaStreamManager().setVideoEnabled(isNeedEnableCam);
             getActivity().invalidateOptionsMenu();
-
-            localVideoView.setVisibility(isNeedEnableCam ? View.VISIBLE: View.INVISIBLE);
         }
     }
 
     @Override
     public void onLocalVideoTrackReceive(QBRTCSession qbrtcSession, final QBRTCVideoTrack videoTrack) {
         Log.d(TAG, "onLocalVideoTrackReceive() run");
+        localVideoTrack = videoTrack;
 
-        if (localVideoView != null) {
-            fillVideoView(localVideoView, videoTrack, !isPeerToPeerCall);
-        } else {
-            //localVideoView hasn't been inflated yet. Will set track while OnBindLastViewHolder
-            localVideoTrack = videoTrack;
+        if (remoteVideoView != null && remoteVideoTrack == null) {
+            fillVideoView(remoteVideoView, videoTrack, true);
         }
     }
 
     @Override
     public void onRemoteVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack, Integer userID) {
         Log.d(TAG, "onRemoteVideoTrackReceive for opponent= " + userID);
+        remoteVideoTrack = videoTrack;
+
         if (remoteVideoView != null) {
-            fillVideoView(remoteVideoView, videoTrack);
-        } else {
-            //remoteVideoView hasn't been inflated yet. Will set track while OnBindLastViewHolder
-            remoteVideoTrack = videoTrack;
+            fillVideoView(remoteVideoView, videoTrack, true);
+
+            RTCGLVideoView.RendererConfig config = new RTCGLVideoView.RendererConfig();
+            config.mirror = false;
+            remoteVideoView.updateRenderer(RTCGLVideoView.RendererSurface.MAIN, config);
+
+            if (localVideoTrack != null) {
+                localVideoTrack.removeRenderer(localVideoTrack.getRenderer());
+            }
         }
     }
 
@@ -409,9 +472,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                actionButtonsEnabled(true);
-                ((CallActivity) getActivity()).startTimer();
-                getActivity().invalidateOptionsMenu();
+                actionsByConnectedToUser();
             }
         });
 //        setStatusForOpponent(userId, getString(R.string.connected));

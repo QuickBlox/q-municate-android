@@ -193,6 +193,7 @@
     <!-- Call -->
     <string name="call_incoming_audio_call">Incoming Audio Call</string>
     <string name="call_incoming_video_call">Incoming Video Call</string>
+    <string name="calling_to">Calling %1$s…</string>
     <string name="call_accepted">Accepted</string>
     <string name="call_rejected">Rejected</string>
     <string name="call_no_answer">No answer</string>

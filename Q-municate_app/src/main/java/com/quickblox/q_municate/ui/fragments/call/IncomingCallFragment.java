@@ -10,13 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
@@ -32,10 +36,9 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
     public static final String TAG = IncomingCallFragment.class.getSimpleName();
 
     private static final long CLICK_DELAY = TimeUnit.SECONDS.toMillis(2);
-    private TextView incVideoCall;
-    private TextView incAudioCall;
+    private TextView typeIncCall;
     private TextView callerName;
-    private TextView otherIncUsers;
+    private ImageView avatarImageView;
     private ImageButton rejectBtn;
     private ImageButton takeBtn;
 
@@ -67,15 +70,11 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         }
 
         if (savedInstanceState == null) {
-
             view = inflater.inflate(R.layout.fragment_income_call, container, false);
-
-//            ((CallActivity) getActivity()).initActionBar();
 
             initUI(view);
             setDisplayedTypeCall(qbConferenceType);
             initButtonsListener();
-
         }
 
         ringtonePlayer = new RingtonePlayer(getActivity());
@@ -102,17 +101,23 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
 
     private void initUI(View view) {
 
-        incAudioCall = (TextView) view.findViewById(R.id.incAudioCall);
-        incVideoCall = (TextView) view.findViewById(R.id.incVideoCall);
+        typeIncCall = (TextView) view.findViewById(R.id.type_inc_call);
 
-        callerName = (TextView) view.findViewById(R.id.callerName);
-        callerName.setText(getCallerName(((CallActivity) getActivity()).getCurrentSession()));
+        avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
 
-        otherIncUsers = (TextView) view.findViewById(R.id.otherIncUsers);
-        otherIncUsers.setText(getOtherIncUsersNames(opponents));
+        callerName = (TextView) view.findViewById(R.id.calling_to_text_view);
+        callerName.setLines(1);
 
         rejectBtn = (ImageButton) view.findViewById(R.id.rejectBtn);
         takeBtn = (ImageButton) view.findViewById(R.id.takeBtn);
+
+        setOpponentAvatarAndName();
+    }
+
+    private void setOpponentAvatarAndName(){
+        User opponent = ((CallActivity) getActivity()).getOpponentAsUserFromDB(sessionDescription.getCallerID());
+        ImageLoader.getInstance().displayImage(opponent.getAvatar(), avatarImageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        callerName.setText(opponent.getFullName());
     }
 
     public void startCallNotification() {
@@ -136,47 +141,11 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         }
     }
 
-    private String getOtherIncUsersNames(ArrayList<Integer> opponents) {
-        StringBuffer s = new StringBuffer("");
-        opponents.remove(QBChatService.getInstance().getUser().getId());
-
-        for (Integer i : opponents) {
-            for (QBUser usr : opponentsFromCall) {
-                if (usr.getId().equals(i)) {
-                    if (opponents.indexOf(i) == (opponents.size() - 1)) {
-                        s.append(usr.getFullName() + " ");
-                        break;
-                    } else {
-                        s.append(usr.getFullName() + ", ");
-                    }
-                }
-            }
-        }
-        return s.toString();
-    }
-
-    private String getCallerName(QBRTCSession session) {
-        String s = new String();
-        int i = session.getCallerID();
-
-        opponentsFromCall.addAll(((CallActivity) getActivity()).getOpponentsList());
-
-        for (QBUser usr : opponentsFromCall) {
-            if (usr.getId().equals(i)) {
-                s = usr.getFullName();
-            }
-        }
-        return s;
-    }
-
     private void setDisplayedTypeCall(QBRTCTypes.QBConferenceType conferenceType) {
-        if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(conferenceType)) {
-            incVideoCall.setVisibility(View.VISIBLE);
-            incAudioCall.setVisibility(View.INVISIBLE);
-        } else if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO.equals(conferenceType)) {
-            incVideoCall.setVisibility(View.INVISIBLE);
-            incAudioCall.setVisibility(View.VISIBLE);
-        }
+        typeIncCall.setText(getString(QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(conferenceType) ?
+                R.string.call_incoming_video_call : R.string.call_incoming_audio_call));
+        takeBtn.setImageResource(QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(conferenceType) ?
+                R.drawable.ic_video_white : R.drawable.ic_call);
     }
 
     @Override
@@ -186,6 +155,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
             return;
         }
         lastClickTime = SystemClock.uptimeMillis();
+
         switch (v.getId()) {
             case R.id.rejectBtn:
                 reject();
@@ -204,9 +174,6 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
 
         ((CallActivity) getActivity())
                 .addConversationFragmentReceiveCall();
-//        ((CallActivity) getActivity())
-//                .startTimer();
-
         Log.d(TAG, "Call is started");
     }
 

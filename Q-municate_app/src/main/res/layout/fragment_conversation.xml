@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/fragmentOpponents"
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragmentOpponents"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/white"
-    android:keepScreenOn="true">
+    android:background="@color/black"
+    android:keepScreenOn="true"
+    >
 
     <FrameLayout
         android:id="@+id/remoteVideoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="invisible"
         >
 
         <ViewStub
@@ -18,14 +21,14 @@
             android:layout_height="match_parent"
             android:layout="@layout/view_remote_video"
             />
+
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/localVideoView"
-        android:layout_width="100dp"
-        android:layout_height="150dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:layout_alignParentRight="true"
         >
 
         <ViewStub
@@ -34,6 +37,13 @@
             android:layout_height="match_parent"
             android:layout="@layout/view_local_video"
             />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/avatar_and_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
     </FrameLayout>
 
     <include
