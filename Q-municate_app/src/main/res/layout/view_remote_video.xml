@@ -6,6 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     custom:mainCoords="@array/local_view_coordinates"
+    custom:secondCoords="@array/local_view_coordinates_full_screen"
     custom:mainMirror="false"
+    custom:secondMirror="true"
 
     />

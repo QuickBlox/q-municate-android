@@ -25,6 +25,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Chronometer;
@@ -128,11 +129,24 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
 
         actionBar = getSupportActionBar();
+
     }
 
     public void setCallActionBarTitle(String title){
         if (actionBar != null) {
             actionBar.setTitle(title);
+        }
+    }
+
+    public void hideCallActionBar(){
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+    }
+
+    public void showCallActionBar(){
+        if (actionBar != null) {
+            actionBar.show();
         }
     }
 
@@ -235,7 +249,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             return false;
         }
 
-        if (mediaStreamManager != null){
+        if (mediaStreamManager != null) {
             return CameraUtils.isCameraFront(mediaStreamManager.getCurrentCameraId());
         } else {
             return false;
@@ -301,7 +315,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     @Override
     public void onErrorSendingPacket(QBSignalingSpec.QBSignalCMD qbSignalCMD, Integer userId,
-            QBRTCSignalException e) {
+                                     QBRTCSignalException e) {
         ToastUtils.longToast(R.string.dlg_signal_error);
     }
 
@@ -687,9 +701,14 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     public void addVideoTrackCallbacksListener(QBRTCClientVideoTracksCallbacks videoTracksCallbacks) {
-        if (getCurrentSession() != null){
+        if (getCurrentSession() != null) {
             getCurrentSession().addVideoTrackCallbacksListener(videoTracksCallbacks);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        //blocked back button
     }
 
     public void addTCClientConnectionCallback(QBRTCSessionConnectionCallbacks clientConnectionCallbacks) {

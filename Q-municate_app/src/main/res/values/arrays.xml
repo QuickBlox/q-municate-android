@@ -16,10 +16,10 @@
     </integer-array>
 
     <integer-array name="local_view_coordinates_full_screen">
-        <item>50</item>
-        <item>50</item>
-        <item>30</item>
-        <item>30</item>
+        <item>55</item>
+        <item>65</item>
+        <item>43</item>
+        <item>34</item>
     </integer-array>
 
 </resources>

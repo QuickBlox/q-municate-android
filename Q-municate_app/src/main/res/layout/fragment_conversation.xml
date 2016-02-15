@@ -12,7 +12,6 @@
         android:id="@+id/remoteVideoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
         >
 
         <ViewStub
@@ -22,21 +21,6 @@
             android:layout="@layout/view_remote_video"
             />
 
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/localVideoView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        >
-
-        <ViewStub
-            android:id="@+id/localViewStub"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout="@layout/view_local_video"
-            />
     </FrameLayout>
 
     <FrameLayout

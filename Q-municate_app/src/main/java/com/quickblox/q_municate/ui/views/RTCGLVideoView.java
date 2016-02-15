@@ -111,6 +111,20 @@ public class RTCGLVideoView extends GLSurfaceView {
         }
     }
 
+    public void removeLocalRendererCallback(){
+        if (localRendererCallback != null) {
+            VideoRendererGui.remove(localRendererCallback);
+            localRendererCallback = null;
+        }
+    }
+
+    public void removeMainRendererCallback(){
+        if (mainRendererCallback != null) {
+            VideoRendererGui.remove(mainRendererCallback);
+            mainRendererCallback = null;
+        }
+    }
+
     private void setRendererMirror(boolean mirror, RendererSurface type){
         Log.i(TAG, "setRendererMirror type=" + type + ", value= " + mirror);
         if (RendererSurface.MAIN.equals(type)){
@@ -172,6 +186,5 @@ public class RTCGLVideoView extends GLSurfaceView {
     public enum RendererSurface {
         MAIN, SECOND
     }
-
 }
 
