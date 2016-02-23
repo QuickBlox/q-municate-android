@@ -15,8 +15,6 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
-    compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':Q-municate_core')
     compile project(':cropper')
     compile project(':stickyListHeaders')
@@ -37,6 +35,7 @@ android {
         versionCode rootProject.versionCode
         versionName rootProject.versionName
     }
+
     buildTypes {
         release {
             debuggable rootProject.prodDebug
@@ -45,10 +44,12 @@ android {
             proguardFile 'proguard.cfg'
         }
     }
+
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+
     lintOptions {
         abortOnError false
     }
