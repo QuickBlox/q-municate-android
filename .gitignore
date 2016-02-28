@@ -39,4 +39,4 @@ local.properties
 .DS_Store
 
 # Keystore
-keystore/
+Q-municate_app/keystore

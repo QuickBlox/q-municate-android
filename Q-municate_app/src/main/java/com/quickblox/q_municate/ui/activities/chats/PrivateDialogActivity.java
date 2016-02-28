@@ -315,6 +315,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         if (updatedDialog == null) {
             finish();
+        } else {
+            dialog = updatedDialog;
         }
     }
 

@@ -15,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -578,6 +579,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (isNetworkAvailable()) {
             if (service != null) {
                 baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
+                Log.d("Fix double message", "baseChatHelper = " + baseChatHelper + "\n dialog = " + dialog);
                 if (baseChatHelper != null && dialog != null) {
                     try {
                         baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
@@ -664,6 +666,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
+            Log.d("Fix double message", "MessageObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
             if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
                 updateMessagesList();
             }
@@ -674,6 +677,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
+            Log.d("Fix double message", "DialogNotificationObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
             if (data != null && data.equals(DialogNotificationDataManager.OBSERVE_KEY)) {
                 updateMessagesList();
             }
@@ -684,6 +688,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
+            Log.d("Fix double message", "DialogObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
             if (data != null && data.equals(DialogDataManager.OBSERVE_KEY) && dialog != null) {
                 dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
                 updateActionBar();
@@ -715,8 +720,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void execute(Bundle bundle) {
             messageSwipeRefreshLayout.setRefreshing(false);
+            int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
 
-            if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+
+            if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
                 scrollMessagesToBottom();
             }
 

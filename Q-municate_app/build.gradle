@@ -42,11 +42,20 @@ android {
     }
 
     // before release need to enable Crashlytics
+//    signingConfigs {
+//        release {
+//            storeFile file('keystore/qmun.jks')
+//            storePassword ''
+//            keyAlias ''
+//            keyPassword ''
+//        }
+//    }
 
     buildTypes {
         release {
             debuggable rootProject.prodDebug
             signingConfig signingConfigs.debug
+//            signingConfig signingConfigs.release
             proguardFile 'proguard.cfg'
         }
     }

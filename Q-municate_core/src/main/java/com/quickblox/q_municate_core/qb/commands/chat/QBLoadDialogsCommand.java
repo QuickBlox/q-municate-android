@@ -10,6 +10,7 @@ import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class QBLoadDialogsCommand extends ServiceCommand {
 
+    private QBPrivateChatHelper privateChatHelper;
     private QBGroupChatHelper multiChatHelper;
 
     // TODO: HACK!
@@ -28,10 +30,11 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     // it is 200 Dialogs
     private final static int DIALOGS_PARTS = 10; // TODO: need to fix in the second release.
 
-    public QBLoadDialogsCommand(Context context, QBGroupChatHelper multiChatHelper, String successAction,
-            String failAction) {
+    public QBLoadDialogsCommand(Context context, QBPrivateChatHelper privateChatHelper, QBGroupChatHelper multiChatHelper, String successAction,
+                                String failAction) {
         super(context, successAction, failAction);
         this.multiChatHelper = multiChatHelper;
+        this.privateChatHelper = privateChatHelper;
     }
 
     public static void start(Context context) {
@@ -43,12 +46,17 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
         List<QBDialog> dialogsList;
+//        List<QBDialog> dialogsList2;
+
 
         Bundle returnedBundle = new Bundle();
         QBRequestGetBuilder qbRequestGetBuilder = new QBRequestGetBuilder();
 
         qbRequestGetBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         qbRequestGetBuilder.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
+
+
+//        dialogsList2 = privateChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
 
         dialogsList = multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
         parseLoadedDialogsAndJoin(dialogsList, parcelableQBDialog);

@@ -112,7 +112,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType);
         intent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE, StartConversationReason.OUTCOME_CALL_MADE);
         intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT| Intent.FLAG_ACTIVITY_CLEAR_TASK);
         activity.startActivityForResult(intent, CALL_ACTIVITY_CLOSE);
     }
 
@@ -153,6 +153,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        canPerformLogout.set(false);
         initFields();
         audioStreamReceiver = new AudioStreamReceiver();
         initWiFiManagerListener();
@@ -181,9 +182,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         super.onStop();
         unregisterReceiver(wifiStateReceiver);
         unregisterReceiver(audioStreamReceiver);
-        if (qbCallChatHelper != null) {
-            qbCallChatHelper.removeRTCSessionUserCallback();
-        }
     }
 
     @Override
@@ -305,6 +303,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         super.onDestroy();
         opponentsList = null;
         if (qbCallChatHelper != null) {
+            qbCallChatHelper.removeRTCSessionUserCallback();
             qbCallChatHelper.releaseCurrentSession(CallActivity.this, CallActivity.this);
         }
     }
@@ -731,10 +730,10 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         this.qbRtcSessionUserCallback = null;
     }
 
-    @Override
-    public boolean isCanPerformLogoutInOnStop() {
-        return false;
-    }
+//    @Override
+//    public boolean isCanPerformLogoutInOnStop() {
+//        return false;
+//    }
 
     private class AudioStreamReceiver extends BroadcastReceiver {
 

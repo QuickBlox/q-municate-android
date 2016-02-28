@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
@@ -219,7 +220,9 @@ public class ChatUtils {
 
         for (QBDialog qbDialog : qbDialogsList) {
             // dialog is opened
+            Log.d("Fix double message", "currentDialog = " + currentDialog);
             if (currentDialog != null && qbDialog.getDialogId().equals(currentDialog.getDialogId())) {
+                Log.d("Fix double message", "currentDialog = " + currentDialog + " currentDialogID = " + currentDialog.getDialogId());
                 continue;
             }
 
