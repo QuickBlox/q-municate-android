@@ -18,6 +18,7 @@
         app:border_width="@dimen/avatar_border_width"
         app:oval="true"
         android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/call_horizontal_avatar_start_margin"
         />
 
     <TextView
@@ -28,6 +29,8 @@
         android:textSize="@dimen/text_size_large"
         android:layout_marginStart="@dimen/call_buttons_padding"
         android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/call_horizontal_avatar_end_margin"
+        android:maxLines="1"
         />
 
 </LinearLayout>
