@@ -37,3 +37,6 @@ local.properties
 
 # Mac
 .DS_Store
+
+# Keystore
+Q-municate_app/keystore

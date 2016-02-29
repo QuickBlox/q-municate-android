@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBGroupChat;
@@ -63,6 +64,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     @Override
     public synchronized QBChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
+        Log.d("Fix double message", "createChatLocally from " + QBGroupChatHelper.class.getSimpleName());
+        Log.d("Fix double message", "dialog = " + dialog);
         currentDialog = dialog;
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
         roomChat.addParticipantListener(participantListener);
@@ -71,6 +74,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     @Override
     public synchronized void closeChat(QBDialog qbDialog, Bundle additional) {
+        Log.d("Fix double message", "closeChat from " + QBGroupChatHelper.class.getSimpleName());
         if (currentDialog != null && currentDialog.getDialogId().equals(qbDialog.getDialogId())) {
             currentDialog = null;
         }
@@ -251,7 +255,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     public void joinRoomChat(QBDialog dialog) throws Exception {
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
-        if (!roomChat.isJoined()) {
+        if (roomChat != null && !roomChat.isJoined()) {
             DiscussionHistory history = new DiscussionHistory();
             history.setMaxStanzas(0); // without getting messages
             roomChat.join(history);

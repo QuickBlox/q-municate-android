@@ -329,8 +329,9 @@ public class QBService extends Service {
 
     private void registerLoadChatsDialogsCommand() {
         QBGroupChatHelper groupChatHelper = (QBGroupChatHelper) getHelper(GROUP_CHAT_HELPER);
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
 
-        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, groupChatHelper,
+        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, privateChatHelper, groupChatHelper,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
 
@@ -628,7 +629,7 @@ public class QBService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive" + intent.getAction());
+            Log.d(TAG, "onReceive " + intent.getAction());
             String action = intent.getAction();
             if (action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)) {
                 ((QBBaseChatHelper) getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());

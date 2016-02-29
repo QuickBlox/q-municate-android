@@ -121,6 +121,19 @@ public class CombinationMessage implements Serializable {
     }
 
     @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder(CombinationMessage.class.getSimpleName());
+        sb.append("[ messageId = " + getMessageId())
+                .append(", dialogOccupant = " + getDialogOccupant())
+                .append(", attachment = " + getAttachment())
+                .append(", state = " + getState())
+                .append(", body = " + getBody())
+                .append(", createdDate = " + getCreatedDate())
+                .append(", notificationType = " + getNotificationType()+ " ]");
+        return sb.toString();
+    }
+
+    @Override
     public boolean equals(Object object) {
         if (object instanceof CombinationMessage) {
             return ((CombinationMessage) object).getMessageId().equals(messageId);

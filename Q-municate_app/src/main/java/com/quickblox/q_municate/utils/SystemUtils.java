@@ -56,4 +56,20 @@ public class SystemUtils {
             return Runtime.getRuntime().availableProcessors() * 2;
         }
     }
+
+    public static String getNameActivityOnTopStack(){
+        ActivityManager activityManager = (ActivityManager) App.getInstance().getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> runningTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+        String ourPackageName = App.getInstance().getPackageName();
+        String topActivityName = null;
+
+        if (runningTasks != null) {
+            for (ActivityManager.RunningTaskInfo taskInfo : runningTasks) {
+                if (taskInfo.topActivity.getPackageName().equalsIgnoreCase(ourPackageName)) {
+                    topActivityName =  taskInfo.topActivity.getClassName();
+                }
+            }
+        }
+        return topActivityName;
+    }
 }

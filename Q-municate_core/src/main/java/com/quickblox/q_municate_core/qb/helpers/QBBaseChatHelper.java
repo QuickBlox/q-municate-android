@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
@@ -156,6 +157,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public List<QBDialog> getDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
+        Log.d("Fix double message", "currentDialog = " + currentDialog);
         List<QBDialog> qbDialogsList = QBChatService.getChatDialogs(null, qbRequestGetBuilder, returnedBundle);
 
         if (qbDialogsList != null && !qbDialogsList.isEmpty()) {

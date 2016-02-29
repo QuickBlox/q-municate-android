@@ -363,8 +363,11 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     private void setLocalVideoViewVisible(boolean visible){
         if (remoteVideoView != null && localVideoTrack != null){
             if (visible) {
+                QBMediaStreamManager mediaStreamManager = ((CallActivity) getActivity()).getCurrentSession().getMediaStreamManager();
+                int currentCameraId = mediaStreamManager.getCurrentCameraId();
+
                 RTCGLVideoView.RendererConfig config = new RTCGLVideoView.RendererConfig();
-                config.mirror = true;
+                config.mirror = CameraUtils.isCameraFront(currentCameraId);
                 config.coordinates = getResources().getIntArray(R.array.local_view_coordinates_full_screen);
 
                 localVideoTrack.addRenderer(new VideoRenderer(remoteVideoView.obtainVideoRenderer(RTCGLVideoView.RendererSurface.SECOND)));

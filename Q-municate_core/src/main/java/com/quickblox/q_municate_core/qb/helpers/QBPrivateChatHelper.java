@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBPrivateChat;
@@ -44,6 +45,8 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
     @Override
     public synchronized QBPrivateChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
+        Log.d("Fix double message", "createChatLocally from " + QBPrivateChatHelper.class.getSimpleName());
+        Log.d("Fix double message", "dialog = " + dialog);
         currentDialog = dialog;
         int opponentId = additional.getInt(QBServiceConsts.EXTRA_OPPONENT_ID);
         return createPrivateChatIfNotExist(opponentId);
@@ -51,6 +54,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
     @Override
     public synchronized void closeChat(QBDialog qbDialog, Bundle additional) {
+        Log.d("Fix double message", "closeChat " + QBPrivateChatHelper.class.getSimpleName());
         if (currentDialog != null && currentDialog.getDialogId().equals(qbDialog.getDialogId())) {
             currentDialog = null;
         }

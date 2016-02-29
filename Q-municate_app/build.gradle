@@ -42,19 +42,20 @@ android {
     }
 
     // before release need to enable Crashlytics
-    signingConfigs {
-        release {
-            storeFile file('keystore/qmun.jks')
-            storePassword 'Injoit00'
-            keyAlias 'qmunicate'
-            keyPassword 'Injoit00'
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file('keystore/qmun.jks')
+//            storePassword ''
+//            keyAlias ''
+//            keyPassword ''
+//        }
+//    }
 
     buildTypes {
         release {
             debuggable rootProject.prodDebug
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
+//            signingConfig signingConfigs.release
             proguardFile 'proguard.cfg'
         }
     }
@@ -78,9 +79,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
-    compile fileTree(dir: 'libs', include: '*.jar')
-
     compile project(':Q-municate_core')
 
     compile "com.android.support:multidex:${rootProject.multiDexVersion}"
