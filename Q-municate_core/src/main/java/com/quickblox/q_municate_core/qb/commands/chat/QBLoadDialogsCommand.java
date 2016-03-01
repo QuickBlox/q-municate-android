@@ -3,12 +3,16 @@ package com.quickblox.q_municate_core.qb.commands.chat;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
+import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -23,6 +27,9 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     private QBPrivateChatHelper privateChatHelper;
     private QBGroupChatHelper multiChatHelper;
+
+    private final String FIELD_DIALOG_TYPE = "type";
+    private final String OPERATOR_EQ = "eq";
 
     // TODO: HACK!
     // This is temporary value,
@@ -45,11 +52,6 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
-        List<QBDialog> groupDialogsList;
-        List<QBDialog> privateDialogsList;
-        List<QBDialog> dialogsList = new ArrayList<>();
-
-
 
         Bundle returnedBundle = new Bundle();
         QBRequestGetBuilder qbRequestGetBuilder = new QBRequestGetBuilder();
@@ -57,25 +59,11 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         qbRequestGetBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         qbRequestGetBuilder.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
 
-        qbRequestGetBuilder.addRule("type", "eq", 3);
-        privateDialogsList = privateChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
-        parseLoadedDialogsAndJoin(privateDialogsList, parcelableQBDialog, false);
+        parcelableQBDialog.addAll(ChatUtils.qbDialogsToParcelableQBDialogs(
+                loadAllDialogsByType(QBDialogType.PRIVATE, returnedBundle, qbRequestGetBuilder)));
 
-        qbRequestGetBuilder.addRule("type", "eq", 2);
-        groupDialogsList = multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
-        parseLoadedDialogsAndJoin(groupDialogsList, parcelableQBDialog, true);
-
-//        dialogsList.addAll(privateDialogsList);
-//        dialogsList.addAll(groupDialogsList);
-
-//        parseLoadedDialogsAndJoin(dialogsList, parcelableQBDialog);
-
-//        boolean needToLoadByPart = dialogsList != null && !dialogsList.isEmpty();
-//        if (needToLoadByPart) {
-//            loadByParts(parcelableQBDialog, dialogsList, returnedBundle, qbRequestGetBuilder);
-//        }
-
-
+        parcelableQBDialog.addAll(ChatUtils.qbDialogsToParcelableQBDialogs(
+                loadAllDialogsByType(QBDialogType.GROUP, returnedBundle, qbRequestGetBuilder)));
 
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
@@ -83,24 +71,38 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return bundle;
     }
 
-//    private void loadByParts(ArrayList<ParcelableQBDialog> parcelableQBDialog, List<QBDialog> dialogsList,
-//            Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
-//        boolean needToLoadMore = true;
-//        for (int i = 0; i < DIALOGS_PARTS && needToLoadMore; i++) {
-//            qbRequestGetBuilder.setPagesSkip(dialogsList.size());
-//            List<QBDialog> newDialogsList = multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
-//            dialogsList.addAll(newDialogsList);
-//            parseLoadedDialogsAndJoin(dialogsList, parcelableQBDialog);
-//            needToLoadMore = !newDialogsList.isEmpty();
-//        }
-//    }
+    private List<QBDialog> loadAllDialogsByType(QBDialogType dialogsType,
+                             Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
+        List<QBDialog> allDialogsList = new ArrayList<>();
+        boolean needToLoadMore;
 
-    private void parseLoadedDialogsAndJoin(List<QBDialog> dialogsList, ArrayList<ParcelableQBDialog> parcelableQBDialog, boolean isGroupDialogs) {
-        if (dialogsList != null && !dialogsList.isEmpty()) {
-            parcelableQBDialog.addAll(ChatUtils.qbDialogsToParcelableQBDialogs(dialogsList));
-            if (isGroupDialogs) {
-                multiChatHelper.tryJoinRoomChats(dialogsList);
-            }
+        do {
+            qbRequestGetBuilder.setPagesSkip(allDialogsList.size());
+            qbRequestGetBuilder.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, dialogsType.getCode());
+            List<QBDialog> newDialogsList = dialogsType == QBDialogType.PRIVATE
+                    ? getPrivateDialogs(qbRequestGetBuilder, returnedBundle)
+                    : getGroupDialogs(qbRequestGetBuilder, returnedBundle);
+            allDialogsList.addAll(newDialogsList);
+            needToLoadMore = newDialogsList.size() == ConstsCore.CHATS_DIALOGS_PER_PAGE;
+            Log.d("QBLoadDialogsCommand", "needToLoadMore = " + needToLoadMore  + "newDialogsList.size() = " + newDialogsList.size());
+        } while (needToLoadMore);
+
+        if (dialogsType == QBDialogType.GROUP) {
+            tryJoinRoomChats(allDialogsList);
         }
+
+        return allDialogsList;
+    }
+
+    private List<QBDialog> getPrivateDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
+        return privateChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
+    }
+
+    private List<QBDialog> getGroupDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
+        return multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
+    }
+
+    private void tryJoinRoomChats(List<QBDialog> allDialogsList){
+        multiChatHelper.tryJoinRoomChats(allDialogsList);
     }
 }
