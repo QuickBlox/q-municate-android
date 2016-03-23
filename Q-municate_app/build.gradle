@@ -31,31 +31,48 @@ android {
         multiDexEnabled = true
     }
 
-    productFlavors{
-        speedDev{
-            minSdkVersion 21
+
+//     before release need to enable Crashlytics
+
+    signingConfigs {
+        release {
+            storeFile file (property('prodStoreFile'))
+            storePassword property('prodStorePassword')
+            keyAlias property('prodKeyAlias')
+            keyPassword property('prodKeyPassword')
         }
 
-        dev{
-            minSdkVersion rootProject.minSdkVersion
+        debug {
+            storeFile file (property('devStoreFile'))
+            storePassword property('devStorePassword')
+            keyAlias property('devKeyAlias')
+            keyPassword property('devKeyPassword')
         }
     }
-
-    // before release need to enable Crashlytics
-//    signingConfigs {
-//        release {
-//            storeFile file('keystore/qmun.jks')
-//            storePassword ''
-//            keyAlias ''
-//            keyPassword ''
-//        }
-//    }
 
     buildTypes {
         release {
             debuggable rootProject.prodDebug
+            signingConfig signingConfigs.release
+            buildConfigField "String", "APP_ID", property('prodAppID')
+            buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
+            buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
+            buildConfigField "String", "FACEBOOK_APP_ID", property('prodFacebookAppID')
+            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
+            resValue "string", "facebookAppId", property('prodFacebookAppID')
+            proguardFile 'proguard.cfg'
+        }
+
+        debug {
+            debuggable rootProject.prodDebug
             signingConfig signingConfigs.debug
-//            signingConfig signingConfigs.release
+            versionNameSuffix  ' (debug)'
+            buildConfigField "String", "APP_ID", property('devAppID')
+            buildConfigField "String", "AUTH_KEY", property('devAuthKey')
+            buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
+            buildConfigField "String", "FACEBOOK_APP_ID", property('devFacebookAppID')
+            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
+            resValue "string", "facebookAppId", property('devFacebookAppID')
             proguardFile 'proguard.cfg'
         }
     }
@@ -89,6 +106,7 @@ dependencies {
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile 'com.crashlytics.android:crashlytics:1.+'
+    compile 'com.flurry.android:analytics:6.2.0'
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
     compile "com.afollestad:material-dialogs:${rootProject.materialDialogsVersion}"
     compile "com.github.orangegangsters:swipy:${rootProject.swipyRecyclerviewVersion}@aar"

@@ -12,6 +12,7 @@ import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate_core.core.concurrency.BaseErrorAsyncTask;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -50,7 +51,7 @@ public class QBGCMRegistrationTask extends BaseErrorAsyncTask<GoogleCloudMessagi
     }
 
     private String getRegistrationId(GoogleCloudMessaging gcm) throws IOException {
-        String registrationId = activityRef.get().getResources().getString(R.string.push_registration_app_id);
+        String registrationId = StringObfuscator.getPushRegistrationAppId();
         registrationId = gcm.register(registrationId);
         return registrationId;
     }

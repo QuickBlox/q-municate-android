@@ -17,6 +17,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
+import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -218,6 +219,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
         // send analytics data
         GoogleAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
+        FlurryAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this);
     }
 
     protected boolean isLoggedInToServer() {

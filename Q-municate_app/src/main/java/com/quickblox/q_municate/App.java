@@ -6,6 +6,7 @@ import android.support.multidex.MultiDexApplication;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBSettings;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
@@ -30,15 +31,17 @@ public class App extends MultiDexApplication {
     private void initApplication() {
         instance = this;
 
-        initQb(this);
+        initQb();
         initDb();
         initImageLoader(this);
     }
 
-    private void initQb(Context context) {
-        QBChatService.setDebugEnabled(context.getResources().getBoolean(R.bool.qb_debug));
-        QBSettings.getInstance().fastConfigInit(context.getString(R.string.qb_app_id), context.getString(
-                R.string.qb_auth_key), context.getString(R.string.qb_secret));
+    private void initQb() {
+        QBChatService.setDebugEnabled(StringObfuscator.getDebugEnabled());
+        QBSettings.getInstance().fastConfigInit(
+                StringObfuscator.getApplicationId(),
+                StringObfuscator.getAuthKey(),
+                StringObfuscator.getAuthSecret());
     }
 
     private void initDb() {

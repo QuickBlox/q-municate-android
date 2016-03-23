@@ -279,6 +279,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             QBDialog qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
             groupChatHelper.tryJoinRoomChat(qbDialog);
         }
+
+        startLoadDialogMessages();
     }
 
     private void initFields() {
