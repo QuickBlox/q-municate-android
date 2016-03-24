@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.activities.main;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -79,10 +78,8 @@ public class MainActivity extends BaseLoggableActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (facebookHelper != null /*&& resultCode != Activity.RESULT_CANCELED*/) {
+        if (facebookHelper != null) {
             facebookHelper.onActivityResult(requestCode, resultCode, data);
-        } else {
-//            FacebookHelper.logout();
         }
     }
 
@@ -93,9 +90,16 @@ public class MainActivity extends BaseLoggableActivity {
 
     @Override
     protected void onResume() {
+        actualizeCurrentTitle();
         super.onResume();
         addActions();
         checkGCMRegistration();
+    }
+
+    private void actualizeCurrentTitle() {
+        if (AppSession.getSession().getUser().getFullName() != null) {
+            title = " " + AppSession.getSession().getUser().getFullName();
+        }
     }
 
     @Override
@@ -118,6 +122,7 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
+        actualizeCurrentTitle();
         checkImportFriends();
     }
 
