@@ -605,6 +605,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected List<CombinationMessage> createCombinationMessagesList() {
         if (dialog == null) {
+            Log.d("PrivateDialogActivity", "dialog = " + dialog);
             return null;
         }
 

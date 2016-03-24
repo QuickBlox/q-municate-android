@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,6 +49,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
     private int operationItemPosition;
+    private final String TAG = "PrivateDialogActivity";
 
     public static void start(Context context, User opponent, Dialog dialog) {
         Intent intent = new Intent(context, PrivateDialogActivity.class);
@@ -151,15 +153,22 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
+        initActualExtras();
         checkForCorrectChat();
 
         int oldMessagesCount = messagesAdapter.getAllItems().size();
 
         this.combinationMessagesList = createCombinationMessagesList();
+        Log.d(TAG, "combinationMessagesList = " + combinationMessagesList);
         messagesAdapter.setList(combinationMessagesList);
         findLastFriendsRequest();
 
         checkForScrolling(oldMessagesCount);
+    }
+
+    private void initActualExtras() {
+        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
     }
 
     @Override
@@ -214,8 +223,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         chatHelperIdentifier = QBService.PRIVATE_CHAT_HELPER;
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
-        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        initActualExtras();
+//        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+//        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
         title = opponentUser.getFullName();
     }
