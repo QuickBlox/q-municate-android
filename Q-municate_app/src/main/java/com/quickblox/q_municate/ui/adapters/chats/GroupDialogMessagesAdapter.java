@@ -79,7 +79,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             if (combinationMessage.getAttachment() != null) {
                 viewHolder.timeAttachMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
                 setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-                displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
+                displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
             } else {
                 setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
                 viewHolder.timeTextMessageTextView.setText(

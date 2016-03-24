@@ -91,7 +91,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                         combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }
 
-            displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
+            displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
         } else {
             resetUI(viewHolder);
 
