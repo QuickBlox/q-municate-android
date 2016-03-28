@@ -1,0 +1,162 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbar_view"
+        layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_view"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/profile_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_margin="@dimen/padding_large">
+
+                <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+                    style="@style/AvatarImageViewStyle"
+                    android:id="@+id/avatar_imageview"
+                    android:layout_alignParentLeft="true"
+                    app:border_color="@color/dark_gray"
+                    app:border_width="@dimen/avatar_border_width"
+                    app:oval="true" />
+
+                <TextView
+                    android:id="@+id/full_name_edittext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginLeft="@dimen/padding_large"
+                    android:layout_toLeftOf="@+id/edit_profile_imagebutton"
+                    android:layout_toRightOf="@id/avatar_imageview"
+                    android:maxLines="2"
+                    android:textColor="@color/text_dark"
+                    android:textSize="@dimen/text_size"
+                    tools:text="FullName" />
+
+                <ImageButton
+                    android:id="@+id/edit_profile_imagebutton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/selector_button_general"
+                    android:src="@drawable/ic_edit_dark" />
+
+            </RelativeLayout>
+
+            <include
+                android:id="@+id/divider0"
+                layout="@layout/view_horizontal_divider_gray"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_below="@id/profile_view" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/push_notification_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/divider0"
+                android:padding="@dimen/padding_large"
+                android:text="@string/settings_push_notifications"
+                android:textColor="@color/text_dark"
+                android:textSize="@dimen/text_size" />
+
+            <include
+                android:id="@+id/divider1"
+                layout="@layout/view_horizontal_divider_gray"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_below="@id/push_notification_switch" />
+
+            <Button
+                style="@style/SettingsButtonStyle"
+                android:id="@+id/invite_friends_button"
+                android:layout_below="@id/divider1"
+                android:text="@string/settings_invite_friends" />
+
+            <include
+                android:id="@+id/divider2"
+                layout="@layout/view_horizontal_divider_gray"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_below="@id/invite_friends_button" />
+
+            <Button
+                style="@style/SettingsButtonStyle"
+                android:id="@+id/give_feedback_button"
+                android:layout_below="@id/divider2"
+                android:text="@string/settings_give_feedback" />
+
+            <include
+                android:id="@+id/divider3"
+                layout="@layout/view_horizontal_divider_gray"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_below="@id/give_feedback_button" />
+
+            <RelativeLayout
+                android:id="@+id/change_password_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/divider3">
+
+                <Button
+                    style="@style/SettingsButtonStyle"
+                    android:id="@+id/change_password_button"
+                    android:text="@string/settings_change_password" />
+
+                <include
+                    layout="@layout/view_horizontal_divider_gray"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:layout_below="@id/change_password_button" />
+
+            </RelativeLayout>
+
+            <Button
+                style="@style/SettingsButtonStyle"
+                android:id="@+id/logout_button"
+                android:layout_below="@id/change_password_view"
+                android:text="@string/settings_logout" />
+
+            <include
+                android:id="@+id/divider4"
+                layout="@layout/view_horizontal_divider_gray"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_below="@id/logout_button" />
+
+            <Button
+                style="@style/SettingsButtonStyle"
+                android:id="@+id/delete_my_account_button"
+                android:layout_below="@id/divider4"
+                android:text="@string/settings_delete_my_account"
+                android:textColor="@color/text_red" />
+
+            <include
+                android:id="@+id/divider5"
+                layout="@layout/view_horizontal_divider_gray"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_below="@id/delete_my_account_button" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

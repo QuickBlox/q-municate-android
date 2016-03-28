@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Q-municate</string>
+
+
+    <!-- ActionBar -->
+    <string name="action_bar_chats">Chats</string>
+    <string name="action_bar_settings">Settings</string>
+    <string name="action_bar_invite_friends">Invite Friends</string>
+    <string name="action_bar_feedback">Feedback</string>
+    <string name="action_bar_about">About</string>
+    <string name="action_bar_search">Search</string>
+    <string name="action_bar_add_chat">Add Chat</string>
+    <string name="action_bar_delete_friend">Delete Friend</string>
+    <string name="action_bar_add_friend_to_chat">Add friend to Chat</string>
+    <string name="action_bar_leave_chat">Leave Chat</string>
+    <string name="action_bar_chat_details">Chat details</string>
+    <string name="action_bar_add_chat_attach">Add attach</string>
+
+
+    <!-- Landing -->
+    <string name="landing_connect_with_facebook">Connect with Facebook</string>
+    <string name="landing_already_have_account">Already have an account?</string>
+    <string name="landing_sign_up">Sign Up with Email</string>
+    <string name="landing_version">v. %1$s</string>
+
+
+    <!-- Authorization -->
+    <string name="auth_sign_up_title">Sign Up</string>
+    <string name="auth_login_title">Log In</string>
+    <string name="auth_forgot_password">Forgot password?</string>
+    <string name="auth_hint_password">Password</string>
+    <string name="auth_log_in_with_facebook">Log in with Facebook</string>
+    <string name="auth_hint_email">Email</string>
+    <string name="auth_remember_me">Remember Me</string>
+    <string name="auth_username_error">This username has not authenticated yet, please check your credentials</string>
+    <string name="auth_not_all_fields_entered">Please fill all empty input fields</string>
+    <string name="auth_email_field_is_incorrect">Please enter a valid email</string>
+    <string name="auth_email_field_not_entered">Please enter email</string>
+    <string name="auth_password_field_not_entered">Please enter password</string>
+    <string name="auth_password_field_is_too_short">Password is too short (minimum is 8 characters)</string>
+    <string name="auth_full_name_field_not_entered">Please enter Full Name</string>
+    <string name="auth_full_name_field_is_too_short">Full Name is too short (minimum is 3 characters)</string>
+    <string name="auth_full_name_field_is_too_long">Full Name is too long (maximum is 50 characters)</string>
+    <string name="auth_full_name_has_impossible_characters">Full Name has impossible characters (not allowed: \'&gt;\', \'&lt;\', \';\')</string>
+    <string name="auth_hint_full_name">Full Name</string>
+    <string name="auth_choose_user_picture">Choose user picture</string>
+
+
+    <!-- User Agreement -->
+    <string name="user_agreement_title">User Agreement</string>
+    <string name="user_agreement_label">By clicking Tick, you agree to Q-municate\n<b><u>User Agreement</u></b></string>
+
+
+    <!-- Forgot Password -->
+    <string name="forgot_password_title">Forgot Password</string>
+    <string name="forgot_password_email">Email</string>
+    <string name="forgot_password_email_field_not_entered">Please enter email</string>
+    <string name="forgot_password_email_field_is_incorrect">Please enter a valid email</string>
+    <string name="forgot_password_label">Enter your email and we\'ll send a link to reset your password</string>
+    <string name="forgot_password_massage_email_was_sent">Mail was sent to %1$s</string>
+
+
+    <!-- User profile -->
+    <string name="user_profile_title">Info</string>
+    <string name="user_profile_mobile">Mobile</string>
+    <string name="user_profile_send_message">Send Message</string>
+    <string name="user_profile_audio_call">Audio Call</string>
+    <string name="user_profile_video_call">Video Call</string>
+    <string name="user_delete_chat_history">Delete Chat History</string>
+    <string name="user_remove_contact_and_chat_history">Remove Contact and Chat</string>
+    <string name="user_profile_remove_contact_and_chat_history">Do you really want to delete %1$s from your contact list with his chat?</string>
+    <string name="user_profile_delete_chat_history">Do you really want to delete chat history with %1$s?</string>
+    <string name="user_profile_success_contacts_deleting">You have deleted %1$s from your contacts</string>
+    <string name="user_profile_success_chat_history_deleting">You have deleted chat history with %1$s</string>
+    <string name="user_profile_chat_does_not_exists">Chat does not exists</string>
+
+
+    <!-- New Message -->
+    <string name="new_message_title">New Message</string>
+    <string name="new_message_create_group">Create group</string>
+    <string name="new_message_no_friends_for_new_message">You don\'t have any Friends for creating New Chat</string>
+
+
+    <!-- New Group Dialog -->
+    <string name="new_group_title">New Group</string>
+    <string name="new_group_no_friends_for_creating_group">No friends for creating group</string>
+    <string name="new_group_add_people">Add People</string>
+
+
+    <!-- Create Group Dialog -->
+    <string name="create_group_title">New Group</string>
+    <string name="create_group_group_name">Group Name</string>
+    <string name="create_group_empty_group_name">Group name can not be empty</string>
+    <string name="create_group_participants">%1d participants</string>
+    <string name="create_group_confirm_selecting_photo">Do you really want to load this photo?</string>
+
+
+    <!-- Add Friends To Group Dialog -->
+    <string name="add_friends_to_group_title">Add Friends</string>
+    <string name="add_friends_to_group_no_friends_for_adding">No Friends for adding</string>
+
+
+    <!-- Dialog -->
+    <string name="dialog_hint_message">Message</string>
+    <string name="dialog_no_chats">Oops…\nYou don\'t have any chats,\n tap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
+    <string name="dialog_reply">Reply</string>
+    <string name="dialog_user_is_not_friend">User is not your friend</string>
+    <string name="dialog_confirm_sending_attach">Do you really want to send attachment?</string>
+    <string name="dialog_now_typing">Typing…</string>
+    <string name="dialog_message_reject_friend">Do you really want to reject contact request from %1$s?</string>
+    <string name="dialog_ctx_menu_reply">Reply</string>
+    <string name="dialog_ctx_menu_prv_message">Private Message</string>
+    <string name="dialog_ctx_menu_video_call">Video Call</string>
+    <string name="dialog_ctx_menu_profile">View Profile</string>
+    <string name="dialog_ctx_menu_remove">Delete dialog</string>
+    <string name="dialog_loading_dialogs">Updating dialogs list… Please wait</string>
+
+    <string-array name="dialog_attach_types_array">
+        <item>Take Photo</item>
+        <item>From Library</item>
+    </string-array>
+
+
+    <!-- Group Dialog Details -->
+    <string name="dialog_details_title">Group Details</string>
+    <string name="dialog_details_leave_group">Leave group</string>
+    <string name="dialog_details_participants">%1$d participants</string>
+    <string name="dialog_details_online_participants">%1$d/%2$d online</string>
+    <string name="dialog_details_name_not_entered">Please fill group name</string>
+    <string name="dialog_details_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
+    <string name="dialog_details_service_is_initializing">Please, wait, connection is setting up…</string>
+
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_profile">Profile</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_change_password">Change Password</string>
+    <string name="settings_push_notifications">Push Notifications</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_invite_friends">Invite Friends</string>
+    <string name="settings_give_feedback">Give Feedback</string>
+    <string name="settings_delete_my_account">Delete My Account</string>
+
+
+    <!-- Change Password -->
+    <string name="change_password_title">Change Password</string>
+    <string name="change_password_change">Change</string>
+    <string name="change_password_hint_old_password">Old Password</string>
+    <string name="change_password_hint_new_password">New Password</string>
+    <string name="change_password_all_fields_not_entered">Please fill all empty input fields</string>
+    <string name="change_password_old_password_not_entered">Please enter old password</string>
+    <string name="change_password_new_password_not_entered">Please enter new password</string>
+    <string name="change_password_old_password_wrong">Wrong old password</string>
+
+
+    <!-- Profile -->
+    <string name="profile_title">Edit</string>
+    <string name="profile_full_name">Full Name</string>
+    <string name="profile_change_photo">Change photo</string>
+    <string name="profile_full_name_not_entered">Please enter Full Name</string>
+    <string name="profile_full_name_not_changed">Full Name must be different</string>
+    <string name="profile_full_name_and_photo_not_changed">Full Name or Photo must be changed</string>
+
+
+    <!-- Feedback -->
+    <string name="feedback_title">Feedback Description</string>
+    <string name="feedback_label">
+        In your email please provide the steps of bug/error reproduction. Let us know how often it occurs and if it gives any error code.
+        This information will help us to find the source of the issue. Kindly give us as many details as possible. Thank you.
+    </string>
+    <string name="feedback_bug_type">Bug</string>
+    <string name="feedback_improvement_type">Improvement</string>
+    <string name="feedback_suggestion_type">Suggestion</string>
+    <string name="feedback_support_email">q-municate@quickblox.com</string>
+    <string name="feedback_choose_email_provider">Choose an email provider:</string>
+    <string name="feedback_write_email">Write an Email</string>
+
+
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_vendor">&#169; 2015 QuickBlox</string>
+    <string name="about_user_agreement">User Agreement</string>
+
+
+    <!-- Preview Images -->
+    <string name="preview_image_title">Preview image</string>
+
+
+    <!-- Call -->
+    <string name="call_incoming_audio_call">Incoming Audio Call</string>
+    <string name="call_incoming_video_call">Incoming Video Call</string>
+    <string name="calling_to">Calling %1$s…</string>
+    <string name="call_accepted">Accepted</string>
+    <string name="call_rejected">Rejected</string>
+    <string name="call_no_answer">No answer</string>
+    <string name="call_hung_up">Hung up</string>
+    <string name="call_chat_service_is_initializing">Please, wait, connection is setting up…</string>
+    <string name="switch_speaker">Switch speaker</string>
+    <string name="switch_camera">Switch camera</string>
+    <string name="decline_call">Decline</string>
+    <string name="answer_call">Answer</string>
+
+
+    <!-- Invite Friends -->
+    <string name="invite_friends_title">Invite Friends</string>
+    <string name="invite_friends_send">Send</string>
+    <string name="invite_friends_select_all">Select All</string>
+    <string name="invite_friends_choose_email_provider">Choose an email provider:</string>
+    <string name="invite_friends_subject_of_invitation">Q-municate</string>
+    <string name="invite_friends_body_of_invitation">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
+    <string name="invite_friends_fb_request_canceled">Request cancelled</string>
+
+
+    <!-- Local/Global Search -->
+    <string name="search_users_not_found">Sorry… no users</string>
+    <string name="search_pending_request_status">Pending contact request</string>
+    <string name="search_local_list">Local</string>
+    <string name="search_global_list">Global</string>
+
+
+    <!-- Others -->
+    <string name="chat_service_is_initializing">Please, wait, connection is setting up…</string>
+    <string name="dlg_internet_connection_is_missing">Waiting for connection</string>
+    <string name="dlg_wait_please">Please, wait</string>
+    <string name="dlg_ok">OK</string>
+    <string name="dlg_cancel">Cancel</string>
+    <string name="dlg_done">Done</string>
+    <string name="dlg_logout">Logout</string>
+    <string name="dlg_confirm">Are you sure?</string>
+    <string name="dlg_password_changed">Password changed</string>
+    <string name="dlg_success_request_facebook">Request sent</string>
+    <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
+    <string name="dlg_leave_group">Leave Group</string>
+    <string name="dlg_force_relogin_on_token_required">Token error is occurred in application. Relogin will be executed now</string>
+    <string name="dlg_refresh_session">QB Session expired. Update session will be executed now</string>
+    <string name="error_bad_timestamp">base Bad timestamp</string>
+    <string name="error_bad_timestamp_from_app">Please go to phone system settings, choose date and time and make sure, that auto synchronization is on.</string>
+    <string name="error_login_or_email_required">base Login or email required</string>
+    <string name="error_login_or_email_required_from_app">Login or email required, please make sure that your FB email is public (facebook.com/settings)</string>
+    <string name="error_email_already_taken">email has already been taken</string>
+    <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogin. This email has already been taken</string>
+    <string name="error_unauthorized">Unauthorized</string>
+    <string name="error_unauthorized_from_app">Incorrect Email or Password</string>
+    <string name="dlg_choose_image_from">Select image from…</string>
+    <string name="snackbar_new_message_title">%1$s\nMessage: %2$s</string>
+    <string name="snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
+    <string name="facebook_exception">Facebook exception: </string>
+    <string name="error_playing_ringtone">Error during playing ringtone</string>
+    <string name="coming_soon">Coming soon…</string>
+    <string name="search_at_last_items">Enter more symbols, not less than 3</string>
+    <string name="deleted_user">DELETED USER</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="days_short">%1$dd</string>
+    <string name="hours_short">%1$dh</string>
+    <string name="minutes_short">%1$dm</string>
+    <string name="date_ago">ago</string>
+    <string name="last_seen">Last seen %1$s at %2$s</string>
+    <string name="dlg_signal_error">Disconnected… Please check your Internet connection!</string>
+    <string name="also_on_call">Also on call:</string>
+    <string name="connect">Connect…</string>
+    <string name="checking">Checking…</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="closed">Closed</string>
+    <string name="time_out">Time Out</string>
+    <string name="failed">Failed</string>
+    <string name="wifi_disabled">Call was stopped because connection was lost</string>
+    <string name="dlg_offline_call">%1$s is calling you!</string>
+
+    <plurals name="days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+
+    <string-array name="dlg_image_pick">
+        <item>Gallery</item>
+        <item>Camera</item>
+    </string-array>
+
+</resources>

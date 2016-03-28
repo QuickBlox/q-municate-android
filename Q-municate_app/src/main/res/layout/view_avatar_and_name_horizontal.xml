@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/view_avatar_and_name_horizontal"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical|center_horizontal"
+    android:layout_marginTop="@dimen/call_avatar_top_margin_plus_height_actionbar">
+
+    <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+        style="@style/AvatarImageViewStyle"
+        android:id="@+id/avatar_imageview"
+        android:layout_width="@dimen/image_view_small_avatar_layout_width"
+        android:layout_height="@dimen/image_view_small_avatar_layout_height"
+        app:border_color="@color/dark_gray"
+        app:border_width="@dimen/avatar_border_width"
+        app:oval="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/call_horizontal_avatar_start_margin"
+        />
+
+    <TextView
+        android:id="@+id/calling_to_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/light_gray"
+        android:textSize="@dimen/text_size_large"
+        android:layout_marginStart="@dimen/call_buttons_padding"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/call_horizontal_avatar_end_margin"
+        android:maxLines="1"
+        />
+
+</LinearLayout>

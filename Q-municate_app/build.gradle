@@ -1,0 +1,124 @@
+buildscript {
+    repositories {
+        maven {
+            url 'http://download.crashlytics.com/maven'
+        }
+    }
+
+    dependencies {
+        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'crashlytics'
+
+repositories {
+    maven { url 'http://download.crashlytics.com/maven' }
+    maven { url 'https://dl.bintray.com/drummer-aidan/maven' }
+    maven { url "https://jitpack.io" }
+}
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
+        multiDexEnabled = true
+    }
+
+
+//     before release need to enable Crashlytics
+
+    signingConfigs {
+        release {
+            storeFile file (property('prodStoreFile'))
+            storePassword property('prodStorePassword')
+            keyAlias property('prodKeyAlias')
+            keyPassword property('prodKeyPassword')
+        }
+
+        debug {
+            storeFile file (property('devStoreFile'))
+            storePassword property('devStorePassword')
+            keyAlias property('devKeyAlias')
+            keyPassword property('devKeyPassword')
+        }
+    }
+
+    buildTypes {
+        release {
+            debuggable rootProject.prodDebug
+            signingConfig signingConfigs.release
+            buildConfigField "String", "APP_ID", property('prodAppID')
+            buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
+            buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
+            buildConfigField "String", "FACEBOOK_APP_ID", property('prodFacebookAppID')
+            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
+            resValue "string", "facebookAppId", property('prodFacebookAppID')
+            proguardFile 'proguard.cfg'
+        }
+
+        debug {
+            debuggable rootProject.prodDebug
+            signingConfig signingConfigs.debug
+            versionNameSuffix  ' (debug)'
+            buildConfigField "String", "APP_ID", property('devAppID')
+            buildConfigField "String", "AUTH_KEY", property('devAuthKey')
+            buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
+            buildConfigField "String", "FACEBOOK_APP_ID", property('devFacebookAppID')
+            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
+            resValue "string", "facebookAppId", property('devFacebookAppID')
+            proguardFile 'proguard.cfg'
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    applicationVariants.all { variant ->
+        changeApkFileName(variant)
+    }
+}
+
+dependencies {
+    compile project(':Q-municate_core')
+
+    compile "com.android.support:multidex:${rootProject.multiDexVersion}"
+    compile "com.android.support:appcompat-v7:${rootProject.supportVersion}"
+    compile "com.android.support:design:${rootProject.supportVersion}"
+    compile "com.android.support:recyclerview-v7:${rootProject.supportVersion}"
+    compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
+
+    compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
+    compile 'com.crashlytics.android:crashlytics:1.+'
+    compile 'com.flurry.android:analytics:6.2.0'
+    compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
+    compile "com.afollestad:material-dialogs:${rootProject.materialDialogsVersion}"
+    compile "com.github.orangegangsters:swipy:${rootProject.swipyRecyclerviewVersion}@aar"
+    compile "com.timehop.stickyheadersrecyclerview:library:${rootProject.stickylistheadersRecyclerViewVersion}@aar"
+    compile "com.rockerhieu.emojicon:library:${rootProject.emojiconVersion}"
+    compile "com.soundcloud.android:android-crop:${rootProject.cropVersion}@aar"
+}
+
+def changeApkFileName(variant) {
+    variant.outputs.each { output ->
+        def file = output.outputFile
+        def newName = 'QMUN_Android_v.' + rootProject.versionName + '_c.' + rootProject.versionCode + '-' + variant.buildType.name + '.apk'
+        output.outputFile = new File(file.parent, newName)
+    }
+}

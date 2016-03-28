@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/selector_button_general"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+        style="@style/AvatarImageViewStyle"
+        android:id="@+id/avatar_imageview"
+        android:layout_width="@dimen/image_view_small_avatar_layout_width"
+        android:layout_height="@dimen/image_view_small_avatar_layout_height"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        app:border_color="@color/dark_gray"
+        app:border_width="@dimen/avatar_border_width"
+        app:oval="true" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@id/avatar_imageview"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textSize="@dimen/text_size"
+            tools:text="Title" />
+
+        <TextView
+            android:id="@+id/label_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title_textview"
+            android:layout_gravity="fill"
+            android:singleLine="true"
+            android:textColor="@color/dark_gray"
+            android:textSize="@dimen/text_size_small"
+            tools:text="Subtitle" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

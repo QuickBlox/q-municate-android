@@ -1,0 +1,64 @@
+<RelativeLayout
+    android:id="@+id/message_relativelayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/chat_input_message_height"
+    android:background="@color/white">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/gray" />
+
+    <FrameLayout
+        android:id="@+id/action_buttons_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="2dp">
+
+        <ImageButton
+            style="@style/ChatActionButtonStyle"
+            android:id="@+id/send_button"
+            android:onClick="sendMessage"
+            android:src="@drawable/ic_send_message_dark"
+            android:visibility="gone" />
+
+        <ImageButton
+            style="@style/ChatActionButtonStyle"
+            android:id="@+id/attach_button"
+            android:src="@drawable/ic_attach_dark" />
+
+    </FrameLayout>
+
+    <com.rockerhieu.emojicon.EmojiconEditText
+        android:id="@+id/message_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@id/action_buttons_view"
+        android:layout_toRightOf="@+id/smile_panel_imagebutton"
+        android:autoLink="all"
+        android:background="@null"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical|right|left"
+        android:hint="@string/dialog_hint_message"
+        android:maxLines="5"
+        android:textColor="@color/black"
+        emojicon:emojiconSize="@dimen/chat_emoji_item_preview_size" />
+
+    <ImageButton
+        style="@style/ChatActionButtonStyle"
+        android:id="@+id/smile_panel_imagebutton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="false"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="2dp"
+        android:src="@drawable/ic_smile_dark" />
+
+</RelativeLayout>

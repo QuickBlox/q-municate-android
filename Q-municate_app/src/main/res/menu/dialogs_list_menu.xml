@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_dark"
+        android:title="@string/action_bar_search"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_add_chat"
+        android:icon="@drawable/ic_add_dark"
+        android:title="@string/action_bar_add_chat"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_start_settings"
+        android:title="@string/action_bar_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_start_invite_friends"
+        android:title="@string/action_bar_invite_friends"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_start_feedback"
+        android:title="@string/action_bar_feedback"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_start_about"
+        android:title="@string/action_bar_about"
+        app:showAsAction="never" />
+
+</menu>

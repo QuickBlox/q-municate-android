@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragmentIncomeCall"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/black">
+
+    <RelativeLayout
+        android:id="@+id/infoAboutCall"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop = "true">
+
+        <include
+            android:id="@+id/avatar_and_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/view_avatar_and_name_vertical">
+        </include>
+
+        <TextView
+            android:id="@+id/type_inc_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/light_gray"
+            android:text="@string/call_incoming_video_call"
+            android:gravity="center_horizontal|center_vertical"
+            android:layout_below="@+id/avatar_and_name"
+            android:layout_marginTop="@dimen/call_buttons_padding"
+            android:layout_centerHorizontal="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/call_buttons_margin"
+        android:gravity="center"
+        >
+
+        <ImageButton
+            android:id="@+id/rejectBtn"
+            android:layout_width="@dimen/call_buttons_diameter"
+            android:layout_height="@dimen/call_buttons_diameter"
+            android:padding="@dimen/call_buttons_padding"
+            android:background="@drawable/selector_call_end"
+            android:src="@drawable/ic_call_end"
+            android:scaleType="centerCrop"
+            />
+
+        <ImageButton
+            android:id="@+id/takeBtn"
+            android:layout_width="@dimen/call_buttons_diameter"
+            android:layout_height="@dimen/call_buttons_diameter"
+            android:padding="@dimen/call_buttons_padding"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_call"
+            android:background="@drawable/selector_call_take"
+            android:layout_toRightOf="@id/rejectBtn"
+            android:layout_marginLeft="@dimen/income_call_buttons_margin"
+            />
+
+    </RelativeLayout>
+
+</RelativeLayout>

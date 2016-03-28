@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape
+            android:shape="oval">
+            <size
+                android:width="@dimen/call_buttons_diameter"
+                android:height="@dimen/call_buttons_diameter" />
+            <solid
+                android:color="@color/toggle_button_background_checked"
+                />
+            <padding
+                android:bottom="@dimen/call_buttons_padding"
+                android:left="@dimen/call_buttons_padding"
+                android:right="@dimen/call_buttons_padding"
+                android:top="@dimen/call_buttons_padding"
+                />
+        </shape>
+    </item>
+</selector>

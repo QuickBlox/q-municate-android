@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_select_all"
+        android:title="@string/invite_friends_select_all"
+        android:icon="@drawable/ic_select_all"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_send"
+        android:title="@string/invite_friends_send"
+        android:icon="@drawable/ic_done_dark"
+        app:showAsAction="ifRoom" />
+
+</menu>

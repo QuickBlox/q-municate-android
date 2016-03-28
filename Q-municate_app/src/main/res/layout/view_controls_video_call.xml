@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/actionVideoButtons"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_gravity="center_horizontal"
+    >
+
+    <ToggleButton
+        android:id="@+id/micToggleVideoCall"
+        android:layout_width="@dimen/call_buttons_diameter"
+        android:layout_height="@dimen/call_buttons_diameter"
+        android:background="@drawable/call_mic_toggle_background"
+        android:checked="true"
+        android:textOn=""
+        android:textOff=""
+        />
+
+    <ImageButton
+        android:id="@+id/handUpVideoCall"
+        android:layout_width="@dimen/call_buttons_diameter"
+        android:layout_height="@dimen/call_buttons_diameter"
+        android:padding="@dimen/call_buttons_padding"
+        android:layout_marginLeft="@dimen/call_buttons_margin"
+        android:background="@drawable/selector_call_end"
+        android:src="@drawable/ic_call_end"
+        android:scaleType="centerCrop"
+        />
+
+    <ToggleButton
+        android:id="@+id/cameraToggle"
+        android:layout_width="@dimen/call_buttons_diameter"
+        android:layout_height="@dimen/call_buttons_diameter"
+        android:background="@drawable/call_camera_toggle_background"
+        android:layout_marginLeft="@dimen/call_buttons_margin"
+        android:checked="true"
+        android:textOff=""
+        android:textOn=""
+        />
+
+</LinearLayout>

@@ -1,0 +1,106 @@
+<resources>
+
+    <style name="ToolbarStyle">
+        <item name="android:minHeight">?actionBarSize</item>
+        <item name="android:background">?colorPrimary</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ToolbarTheme</item>
+    </style>
+
+    <style name="ToolbarStyleCall">
+        <item name="android:minHeight">?actionBarSize</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat</item>
+        <item name="theme">@style/ToolbarThemeCall</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/selector_button_general</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/text_dark</item>
+    </style>
+
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/text_dark</item>
+        <item name="android:textColorHint">@color/text_light_dark</item>
+    </style>
+
+    <style name="AvatarImageViewStyle">
+        <item name="android:layout_width">@dimen/image_view_big_avatar_layout_width</item>
+        <item name="android:layout_height">@dimen/image_view_big_avatar_layout_height</item>
+        <item name="android:layout_gravity">center|top</item>
+        <item name="android:scaleType">centerCrop</item>
+        <item name="android:src">@drawable/placeholder_user</item>
+    </style>
+
+    <style name="SearchRadioButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/contact_item_header_height</item>
+        <item name="android:textColor">@drawable/selector_contacts_tab_text</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:button">@android:color/transparent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/selector_contacts_mode_tab</item>
+    </style>
+
+    <style name="TextViewDrawableStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:background">@drawable/selector_button_general</item>
+    </style>
+
+    <style name="TextViewDrawableStyle.White">
+        <item name="android:textColor">@color/text_white</item>
+    </style>
+
+    <style name="TextViewDrawableStyle.Dark">
+        <item name="android:textColor">@color/text_dark</item>
+    </style>
+
+    <style name="TextViewLinkStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/selector_button_general</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">@dimen/text_size</item>
+    </style>
+
+    <style name="TextViewLinkStyle.Dark">
+        <item name="android:textColor">@color/text_light_dark</item>
+    </style>
+
+    <style name="TextViewLinkStyle.Red">
+        <item name="android:textColor">@color/text_red</item>
+    </style>
+
+    <style name="TextViewLinkStyle.Green">
+        <item name="android:textColor">@color/green</item>
+    </style>
+
+    <style name="ChatActionButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/chat_input_message_height</item>
+        <item name="android:background">@drawable/selector_button_general</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textSize">@dimen/text_size</item>
+    </style>
+
+    <style name="SettingsButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/selector_button_general</item>
+        <item name="android:gravity">left</item>
+        <item name="android:padding">@dimen/padding_large</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+</resources>

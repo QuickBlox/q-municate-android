@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="google_analytics_tracking_id">UA-26728270-9</string>
+
+    <string name="app_policy_link">http://q-municate.com/agreement/</string>
+
+</resources>

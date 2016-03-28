@@ -1,0 +1,162 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:orientation="horizontal">
+
+                <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+                    style="@style/AvatarImageViewStyle"
+                    android:id="@+id/avatar_imageview"
+                    android:layout_width="@dimen/image_view_small_avatar_layout_width"
+                    android:layout_height="@dimen/image_view_small_avatar_layout_height"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    app:border_color="@color/dark_gray"
+                    app:border_width="@dimen/avatar_border_width"
+                    app:oval="true" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:layout_toLeftOf="@+id/actions_friend_linearlayout"
+                    android:layout_toRightOf="@id/avatar_imageview"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/name_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:textColor="@color/text_dark"
+                        android:textSize="@dimen/text_size"
+                        android:textStyle="bold"
+                        tools:text="Title" />
+
+                    <TextView
+                        android:id="@+id/timestamp_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_below="@+id/name_textview"
+                        android:singleLine="true"
+                        android:textColor="@color/text_light_dark"
+                        android:textSize="@dimen/text_size_small"
+                        tools:text="Subtitle" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/phone_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/phone_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_dark"
+                        android:textSize="@dimen/text_size"
+                        tools:text="111111111111" />
+
+                    <TextView
+                        android:id="@+id/description_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/user_profile_mobile"
+                        android:textColor="@color/text_light_dark"
+                        android:textSize="@dimen/text_size_small" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <include layout="@layout/view_horizontal_divider_gray" />
+
+            <TextView
+                style="@style/TextViewDrawableStyle.Dark"
+                android:id="@+id/send_message_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawableLeft="@drawable/ic_user_send_message_dark"
+                android:gravity="left|center_vertical"
+                android:text="@string/user_profile_send_message" />
+
+            <TextView
+                style="@style/TextViewDrawableStyle.Dark"
+                android:id="@+id/audio_call_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:drawableLeft="@drawable/ic_user_audio_call_dark"
+                android:gravity="left|center_vertical"
+                android:text="@string/user_profile_audio_call" />
+
+            <TextView
+                style="@style/TextViewDrawableStyle.Dark"
+                android:id="@+id/video_call_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:drawableLeft="@drawable/ic_user_video_call_dark"
+                android:gravity="left|center_vertical"
+                android:text="@string/user_profile_video_call" />
+
+            <include layout="@layout/view_horizontal_divider_gray" />
+
+            <TextView
+                style="@style/TextViewLinkStyle.Red"
+                android:id="@+id/delete_chat_history_button"
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
+                android:gravity="left"
+                android:text="@string/user_delete_chat_history" />
+
+            <TextView
+                style="@style/TextViewLinkStyle.Red"
+                android:id="@+id/remove_contact_and_chat_history_button"
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
+                android:gravity="left"
+                android:text="@string/user_remove_contact_and_chat_history" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/actionAudioButtons"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_centerHorizontal="true"
+    android:layout_marginBottom="7dp"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal">
+
+    <ToggleButton
+        android:id="@+id/dynamicToggleVideoCall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/selector_toggle_dynamic"
+        android:checked="true"
+        android:textOff=""
+        android:textOn="" />
+
+    <ToggleButton
+        android:id="@+id/micToggleVideoCall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/selector_toggle_mic"
+        android:checked="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:textOff=""
+        android:textOn="" />
+
+    <ImageButton
+        android:id="@+id/handUpVideoCall"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:background="@drawable/selector_call_end"
+        android:src="@drawable/ic_call_end" />
+
+</LinearLayout>

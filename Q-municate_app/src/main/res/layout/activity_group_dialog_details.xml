@@ -1,0 +1,98 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/bg_main"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="15dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+                style="@style/AvatarImageViewStyle"
+                android:id="@+id/avatar_imageview"
+                android:onClick="changeAvatarOnClick"
+                android:src="@drawable/placeholder_group"
+                app:border_color="@color/dark_gray"
+                app:border_width="@dimen/avatar_border_width"
+                app:oval="true" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:descendantFocusability="beforeDescendants"
+                android:focusableInTouchMode="true"
+                android:orientation="vertical"
+                android:paddingLeft="10dp">
+
+                <EditText
+                    android:id="@+id/name_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="5dp"
+                    android:background="@null"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textSize="@dimen/text_size" />
+
+                <TextView
+                    android:id="@+id/occupants_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="@dimen/text_size_small" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="15dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/online_imageview"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="15dp"
+                android:src="@drawable/badge_online" />
+
+            <TextView
+                android:id="@+id/online_occupants_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="111"
+                android:textSize="@dimen/text_size_small" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="@color/dark_gray" />
+
+        <ListView
+            android:id="@+id/occupants_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>

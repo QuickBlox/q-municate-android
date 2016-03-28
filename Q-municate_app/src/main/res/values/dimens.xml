@@ -1,0 +1,84 @@
+<resources>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="navigation_drawer_width">240dp</dimen>
+
+    <dimen name="button_height">50dp</dimen>
+    <dimen name="button_text_size">18sp</dimen>
+    <dimen name="button_icon_margin">10dp</dimen>
+
+    <dimen name="padding_small">5dp</dimen>
+    <dimen name="padding_medium">10dp</dimen>
+    <dimen name="padding_large">15dp</dimen>
+
+    <dimen name="landing_button_height">42dp</dimen>
+    <dimen name="landing_button_width">300dp</dimen>
+
+    <dimen name="divider_height">1dip</dimen>
+    <dimen name="divider_width">1dip</dimen>
+
+    <dimen name="text_size_small">15sp</dimen>
+    <dimen name="text_size">18sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_xlarge">24sp</dimen>
+    <dimen name="text_size_xxlarge">28sp</dimen>
+    <dimen name="text_size_xxxlarge">42sp</dimen>
+
+    <dimen name="image_view_small_avatar_layout_width">53dp</dimen>
+    <dimen name="image_view_small_avatar_layout_height">53dp</dimen>
+    <dimen name="image_view_big_avatar_layout_width">70dp</dimen>
+    <dimen name="image_view_big_avatar_layout_height">70dp</dimen>
+
+    <dimen name="call_avatar_size">150dp</dimen>
+    <dimen name="call_margin_top">50dp</dimen>
+    <dimen name="call_name_size">25sp</dimen>
+    <dimen name="call_end_button_width">200dp</dimen>
+    <dimen name="call_end_button_height">50dp</dimen>
+
+    <dimen name="call_buttons_diameter">64dp</dimen>
+    <dimen name="call_buttons_padding">16dp</dimen>
+    <dimen name="call_caller_name_top_avatar_margin">16dp</dimen>
+    <dimen name="call_buttons_margin">32dp</dimen>
+    <dimen name="call_avatar_top_margin">64dp</dimen>
+    <dimen name="call_horizontal_avatar_start_margin">24dp</dimen>
+    <dimen name="call_horizontal_avatar_end_margin">24dp</dimen>
+    <dimen name="call_opponent_avatar_diameter">176dp</dimen>
+    <dimen name="call_avatar_top_margin_plus_height_actionbar">112dp</dimen>
+    <dimen name="income_call_buttons_margin">80dp</dimen>
+
+
+    <dimen name="inf_list_avatar_height">48dp</dimen>
+
+    <dimen name="corners_small_value">3dp</dimen>
+    <dimen name="corners_middle_value">10dp</dimen>
+    <dimen name="corners_big_value">15dp</dimen>
+
+    <dimen name="corners_radius">5dp</dimen>
+
+    <dimen name="chat_input_message_height">50dp</dimen>
+    <dimen name="chat_button_reply_height">30dp</dimen>
+    <dimen name="chat_emoji_item_size">30dp</dimen>
+    <dimen name="chat_emoji_item_preview_size">18dp</dimen>
+    <dimen name="chat_attach_width">200dp</dimen>
+    <dimen name="chat_attach_height">200dp</dimen>
+    <dimen name="chat_babble_margin">30dp</dimen>
+
+    <dimen name="avatar_border_width">1dp</dimen>
+
+    <dimen name="action_bar_height">48dp</dimen>
+
+    <dimen name="contact_item_header_height">48dp</dimen>
+
+    <dimen name="friend_first_latter_width">53dp</dimen>
+
+    <dimen name="about_logo_margin_top">86dp</dimen>
+    <dimen name="about_version_margin_top">23dp</dimen>
+    <dimen name="about_version_text_size">14sp</dimen>
+    <dimen name="about_logo_vendor_margin_bottom">84dp</dimen>
+    <dimen name="about_vendor_text_margin_bottom">22dp</dimen>
+
+    <dimen name="grid_item_divider">4dp</dimen>
+
+</resources>

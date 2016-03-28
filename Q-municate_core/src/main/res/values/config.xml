@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="call_hw_codec_default">true</bool>
+    <integer name="call_resolution_default">0</integer>
+    <string name="call_startbitrate_default">Default</string>
+    <integer name="call_startbitrate_value_default">1000</integer>
+    <integer name="call_video_codec_default">0</integer>
+    <string name="call_audio_codec_default">ISAC</string>
+
+</resources>

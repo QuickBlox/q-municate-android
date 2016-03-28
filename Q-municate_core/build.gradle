@@ -1,0 +1,23 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+
+    compile project(':facebook')
+    compile project(':Q-municate_db')
+
+    compile "com.j256.ormlite:ormlite-android:${rootProject.ormliteAndroidVersion}"
+    compile "com.j256.ormlite:ormlite-core:${rootProject.ormliteCoreVersion}"
+}

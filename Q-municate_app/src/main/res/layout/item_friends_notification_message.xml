@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:id="@+id/time_text_message_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/dark_gray"
+        android:background="@color/white"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:padding="5dp">
+
+        <com.rockerhieu.emojicon.EmojiconTextView
+            android:id="@+id/message_textview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:gravity="center"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size"
+            android:paddingRight="5dp" />
+
+        <LinearLayout
+            android:id="@+id/actions_friend_linearlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/reject_friend_imagebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_button_general"
+                android:padding="10dp"
+                android:src="@drawable/ic_friend_reject_red" />
+
+            <View
+                android:id="@+id/divider_view"
+                android:layout_width="@dimen/divider_width"
+                android:layout_height="match_parent"
+                android:background="@color/dark_gray"
+                android:padding="1dp"/>
+
+            <ImageButton
+                android:id="@+id/accept_friend_imagebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_button_general"
+                android:padding="10dp"
+                android:src="@drawable/ic_friend_accept_green" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

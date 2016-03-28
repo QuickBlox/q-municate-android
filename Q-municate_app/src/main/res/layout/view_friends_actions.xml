@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/actions_friend_linearlayout"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_alignParentRight="true"
+    android:layout_centerVertical="true"
+    android:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/add_friend_imagebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/selector_button_general"
+        android:padding="10dp"
+        android:src="@drawable/ic_add_user_dark"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/online_imageview"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:src="@drawable/badge_online"
+        android:visibility="gone" />
+</LinearLayout>

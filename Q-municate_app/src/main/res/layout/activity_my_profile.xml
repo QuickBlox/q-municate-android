@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/toolbar_view"
+        layout="@layout/toolbar" />
+
+    <RelativeLayout
+        android:id="@+id/change_photo_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_view"
+        android:layout_margin="@dimen/padding_large"
+        android:background="@drawable/selector_button_general">
+
+        <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+            style="@style/AvatarImageViewStyle"
+            android:id="@+id/photo_imageview"
+            android:layout_alignParentLeft="true"
+            app:border_color="@color/dark_gray"
+            app:border_width="@dimen/avatar_border_width"
+            app:oval="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/padding_large"
+            android:layout_toRightOf="@id/photo_imageview"
+            android:gravity="center"
+            android:text="@string/profile_change_photo"
+            android:textColor="@color/text_dark"
+            android:textSize="@dimen/text_size" />
+
+    </RelativeLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/full_name_textinputlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/change_photo_view"
+        android:paddingLeft="@dimen/padding_large"
+        android:paddingRight="@dimen/padding_large">
+
+        <EditText
+            android:id="@+id/full_name_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/profile_full_name"
+            android:imeOptions="actionDone" />
+
+    </android.support.design.widget.TextInputLayout>
+
+</RelativeLayout>

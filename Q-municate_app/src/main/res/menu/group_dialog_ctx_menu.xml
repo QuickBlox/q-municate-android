@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_reply"
+        android:title="@string/dialog_ctx_menu_reply" />
+
+    <item
+        android:id="@+id/action_private_message"
+        android:title="@string/dialog_ctx_menu_prv_message" />
+
+    <item
+        android:id="@+id/switch_camera_toggle"
+        android:title="@string/dialog_ctx_menu_video_call"/>
+
+    <item
+        android:id="@+id/action_profile"
+        android:title="@string/dialog_ctx_menu_profile"/>
+
+</menu>

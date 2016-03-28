@@ -37,6 +37,3 @@ local.properties
 
 # Mac
 .DS_Store
-
-# Keystore
-/keystore

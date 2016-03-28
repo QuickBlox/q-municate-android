@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_add"
+        android:icon="@drawable/ic_add_user_dark"
+        android:orderInCategory="100"
+        android:title="@string/action_bar_add_friend_to_chat"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_leave"
+        android:icon="@drawable/ic_leave_chat_dark"
+        android:orderInCategory="100"
+        android:title="@string/action_bar_leave_chat"
+        app:showAsAction="ifRoom" />
+
+</menu>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/contentRelativeLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+        style="@style/AvatarImageViewStyle"
+        android:id="@+id/avatar_imageview"
+        android:layout_width="@dimen/inf_list_avatar_height"
+        android:layout_height="@dimen/inf_list_avatar_height"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"
+        app:border_color="@color/dark_gray"
+        app:border_width="@dimen/avatar_border_width"
+        app:oval="true" />
+
+    <TextView
+        android:id="@+id/name_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        android:layout_toLeftOf="@+id/select_user_checkbox"
+        android:layout_toRightOf="@id/avatar_imageview"
+        android:singleLine="true"
+        android:textSize="@dimen/text_size" />
+
+    <CheckBox
+        android:id="@+id/select_user_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true" />
+
+</RelativeLayout>

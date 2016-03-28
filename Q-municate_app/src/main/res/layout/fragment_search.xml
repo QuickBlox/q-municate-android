@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:orientation="vertical">
+
+    <RadioGroup
+        android:id="@+id/search_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            style="@style/SearchRadioButtonStyle"
+            android:id="@+id/local_search_radiobutton"
+            android:text="@string/search_local_list" />
+
+        <RadioButton
+            style="@style/SearchRadioButtonStyle"
+            android:id="@+id/global_search_radiobutton"
+            android:text="@string/search_global_list" />
+
+    </RadioGroup>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/search_viewpager"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
