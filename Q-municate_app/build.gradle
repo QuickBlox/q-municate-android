@@ -52,7 +52,8 @@ android {
 
     buildTypes {
         release {
-            debuggable rootProject.prodDebug
+            minifyEnabled false
+            debuggable false
             signingConfig signingConfigs.release
             buildConfigField "String", "APP_ID", property('prodAppID')
             buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
@@ -60,7 +61,6 @@ android {
             buildConfigField "String", "FACEBOOK_APP_ID", property('prodFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
             resValue "string", "facebookAppId", property('prodFacebookAppID')
-            proguardFile 'proguard.cfg'
         }
 
         debug {
@@ -73,7 +73,6 @@ android {
             buildConfigField "String", "FACEBOOK_APP_ID", property('devFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
             resValue "string", "facebookAppId", property('devFacebookAppID')
-            proguardFile 'proguard.cfg'
         }
     }
 
