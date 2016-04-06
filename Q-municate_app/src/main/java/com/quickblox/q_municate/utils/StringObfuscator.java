@@ -20,10 +20,6 @@ public class StringObfuscator {
         return BuildConfig.VERSION_NAME;
     }
 
-    public static String getFBAppId() {
-        return BuildConfig.FACEBOOK_APP_ID;
-    }
-
     public static boolean getDebugEnabled() {
         return BuildConfig.DEBUG;
     }

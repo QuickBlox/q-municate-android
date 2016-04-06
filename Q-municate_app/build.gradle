@@ -34,45 +34,15 @@ android {
 
 //     before release need to enable Crashlytics
 
-    signingConfigs {
-        release {
-            storeFile file (property('prodStoreFile'))
-            storePassword property('prodStorePassword')
-            keyAlias property('prodKeyAlias')
-            keyPassword property('prodKeyPassword')
-        }
-
-        debug {
-            storeFile file (property('devStoreFile'))
-            storePassword property('devStorePassword')
-            keyAlias property('devKeyAlias')
-            keyPassword property('devKeyPassword')
-        }
-    }
-
     buildTypes {
-        release {
-            minifyEnabled false
-            debuggable false
-            signingConfig signingConfigs.release
-            buildConfigField "String", "APP_ID", property('prodAppID')
-            buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
-            buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
-            buildConfigField "String", "FACEBOOK_APP_ID", property('prodFacebookAppID')
-            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
-            resValue "string", "facebookAppId", property('prodFacebookAppID')
-        }
-
         debug {
             debuggable rootProject.prodDebug
             signingConfig signingConfigs.debug
-            versionNameSuffix  ' (debug)'
-            buildConfigField "String", "APP_ID", property('devAppID')
-            buildConfigField "String", "AUTH_KEY", property('devAuthKey')
-            buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
-            buildConfigField "String", "FACEBOOK_APP_ID", property('devFacebookAppID')
-            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
-            resValue "string", "facebookAppId", property('devFacebookAppID')
+            buildConfigField "String", "APP_ID", property('prodAppID')
+            buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
+            buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
+            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
+            resValue "string", "facebookAppId", property('prodFacebookAppID')
         }
     }
 
