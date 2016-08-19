@@ -51,7 +51,7 @@
 
     <dimen name="inf_list_avatar_height">48dp</dimen>
 
-    <dimen name="corners_small_value">3dp</dimen>
+    <dimen name="corners_small_value">6dp</dimen>
     <dimen name="corners_middle_value">10dp</dimen>
     <dimen name="corners_big_value">15dp</dimen>
 

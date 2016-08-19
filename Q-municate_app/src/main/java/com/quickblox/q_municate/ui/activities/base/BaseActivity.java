@@ -27,7 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.facebook.Session;
+import com.facebook.AccessToken;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.App;
@@ -521,7 +521,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             QBLoginRestCommand.start(this, AppSession.getSession().getUser());
         } else {
-            QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, Session.getActiveSession().getAccessToken(), null);
+            QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, AccessToken.getCurrentAccessToken().getToken(), null);
         }
     }
 

@@ -31,19 +31,18 @@ android {
         multiDexEnabled = true
     }
 
-
 //     before release need to enable Crashlytics
 
     signingConfigs {
         release {
-            storeFile file (property('prodStoreFile'))
+            storeFile file(property('prodStoreFile'))
             storePassword property('prodStorePassword')
             keyAlias property('prodKeyAlias')
             keyPassword property('prodKeyPassword')
         }
 
         debug {
-            storeFile file (property('devStoreFile'))
+            storeFile file(property('devStoreFile'))
             storePassword property('devStorePassword')
             keyAlias property('devKeyAlias')
             keyPassword property('devKeyPassword')
@@ -66,7 +65,7 @@ android {
         debug {
             debuggable rootProject.prodDebug
             signingConfig signingConfigs.debug
-            versionNameSuffix  ' (debug)'
+            versionNameSuffix ' (debug)'
             buildConfigField "String", "APP_ID", property('devAppID')
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
@@ -112,6 +111,9 @@ dependencies {
     compile "com.timehop.stickyheadersrecyclerview:library:${rootProject.stickylistheadersRecyclerViewVersion}@aar"
     compile "com.rockerhieu.emojicon:library:${rootProject.emojiconVersion}"
     compile "com.soundcloud.android:android-crop:${rootProject.cropVersion}@aar"
+    compile('com.android.support:cardview-v7:23.2.0') {
+        force = true
+    }
 }
 
 def changeApkFileName(variant) {
