@@ -1,4 +1,3 @@
 include ':Q-municate_app'
 include ':Q-municate_core'
 include ':Q-municate_db'
-include ':facebook'
