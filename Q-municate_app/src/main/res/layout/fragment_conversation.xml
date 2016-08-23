@@ -8,20 +8,22 @@
     android:keepScreenOn="true"
     >
 
-    <FrameLayout
-        android:id="@+id/remoteVideoView"
-        android:layout_width="match_parent"
+    <com.quickblox.videochat.webrtc.view.QBRTCSurfaceView
+        android:id="@+id/remote_video_view"
         android:layout_height="match_parent"
-        >
+        android:layout_width="match_parent"
+        />
 
-        <ViewStub
-            android:id="@+id/remoteViewStub"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout="@layout/view_remote_video"
-            />
-
-    </FrameLayout>
+    <com.quickblox.videochat.webrtc.view.QBRTCSurfaceView
+        android:id="@+id/local_video_view"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="invisible"
+        />
 
     <FrameLayout
         android:id="@+id/avatar_and_name"

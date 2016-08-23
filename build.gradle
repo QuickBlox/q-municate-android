@@ -10,18 +10,26 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven { url 'https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/' }
     }
 }
 
 ext {
-    compileSdkVersion = 22
-    buildToolsVersion = '23.0.3'
+    compileSdkVersion = 24
+    buildToolsVersion = '24.0.1'
     minSdkVersion = 15
-    targetSdkVersion = 22
+    targetSdkVersion = 24
     versionName = '2.0'
     versionCode = 200
 
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
     prodDebug = true
+    lintAbortOnError = false
+
+//    QuickBlox SDK version
+    qbSdkVersion = '2.6.1'
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
@@ -36,4 +44,5 @@ ext {
     stickylistheadersRecyclerViewVersion = '0.4.2'
     emojiconVersion = '1.3.1'
     cropVersion = '1.0.1'
+    facebookSdkVersoin = '4.14.1'
 }

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.quickblox.q_municate.R;
 
+import org.webrtc.RendererCommon;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
 
@@ -98,7 +99,7 @@ public class RTCGLVideoView extends GLSurfaceView {
         setRendererMirror(config.mirror, rendererSurface);
         int[] viewCoordinates = mainRenderer ? remoteCoords : localCoords;
         VideoRendererGui.update(callbacks, viewCoordinates[0], viewCoordinates[1], viewCoordinates[2],
-                viewCoordinates[3], VideoRendererGui.ScalingType.SCALE_ASPECT_FILL,
+                viewCoordinates[3], RendererCommon.ScalingType.SCALE_ASPECT_FILL,
                 (mainRenderer ? mainMirror : secondMirror));
     }
 
@@ -136,7 +137,7 @@ public class RTCGLVideoView extends GLSurfaceView {
 
     private VideoRenderer.Callbacks initRenderer(boolean mirror, int[] viewCoordinates) {
         return VideoRendererGui.createGuiRenderer(viewCoordinates[0], viewCoordinates[1], viewCoordinates[2],
-                viewCoordinates[3], VideoRendererGui.ScalingType.SCALE_ASPECT_FILL, mirror);
+                viewCoordinates[3], RendererCommon.ScalingType.SCALE_ASPECT_FILL, mirror);
 
     }
 

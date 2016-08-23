@@ -22,7 +22,7 @@ import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCSessionConnectionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCSignalingCallback;
 
-import org.webrtc.VideoCapturerAndroid;
+import org.webrtc.CameraVideoCapturer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ public class QBCallChatHelper extends BaseHelper {
             QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         if (currentQbRtcSession != null) {
             currentQbRtcSession.removeSignalingCallback(qbRtcSignalingCallback);
-            currentQbRtcSession.removeSessionnCallbacksListener(qbRtcSessionConnectionCallbacks);
+            currentQbRtcSession.removeSessionCallbacksListener(qbRtcSessionConnectionCallbacks);
             currentQbRtcSession = null;
         }
     }
@@ -94,10 +94,30 @@ public class QBCallChatHelper extends BaseHelper {
     private void setUpCallClient() {
         Log.d(TAG, "setUpCallClient()");
 
-        qbRtcClient.setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
+        qbRtcClient.setCameraErrorHendler(new CameraVideoCapturer.CameraEventsHandler() {
             @Override
-            public void onCameraError(String error) {
-                Log.e(TAG, "Error on cams, error = " + error);
+            public void onCameraError(String s) {
+                Log.e(TAG, "Error on cams, error = " + s);
+            }
+
+            @Override
+            public void onCameraFreezed(String s) {
+
+            }
+
+            @Override
+            public void onCameraOpening(int i) {
+
+            }
+
+            @Override
+            public void onFirstFrameAvailable() {
+
+            }
+
+            @Override
+            public void onCameraClosed() {
+
             }
         });
 
@@ -204,12 +224,12 @@ public class QBCallChatHelper extends BaseHelper {
         }
 
         @Override
-        public void onReceiveHangUpFromUser(QBRTCSession qbRtcSession, Integer integer) {
+        public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
             Log.d(TAG,
-                    "onReceiveHangUpFromUser(), qbRtcSession.getSession() = " + qbRtcSession.getSessionID());
+                    "onReceiveHangUpFromUser(), qbRtcSession.getSession() = " + qbrtcSession.getSessionID());
 
             if (qbRtcClientSessionCallbacks != null) {
-                qbRtcClientSessionCallbacks.onReceiveHangUpFromUser(qbRtcSession, integer);
+                qbRtcClientSessionCallbacks.onReceiveHangUpFromUser(qbrtcSession, integer, map);
             }
         }
 

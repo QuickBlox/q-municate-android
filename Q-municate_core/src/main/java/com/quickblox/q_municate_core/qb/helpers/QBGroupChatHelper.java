@@ -121,8 +121,6 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
         try {
             groupChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            error = context.getString(R.string.dlg_fail_send_msg);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         } catch (IllegalStateException e) {
