@@ -414,7 +414,7 @@ public class ChatUtils {
                 .concat("_")
                 .concat(dialogId)
                 .concat(ConstsCore.CHAT_MUC)
-                .concat(QBSettings.getInstance().getChatServerDomain());
+                .concat(QBSettings.getInstance().getChatEndpoint());
     }
 
     public static Attachment createLocalAttachment(QBAttachment qbAttachment) {

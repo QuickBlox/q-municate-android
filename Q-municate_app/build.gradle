@@ -65,7 +65,6 @@ android {
 
         debug {
             debuggable rootProject.prodDebug
-            signingConfig signingConfigs.debug
             versionNameSuffix ' (debug)'
             buildConfigField "String", "APP_ID", property('devAppID')
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')

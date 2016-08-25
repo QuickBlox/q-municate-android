@@ -20,7 +20,6 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -28,14 +27,12 @@ import android.widget.ToggleButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
-import com.quickblox.q_municate.ui.views.RTCGLVideoView;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.call.CameraUtils;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.AppRTCAudioManager;
@@ -75,7 +72,6 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     private ToggleButton cameraToggle;
     private ToggleButton micToggleVideoCall;
     private ImageButton handUpVideoCall;
-    private View view;
     private boolean isVideoCall = false;
     private boolean isAudioEnabled = true;
     private List<QBUser> allUsers = new ArrayList<>();
@@ -117,7 +113,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_conversation, container, false);
+        View view = inflater.inflate(R.layout.fragment_conversation, container, false);
         Log.d(TAG, "Fragment. Thread id: " + Thread.currentThread().getId());
 
         if (getArguments() != null) {
@@ -325,11 +321,11 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
                 if (((CallActivity) getActivity()).getCurrentSession() != null) {
                     if (isAudioEnabled) {
                         Log.d(TAG, "Mic is off!");
-                        ((CallActivity) getActivity()).getCurrentSession().setAudioEnabled(false);
+                        ((CallActivity) getActivity()).getCurrentSession().getMediaStreamManager().setAudioEnabled(false);
                         isAudioEnabled = false;
                     } else {
                         Log.d(TAG, "Mic is on!");
-                        ((CallActivity) getActivity()).getCurrentSession().setAudioEnabled(true);
+                        ((CallActivity) getActivity()).getCurrentSession().getMediaStreamManager().setAudioEnabled(true);
                         isAudioEnabled = true;
                     }
                 }
@@ -425,16 +421,14 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
                     @Override
                     public void onCameraSwitchDone(boolean b) {
                         isFrontCameraSelected = b;
-                        toggleCamerainternal(mediaStreamManager);
+                        toggleCameraInternal();
                     }
-
                     @Override
                     public void onCameraSwitchError(String s) {
 
                     }
                 });
-                getActivity().invalidateOptionsMenu();
-                return true;
+                break;
             case R.id.switch_speaker_toggle:
                 if (!audioManager.getSelectedAudioDevice().equals(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
                     audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
@@ -445,11 +439,13 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
                         audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.EARPIECE);
                     }
                 }
-                getActivity().invalidateOptionsMenu();
-                return true;
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+
+        getActivity().invalidateOptionsMenu();
+        return super.onOptionsItemSelected(item);
     }
 
     private void initAudioManager() {
@@ -503,31 +499,9 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         }
     }
 
-    private void toggleCamerainternal(QBMediaStreamManager mediaStreamManager){
-        toggleCameraOnUiThread(false);
-        int currentCameraId = mediaStreamManager.getCurrentCameraId();
-        Log.d(TAG, "Camera was switched!");
-        RTCGLVideoView.RendererConfig config = new RTCGLVideoView.RendererConfig();
-        config.mirror = CameraUtils.isCameraFront(currentCameraId);
-        mainHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                toggleCameraOnUiThread(true);
-            }
-        }, TOGGLE_CAMERA_DELAY);
-    }
-
-    private void toggleCameraOnUiThread(final boolean toggle){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                toggleCamera(toggle);
-            }
-        });
-    }
-
-    private void runOnUiThread(Runnable runnable){
-        mainHandler.post(runnable);
+    private void toggleCameraInternal(){
+        getActivity().invalidateOptionsMenu();
+        updateVideoView(remoteVideoTrack == null ? remoteVideoView : localVideoView, isFrontCameraSelected);
     }
 
     private void toggleCamera(boolean isNeedEnableCam) {

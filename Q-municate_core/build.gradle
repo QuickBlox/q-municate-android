@@ -16,7 +16,7 @@ dependencies {
     compile "com.quickblox:quickblox-android-sdk-customobjects:${rootProject.qbSdkVersion}"
     compile "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
     compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
-    //    Other QuickBlox libs will be connected as transitive dependencies
+    //    Other QuickBlox libs (core + chat) will be connected as transitive dependencies
 
     compile project(':Q-municate_db')
 

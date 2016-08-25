@@ -15,15 +15,15 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 24
-    buildToolsVersion = '24.0.1'
+    compileSdkVersion = 22
+    buildToolsVersion = '23.0.2'
     minSdkVersion = 15
-    targetSdkVersion = 24
-    versionName = '2.0'
+    targetSdkVersion = 22
+    versionName = '2.0.1'
     versionCode = 200
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
 
     prodDebug = true
     lintAbortOnError = false
