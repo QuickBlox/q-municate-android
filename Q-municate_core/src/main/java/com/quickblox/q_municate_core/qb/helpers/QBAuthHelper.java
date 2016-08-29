@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.facebook.login.LoginManager;
 import com.quickblox.auth.QBAuth;
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
@@ -62,7 +63,16 @@ public class QBAuthHelper extends BaseHelper {
             String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
         QBSession session = QBAuth.createSession();
-        qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+
+        if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
+            qbUser = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret);
+            CoreSharedHelper.getInstance().saveTDServiceProvider(accessToken);
+            CoreSharedHelper.getInstance().saveTDCredentials(accessTokenSecret);
+        } else {
+            qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+            CoreSharedHelper.getInstance().saveFBToken(accessToken);
+        }
+
         qbUser.setPassword(session.getToken());
 
         if (!hasUserCustomData(qbUser)) {
@@ -70,14 +80,15 @@ public class QBAuthHelper extends BaseHelper {
             qbUser = updateUser(qbUser);
         }
 
-        CoreSharedHelper.getInstance().saveFBToken(accessToken);
-
         qbUser.setPassword(session.getToken());
-        String token = QBAuth.getBaseService().getToken();
+        String qbToken = QBAuth.getBaseService().getToken();
 
         saveOwnerUser(qbUser);
 
-        AppSession.startSession(LoginType.FACEBOOK, qbUser, token);
+        AppSession.startSession(socialProvider.equals(QBProvider.FACEBOOK)
+                ? LoginType.FACEBOOK
+                : LoginType.TWITTER_DIGITS,
+                qbUser, qbToken);
 
         return qbUser;
     }

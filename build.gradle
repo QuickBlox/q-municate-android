@@ -1,9 +1,11 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.3'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
@@ -11,6 +13,7 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/' }
+        maven { url 'https://maven.fabric.io/public' }
     }
 }
 
@@ -45,4 +48,5 @@ ext {
     emojiconVersion = '1.3.1'
     cropVersion = '1.0.1'
     facebookSdkVersoin = '4.14.1'
+    twitterDigitsSdkVersion = '2.0.0'
 }

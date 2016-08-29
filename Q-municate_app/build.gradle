@@ -41,12 +41,12 @@ android {
             keyPassword property('prodKeyPassword')
         }
 
-        debug {
-            storeFile file(property('devStoreFile'))
+/*        debug {
+            storeFile file (property('devStoreFile'))
             storePassword property('devStorePassword')
             keyAlias property('devKeyAlias')
             keyPassword property('devKeyPassword')
-        }
+        }*/
     }
 
     buildTypes {
@@ -61,6 +61,7 @@ android {
             buildConfigField "String", "FACEBOOK_APP_ID", property('prodFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
             resValue "string", "facebookAppId", property('prodFacebookAppID')
+            resValue "string", "twitterDigitsApiKey", property('prodTwittedDigitsApiKey')
         }
 
         debug {
@@ -73,6 +74,7 @@ android {
             buildConfigField "String", "FACEBOOK_APP_ID", property('devFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
             resValue "string", "facebookAppId", property('devFacebookAppID')
+            resValue "string", "twitterDigitsApiKey", property('devTwittedDigitsApiKey')
         }
     }
 

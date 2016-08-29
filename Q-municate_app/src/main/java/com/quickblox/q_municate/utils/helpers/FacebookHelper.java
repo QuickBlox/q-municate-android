@@ -24,6 +24,7 @@ public class FacebookHelper {
     private Activity activity;
     private FBAccessTokenTracker fbAccessTokenTracker;
     private CallbackManager fbCallbackManager;
+    private LoginManager fbLoginManager;
 
     public FacebookHelper(Activity activity, FacebookCallback<LoginResult> facebookStatusCallback) {
         this.activity = activity;
@@ -40,7 +41,7 @@ public class FacebookHelper {
 
         fbCallbackManager = CallbackManager.Factory.create();
 
-        LoginManager fbLoginManager = LoginManager.getInstance();
+        fbLoginManager = LoginManager.getInstance();
         fbLoginManager.registerCallback(fbCallbackManager, facebookLoginCallback);
 
         this.fbAccessTokenTracker = new FBAccessTokenTracker();
@@ -51,9 +52,7 @@ public class FacebookHelper {
     }
 
     public void loginWithFacebook() {
-        if (AccessToken.getCurrentAccessToken() == null){
-            LoginManager.getInstance().logInWithReadPermissions(activity, generatePermissionsList());
-        }
+        fbLoginManager.logInWithReadPermissions(activity, generatePermissionsList());
     }
 
     public List<String> generatePermissionsList() {

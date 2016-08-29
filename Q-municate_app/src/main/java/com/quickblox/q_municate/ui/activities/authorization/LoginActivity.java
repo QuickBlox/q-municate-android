@@ -89,7 +89,7 @@ public class LoginActivity extends BaseAuthActivity {
 
     private void loginFB() {
         loginType = LoginType.FACEBOOK;
-        LoginManager.getInstance().logInWithReadPermissions(this, facebookHelper.generatePermissionsList());
+        facebookHelper.loginWithFacebook();
     }
 
     private void login() {

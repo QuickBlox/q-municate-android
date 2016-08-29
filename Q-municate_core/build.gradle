@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -17,6 +18,10 @@ dependencies {
     compile "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
     compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
     //    Other QuickBlox libs (core + chat) will be connected as transitive dependencies
+
+    compile("com.digits.sdk.android:digits:${rootProject.twitterDigitsSdkVersion}@aar") {
+        transitive = true;
+    }
 
     compile project(':Q-municate_db')
 

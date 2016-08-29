@@ -10,6 +10,10 @@ import android.util.Log;
 import android.widget.EditText;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.digits.sdk.android.AuthCallback;
+import com.digits.sdk.android.DigitsException;
+import com.digits.sdk.android.DigitsOAuthSigning;
+import com.digits.sdk.android.DigitsSession;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
@@ -21,6 +25,7 @@ import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -31,6 +36,11 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterAuthToken;
+import com.twitter.sdk.android.core.TwitterCore;
+
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
@@ -58,6 +68,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected EditText passwordEditText;
 
     protected FacebookHelper facebookHelper;
+    protected TwitterDigitsHelper twitterDigitsHelper;
     protected LoginType loginType = LoginType.EMAIL;
     protected Resources resources;
 
@@ -130,14 +141,13 @@ public abstract class BaseAuthActivity extends BaseActivity {
             loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
         facebookHelper = new FacebookHelper(this, new FacebookLoginCallback());
+        twitterDigitsHelper = new TwitterDigitsHelper(this, new TwitterDigitsStatusCallback());
         loginSuccessAction = new LoginSuccessAction();
         socialLoginSuccessAction = new SocialLoginSuccessAction();
         failAction = new FailAction();
     }
 
-    protected void facebookConnect() {
-        loginType = LoginType.FACEBOOK;
-
+    protected void startSocialLogin() {
         if (!appSharedHelper.isShownUserAgreement()) {
             UserAgreementDialogFragment
                     .show(getSupportFragmentManager(), new MaterialDialog.ButtonCallback() {
@@ -145,21 +155,27 @@ public abstract class BaseAuthActivity extends BaseActivity {
                                 public void onPositive(MaterialDialog dialog) {
                                     super.onPositive(dialog);
                                     appSharedHelper.saveShownUserAgreement(true);
-                                    loginWithFacebook();
+                                    loginWithSocial();
                                 }
                             });
         } else {
-            loginWithFacebook();
+            loginWithSocial();
         }
     }
 
-    private void loginWithFacebook() {
+    private void loginWithSocial() {
         AppSession.getSession().closeAndClear();
         DataManager.getInstance().clearAllTables();
         appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
         FacebookHelper.logout(); // clearing old data
-        facebookHelper.loginWithFacebook();
+        TwitterDigitsHelper.logout();
+        //TODO VT need implement logout from TD
+        if (loginType.equals(LoginType.FACEBOOK)){
+            facebookHelper.loginWithFacebook();
+        } else if (loginType.equals(LoginType.TWITTER_DIGITS)){
+            twitterDigitsHelper.loginWithTwitterDigits();
+        }
     }
 
     protected void startMainActivity(QBUser user) {
@@ -255,6 +271,14 @@ public abstract class BaseAuthActivity extends BaseActivity {
         finish();
     }
 
+    private void showProgresIfNeed(){
+        if (BaseAuthActivity.this instanceof SplashActivity) {
+            hideProgress();
+        } else {
+            showProgress();
+        }
+    }
+
     private class LoginSuccessAction implements Command {
 
         @Override
@@ -289,12 +313,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
             if (loginType.equals(LoginType.FACEBOOK)) {
                 QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
-
-                if (BaseAuthActivity.this instanceof SplashActivity) {
-                    hideProgress();
-                } else {
-                    showProgress();
-                }
+                showProgresIfNeed();
             }
         }
 
@@ -307,6 +326,29 @@ public abstract class BaseAuthActivity extends BaseActivity {
         @Override
         public void onError(FacebookException error) {
             Log.d(TAG, "+++ FacebookCallback call onCancel BaseAuthActivity +++");
+            hideProgress();
+        }
+    }
+
+    private class TwitterDigitsStatusCallback implements AuthCallback {
+
+        @Override
+        public void success(DigitsSession session, String phoneNumber) {
+            Log.d(TAG, "Success login by number: " + phoneNumber);
+            TwitterAuthConfig authConfig = TwitterCore.getInstance().getAuthConfig();
+            TwitterAuthToken authToken = session.getAuthToken();
+            DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
+            Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
+
+            QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.TWITTER_DIGITS,
+                    authHeaders.get("X-Auth-Service-Provider"),
+                    authHeaders.get("X-Verify-Credentials-Authorization"));
+            showProgresIfNeed();
+        }
+
+        @Override
+        public void failure(DigitsException error) {
+            Log.d(TAG, "failure!!!! error: " + error.getLocalizedMessage());
             hideProgress();
         }
     }
