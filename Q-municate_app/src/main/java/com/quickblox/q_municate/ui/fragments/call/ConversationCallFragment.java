@@ -9,7 +9,6 @@ import android.os.Message;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -241,7 +240,6 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         remoteVideoView = (QBRTCSurfaceView) view.findViewById(R.id.remote_video_view);
 
         localVideoView = (QBRTCSurfaceView) view.findViewById(R.id.local_video_view);
-        initCorrectSizeForLocalView();
         localVideoView.setZOrderMediaOverlay(true);
 
         cameraToggle = (ToggleButton) view.findViewById(R.id.cameraToggle);
@@ -263,17 +261,6 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         callingToTextView = (TextView) avatarAndNameView.findViewById(R.id.calling_to_text_view);
 
         actionButtonsEnabled(false);
-    }
-
-    private void initCorrectSizeForLocalView() {
-        ViewGroup.LayoutParams params = localVideoView.getLayoutParams();
-        DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
-
-        int screenWidthPx = displaymetrics.widthPixels;
-        Log.d(TAG, "screenWidthPx " + screenWidthPx);
-        params.width = (int) (screenWidthPx * 0.3);
-        params.height = (params.width / 2) * 3;
-        localVideoView.setLayoutParams(params);
     }
 
     @Override
@@ -430,15 +417,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
                 });
                 break;
             case R.id.switch_speaker_toggle:
-                if (!audioManager.getSelectedAudioDevice().equals(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
-                    audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
-                } else {
-                    if(audioManager.getAudioDevices().contains(AppRTCAudioManager.AudioDevice.WIRED_HEADSET)){
-                        audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.WIRED_HEADSET);
-                    } else {
-                        audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.EARPIECE);
-                    }
-                }
+                toggleAudioOutput();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -446,6 +425,18 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
 
         getActivity().invalidateOptionsMenu();
         return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleAudioOutput() {
+        if (!audioManager.getSelectedAudioDevice().equals(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
+            audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
+        } else {
+            if(audioManager.getAudioDevices().contains(AppRTCAudioManager.AudioDevice.WIRED_HEADSET)){
+                audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.WIRED_HEADSET);
+            } else {
+                audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.EARPIECE);
+            }
+        }
     }
 
     private void initAudioManager() {
@@ -462,12 +453,22 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem itemSpeakerToggle = menu.findItem(R.id.switch_speaker_toggle);
         if (itemSpeakerToggle != null){
-            boolean speakerEnabled = audioManager.getSelectedAudioDevice().equals(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
-            itemSpeakerToggle.setIcon(speakerEnabled ? R.drawable.ic_phonelink_ring : R.drawable.ic_speaker_phone);
+            updateSpeakerToggleIcon(itemSpeakerToggle);
         }
 
         MenuItem itemCameraToggle = menu.findItem(R.id.switch_camera_toggle);
-        if (itemCameraToggle != null && ((CallActivity) getActivity()).getCurrentSession() != null){
+        if (itemCameraToggle != null){
+            updateCameraToggleIcon(itemCameraToggle);
+        }
+    }
+
+    private void updateSpeakerToggleIcon(MenuItem itemSpeakerToggle) {
+        boolean speakerEnabled = audioManager.getSelectedAudioDevice().equals(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
+        itemSpeakerToggle.setIcon(speakerEnabled ? R.drawable.ic_phonelink_ring : R.drawable.ic_speaker_phone);
+    }
+
+    private void updateCameraToggleIcon(MenuItem itemCameraToggle) {
+        if (((CallActivity) getActivity()).getCurrentSession() != null) {
             if (isVideoCall) {
                 if (isVideoEnabled()) {
                     itemCameraToggle.setIcon(isFrontCameraSelected ? R.drawable.ic_camera_front_white : R.drawable.ic_camera_rear_white);
@@ -479,7 +480,6 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
                 itemCameraToggle.setEnabled(false);
                 itemCameraToggle.setVisible(false);
             }
-
         }
     }
 

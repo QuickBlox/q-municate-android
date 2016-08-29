@@ -94,32 +94,7 @@ public class QBCallChatHelper extends BaseHelper {
     private void setUpCallClient() {
         Log.d(TAG, "setUpCallClient()");
 
-        qbRtcClient.setCameraErrorHendler(new CameraVideoCapturer.CameraEventsHandler() {
-            @Override
-            public void onCameraError(String s) {
-                Log.e(TAG, "Error on cams, error = " + s);
-            }
-
-            @Override
-            public void onCameraFreezed(String s) {
-
-            }
-
-            @Override
-            public void onCameraOpening(int i) {
-
-            }
-
-            @Override
-            public void onFirstFrameAvailable() {
-
-            }
-
-            @Override
-            public void onCameraClosed() {
-
-            }
-        });
+        qbRtcClient.setCameraErrorHendler(new CameraErrorHandler());
 
         QBRTCConfig.setMaxOpponentsCount(MAX_OPPONENTS_COUNT);
         QBRTCConfig.setDisconnectTime(DISCONNECT_TIME);
@@ -258,6 +233,34 @@ public class QBCallChatHelper extends BaseHelper {
             if (qbRtcClientSessionCallbacks != null) {
                 qbRtcClientSessionCallbacks.onSessionStartClose(qbRtcSession);
             }
+        }
+    }
+
+    class CameraErrorHandler implements CameraVideoCapturer.CameraEventsHandler {
+
+        @Override
+        public void onCameraError(String s) {
+            Log.e(TAG, "Error on cams, error = " + s);
+        }
+
+        @Override
+        public void onCameraFreezed(String s) {
+            Log.e(TAG, "Camera is frozen " + s);
+        }
+
+        @Override
+        public void onCameraOpening(int i) {
+            Log.e(TAG, "Camera orientation = " + i);
+        }
+
+        @Override
+        public void onFirstFrameAvailable() {
+            Log.e(TAG, "Camera first frame available");
+        }
+
+        @Override
+        public void onCameraClosed() {
+            Log.e(TAG, "Camera closed");
         }
     }
 }
