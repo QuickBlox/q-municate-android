@@ -152,6 +152,20 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
+    public void tryJoinRoomChatsPage(List<QBDialog> qbDialogsList) {
+        if (!qbDialogsList.isEmpty()) {
+            if (groupDialogsList == null){
+                groupDialogsList = new ArrayList<QBDialog>();
+            }
+            for (QBDialog dialog : qbDialogsList) {
+                if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
+                    groupDialogsList.add(dialog);
+                    tryJoinRoomChat(dialog);
+                }
+            }
+        }
+    }
+
     public void tryJoinRoomChats() {
         List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
 

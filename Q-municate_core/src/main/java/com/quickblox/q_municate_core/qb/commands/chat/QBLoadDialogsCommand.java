@@ -5,14 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -30,6 +28,8 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     private final String FIELD_DIALOG_TYPE = "type";
     private final String OPERATOR_EQ = "eq";
+
+    private final int FIRST_PAGE_NUMBER = 1;
 
     // TODO: HACK!
     // This is temporary value,
@@ -51,19 +51,16 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
+        final ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
 
-        Bundle returnedBundle = new Bundle();
-        QBRequestGetBuilder qbRequestGetBuilder = new QBRequestGetBuilder();
+        final Bundle returnedBundle = new Bundle();
+        final QBRequestGetBuilder qbRequestGetBuilder = new QBRequestGetBuilder();
 
         qbRequestGetBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         qbRequestGetBuilder.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
 
         parcelableQBDialog.addAll(ChatUtils.qbDialogsToParcelableQBDialogs(
-                loadAllDialogsByType(QBDialogType.PRIVATE, returnedBundle, qbRequestGetBuilder)));
-
-        parcelableQBDialog.addAll(ChatUtils.qbDialogsToParcelableQBDialogs(
-                loadAllDialogsByType(QBDialogType.GROUP, returnedBundle, qbRequestGetBuilder)));
+                loadAllDialogs(returnedBundle, qbRequestGetBuilder)));
 
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
@@ -75,6 +72,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
                              Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
         List<QBDialog> allDialogsList = new ArrayList<>();
         boolean needToLoadMore;
+        int pageNumber = 0;
 
         do {
             qbRequestGetBuilder.setPagesSkip(allDialogsList.size());
@@ -84,12 +82,70 @@ public class QBLoadDialogsCommand extends ServiceCommand {
                     : getGroupDialogs(qbRequestGetBuilder, returnedBundle);
             allDialogsList.addAll(newDialogsList);
             needToLoadMore = newDialogsList.size() == ConstsCore.CHATS_DIALOGS_PER_PAGE;
-            Log.d("QBLoadDialogsCommand", "needToLoadMore = " + needToLoadMore  + "newDialogsList.size() = " + newDialogsList.size());
+            Log.d("QBLoadDialogsCommand", "needToLoadMore = " + needToLoadMore  + "newDialogsList.size() = " + newDialogsList.size()+ "pageNumber = " + pageNumber);
+            pageNumber++;
+            if(pageNumber == FIRST_PAGE_NUMBER){
+                sendLoadPageSuccess(new Bundle());
+            }
         } while (needToLoadMore);
 
         if (dialogsType == QBDialogType.GROUP) {
             tryJoinRoomChats(allDialogsList);
         }
+
+        return allDialogsList;
+    }
+
+    private List<QBDialog> loadAllDialogs(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
+        List<QBDialog> allDialogsList = null;
+        List<QBDialog> allDialogsListPrivate = new ArrayList<>();
+        List<QBDialog> allDialogsListGroup = new ArrayList<>();
+        boolean needToLoadMorePrivate = true;
+        boolean needToLoadMoreGroup = true;
+        int pageNumber = 0;
+
+        final QBRequestGetBuilder qbRequestGetBuilderPrivate = new QBRequestGetBuilder();
+
+        qbRequestGetBuilderPrivate.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
+        qbRequestGetBuilderPrivate.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
+        qbRequestGetBuilderPrivate.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, QBDialogType.PRIVATE.getCode());
+
+        final QBRequestGetBuilder qbRequestGetBuilderGroup = new QBRequestGetBuilder();
+
+        qbRequestGetBuilderGroup.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
+        qbRequestGetBuilderGroup.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
+        qbRequestGetBuilderGroup.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, QBDialogType.GROUP.getCode());
+
+        do {
+            if(needToLoadMorePrivate) {
+                qbRequestGetBuilderPrivate.setPagesSkip(allDialogsListPrivate.size());
+                List<QBDialog> newDialogsListPrivate = getPrivateDialogs(qbRequestGetBuilderPrivate, returnedBundle);
+                allDialogsListPrivate.addAll(newDialogsListPrivate);
+                needToLoadMorePrivate = newDialogsListPrivate.size() == ConstsCore.CHATS_DIALOGS_PER_PAGE;
+                Log.d("QBLoadDialogsCommand", "needToLoadMorePrivate = " + needToLoadMorePrivate + "newDialogsListPrivate.size() = " + newDialogsListPrivate.size());
+            }
+
+            if(needToLoadMoreGroup) {
+                qbRequestGetBuilderGroup.setPagesSkip(allDialogsListGroup.size());
+                List<QBDialog> newDialogsListGroup = getGroupDialogs(qbRequestGetBuilderGroup, returnedBundle);
+                allDialogsListGroup.addAll(newDialogsListGroup);
+                needToLoadMoreGroup = newDialogsListGroup.size() == ConstsCore.CHATS_DIALOGS_PER_PAGE;
+                Log.d("QBLoadDialogsCommand", "needToLoadMoreGroup = " + needToLoadMoreGroup + "newDialogsListGroup.size() = " + newDialogsListGroup.size());
+
+                tryJoinRoomChatsPage(newDialogsListGroup);
+            }
+
+            pageNumber++;
+
+            if (pageNumber == FIRST_PAGE_NUMBER) {
+                sendLoadPageSuccess(new Bundle());
+            }
+
+        } while (needToLoadMorePrivate || needToLoadMoreGroup);
+
+        allDialogsList = new ArrayList<>(allDialogsListPrivate.size() + allDialogsListGroup.size());
+        allDialogsList.addAll(allDialogsListPrivate);
+        allDialogsList.addAll(allDialogsListGroup);
 
         return allDialogsList;
     }
@@ -104,5 +160,17 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     private void tryJoinRoomChats(List<QBDialog> allDialogsList){
         multiChatHelper.tryJoinRoomChats(allDialogsList);
+    }
+
+    private void tryJoinRoomChatsPage(List<QBDialog> dialogsList){
+        multiChatHelper.tryJoinRoomChatsPage(dialogsList);
+    }
+
+    private void sendLoadPageSuccess(Bundle result){
+        sendResult(result, successAction);
+    }
+
+    private void sendLoadPageFail(Bundle result){
+        sendResult(result, failAction);
     }
 }
