@@ -140,8 +140,8 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void checkVisibilityUserIcon() {
         UserCustomData userCustomData = Utils.customDataToObject(AppSession.getSession().getUser().getCustomData());
-        if (!TextUtils.isEmpty(userCustomData.getAvatar_url())) {
-            loadLogoActionBar(userCustomData.getAvatar_url());
+        if (!TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
+            loadLogoActionBar(userCustomData.getAvatarUrl());
         } else {
             setActionBarIcon(ImageUtils.getRoundIconDrawable(this,
                             BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));

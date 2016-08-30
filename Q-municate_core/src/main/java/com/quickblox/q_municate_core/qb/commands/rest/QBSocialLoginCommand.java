@@ -45,11 +45,13 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
         UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
-        if (QBProvider.FACEBOOK.equals(socialProvider) && TextUtils.isEmpty(userCustomData.getAvatar_url())) {
+        if (QBProvider.FACEBOOK.equals(socialProvider) && TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
+            //Actions for first login via Facebook
             CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, getFBUserWithAvatar(user));
         } else if (QBProvider.TWITTER_DIGITS.equals(socialProvider) && TextUtils.isEmpty(user.getFullName())) {
+            //Actions for first login via Twitter Digits
             CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, getTDUserWithFullName(user));
@@ -68,14 +70,13 @@ public class QBSocialLoginCommand extends ServiceCommand {
     }
 
     private QBUser getTDUserWithFullName(QBUser user){
-        String fullName = user.getPhone();
-        user.setFullName(fullName);
+        user.setFullName(user.getPhone());
         user.setCustomData(Utils.customDataToString(getUserCustomData(ConstsCore.EMPTY_STRING)));
         return user;
     }
 
     private UserCustomData getUserCustomData(String avatarUrl) {
-        String isImport = "1"; // TODO: temp, first FB login
+        String isImport = "1"; // TODO: temp, first FB or TD login (for correct work need use crossplatform)
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
 }

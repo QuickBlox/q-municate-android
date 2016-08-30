@@ -112,9 +112,9 @@ public class Utils {
     public static String customDataToString(UserCustomData userCustomData) {
         JSONObject jsonObject = new JSONObject();
 
-        setJsonValue(jsonObject, UserCustomData.TAG_AVATAR_URL, userCustomData.getAvatar_url());
+        setJsonValue(jsonObject, UserCustomData.TAG_AVATAR_URL, userCustomData.getAvatarUrl());
         setJsonValue(jsonObject, UserCustomData.TAG_STATUS, userCustomData.getStatus());
-        setJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT, userCustomData.isIs_import());
+        setJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT, userCustomData.isImport());
 
         return jsonObject.toString();
     }

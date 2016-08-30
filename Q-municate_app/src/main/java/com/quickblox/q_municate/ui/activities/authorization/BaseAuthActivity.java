@@ -174,7 +174,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (loginType.equals(LoginType.FACEBOOK)){
             facebookHelper.loginWithFacebook();
         } else if (loginType.equals(LoginType.TWITTER_DIGITS)){
-            twitterDigitsHelper.loginWithTwitterDigits();
+            twitterDigitsHelper.login();
         }
     }
 
@@ -341,14 +341,14 @@ public abstract class BaseAuthActivity extends BaseActivity {
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
             QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.TWITTER_DIGITS,
-                    authHeaders.get("X-Auth-Service-Provider"),
-                    authHeaders.get("X-Verify-Credentials-Authorization"));
+                    authHeaders.get(TwitterDigitsHelper.Consts.PROVIDER),
+                    authHeaders.get(TwitterDigitsHelper.Consts.CREDENTIALS));
             showProgresIfNeed();
         }
 
         @Override
         public void failure(DigitsException error) {
-            Log.d(TAG, "failure!!!! error: " + error.getLocalizedMessage());
+            Log.d(TAG, "Failure!!!! error: " + error.getLocalizedMessage());
             hideProgress();
         }
     }

@@ -169,8 +169,8 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     }
 
     private void loadAvatar() {
-        if (userCustomData != null && !TextUtils.isEmpty(userCustomData.getAvatar_url())) {
-            ImageLoader.getInstance().displayImage(userCustomData.getAvatar_url(),
+        if (userCustomData != null && !TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
+            ImageLoader.getInstance().displayImage(userCustomData.getAvatarUrl(),
                     photoImageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
     }

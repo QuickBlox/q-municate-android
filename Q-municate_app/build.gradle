@@ -11,7 +11,6 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'crashlytics'
 
 repositories {
     maven { url 'http://download.crashlytics.com/maven' }
@@ -40,13 +39,6 @@ android {
             keyAlias property('prodKeyAlias')
             keyPassword property('prodKeyPassword')
         }
-
-/*        debug {
-            storeFile file (property('devStoreFile'))
-            storePassword property('devStorePassword')
-            keyAlias property('devKeyAlias')
-            keyPassword property('devKeyPassword')
-        }*/
     }
 
     buildTypes {
@@ -65,7 +57,7 @@ android {
         }
 
         debug {
-            debuggable rootProject.prodDebug
+            debuggable true
             versionNameSuffix ' (debug)'
             buildConfigField "String", "APP_ID", property('devAppID')
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')

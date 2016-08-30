@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.digits.sdk.android.Digits;
 import com.facebook.AccessToken;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
@@ -47,6 +48,7 @@ import com.quickblox.q_municate.utils.broadcasts.NetworkChangeReceiver;
 import com.quickblox.q_municate.utils.helpers.ActivityUIHelper;
 import com.quickblox.q_municate.utils.helpers.LoginHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
+import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHelper;
 import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
@@ -520,9 +522,18 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     public void refreshSession() {
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             QBLoginRestCommand.start(this, AppSession.getSession().getUser());
-        } else {
+        } else if (LoginType.FACEBOOK.equals(AppSession.getSession().getLoginType())){
             QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, AccessToken.getCurrentAccessToken().getToken(), null);
+        } else if (LoginType.TWITTER_DIGITS.equals(AppSession.getSession().getLoginType())){
+            refreshTDSession();
         }
+    }
+
+    private void refreshTDSession() {
+        Map<String, String> authHeaders = TwitterDigitsHelper.getCurrentAuthHeaders();
+        String tdServiceProvider = authHeaders.get(TwitterDigitsHelper.Consts.PROVIDER);
+        String tdCredentials = authHeaders.get(TwitterDigitsHelper.Consts.CREDENTIALS);
+        QBSocialLoginCommand.start(this, QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials);
     }
 
     private Handler getHandler() {
