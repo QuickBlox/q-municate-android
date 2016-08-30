@@ -28,10 +28,11 @@
 
     <!-- Authorization -->
     <string name="auth_sign_up_title">Sign Up</string>
-    <string name="auth_login_title">Log In</string>
+    <string name="auth_login_title">Login</string>
     <string name="auth_forgot_password">Forgot password?</string>
+    <string name="auth_or_text">or</string>
     <string name="auth_hint_password">Password</string>
-    <string name="auth_log_in_with_facebook">Log in with Facebook</string>
+    <string name="auth_log_in_with_facebook">Login with Facebook</string>
     <string name="auth_hint_email">Email</string>
     <string name="auth_remember_me">Remember Me</string>
     <string name="auth_username_error">This username has not authenticated yet, please check your credentials</string>

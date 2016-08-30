@@ -27,7 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.facebook.Session;
+import com.facebook.AccessToken;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.App;
@@ -521,7 +521,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             QBLoginRestCommand.start(this, AppSession.getSession().getUser());
         } else {
-            QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, Session.getActiveSession().getAccessToken(), null);
+            QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, AccessToken.getCurrentAccessToken().getToken(), null);
         }
     }
 
@@ -600,7 +600,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void checkOpeningDialog() {
-        if (appSharedHelper.needToOpenDialog() && isChatInitialized()) {
+        if (appSharedHelper.needToOpenDialog() && isChatInitializedAndUserLoggedIn()) {
             Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
             User user = DataManager.getInstance().getUserDataManager().get(appSharedHelper.getPushUserId());
 
@@ -620,12 +620,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         QBLoginChatCompositeCommand.start(this);
     }
 
-    protected boolean isChatInitialized() {
-        return QBChatService.isInitialized() && AppSession.getSession().isSessionExist();
+    protected boolean isAppInitialized() {
+        return AppSession.getSession().isSessionExist();
     }
 
     protected boolean isChatInitializedAndUserLoggedIn() {
-        return isChatInitialized() && QBChatService.getInstance().isLoggedIn();
+        return isAppInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
     public void startPrivateChatActivity(User user, Dialog dialog) {
