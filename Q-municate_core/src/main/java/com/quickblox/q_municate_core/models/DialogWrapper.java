@@ -18,9 +18,6 @@ import com.quickblox.users.model.QBUser;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Created by Andrey on 8/26/16.
- */
 public class DialogWrapper implements Serializable {
 
     private Dialog dialog;
@@ -35,26 +32,37 @@ public class DialogWrapper implements Serializable {
 
     private void transform(Context context, DataManager dataManager){
         QBUser currentUser = AppSession.getSession().getUser();
-
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(dialog.getDialogId());
+        List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
 
+        fillOpponentUser(context, dataManager, dialogOccupantsList, currentUser);
+        fillTotalCount(context, dataManager, dialogOccupantsIdsList, currentUser);
+        fillLastMessage(context, dataManager, dialogOccupantsIdsList);
+    }
+
+    private void fillOpponentUser(Context context, DataManager dataManager,  List<DialogOccupant> dialogOccupantsList,  QBUser currentUser ){
         if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
             opponentUser = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(currentUser), dialogOccupantsList);
         }else{
             dataManager.getDialogDataManager().deleteById(dialog.getDialogId());
         }
 
-        List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+    }
+
+    private void fillTotalCount(Context context, DataManager dataManager,  List<Long> dialogOccupantsIdsList,  QBUser currentUser){
         long unreadMessages = dataManager.getMessageDataManager().getCountUnreadMessages(dialogOccupantsIdsList, currentUser.getId());
         long unreadDialogNotifications = dataManager.getDialogNotificationDataManager().getCountUnreadDialogNotifications(dialogOccupantsIdsList, currentUser.getId());
 
         totalCount = unreadMessages + unreadDialogNotifications;
+    }
 
+    private void fillLastMessage(Context context, DataManager dataManager, List<Long> dialogOccupantsIdsList){
         Message message = dataManager.getMessageDataManager().getLastMessageWithTempByDialogId(dialogOccupantsIdsList);
         DialogNotification dialogNotification = dataManager.getDialogNotificationDataManager().getLastDialogNotificationByDialogId(dialogOccupantsIdsList);
 
         lastMessage = ChatUtils.getDialogLastMessage(context.getResources().getString(R.string.cht_notification_message), message, dialogNotification);
     }
+
 
     public Dialog getDialog() {
         return dialog;
