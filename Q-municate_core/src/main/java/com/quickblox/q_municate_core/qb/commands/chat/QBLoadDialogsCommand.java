@@ -68,32 +68,24 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return bundle;
     }
 
-    private List<QBDialog> loadAllDialogsByType(QBDialogType dialogsType,
-                             Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
-        List<QBDialog> allDialogsList = new ArrayList<>();
-        boolean needToLoadMore;
-        int pageNumber = 0;
+    private boolean loadAllDialogsByType(QBDialogType dialogsType,  Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, List<QBDialog> allDialogsList, int pageNumber) throws QBResponseException {
+        boolean needToLoadMore = false;
 
-        do {
-            qbRequestGetBuilder.setPagesSkip(allDialogsList.size());
+        qbRequestGetBuilder.setPagesSkip(allDialogsList.size());
             qbRequestGetBuilder.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, dialogsType.getCode());
             List<QBDialog> newDialogsList = dialogsType == QBDialogType.PRIVATE
                     ? getPrivateDialogs(qbRequestGetBuilder, returnedBundle)
                     : getGroupDialogs(qbRequestGetBuilder, returnedBundle);
             allDialogsList.addAll(newDialogsList);
             needToLoadMore = newDialogsList.size() == ConstsCore.CHATS_DIALOGS_PER_PAGE;
-            Log.d("QBLoadDialogsCommand", "needToLoadMore = " + needToLoadMore  + "newDialogsList.size() = " + newDialogsList.size()+ "pageNumber = " + pageNumber);
-            pageNumber++;
-            if(pageNumber == FIRST_PAGE_NUMBER){
-                sendLoadPageSuccess(new Bundle());
+            Log.d("QBLoadDialogsCommand", "needToLoadMore = " + needToLoadMore  + "newDialogsList.size() = " + newDialogsList.size());
+
+            if (dialogsType == QBDialogType.GROUP) {
+                boolean needClean = (pageNumber == 0);
+                tryJoinRoomChatsPage(allDialogsList, needClean);
             }
-        } while (needToLoadMore);
 
-        if (dialogsType == QBDialogType.GROUP) {
-            tryJoinRoomChats(allDialogsList);
-        }
-
-        return allDialogsList;
+        return needToLoadMore;
     }
 
     private List<QBDialog> loadAllDialogs(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
@@ -118,21 +110,11 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
         do {
             if(needToLoadMorePrivate) {
-                qbRequestGetBuilderPrivate.setPagesSkip(allDialogsListPrivate.size());
-                List<QBDialog> newDialogsListPrivate = getPrivateDialogs(qbRequestGetBuilderPrivate, returnedBundle);
-                allDialogsListPrivate.addAll(newDialogsListPrivate);
-                needToLoadMorePrivate = newDialogsListPrivate.size() == ConstsCore.CHATS_DIALOGS_PER_PAGE;
-                Log.d("QBLoadDialogsCommand", "needToLoadMorePrivate = " + needToLoadMorePrivate + "newDialogsListPrivate.size() = " + newDialogsListPrivate.size());
+                needToLoadMorePrivate = loadAllDialogsByType(QBDialogType.PRIVATE, returnedBundle, qbRequestGetBuilderPrivate, allDialogsListPrivate, pageNumber);
             }
 
             if(needToLoadMoreGroup) {
-                qbRequestGetBuilderGroup.setPagesSkip(allDialogsListGroup.size());
-                List<QBDialog> newDialogsListGroup = getGroupDialogs(qbRequestGetBuilderGroup, returnedBundle);
-                allDialogsListGroup.addAll(newDialogsListGroup);
-                needToLoadMoreGroup = newDialogsListGroup.size() == ConstsCore.CHATS_DIALOGS_PER_PAGE;
-                Log.d("QBLoadDialogsCommand", "needToLoadMoreGroup = " + needToLoadMoreGroup + "newDialogsListGroup.size() = " + newDialogsListGroup.size());
-
-                tryJoinRoomChatsPage(newDialogsListGroup);
+                needToLoadMoreGroup = loadAllDialogsByType(QBDialogType.GROUP, returnedBundle, qbRequestGetBuilderGroup, allDialogsListGroup, pageNumber);
             }
 
             pageNumber++;
@@ -158,12 +140,8 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
     }
 
-    private void tryJoinRoomChats(List<QBDialog> allDialogsList){
-        multiChatHelper.tryJoinRoomChats(allDialogsList);
-    }
-
-    private void tryJoinRoomChatsPage(List<QBDialog> dialogsList){
-        multiChatHelper.tryJoinRoomChatsPage(dialogsList);
+    private void tryJoinRoomChatsPage(List<QBDialog> dialogsList, boolean needClean){
+        multiChatHelper.tryJoinRoomChatsPage(dialogsList, needClean);
     }
 
     private void sendLoadPageSuccess(Bundle result){
