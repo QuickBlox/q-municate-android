@@ -144,7 +144,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         tryJoinRoomChatsPage(qbDialogsList, true);
     }
 
-    public void tryJoinRoomChatsPage(List<QBDialog> qbDialogsList, boolean needClean) {
+    public synchronized void tryJoinRoomChatsPage(List<QBDialog> qbDialogsList, boolean needClean) {
         if (!qbDialogsList.isEmpty()) {
             initGroupDialogsList(needClean);
             for (QBDialog dialog : qbDialogsList) {

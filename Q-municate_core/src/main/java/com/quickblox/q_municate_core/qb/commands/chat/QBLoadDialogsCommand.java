@@ -140,8 +140,13 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
     }
 
-    private void tryJoinRoomChatsPage(List<QBDialog> dialogsList, boolean needClean){
-        multiChatHelper.tryJoinRoomChatsPage(dialogsList, needClean);
+    private void tryJoinRoomChatsPage(final List<QBDialog> dialogsList, final boolean needClean){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                multiChatHelper.tryJoinRoomChatsPage(dialogsList, needClean);
+            }
+        }).start();
     }
 
     private void sendLoadPageSuccess(Bundle result){
