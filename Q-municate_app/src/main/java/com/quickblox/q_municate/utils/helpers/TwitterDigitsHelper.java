@@ -1,12 +1,13 @@
 package com.quickblox.q_municate.utils.helpers;
 
-import android.app.Activity;
+import android.content.Context;
 
 import com.digits.sdk.android.AuthCallback;
 import com.digits.sdk.android.AuthConfig;
 import com.digits.sdk.android.Digits;
 import com.digits.sdk.android.DigitsOAuthSigning;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.twitter.sdk.android.core.TwitterCore;
@@ -17,33 +18,30 @@ import io.fabric.sdk.android.Fabric;
 
 public class TwitterDigitsHelper {
 
-    private final Activity activity;
+    private final Context context;
 
     public class Consts{
         public static final String PROVIDER = "X-Auth-Service-Provider";
         public static final String CREDENTIALS = "X-Verify-Credentials-Authorization";
     }
 
-//    test values
-// Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "90CcwzxplDO6nzCmgSP8u37IY";
-    private static final String TWITTER_SECRET = "61mnFULWURLwKxwjdMQwdZOMD6422dFYe218Nd8eRNGXSrYQDx";
-
     private final AuthCallback twitterDigitsAuthCallback;
 
-    public TwitterDigitsHelper(Activity activity, AuthCallback twitterDigitsAuthCallback) {
-        this.activity = activity;
+    public TwitterDigitsHelper(Context context, AuthCallback twitterDigitsAuthCallback) {
+        this.context = context;
         this.twitterDigitsAuthCallback = twitterDigitsAuthCallback;
         initTwitterDigits();
     }
 
     private void initTwitterDigits() {
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(activity.getApplicationContext(),
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(
+                StringObfuscator.getTwitterConsumerKey(),
+                StringObfuscator.getTwitterConsumerSecret());
+
+        Fabric.with(context.getApplicationContext(),
                 new TwitterCore(authConfig),
                 new Digits.Builder()
                         .withTheme(R.style.AppTheme).build());
-
     }
 
     public AuthCallback getAuthCallback(){

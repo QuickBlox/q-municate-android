@@ -8,8 +8,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.utils.Utils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -49,14 +49,6 @@ public class LandingActivity extends BaseAuthActivity {
         finish();
     }
 
-//    @OnClick(R.id.facebook_connect_button)
-//    void facebookConnect(View view) {
-//        if (checkNetworkAvailableWithError()) {
-//            loginType = LoginType.FACEBOOK;
-//            startSocialLogin();
-//        }
-//    }
-
     @OnClick(R.id.twitter_digits_connect_button)
     void twitterDigitsConnect(View view) {
         if (checkNetworkAvailableWithError()) {
@@ -76,6 +68,6 @@ public class LandingActivity extends BaseAuthActivity {
     }
 
     private void initVersionName() {
-        appVersionTextView.setText(getString(R.string.landing_version, Utils.getAppVersionName(this)));
+        appVersionTextView.setText(StringObfuscator.getAppVersionName());
     }
 }

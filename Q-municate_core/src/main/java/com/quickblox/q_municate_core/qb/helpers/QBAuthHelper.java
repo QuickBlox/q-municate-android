@@ -110,7 +110,7 @@ public class QBAuthHelper extends BaseHelper {
 
         if (file != null) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-            userCustomData.setAvatar_url(qbFile.getPublicUrl());
+            userCustomData.setAvatarUrl(qbFile.getPublicUrl());
             inputUser.setCustomData(Utils.customDataToString(userCustomData));
             qbUser = QBUsers.updateUser(inputUser);
         }
@@ -166,7 +166,7 @@ public class QBAuthHelper extends BaseHelper {
         newUser.setFullName(user.getFullName());
 
         UserCustomData userCustomData = getUserCustomData(user);
-        userCustomData.setAvatar_url(qbFile.getPublicUrl());
+        userCustomData.setAvatarUrl(qbFile.getPublicUrl());
         newUser.setCustomData(Utils.customDataToString(userCustomData));
 
         return updateUser(newUser);

@@ -50,10 +50,11 @@ android {
             buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('prodAccountKey')
-            buildConfigField "String", "FACEBOOK_APP_ID", property('prodFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
-            resValue "string", "facebookAppId", property('prodFacebookAppID')
+            buildConfigField "String", "TWITTER_KEY", property('prodTwitterDigitsConsumerKey')
+            buildConfigField "String", "TWITTER_SECRET", property('prodTwitterDigitsConsumerSecret')
             resValue "string", "twitterDigitsApiKey", property('prodTwittedDigitsApiKey')
+            resValue "string", "facebookAppId", property('prodFacebookAppID')
         }
 
         debug {
@@ -63,10 +64,11 @@ android {
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('devAccountKey')
-            buildConfigField "String", "FACEBOOK_APP_ID", property('devFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
-            resValue "string", "facebookAppId", property('devFacebookAppID')
+            buildConfigField "String", "TWITTER_KEY", property('devTwitterDigitsConsumerKey')
+            buildConfigField "String", "TWITTER_SECRET", property('devTwitterDigitsConsumerSecret')
             resValue "string", "twitterDigitsApiKey", property('devTwittedDigitsApiKey')
+            resValue "string", "facebookAppId", property('devFacebookAppID')
         }
     }
 

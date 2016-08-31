@@ -51,7 +51,8 @@ public class LoginActivity extends BaseAuthActivity {
     @OnClick(R.id.facebook_connect_button)
     void loginFB(View view) {
         if (checkNetworkAvailableWithError()) {
-            loginFB();
+            loginType = LoginType.FACEBOOK;
+            startSocialLogin();
         }
     }
 
