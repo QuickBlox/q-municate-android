@@ -8,12 +8,6 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_add_chat"
-        android:icon="@drawable/ic_add_dark"
-        android:title="@string/action_bar_add_chat"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/action_start_settings"
         android:title="@string/action_bar_settings"
         app:showAsAction="never" />

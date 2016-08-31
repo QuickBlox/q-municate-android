@@ -56,6 +56,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
@@ -124,14 +125,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         switch (item.getItemId()) {
             case R.id.action_search:
                 launchContactsFragment();
-                break;
-            case R.id.action_add_chat:
-                boolean isFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
-                if (isFriends) {
-                    NewMessageActivity.start(getActivity());
-                } else {
-                    ToastUtils.longToast(R.string.new_message_no_friends_for_new_message);
-                }
                 break;
             case R.id.action_start_invite_friends:
                 InviteFriendsActivity.start(getActivity());
@@ -206,6 +199,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
             startGroupChatActivity(dialog);
         }
     }
+    @OnClick(R.id.fab_dialogs_new_chat)
+    public void onAddChatClick(View view) {
+        addChat();
+    }
 
     private boolean isFirstOpeningDialog(String dialogId){
         return !dataManager.getMessageDataManager().getTempMessagesByDialogId(dialogId).isEmpty();
@@ -230,6 +227,15 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         dialogsListAdapter.setNewData(dialogsList);
         dialogsListAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
+    }
+
+    private void addChat(){
+        boolean isFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
+        if (isFriends) {
+            NewMessageActivity.start(getActivity());
+        } else {
+            ToastUtils.longToast(R.string.new_message_no_friends_for_new_message);
+        }
     }
 
     private void checkVisibilityEmptyLabel() {
