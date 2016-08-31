@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -24,7 +24,7 @@
             app:border_width="@dimen/avatar_border_width"
             app:oval="true" />
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -53,7 +53,7 @@
                 android:textSize="@dimen/text_size_small"
                 tools:text="1111111 sclk" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/unread_messages_textview"
@@ -71,4 +71,4 @@
 
     </RelativeLayout>
 
-</RelativeLayout>
+</LinearLayout>

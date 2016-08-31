@@ -31,6 +31,7 @@ import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.fragments.search.SearchFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -58,7 +59,7 @@ import java.util.Observer;
 import butterknife.Bind;
 import butterknife.OnItemClick;
 
-public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
+public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>> {
 
     private static final String TAG = DialogsListFragment.class.getSimpleName();
     private static final int LOADER_ID = DialogsListFragment.class.hashCode();
@@ -164,7 +165,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         switch (item.getItemId()) {
             case R.id.action_delete:
                 if (baseActivity.checkNetworkAvailableWithError()) {
-                    Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
+                    Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position).getDialog();
                     deleteDialog(dialog);
                 }
                 break;
@@ -194,7 +195,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
 
     @OnItemClick(R.id.chats_listview)
     void startChat(int position) {
-        Dialog dialog = dialogsListAdapter.getItem(position);
+        Dialog dialog = dialogsListAdapter.getItem(position).getDialog();
 
         if (!baseActivity.checkNetworkAvailableWithError() && isFirstOpeningDialog(dialog.getDialogId())) {
             return;
@@ -221,12 +222,12 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     }
 
     @Override
-    protected Loader<List<Dialog>> createDataLoader() {
+    protected Loader<List<DialogWrapper>> createDataLoader() {
         return new DialogsListLoader(getActivity(), dataManager);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Dialog>> loader, List<Dialog> dialogsList) {
+    public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
         dialogsListAdapter.setNewData(dialogsList);
         dialogsListAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
@@ -251,7 +252,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     }
 
     private void initChatsDialogs() {
-        List<Dialog> dialogsList = Collections.emptyList();
+        List<DialogWrapper> dialogsList = Collections.emptyList();
         dialogsListAdapter = new DialogsListAdapter(baseActivity, dialogsList);
         dialogsListView.setAdapter(dialogsListAdapter);
     }
@@ -306,16 +307,21 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         baseActivity.setCurrentFragment(SearchFragment.newInstance());
     }
 
-    private static class DialogsListLoader extends BaseLoader<List<Dialog>> {
+    private static class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
 
         public DialogsListLoader(Context context, DataManager dataManager) {
             super(context, dataManager);
         }
 
         @Override
-        protected List<Dialog> getItems() {
-            return ChatUtils.fillTitleForPrivateDialogsList(getContext().getResources().getString(R.string.deleted_user),
+        protected List<DialogWrapper> getItems() {
+            List<Dialog> dialogs = ChatUtils.fillTitleForPrivateDialogsList(getContext().getResources().getString(R.string.deleted_user),
                     dataManager, dataManager.getDialogDataManager().getAllSorted());
+            List<DialogWrapper> dialogWrappers = new ArrayList<>(dialogs.size());
+            for(Dialog dialog : dialogs){
+                dialogWrappers.add(new DialogWrapper(getContext(), dataManager, dialog));
+            }
+            return dialogWrappers;
         }
     }
 
