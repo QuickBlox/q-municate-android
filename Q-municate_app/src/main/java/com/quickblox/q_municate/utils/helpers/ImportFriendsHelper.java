@@ -1,15 +1,19 @@
 package com.quickblox.q_municate.utils.helpers;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
 
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.model.GraphUser;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate_core.qb.commands.friend.QBImportFriendsCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,16 +66,30 @@ public class ImportFriendsHelper {
     }
 
     private void getFacebookFriendsList() {
-        Request.newMyFriendsRequest(Session.getActiveSession(), new Request.GraphUserListCallback() {
-
+        GraphRequest requestFriends = GraphRequest.newMyFriendsRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONArrayCallback() {
             @Override
-            public void onCompleted(List<GraphUser> users, Response response) {
-                for (com.facebook.model.GraphUser user : users) {
-                    friendsFacebookList.add(new InviteFriend(user.getId(), user.getName(), user.getLink(),
-                            InviteFriend.VIA_FACEBOOK_TYPE, null, false));
+            public void onCompleted(JSONArray objects, GraphResponse response) {
+                Log.d("ImportFriendsHelper", objects.toString());
+                if (objects.length() > 0) {
+                    for (int i = 0; i < objects.length(); i ++) {
+                        try {
+                            JSONObject elementFriend = (JSONObject) objects.get(i);
+                            String userId = elementFriend.getString("id");
+                            String userName = elementFriend.getString("name");
+                            String userLink = elementFriend.getString("link");
+                            friendsFacebookList.add(new InviteFriend(userId, userName, userLink,
+                                    InviteFriend.VIA_FACEBOOK_TYPE, null, false));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    fiendsReceived();
                 }
-                fiendsReceived();
             }
-        }).executeAsync();
+        });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,link");
+        requestFriends.setParameters(parameters);
+        requestFriends.executeAsync();
     }
 }

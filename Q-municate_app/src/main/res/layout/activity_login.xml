@@ -61,11 +61,49 @@
             android:textColor="@color/text_dark"
             android:textSize="@dimen/text_size" />
 
+        <Button
+            android:id="@+id/login_email_button"
+            android:layout_height="@dimen/landing_button_height"
+            android:layout_width="@dimen/landing_button_width"
+            android:background="@drawable/selector_button_green_oval"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/auth_login_title"
+            android:textColor="@color/text_white"
+            android:textSize="@dimen/text_size"
+            />
+
+        <TextView
+            style="@style/TextViewLinkStyle.Dark"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:text="@string/auth_or_text"
+            android:textSize="@dimen/text_size_small" />
+
+        <RelativeLayout
+            android:id="@+id/facebook_connect_button"
+            android:layout_width="@dimen/landing_button_width"
+            android:layout_height="@dimen/landing_button_height"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/selector_button_connect_facebook">
+
+            <TextView
+                style="@style/TextViewDrawableStyle.White"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:textAllCaps="true"
+                android:background="@null"
+                android:drawableLeft="@drawable/ic_fb_white"
+                android:text="@string/auth_log_in_with_facebook" />
+
+        </RelativeLayout>
+
         <TextView
             style="@style/TextViewLinkStyle.Dark"
             android:id="@+id/forgot_password_textview"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="16dp"
             android:text="@string/auth_forgot_password"
             android:textSize="@dimen/text_size_small" />
 

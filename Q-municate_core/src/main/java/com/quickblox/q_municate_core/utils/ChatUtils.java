@@ -388,9 +388,14 @@ public class ChatUtils {
         message.setMessageId(qbChatMessage.getId());
         message.setDialogOccupant(dialogOccupant);
         message.setCreatedDate(dateSent);
-        message.setState(qbChatMessage.isRead() ? State.READ : state);
+        message.setState(messageIsRead(qbChatMessage) ? State.READ : state);
         message.setBody(qbChatMessage.getBody());
         return message;
+    }
+
+    private static boolean messageIsRead(QBChatMessage qbChatMessage){
+        return qbChatMessage.getReadIds() != null
+                && qbChatMessage.getReadIds().contains(qbChatMessage.getRecipientId());
     }
 
     public static long getMessageDateSent(QBChatMessage qbChatMessage) {
@@ -409,7 +414,7 @@ public class ChatUtils {
                 .concat("_")
                 .concat(dialogId)
                 .concat(ConstsCore.CHAT_MUC)
-                .concat(QBSettings.getInstance().getChatServerDomain());
+                .concat(QBSettings.getInstance().getChatEndpoint());
     }
 
     public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
@@ -457,7 +462,7 @@ public class ChatUtils {
 
         long dateSent = getMessageDateSent(qbChatMessage);
         dialogNotification.setCreatedDate(dateSent);
-        dialogNotification.setState(qbChatMessage.isRead() ? State.READ : State.DELIVERED);
+        dialogNotification.setState(messageIsRead(qbChatMessage) ? State.READ : State.DELIVERED);
 
         return dialogNotification;
     }

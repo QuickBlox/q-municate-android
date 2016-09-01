@@ -43,7 +43,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
 
         Bundle returnedBundle = new Bundle();
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+        customObjectRequestBuilder.setLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
 
         if (loadMore) {
             customObjectRequestBuilder.lt(Consts.MESSAGE_DATE_SENT, lastDateLoad);

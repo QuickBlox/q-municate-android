@@ -5,14 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -56,7 +54,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         Bundle returnedBundle = new Bundle();
         QBRequestGetBuilder qbRequestGetBuilder = new QBRequestGetBuilder();
 
-        qbRequestGetBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
+        qbRequestGetBuilder.setLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         qbRequestGetBuilder.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
 
         parcelableQBDialog.addAll(ChatUtils.qbDialogsToParcelableQBDialogs(
@@ -77,7 +75,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         boolean needToLoadMore;
 
         do {
-            qbRequestGetBuilder.setPagesSkip(allDialogsList.size());
+            qbRequestGetBuilder.setSkip(allDialogsList.size());
             qbRequestGetBuilder.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, dialogsType.getCode());
             List<QBDialog> newDialogsList = dialogsType == QBDialogType.PRIVATE
                     ? getPrivateDialogs(qbRequestGetBuilder, returnedBundle)

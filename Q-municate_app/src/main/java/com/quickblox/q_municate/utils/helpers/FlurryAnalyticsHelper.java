@@ -21,7 +21,7 @@ public class FlurryAnalyticsHelper {
 
         //param keys and values have to be of String type
         params.put("app_id", QBSettings.getInstance().getApplicationId());
-        params.put("chat_endpoint", QBSettings.getInstance().getChatServerDomain());
+        params.put("chat_endpoint", QBSettings.getInstance().getChatEndpoint());
 
         //up to 10 params can be logged with each event
         FlurryAgent.logEvent("connect_to_chat", params);

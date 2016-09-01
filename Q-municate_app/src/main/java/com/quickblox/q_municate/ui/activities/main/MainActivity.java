@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.facebook.Session;
-import com.facebook.SessionState;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
@@ -71,7 +69,7 @@ public class MainActivity extends BaseLoggableActivity {
         gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
-        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+        facebookHelper = new FacebookHelper(this, null);
     }
 
     @Override
@@ -185,26 +183,22 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void checkImportFriends() {
-        Log.d("IMPORT_FRIENDS", "checkImportFriends()");
         if (!appSharedHelper.isUsersImportInitialized()) {
             showProgress();
-            importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
+            startImportFriends();
         }
     }
 
-    private class FacebookSessionStatusCallback implements Session.StatusCallback {
+    private void startImportFriends(){
+        importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
 
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-
-            if (session.isOpened()) {
-                importFriendsHelper.startGetFriendsListTask(true);
-            } else if (!session.isClosed() && !appSharedHelper.isUsersImportInitialized()) {
-                importFriendsHelper.startGetFriendsListTask(false);
-                appSharedHelper.saveUsersImportInitialized(true);
-                hideProgress();
-            }
+        if (facebookHelper.isSessionOpened()){
+            importFriendsHelper.startGetFriendsListTask(true);
+        } else {
+            importFriendsHelper.startGetFriendsListTask(false);
         }
+
+        hideProgress();
     }
 
     private class ImportFriendsSuccessAction implements Command {

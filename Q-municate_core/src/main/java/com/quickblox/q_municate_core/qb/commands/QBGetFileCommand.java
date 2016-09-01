@@ -28,8 +28,7 @@ public class QBGetFileCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         Integer fileId = extras.getInt(QBServiceConsts.EXTRA_FILE_ID);
 
-        QBFile qbFile = new QBFile(fileId);
-        qbFile = QBContent.getFile(qbFile);
+        QBFile qbFile = QBContent.getFile(fileId);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_FILE, qbFile);

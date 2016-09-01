@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.utils;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.quickblox.q_municate_core.utils.Utils;
 
@@ -17,7 +18,7 @@ public class DeviceInfoUtils {
         StringBuilder infoStringBuilder = new StringBuilder();
         infoStringBuilder.append(DEVICE).append(android.os.Build.DEVICE);
         infoStringBuilder.append(NEW_LINE);
-        infoStringBuilder.append(SDK_VERSION).append(android.os.Build.VERSION.SDK);
+        infoStringBuilder.append(SDK_VERSION).append(Build.VERSION.SDK_INT);
         infoStringBuilder.append(NEW_LINE);
         infoStringBuilder.append(MODEL).append(android.os.Build.MODEL);
         infoStringBuilder.append(NEW_LINE);

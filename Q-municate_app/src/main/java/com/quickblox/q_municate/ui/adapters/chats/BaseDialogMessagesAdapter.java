@@ -16,6 +16,7 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.auth.QBAuth;
+import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.server.BaseService;
 import com.quickblox.q_municate.R;
@@ -92,18 +93,8 @@ public abstract class BaseDialogMessagesAdapter
     }
 
     protected void displayAttachImageById(String attachId, final ViewHolder viewHolder) {
-        String token;
-        String privateUrl;
-        try {
-            token = QBAuth.getBaseService().getToken();
-            privateUrl = String.format("%s/blobs/%s?token=%s", BaseService.getServiceEndpointURL(), attachId, token);
-            displayAttachImage(privateUrl, viewHolder);
-        } catch (BaseServiceException e) {
-            e.printStackTrace();
-        }
-//        TODO VT надо переделать на след код после обновления версии SDK до 2.5
-//        String privateUrl = QBFile.getPrivateUrlForUID(attachId);
-//        displayAttachImage(privateUrl, viewHolder);
+        String privateUrl = QBFile.getPrivateUrlForUID(attachId);
+        displayAttachImage(privateUrl, viewHolder);
     }
 
     protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder) {

@@ -1,6 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -13,11 +11,18 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
+    //    QuickBlox libs
+    compile "com.quickblox:quickblox-android-sdk-content:${rootProject.qbSdkVersion}"
+    compile "com.quickblox:quickblox-android-sdk-customobjects:${rootProject.qbSdkVersion}"
+    compile "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
+    compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
+    //    Other QuickBlox libs (core + chat) will be connected as transitive dependencies
 
-    compile project(':facebook')
     compile project(':Q-municate_db')
 
-    compile "com.j256.ormlite:ormlite-android:${rootProject.ormliteAndroidVersion}"
-    compile "com.j256.ormlite:ormlite-core:${rootProject.ormliteCoreVersion}"
+    compile "com.facebook.android:facebook-android-sdk:$rootProject.facebookSdkVersoin"
+
+    compile('com.android.support:cardview-v7:23.2.0') {
+        force = true
+    }
 }
