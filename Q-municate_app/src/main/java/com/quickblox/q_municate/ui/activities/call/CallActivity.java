@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.activities.call;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +27,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -87,6 +90,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private ActionBar actionBar;
     private AudioStreamReceiver audioStreamReceiver;
     private String ACTION_ANSWER_CALL = "action_answer_call";
+    private SystemPermissionHelper systemPermissionHelper;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
             QBRTCSessionDescription qbRtcSessionDescription) {
@@ -365,8 +369,26 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         super.onConnectedToService(service);
         if (qbCallChatHelper == null) {
             qbCallChatHelper = (QBCallChatHelper) service.getHelper(QBService.CALL_CHAT_HELPER);
+            systemPermissionHelper = new SystemPermissionHelper(CallActivity.this);
             qbCallChatHelper.addRTCSessionUserCallback(CallActivity.this);
+            checkPermissions();
+//            initCallFragment();
+        }
+    }
+
+    private void checkPermissions() {
+        String [] permissionList = new String[2];
+        permissionList[0] = Manifest.permission.RECORD_AUDIO;
+
+        if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(qbConferenceType)){
+            permissionList[1] = (Manifest.permission.CAMERA);
+        }
+
+        if (systemPermissionHelper.isAllPermissionGranted(permissionList)){
             initCallFragment();
+        } else {
+            ActivityCompat.requestPermissions(this, permissionList,
+                    SystemPermissionHelper.PERMISSIONS_REQUEST);
         }
     }
 
@@ -566,6 +588,23 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     public void onBackPressed() {
         //blocked back button
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case SystemPermissionHelper.PERMISSIONS_REQUEST: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < permissions.length; i++) {
+                        if (grantResults[i] == -1) {
+                            ToastUtils.longToast(getString(R.string.permission_unavailable, permissions[i]));
+                        }
+                    }
+                }
+
+                initCallFragment();
+            }
+        }
     }
 
     public void addTCClientConnectionCallback(QBRTCSessionConnectionCallbacks clientConnectionCallbacks) {

@@ -41,12 +41,12 @@ android {
             keyPassword property('prodKeyPassword')
         }
 
-        debug {
-            storeFile file(property('devStoreFile'))
-            storePassword property('devStorePassword')
-            keyAlias property('devKeyAlias')
-            keyPassword property('devKeyPassword')
-        }
+//        debug {
+//            storeFile file(property('devStoreFile'))
+//            storePassword property('devStorePassword')
+//            keyAlias property('devKeyAlias')
+//            keyPassword property('devKeyPassword')
+//        }
     }
 
     buildTypes {

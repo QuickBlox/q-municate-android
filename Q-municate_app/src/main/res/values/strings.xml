@@ -272,6 +272,7 @@
     <string name="failed">Failed</string>
     <string name="wifi_disabled">Call was stopped because connection was lost</string>
     <string name="dlg_offline_call">%1$s is calling you!</string>
+    <string name="permission_unavailable">%s is not available now!</string>
 
     <plurals name="days">
         <item quantity="one">%1$d day</item>
