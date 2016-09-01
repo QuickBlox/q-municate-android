@@ -20,6 +20,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
 import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
+import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
@@ -35,6 +36,7 @@ import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DbUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
@@ -174,6 +176,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addActions();
+    }
+
+
+    @Override
     public void onResume() {
         super.onResume();
         addObservers();
@@ -190,6 +199,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onDestroy() {
         super.onDestroy();
+        removeActions();
         deleteObservers();
     }
 
@@ -251,6 +261,21 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
     }
 
+    private void removeActions() {
+        baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
+        baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
+
+
+        baseActivity.updateBroadcastActionList();
+    }
+
+    private void addActions() {
+        baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new DeleteDialogSuccessAction());
+        baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, new DeleteDialogFailAction());
+
+        baseActivity.updateBroadcastActionList();
+    }
+
     private void initChatsDialogs() {
         List<DialogWrapper> dialogsList = Collections.emptyList();
         dialogsListAdapter = new DialogsListAdapter(baseActivity, dialogsList);
@@ -276,6 +301,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void deleteDialog(Dialog dialog) {
+        baseActivity.showProgress();
         if (Dialog.Type.GROUP.equals(dialog.getType())) {
             if (groupChatHelper != null) {
                 try {
@@ -305,6 +331,22 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     private void launchContactsFragment() {
         baseActivity.setCurrentFragment(SearchFragment.newInstance());
+    }
+
+    private class DeleteDialogSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            baseActivity.hideProgress();
+        }
+    }
+
+    private class DeleteDialogFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            baseActivity.hideProgress();
+        }
     }
 
     private static class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
