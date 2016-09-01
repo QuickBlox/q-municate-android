@@ -40,7 +40,7 @@ public class ImageLoaderUtils {
 
     public static ImageLoaderConfiguration getImageLoaderConfiguration(Context context) {
         final int MEMORY_CACHE_LIMIT = 2 * 1024 * 1024;
-        final int THREAD_POOL_SIZE = 5;
+        final int THREAD_POOL_SIZE = 3;
 
         ImageLoaderConfiguration imageLoaderConfiguration = new ImageLoaderConfiguration.Builder(context)
                 .threadPoolSize(THREAD_POOL_SIZE).threadPriority(Thread.NORM_PRIORITY)
