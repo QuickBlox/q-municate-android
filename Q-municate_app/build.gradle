@@ -31,19 +31,18 @@ android {
         multiDexEnabled = true
     }
 
-
 //     before release need to enable Crashlytics
 
     signingConfigs {
         release {
-            storeFile file (property('prodStoreFile'))
+            storeFile file(property('prodStoreFile'))
             storePassword property('prodStorePassword')
             keyAlias property('prodKeyAlias')
             keyPassword property('prodKeyPassword')
         }
 
         debug {
-            storeFile file (property('devStoreFile'))
+            storeFile file(property('devStoreFile'))
             storePassword property('devStorePassword')
             keyAlias property('devKeyAlias')
             keyPassword property('devKeyPassword')
@@ -58,6 +57,7 @@ android {
             buildConfigField "String", "APP_ID", property('prodAppID')
             buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
+            buildConfigField "String", "ACCOUNT_KEY", property('prodAccountKey')
             buildConfigField "String", "FACEBOOK_APP_ID", property('prodFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
             resValue "string", "facebookAppId", property('prodFacebookAppID')
@@ -65,11 +65,11 @@ android {
 
         debug {
             debuggable rootProject.prodDebug
-            signingConfig signingConfigs.debug
-            versionNameSuffix  ' (debug)'
+            versionNameSuffix ' (debug)'
             buildConfigField "String", "APP_ID", property('devAppID')
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
+            buildConfigField "String", "ACCOUNT_KEY", property('devAccountKey')
             buildConfigField "String", "FACEBOOK_APP_ID", property('devFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
             resValue "string", "facebookAppId", property('devFacebookAppID')
@@ -112,6 +112,9 @@ dependencies {
     compile "com.timehop.stickyheadersrecyclerview:library:${rootProject.stickylistheadersRecyclerViewVersion}@aar"
     compile "com.rockerhieu.emojicon:library:${rootProject.emojiconVersion}"
     compile "com.soundcloud.android:android-crop:${rootProject.cropVersion}@aar"
+    compile('com.android.support:cardview-v7:23.2.0') {
+        force = true
+    }
 }
 
 def changeApkFileName(variant) {

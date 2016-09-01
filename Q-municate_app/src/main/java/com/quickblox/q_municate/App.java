@@ -38,10 +38,12 @@ public class App extends MultiDexApplication {
 
     private void initQb() {
         QBChatService.setDebugEnabled(StringObfuscator.getDebugEnabled());
-        QBSettings.getInstance().fastConfigInit(
+
+        QBSettings.getInstance().init(getApplicationContext(),
                 StringObfuscator.getApplicationId(),
                 StringObfuscator.getAuthKey(),
                 StringObfuscator.getAuthSecret());
+        QBSettings.getInstance().setAccountKey(StringObfuscator.getAccountKey());
     }
 
     private void initDb() {

@@ -16,6 +16,10 @@ public class StringObfuscator {
         return BuildConfig.AUTH_SECRET;
     }
 
+    public static String getAccountKey(){
+        return BuildConfig.ACCOUNT_KEY;
+    }
+
     public static String getAppVersionName() {
         return BuildConfig.VERSION_NAME;
     }

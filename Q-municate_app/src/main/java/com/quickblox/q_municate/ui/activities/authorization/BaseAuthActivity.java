@@ -10,8 +10,9 @@ import android.util.Log;
 import android.widget.EditText;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.facebook.Session;
-import com.facebook.SessionState;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -103,7 +104,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(STARTED_LOGIN_TYPE, loginType);
-        facebookHelper.onSaveInstanceState(outState);
     }
 
     @Override
@@ -129,7 +129,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
             loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
-        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+        facebookHelper = new FacebookHelper(this, new FacebookLoginCallback());
         loginSuccessAction = new LoginSuccessAction();
         socialLoginSuccessAction = new SocialLoginSuccessAction();
         failAction = new FailAction();
@@ -282,26 +282,32 @@ public abstract class BaseAuthActivity extends BaseActivity {
         }
     }
 
-    private class FacebookSessionStatusCallback implements Session.StatusCallback {
+    private class FacebookLoginCallback implements FacebookCallback<LoginResult> {
 
         @Override
-        public void call(Session session, SessionState state, Exception exception) {
-            Log.d(TAG, "+++ FB StatusCallback call +++");
-            if (session.isOpened() && loginType.equals(LoginType.FACEBOOK)) {
-                Log.d(TAG, "+++ FB StatusCallback - GO TO LOG IN +++");
-
-                QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
+        public void onSuccess(LoginResult loginResult) {
+            Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
+            if (loginType.equals(LoginType.FACEBOOK)) {
+                QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
 
                 if (BaseAuthActivity.this instanceof SplashActivity) {
                     hideProgress();
                 } else {
                     showProgress();
                 }
-
-            } else {
-                Log.d(TAG, "+++ FB StatusCallback - SESSION CLOSED +++");
-                hideProgress();
             }
+        }
+
+        @Override
+        public void onCancel() {
+            Log.d(TAG, "+++ FacebookCallback call onCancel from BaseAuthActivity +++");
+            hideProgress();
+        }
+
+        @Override
+        public void onError(FacebookException error) {
+            Log.d(TAG, "+++ FacebookCallback call onCancel BaseAuthActivity +++");
+            hideProgress();
         }
     }
 }

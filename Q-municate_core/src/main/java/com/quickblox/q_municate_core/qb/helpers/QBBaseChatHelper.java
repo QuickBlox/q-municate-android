@@ -132,7 +132,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             if (privateChat != null) {
                 privateChat.sendMessage(qbChatMessage);
             }
-        } catch (XMPPException | SmackException.NotConnectedException e) {
+        } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         }
         if (error != null) {

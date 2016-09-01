@@ -68,7 +68,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         final Bundle returnedBundle = new Bundle();
         final QBRequestGetBuilder qbRequestGetBuilder = new QBRequestGetBuilder();
 
-        qbRequestGetBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
+        qbRequestGetBuilder.setLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         qbRequestGetBuilder.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
 
         parcelableQBDialog.addAll(ChatUtils.qbDialogsToParcelableQBDialogs(
@@ -89,7 +89,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     private boolean loadAllDialogsByType(QBDialogType dialogsType,  Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, List<QBDialog> allDialogsList, int pageNumber) throws QBResponseException {
         boolean needToLoadMore = false;
 
-        qbRequestGetBuilder.setPagesSkip(allDialogsList.size());
+        qbRequestGetBuilder.setSkip(allDialogsList.size());
             qbRequestGetBuilder.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, dialogsType.getCode());
             List<QBDialog> newDialogsList = dialogsType == QBDialogType.PRIVATE
                     ? getPrivateDialogs(qbRequestGetBuilder, returnedBundle)

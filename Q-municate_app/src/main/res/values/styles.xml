@@ -103,4 +103,13 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
+    <style name="LocalVideoViewStyle">
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_height">180dp</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_marginRight">@dimen/padding_minimal_material</item>
+        <item name="android:layout_marginBottom">@dimen/padding_minimal_material</item>
+    </style>
+
 </resources>

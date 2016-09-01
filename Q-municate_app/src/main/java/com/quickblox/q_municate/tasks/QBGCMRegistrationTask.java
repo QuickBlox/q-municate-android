@@ -8,10 +8,10 @@ import android.telephony.TelephonyManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.messages.QBMessages;
+import com.quickblox.messages.QBPushNotifications;
 import com.quickblox.messages.model.QBEnvironment;
+import com.quickblox.messages.model.QBNotificationChannel;
 import com.quickblox.messages.model.QBSubscription;
-import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate_core.core.concurrency.BaseErrorAsyncTask;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -62,9 +62,16 @@ public class QBGCMRegistrationTask extends BaseErrorAsyncTask<GoogleCloudMessagi
             deviceId = getDeviceIdForTablet(activityRef.get());
         }
 
+        QBSubscription subscription = new QBSubscription();
+        subscription.setDeviceUdid(deviceId);
+        subscription.setRegistrationID(regId);
+        subscription.setNotificationChannel(QBNotificationChannel.GCM);
+        subscription.setEnvironment(QBEnvironment.PRODUCTION);
+
         ArrayList<QBSubscription> subscriptions = null;
+
         try {
-            subscriptions = QBMessages.subscribeToPushNotificationsTask(regId, deviceId, QBEnvironment.PRODUCTION);
+            subscriptions = QBPushNotifications.createSubscription(subscription);
         } catch (QBResponseException e) {
             ErrorUtils.logError(e);
         }

@@ -65,11 +65,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     private boolean isLoggedIn() {
-        boolean result = false;
-        if (QBChatService.isInitialized()) {
-            result = QBChatService.getInstance().isLoggedIn();
-        }
-        return result;
+        return QBChatService.getInstance().isLoggedIn();
     }
 
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {

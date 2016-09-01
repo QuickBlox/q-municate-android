@@ -3,7 +3,7 @@ package com.quickblox.q_municate_core.qb.helpers;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.facebook.Session;
+import com.facebook.login.LoginManager;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.content.QBContent;
@@ -120,7 +120,8 @@ public class QBAuthHelper extends BaseHelper {
         if (activeSession != null) {
             activeSession.closeAndClear();
         }
-        Session.getActiveSession().closeAndClearTokenInformation();
+
+        LoginManager.getInstance().logOut();
         QBAuth.deleteSession();
     }
 
