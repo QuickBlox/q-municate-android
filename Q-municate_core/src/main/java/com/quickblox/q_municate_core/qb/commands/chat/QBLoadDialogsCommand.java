@@ -116,13 +116,13 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
         final QBRequestGetBuilder qbRequestGetBuilderPrivate = new QBRequestGetBuilder();
 
-        qbRequestGetBuilderPrivate.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
+        qbRequestGetBuilderPrivate.setLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         qbRequestGetBuilderPrivate.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
         qbRequestGetBuilderPrivate.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, QBDialogType.PRIVATE.getCode());
 
         final QBRequestGetBuilder qbRequestGetBuilderGroup = new QBRequestGetBuilder();
 
-        qbRequestGetBuilderGroup.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
+        qbRequestGetBuilderGroup.setLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         qbRequestGetBuilderGroup.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
         qbRequestGetBuilderGroup.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, QBDialogType.GROUP.getCode());
 
