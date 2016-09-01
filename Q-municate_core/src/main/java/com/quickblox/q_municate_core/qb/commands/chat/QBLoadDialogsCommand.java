@@ -20,6 +20,10 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class QBLoadDialogsCommand extends ServiceCommand {
 
@@ -37,11 +41,19 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     // it is 200 Dialogs
     private final static int DIALOGS_PARTS = 10; // TODO: need to fix in the second release.
 
+    private static final int KEEP_ALIVE_TIME = 1;
+    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
+    private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
+
+    private BlockingQueue<Runnable> threadQueue;
+    private ThreadPoolExecutor threadPool;
+
     public QBLoadDialogsCommand(Context context, QBPrivateChatHelper privateChatHelper, QBGroupChatHelper multiChatHelper, String successAction,
                                 String failAction) {
         super(context, successAction, failAction);
         this.multiChatHelper = multiChatHelper;
         this.privateChatHelper = privateChatHelper;
+        initThreads();
     }
 
     public static void start(Context context) {
@@ -66,6 +78,12 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
 
         return bundle;
+    }
+
+    private void initThreads() {
+        threadQueue = new LinkedBlockingQueue<>();
+        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, threadQueue);
+        threadPool.allowCoreThreadTimeOut(true);
     }
 
     private boolean loadAllDialogsByType(QBDialogType dialogsType,  Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, List<QBDialog> allDialogsList, int pageNumber) throws QBResponseException {
@@ -140,13 +158,14 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
     }
 
-    private void tryJoinRoomChatsPage(final List<QBDialog> dialogsList, final boolean needClean){
-        new Thread(new Runnable() {
+    private void tryJoinRoomChatsPage(final List<QBDialog> dialogsList, final boolean needClean) {
+        threadPool.execute(new Runnable() {
+
             @Override
             public void run() {
                 multiChatHelper.tryJoinRoomChatsPage(dialogsList, needClean);
             }
-        }).start();
+        });
     }
 
     private void sendLoadPageSuccess(Bundle result){
