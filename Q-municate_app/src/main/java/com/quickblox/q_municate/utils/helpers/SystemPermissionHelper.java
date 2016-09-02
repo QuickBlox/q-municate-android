@@ -59,14 +59,13 @@ public class SystemPermissionHelper {
     }
 
     private String [] collectDaniedPermissions(String... permissions){
-        String [] daniedPermissions = new String[permissions.length];
-
+        ArrayList<String> daniedPermissionsList = new ArrayList<>();
         for (String permission : permissions) {
             if (isPermissionDanied(permission)) {
-                daniedPermissions[daniedPermissions.length - 1] = permission;
+                daniedPermissionsList.add(permission);
             }
         }
 
-        return daniedPermissions;
+        return daniedPermissionsList.toArray(new String[daniedPermissionsList.size()]);
     }
 }

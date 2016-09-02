@@ -387,8 +387,9 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (systemPermissionHelper.isAllPermissionGranted(permissionList)){
             initCallFragment();
         } else {
-            ActivityCompat.requestPermissions(this, permissionList,
-                    SystemPermissionHelper.PERMISSIONS_REQUEST);
+            systemPermissionHelper.checkAndRequestPermissions(permissionList);
+//            ActivityCompat.requestPermissions(this, permissionList,
+//                    SystemPermissionHelper.PERMISSIONS_REQUEST);
         }
     }
 
