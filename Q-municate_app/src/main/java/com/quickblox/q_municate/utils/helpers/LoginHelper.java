@@ -87,11 +87,11 @@ public class LoginHelper {
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
             existingQbSessionListener.onStartSessionSuccess();
         } else {
-            login();
+            reLogin();
         }
     }
 
-    public void login() {
+    public void reLogin() {
         if (LoginType.EMAIL.equals(getCurrentLoginType())) {
             loginQB();
         } else if (LoginType.FACEBOOK.equals(getCurrentLoginType())) {
@@ -143,7 +143,7 @@ public class LoginHelper {
         this.globalLoginListener = globalLoginListener;
         commandBroadcastReceiver = new CommandBroadcastReceiver();
         registerCommandBroadcastReceiver();
-        login();
+        reLogin();
     }
 
     private void unregisterBroadcastReceiver() {

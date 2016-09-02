@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.digits.sdk.android.Digits;
 import com.facebook.AccessToken;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
@@ -530,9 +529,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void refreshTDSession() {
-        Map<String, String> authHeaders = TwitterDigitsHelper.getCurrentAuthHeaders();
-        String tdServiceProvider = authHeaders.get(TwitterDigitsHelper.Consts.PROVIDER);
-        String tdCredentials = authHeaders.get(TwitterDigitsHelper.Consts.CREDENTIALS);
+        Map<String, String> authHeaders = TwitterDigitsHelper.retrieveCurrentAuthHeaders();
+        String tdServiceProvider = authHeaders.get(TwitterDigitsHelper.PROVIDER);
+        String tdCredentials = authHeaders.get(TwitterDigitsHelper.CREDENTIALS);
         QBSocialLoginCommand.start(this, QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials);
     }
 

@@ -88,11 +88,6 @@ public class LoginActivity extends BaseAuthActivity {
         rememberMeSwitch.setChecked(true);
     }
 
-    private void loginFB() {
-        loginType = LoginType.FACEBOOK;
-        facebookHelper.loginWithFacebook();
-    }
-
     private void login() {
         KeyboardUtils.hideKeyboard(this);
 

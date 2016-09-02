@@ -20,10 +20,8 @@ public class TwitterDigitsHelper {
 
     private final Context context;
 
-    public class Consts{
-        public static final String PROVIDER = "X-Auth-Service-Provider";
-        public static final String CREDENTIALS = "X-Verify-Credentials-Authorization";
-    }
+    public static final String PROVIDER = "X-Auth-Service-Provider";
+    public static final String CREDENTIALS = "X-Verify-Credentials-Authorization";
 
     private final AuthCallback twitterDigitsAuthCallback;
 
@@ -57,7 +55,7 @@ public class TwitterDigitsHelper {
         Digits.clearActiveSession();
     }
 
-    public static Map<String, String> getCurrentAuthHeaders(){
+    public static Map<String, String> retrieveCurrentAuthHeaders(){
         TwitterAuthConfig authConfig = TwitterCore.getInstance().getAuthConfig();
         TwitterAuthToken authToken = Digits.getActiveSession().getAuthToken();
         DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);

@@ -68,7 +68,7 @@ public class MainActivity extends BaseLoggableActivity {
         gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
-        facebookHelper = new FacebookHelper(MainActivity.this, null);
+        facebookHelper = new FacebookHelper(MainActivity.this);
     }
 
     @Override

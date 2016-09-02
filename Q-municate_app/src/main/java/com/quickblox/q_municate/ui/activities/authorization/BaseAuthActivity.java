@@ -33,7 +33,6 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -140,7 +139,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
             loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
-        facebookHelper = new FacebookHelper(this, new FacebookLoginCallback());
+        facebookHelper = new FacebookHelper(this);
         twitterDigitsHelper = new TwitterDigitsHelper(this, new TwitterDigitsStatusCallback());
         loginSuccessAction = new LoginSuccessAction();
         socialLoginSuccessAction = new SocialLoginSuccessAction();
@@ -164,15 +163,10 @@ public abstract class BaseAuthActivity extends BaseActivity {
     }
 
     private void loginWithSocial() {
-        AppSession.getSession().closeAndClear();
-        DataManager.getInstance().clearAllTables();
         appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
-        FacebookHelper.logout(); // clearing old data
-        TwitterDigitsHelper.logout();
-        //TODO VT need implement logout from TD
         if (loginType.equals(LoginType.FACEBOOK)){
-            facebookHelper.loginWithFacebook();
+            facebookHelper.login(new FacebookLoginCallback());
         } else if (loginType.equals(LoginType.TWITTER_DIGITS)){
             twitterDigitsHelper.login();
         }
@@ -271,14 +265,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
         finish();
     }
 
-    private void showProgresIfNeed(){
-        if (BaseAuthActivity.this instanceof SplashActivity) {
-            hideProgress();
-        } else {
-            showProgress();
-        }
-    }
-
     private class LoginSuccessAction implements Command {
 
         @Override
@@ -311,10 +297,9 @@ public abstract class BaseAuthActivity extends BaseActivity {
         @Override
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
-            if (loginType.equals(LoginType.FACEBOOK)) {
+                showProgress();
+
                 QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
-                showProgresIfNeed();
-            }
         }
 
         @Override
@@ -335,15 +320,17 @@ public abstract class BaseAuthActivity extends BaseActivity {
         @Override
         public void success(DigitsSession session, String phoneNumber) {
             Log.d(TAG, "Success login by number: " + phoneNumber);
+
+            showProgress();
+
             TwitterAuthConfig authConfig = TwitterCore.getInstance().getAuthConfig();
             TwitterAuthToken authToken = session.getAuthToken();
             DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
             QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.TWITTER_DIGITS,
-                    authHeaders.get(TwitterDigitsHelper.Consts.PROVIDER),
-                    authHeaders.get(TwitterDigitsHelper.Consts.CREDENTIALS));
-            showProgresIfNeed();
+                    authHeaders.get(TwitterDigitsHelper.PROVIDER),
+                    authHeaders.get(TwitterDigitsHelper.CREDENTIALS));
         }
 
         @Override
