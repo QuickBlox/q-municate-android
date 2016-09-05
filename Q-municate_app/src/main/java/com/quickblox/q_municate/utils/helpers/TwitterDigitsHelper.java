@@ -23,11 +23,8 @@ public class TwitterDigitsHelper {
     public static final String PROVIDER = "X-Auth-Service-Provider";
     public static final String CREDENTIALS = "X-Verify-Credentials-Authorization";
 
-    private final AuthCallback twitterDigitsAuthCallback;
-
-    public TwitterDigitsHelper(Context context, AuthCallback twitterDigitsAuthCallback) {
+    public TwitterDigitsHelper(Context context) {
         this.context = context;
-        this.twitterDigitsAuthCallback = twitterDigitsAuthCallback;
         initTwitterDigits();
     }
 
@@ -42,12 +39,8 @@ public class TwitterDigitsHelper {
                         .withTheme(R.style.AppTheme).build());
     }
 
-    public AuthCallback getAuthCallback(){
-        return twitterDigitsAuthCallback;
-    }
-
-    public void login(){
-        AuthConfig authConfig = new AuthConfig.Builder().withAuthCallBack(getAuthCallback()).build();
+    public void login(AuthCallback authCallback){
+        AuthConfig authConfig = new AuthConfig.Builder().withAuthCallBack(authCallback).build();
         Digits.authenticate(authConfig);
     }
 

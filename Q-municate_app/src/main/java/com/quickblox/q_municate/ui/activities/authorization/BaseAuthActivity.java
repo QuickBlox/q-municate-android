@@ -74,6 +74,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected LoginSuccessAction loginSuccessAction;
     protected SocialLoginSuccessAction socialLoginSuccessAction;
     protected FailAction failAction;
+    private TwitterDigitsAuthCallback twitterDigitsAuthCallback;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, BaseAuthActivity.class);
@@ -140,7 +141,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
             loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
         facebookHelper = new FacebookHelper(this);
-        twitterDigitsHelper = new TwitterDigitsHelper(this, new TwitterDigitsStatusCallback());
+        twitterDigitsHelper = new TwitterDigitsHelper(this);
+        twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
         loginSuccessAction = new LoginSuccessAction();
         socialLoginSuccessAction = new SocialLoginSuccessAction();
         failAction = new FailAction();
@@ -168,7 +170,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (loginType.equals(LoginType.FACEBOOK)){
             facebookHelper.login(new FacebookLoginCallback());
         } else if (loginType.equals(LoginType.TWITTER_DIGITS)){
-            twitterDigitsHelper.login();
+            twitterDigitsHelper.login(twitterDigitsAuthCallback);
         }
     }
 
@@ -315,7 +317,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         }
     }
 
-    private class TwitterDigitsStatusCallback implements AuthCallback {
+    private class TwitterDigitsAuthCallback implements AuthCallback {
 
         @Override
         public void success(DigitsSession session, String phoneNumber) {
