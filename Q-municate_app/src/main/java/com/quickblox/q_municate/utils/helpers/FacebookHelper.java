@@ -19,15 +19,14 @@ public class FacebookHelper {
 
     private static final String PERMISSION_EMAIL = "email";
     private static final String PERMISSION_USER_FRIENDS = "user_friends";
-    private final FacebookCallback <LoginResult> facebookLoginCallback;
 
     private Activity activity;
     private FBAccessTokenTracker fbAccessTokenTracker;
     private CallbackManager fbCallbackManager;
+    private LoginManager fbLoginManager;
 
-    public FacebookHelper(Activity activity, FacebookCallback<LoginResult> facebookStatusCallback) {
+    public FacebookHelper(Activity activity) {
         this.activity = activity;
-        this.facebookLoginCallback = facebookStatusCallback;
         initFacebook();
     }
 
@@ -40,8 +39,7 @@ public class FacebookHelper {
 
         fbCallbackManager = CallbackManager.Factory.create();
 
-        LoginManager fbLoginManager = LoginManager.getInstance();
-        fbLoginManager.registerCallback(fbCallbackManager, facebookLoginCallback);
+        fbLoginManager = LoginManager.getInstance();
 
         this.fbAccessTokenTracker = new FBAccessTokenTracker();
     }
@@ -50,10 +48,9 @@ public class FacebookHelper {
         fbCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void loginWithFacebook() {
-        if (AccessToken.getCurrentAccessToken() == null){
-            LoginManager.getInstance().logInWithReadPermissions(activity, generatePermissionsList());
-        }
+    public void login(FacebookCallback<LoginResult> facebookLoginCallback) {
+        fbLoginManager.registerCallback(fbCallbackManager, facebookLoginCallback);
+        fbLoginManager.logInWithReadPermissions(activity, generatePermissionsList());
     }
 
     public List<String> generatePermissionsList() {

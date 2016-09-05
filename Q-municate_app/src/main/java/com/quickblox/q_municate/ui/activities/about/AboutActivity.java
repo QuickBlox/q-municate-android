@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate_core.utils.Utils;
 
 import butterknife.Bind;
@@ -41,7 +42,7 @@ public class AboutActivity extends BaseLoggableActivity {
     }
 
     private void fillUI() {
-        appVersionTextView.setText(getString(R.string.about_version, Utils.getAppVersionName(this)));
+        appVersionTextView.setText(StringObfuscator.getAppVersionName());
     }
 
     @OnClick(R.id.license_button)

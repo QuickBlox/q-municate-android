@@ -4,13 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.utils.Utils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -19,6 +18,9 @@ public class LandingActivity extends BaseAuthActivity {
 
     @Bind(R.id.app_version_textview)
     TextView appVersionTextView;
+
+    @Bind(R.id.twitter_digits_connect_button)
+    Button twitterDigitsConnectButton;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LandingActivity.class);
@@ -47,29 +49,11 @@ public class LandingActivity extends BaseAuthActivity {
         finish();
     }
 
-    @OnClick(R.id.facebook_connect_button)
-    void facebookConnect(View view) {
+    @OnClick(R.id.twitter_digits_connect_button)
+    void twitterDigitsConnect(View view) {
         if (checkNetworkAvailableWithError()) {
-            facebookConnect();
-        }
-    }
-
-    @OnClick(R.id.sign_up_email_button)
-    void signUp(View view) {
-        loginType = LoginType.EMAIL;
-
-        if (!appSharedHelper.isShownUserAgreement()) {
-            UserAgreementDialogFragment
-                    .show(getSupportFragmentManager(), new MaterialDialog.ButtonCallback() {
-                        @Override
-                        public void onPositive(MaterialDialog dialog) {
-                            super.onPositive(dialog);
-                            appSharedHelper.saveShownUserAgreement(true);
-                            startSignUpActivity();
-                        }
-                    });
-        } else {
-            startSignUpActivity();
+            loginType = LoginType.TWITTER_DIGITS;
+            startSocialLogin();
         }
     }
 
@@ -84,6 +68,6 @@ public class LandingActivity extends BaseAuthActivity {
     }
 
     private void initVersionName() {
-        appVersionTextView.setText(getString(R.string.landing_version, Utils.getAppVersionName(this)));
+        appVersionTextView.setText(StringObfuscator.getAppVersionName());
     }
 }

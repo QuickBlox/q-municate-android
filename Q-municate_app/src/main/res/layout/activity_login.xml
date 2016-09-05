@@ -70,7 +70,7 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/auth_login_title"
             android:textColor="@color/text_white"
-            android:textSize="@dimen/text_size"
+            android:textSize="@dimen/landing_button_text_size"
             />
 
         <TextView
@@ -95,7 +95,8 @@
                 android:textAllCaps="true"
                 android:background="@null"
                 android:drawableLeft="@drawable/ic_fb_white"
-                android:text="@string/auth_log_in_with_facebook" />
+                android:text="@string/auth_log_in_with_facebook"
+                android:textSize="@dimen/landing_button_text_size"/>
 
         </RelativeLayout>
 

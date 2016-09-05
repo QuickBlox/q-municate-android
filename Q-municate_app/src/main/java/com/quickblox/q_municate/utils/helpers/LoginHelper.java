@@ -66,15 +66,15 @@ public class LoginHelper {
     public void startExistSession() {
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
         boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
-        if ((isEmailEntered && isPasswordEntered) || (isLoggedViaFB(isPasswordEntered))) {
+        if ((isEmailEntered && isPasswordEntered) || (isLoggedViaSocial(isPasswordEntered))) {
             runExistSession();
         } else {
             existingQbSessionListener.onStartSessionFail();
         }
     }
 
-    public boolean isLoggedViaFB(boolean isPasswordEntered) {
-        return isPasswordEntered && LoginType.FACEBOOK.equals(getCurrentLoginType());
+    public boolean isLoggedViaSocial(boolean isPasswordEntered) {
+        return isPasswordEntered && !LoginType.EMAIL.equals(getCurrentLoginType());
     }
 
     public LoginType getCurrentLoginType() {
@@ -87,16 +87,25 @@ public class LoginHelper {
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
             existingQbSessionListener.onStartSessionSuccess();
         } else {
-            login();
+            reLogin();
         }
     }
 
-    public void login() {
+    public void reLogin() {
         if (LoginType.EMAIL.equals(getCurrentLoginType())) {
             loginQB();
         } else if (LoginType.FACEBOOK.equals(getCurrentLoginType())) {
             loginFB();
+        } else if (LoginType.TWITTER_DIGITS.equals(getCurrentLoginType())){
+            loginTD();
         }
+    }
+
+    public void loginQB() {
+        appSharedHelper.saveUsersImportInitialized(true);
+        QBUser qbUser = new QBUser(null, userPassword, userEmail);
+        AppSession.getSession().closeAndClear();
+        QBLoginCompositeCommand.start(context, qbUser);
     }
 
     public void loginFB() {
@@ -105,11 +114,11 @@ public class LoginHelper {
         QBSocialLoginCommand.start(context, QBProvider.FACEBOOK, fbToken, null);
     }
 
-    public void loginQB() {
-        appSharedHelper.saveUsersImportInitialized(true);
-        QBUser qbUser = new QBUser(null, userPassword, userEmail);
+    private void loginTD() {
+        String tdServiceProvider = appSharedHelper.getTDServiceProvider();
+        String tdCredentials = appSharedHelper.getTDCredentials();
         AppSession.getSession().closeAndClear();
-        QBLoginCompositeCommand.start(context, qbUser);
+        QBSocialLoginCommand.start(context, QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials);
     }
 
     public void loginChat() {
@@ -134,7 +143,7 @@ public class LoginHelper {
         this.globalLoginListener = globalLoginListener;
         commandBroadcastReceiver = new CommandBroadcastReceiver();
         registerCommandBroadcastReceiver();
-        login();
+        reLogin();
     }
 
     private void unregisterBroadcastReceiver() {
