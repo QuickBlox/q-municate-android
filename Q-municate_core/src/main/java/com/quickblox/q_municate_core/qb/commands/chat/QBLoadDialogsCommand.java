@@ -100,7 +100,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
             if (dialogsType == QBDialogType.GROUP) {
                 boolean needClean = (pageNumber == 0);
-                tryJoinRoomChatsPage(allDialogsList, needClean);
+                tryJoinRoomChatsPage(newDialogsList, needClean);
             }
 
         return needToLoadMore;
