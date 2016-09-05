@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -27,7 +26,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
+import com.quickblox.q_municate_core.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -145,7 +144,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         audioStreamReceiver = new AudioStreamReceiver();
         initWiFiManagerListener();
         if (ACTION_ANSWER_CALL.equals(getIntent().getAction())){
-            addConversationFragmentReceiveCall();
+            checkPermissionsAndStartCall(StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
+//            addConversationFragmentReceiveCall();
         }
     }
 
@@ -159,7 +159,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                 }
                 break;
             case OUTCOME_CALL_MADE:
-                addConversationCallFragment();
+                checkPermissionsAndStartCall(StartConversationReason.OUTCOME_CALL_MADE);
+//                addConversationCallFragment();
                 break;
         }
     }
@@ -371,25 +372,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             qbCallChatHelper = (QBCallChatHelper) service.getHelper(QBService.CALL_CHAT_HELPER);
             systemPermissionHelper = new SystemPermissionHelper(CallActivity.this);
             qbCallChatHelper.addRTCSessionUserCallback(CallActivity.this);
-            checkPermissions();
-//            initCallFragment();
-        }
-    }
-
-    private void checkPermissions() {
-        String [] permissionList = new String[2];
-        permissionList[0] = Manifest.permission.RECORD_AUDIO;
-
-        if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(qbConferenceType)){
-            permissionList[1] = (Manifest.permission.CAMERA);
-        }
-
-        if (systemPermissionHelper.isAllPermissionGranted(permissionList)){
             initCallFragment();
-        } else {
-            systemPermissionHelper.checkAndRequestPermissions(permissionList);
-//            ActivityCompat.requestPermissions(this, permissionList,
-//                    SystemPermissionHelper.PERMISSIONS_REQUEST);
         }
     }
 
@@ -501,6 +484,18 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
     }
 
+    public void checkPermissionsAndStartCall(StartConversationReason startConversationReason) {
+        if (systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)) {
+            if (StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)) {
+                addConversationCallFragment();
+            } else {
+                addConversationFragmentReceiveCall();
+            }
+        } else {
+            systemPermissionHelper.requestPermissionsForCallByType(qbConferenceType);
+        }
+    }
+
     public void addConversationCallFragment() {
         Log.d(TAG, "addConversationCallFragment()");
 
@@ -603,7 +598,11 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                     }
                 }
 
-                initCallFragment();
+                if(StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)){
+                    addConversationCallFragment();
+                } else {
+                    addConversationFragmentReceiveCall();
+                }
             }
         }
     }
