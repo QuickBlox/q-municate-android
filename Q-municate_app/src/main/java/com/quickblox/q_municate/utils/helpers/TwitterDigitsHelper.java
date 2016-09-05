@@ -44,7 +44,7 @@ public class TwitterDigitsHelper {
         Digits.authenticate(authConfig);
     }
 
-    public static void logout(){
+    public void logout(){
         Digits.clearActiveSession();
     }
 

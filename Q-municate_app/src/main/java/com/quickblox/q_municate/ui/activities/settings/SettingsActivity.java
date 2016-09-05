@@ -50,6 +50,8 @@ public class SettingsActivity extends BaseLoggableActivity {
     RelativeLayout changePasswordView;
 
     private User user;
+    private FacebookHelper facebookHelper;
+    private TwitterDigitsHelper twitterDigitsHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, SettingsActivity.class);
@@ -123,8 +125,8 @@ public class SettingsActivity extends BaseLoggableActivity {
                                     super.onPositive(dialog);
                                     showProgress();
 
-                                    FacebookHelper.logout();
-                                    TwitterDigitsHelper.logout();
+                                    facebookHelper.logout();
+                                    twitterDigitsHelper.logout();
                                     AppSession.getSession().closeAndClear();
                                     DataManager.getInstance().clearAllTables();
                                     QBLogoutCompositeCommand.start(SettingsActivity.this);
@@ -141,6 +143,8 @@ public class SettingsActivity extends BaseLoggableActivity {
     private void initFields() {
         title = getString(R.string.settings_title);
         user = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+        facebookHelper = new FacebookHelper(this);
+        twitterDigitsHelper = new TwitterDigitsHelper(this);
     }
 
     private void fillUI() {

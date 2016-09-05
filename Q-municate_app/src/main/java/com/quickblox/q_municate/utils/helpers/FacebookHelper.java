@@ -30,7 +30,7 @@ public class FacebookHelper {
         initFacebook();
     }
 
-    public static void logout() {
+    public void logout() {
         LoginManager.getInstance().logOut();
     }
 
