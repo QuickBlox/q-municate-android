@@ -24,10 +24,6 @@ public class StringObfuscator {
         return BuildConfig.VERSION_NAME;
     }
 
-    public static String getFBAppId() {
-        return BuildConfig.FACEBOOK_APP_ID;
-    }
-
     public static boolean getDebugEnabled() {
         return BuildConfig.DEBUG;
     }
@@ -36,4 +32,11 @@ public class StringObfuscator {
         return BuildConfig.PUSH_REGISTRATION_APP_ID;
     }
 
+    public static String getTwitterConsumerKey(){
+        return BuildConfig.TWITTER_KEY;
+    }
+
+    public static String getTwitterConsumerSecret(){
+        return BuildConfig.TWITTER_SECRET;
+    }
 }

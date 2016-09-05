@@ -53,7 +53,7 @@ public class UserFriendUtils {
         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
 
         if (userCustomData != null) {
-            user.setAvatar(userCustomData.getAvatar_url());
+            user.setAvatar(userCustomData.getAvatarUrl());
             user.setStatus(userCustomData.getStatus());
         }
 

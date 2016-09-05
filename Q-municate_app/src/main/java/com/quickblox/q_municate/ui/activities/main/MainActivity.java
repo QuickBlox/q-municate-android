@@ -31,7 +31,6 @@ public class MainActivity extends BaseLoggableActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private FacebookHelper facebookHelper;
-    private ImportFriendsHelper importFriendsHelper;
     private GSMHelper gsmHelper;
 
     private ImportFriendsSuccessAction importFriendsSuccessAction;
@@ -50,7 +49,7 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initFields(savedInstanceState);
+        initFields();
         setUpActionBarWithUpButton();
 
         checkGCMRegistration();
@@ -64,21 +63,18 @@ public class MainActivity extends BaseLoggableActivity {
         launchDialogsListFragment();
     }
 
-    private void initFields(Bundle savedInstanceState) {
+    private void initFields() {
         title = " " + AppSession.getSession().getUser().getFullName();
         gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
-        facebookHelper = new FacebookHelper(this, null);
+        facebookHelper = new FacebookHelper(MainActivity.this);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (facebookHelper != null) {
-            facebookHelper.onActivityResult(requestCode, resultCode, data);
-        }
+        facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -140,8 +136,8 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void checkVisibilityUserIcon() {
         UserCustomData userCustomData = Utils.customDataToObject(AppSession.getSession().getUser().getCustomData());
-        if (!TextUtils.isEmpty(userCustomData.getAvatar_url())) {
-            loadLogoActionBar(userCustomData.getAvatar_url());
+        if (!TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
+            loadLogoActionBar(userCustomData.getAvatarUrl());
         } else {
             setActionBarIcon(ImageUtils.getRoundIconDrawable(this,
                             BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));
@@ -190,7 +186,7 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void startImportFriends(){
-        importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
+        ImportFriendsHelper importFriendsHelper = new ImportFriendsHelper(MainActivity.this);
 
         if (facebookHelper.isSessionOpened()){
             importFriendsHelper.startGetFriendsListTask(true);

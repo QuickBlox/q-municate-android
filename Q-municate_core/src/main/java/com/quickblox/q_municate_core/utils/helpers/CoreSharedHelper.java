@@ -9,6 +9,7 @@ import static com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper.Const
 
 public class CoreSharedHelper {
 
+
     public class Constants {
 
         public static final String NAME = "Q-municate";
@@ -18,6 +19,8 @@ public class CoreSharedHelper {
         public static final String FIRST_AUTH = "first_auth";
         public static final String QB_TOKEN = "qb_token";
         public static final String FB_TOKEN = "fb_token";
+        public static final String TD_SERVICE_PROVIDER = "x_auth_service_provider";
+        public static final String TD_CREDENTIALS = "x_verify_credentials_authorization";
 
         public static final String USER_ID = "user_id";
         public static final String USER_EMAIL = "user_email";
@@ -135,6 +138,22 @@ public class CoreSharedHelper {
 
     public void saveFBToken(String token) {
         savePref(Constants.FB_TOKEN, token);
+    }
+
+    public void saveTDServiceProvider(String serviceProvider){
+        savePref(TD_SERVICE_PROVIDER, serviceProvider);
+    }
+
+    public String getTDServiceProvider(){
+        return getPref(TD_SERVICE_PROVIDER, null);
+    }
+
+    public void saveTDCredentials(String credentials){
+        savePref(TD_CREDENTIALS, credentials);
+    }
+
+    public String getTDCredentials(){
+        return getPref(TD_CREDENTIALS, null);
     }
 
     public int getUserId() {

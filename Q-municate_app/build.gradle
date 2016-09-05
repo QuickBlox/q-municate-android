@@ -11,7 +11,6 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'crashlytics'
 
 repositories {
     maven { url 'http://download.crashlytics.com/maven' }
@@ -40,13 +39,6 @@ android {
             keyAlias property('prodKeyAlias')
             keyPassword property('prodKeyPassword')
         }
-
-        debug {
-            storeFile file(property('devStoreFile'))
-            storePassword property('devStorePassword')
-            keyAlias property('devKeyAlias')
-            keyPassword property('devKeyPassword')
-        }
     }
 
     buildTypes {
@@ -58,20 +50,24 @@ android {
             buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('prodAccountKey')
-            buildConfigField "String", "FACEBOOK_APP_ID", property('prodFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
+            buildConfigField "String", "TWITTER_KEY", property('prodTwitterDigitsConsumerKey')
+            buildConfigField "String", "TWITTER_SECRET", property('prodTwitterDigitsConsumerSecret')
+            resValue "string", "twitterDigitsApiKey", property('prodTwittedDigitsApiKey')
             resValue "string", "facebookAppId", property('prodFacebookAppID')
         }
 
         debug {
-            debuggable rootProject.prodDebug
+            debuggable true
             versionNameSuffix ' (debug)'
             buildConfigField "String", "APP_ID", property('devAppID')
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('devAccountKey')
-            buildConfigField "String", "FACEBOOK_APP_ID", property('devFacebookAppID')
             buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
+            buildConfigField "String", "TWITTER_KEY", property('devTwitterDigitsConsumerKey')
+            buildConfigField "String", "TWITTER_SECRET", property('devTwitterDigitsConsumerSecret')
+            resValue "string", "twitterDigitsApiKey", property('devTwittedDigitsApiKey')
             resValue "string", "facebookAppId", property('devFacebookAppID')
         }
     }

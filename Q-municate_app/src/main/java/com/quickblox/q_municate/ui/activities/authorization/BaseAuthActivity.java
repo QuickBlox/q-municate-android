@@ -10,6 +10,10 @@ import android.util.Log;
 import android.widget.EditText;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.digits.sdk.android.AuthCallback;
+import com.digits.sdk.android.DigitsException;
+import com.digits.sdk.android.DigitsOAuthSigning;
+import com.digits.sdk.android.DigitsSession;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
@@ -21,6 +25,7 @@ import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -28,9 +33,13 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterAuthToken;
+import com.twitter.sdk.android.core.TwitterCore;
+
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
@@ -58,12 +67,14 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected EditText passwordEditText;
 
     protected FacebookHelper facebookHelper;
+    protected TwitterDigitsHelper twitterDigitsHelper;
     protected LoginType loginType = LoginType.EMAIL;
     protected Resources resources;
 
     protected LoginSuccessAction loginSuccessAction;
     protected SocialLoginSuccessAction socialLoginSuccessAction;
     protected FailAction failAction;
+    private TwitterDigitsAuthCallback twitterDigitsAuthCallback;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, BaseAuthActivity.class);
@@ -129,15 +140,15 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
             loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
-        facebookHelper = new FacebookHelper(this, new FacebookLoginCallback());
+        facebookHelper = new FacebookHelper(this);
+        twitterDigitsHelper = new TwitterDigitsHelper(this);
+        twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
         loginSuccessAction = new LoginSuccessAction();
         socialLoginSuccessAction = new SocialLoginSuccessAction();
         failAction = new FailAction();
     }
 
-    protected void facebookConnect() {
-        loginType = LoginType.FACEBOOK;
-
+    protected void startSocialLogin() {
         if (!appSharedHelper.isShownUserAgreement()) {
             UserAgreementDialogFragment
                     .show(getSupportFragmentManager(), new MaterialDialog.ButtonCallback() {
@@ -145,21 +156,22 @@ public abstract class BaseAuthActivity extends BaseActivity {
                                 public void onPositive(MaterialDialog dialog) {
                                     super.onPositive(dialog);
                                     appSharedHelper.saveShownUserAgreement(true);
-                                    loginWithFacebook();
+                                    loginWithSocial();
                                 }
                             });
         } else {
-            loginWithFacebook();
+            loginWithSocial();
         }
     }
 
-    private void loginWithFacebook() {
-        AppSession.getSession().closeAndClear();
-        DataManager.getInstance().clearAllTables();
+    private void loginWithSocial() {
         appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
-        FacebookHelper.logout(); // clearing old data
-        facebookHelper.loginWithFacebook();
+        if (loginType.equals(LoginType.FACEBOOK)){
+            facebookHelper.login(new FacebookLoginCallback());
+        } else if (loginType.equals(LoginType.TWITTER_DIGITS)){
+            twitterDigitsHelper.login(twitterDigitsAuthCallback);
+        }
     }
 
     protected void startMainActivity(QBUser user) {
@@ -287,15 +299,9 @@ public abstract class BaseAuthActivity extends BaseActivity {
         @Override
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
-            if (loginType.equals(LoginType.FACEBOOK)) {
-                QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
+                showProgress();
 
-                if (BaseAuthActivity.this instanceof SplashActivity) {
-                    hideProgress();
-                } else {
-                    showProgress();
-                }
-            }
+                QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
         }
 
         @Override
@@ -307,6 +313,31 @@ public abstract class BaseAuthActivity extends BaseActivity {
         @Override
         public void onError(FacebookException error) {
             Log.d(TAG, "+++ FacebookCallback call onCancel BaseAuthActivity +++");
+            hideProgress();
+        }
+    }
+
+    private class TwitterDigitsAuthCallback implements AuthCallback {
+
+        @Override
+        public void success(DigitsSession session, String phoneNumber) {
+            Log.d(TAG, "Success login by number: " + phoneNumber);
+
+            showProgress();
+
+            TwitterAuthConfig authConfig = TwitterCore.getInstance().getAuthConfig();
+            TwitterAuthToken authToken = session.getAuthToken();
+            DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
+            Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
+
+            QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.TWITTER_DIGITS,
+                    authHeaders.get(TwitterDigitsHelper.PROVIDER),
+                    authHeaders.get(TwitterDigitsHelper.CREDENTIALS));
+        }
+
+        @Override
+        public void failure(DigitsException error) {
+            Log.d(TAG, "Failure!!!! error: " + error.getLocalizedMessage());
             hideProgress();
         }
     }
