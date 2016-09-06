@@ -75,10 +75,7 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (facebookHelper != null) {
-            facebookHelper.onActivityResult(requestCode, resultCode, data);
-        }
+        facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

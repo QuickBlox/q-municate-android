@@ -84,11 +84,19 @@ public class SystemPermissionHelper {
         }
     }
 
+    public boolean isAllPermissionsGrantedForImportFriends(){
+        return isAllPermissionGranted(Manifest.permission.READ_CONTACTS);
+    }
+
     public void requestPermissionsForCallByType(QBRTCTypes.QBConferenceType qbConferenceType){
         if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO.equals(qbConferenceType)) {
             checkAndRequestPermissions(Manifest.permission.RECORD_AUDIO);
         } else {
             checkAndRequestPermissions(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA);
         }
+    }
+
+    public void requestPermissionsForImportFriends(){
+        checkAndRequestPermissions(Manifest.permission.READ_CONTACTS);
     }
 }

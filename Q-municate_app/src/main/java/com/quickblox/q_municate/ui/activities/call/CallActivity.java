@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -592,7 +593,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             case SystemPermissionHelper.PERMISSIONS_REQUEST: {
                 if (grantResults.length > 0) {
                     for (int i = 0; i < permissions.length; i++) {
-                        if (grantResults[i] == -1) {
+                        if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                             ToastUtils.longToast(getString(R.string.permission_unavailable, permissions[i]));
                         }
                     }
