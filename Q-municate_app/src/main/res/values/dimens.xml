@@ -14,8 +14,8 @@
     <dimen name="padding_medium">10dp</dimen>
     <dimen name="padding_large">15dp</dimen>
 
-    <dimen name="landing_button_height">42dp</dimen>
-    <dimen name="landing_button_width">300dp</dimen>
+    <dimen name="landing_button_height">40dp</dimen>
+    <dimen name="landing_button_width">328dp</dimen>
     <dimen name="landing_button_text_size">14sp</dimen>
 
     <dimen name="divider_height">1dip</dimen>
@@ -83,5 +83,8 @@
     <dimen name="about_vendor_text_margin_bottom">22dp</dimen>
 
     <dimen name="grid_item_divider">4dp</dimen>
+
+    <dimen name="fab_margin_right">16dp</dimen>
+    <dimen name="fab_margin_bottom">16dp</dimen>
 
 </resources>

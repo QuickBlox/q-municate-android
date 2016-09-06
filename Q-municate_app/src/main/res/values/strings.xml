@@ -21,7 +21,8 @@
 
     <!-- Landing -->
     <string name="landing_connect_with_facebook">Connect with Facebook</string>
-    <string name="landing_already_have_account">Already have an account?</string>
+    <string name="landing_connect_with_twitter_digits">Connect with phone number</string>
+    <string name="landing_already_have_account">Login by email or social</string>
     <string name="landing_sign_up">Sign Up with Email</string>
     <string name="landing_version">v. %1$s</string>
 

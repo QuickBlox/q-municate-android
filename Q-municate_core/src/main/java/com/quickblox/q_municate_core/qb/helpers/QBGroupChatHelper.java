@@ -141,8 +141,12 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void tryJoinRoomChats(List<QBDialog> qbDialogsList) {
+        tryJoinRoomChatsPage(qbDialogsList, true);
+    }
+
+    public synchronized void tryJoinRoomChatsPage(List<QBDialog> qbDialogsList, boolean needClean) {
         if (!qbDialogsList.isEmpty()) {
-            initGroupDialogsList();
+            initGroupDialogsList(needClean);
             for (QBDialog dialog : qbDialogsList) {
                 if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
                     groupDialogsList.add(dialog);
@@ -161,11 +165,13 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
-    private void initGroupDialogsList() {
+    private void initGroupDialogsList(boolean needClean) {
         if (groupDialogsList == null) {
             groupDialogsList = new ArrayList<QBDialog>();
         } else {
-            groupDialogsList.clear();
+            if (needClean) {
+                groupDialogsList.clear();
+            }
         }
     }
 

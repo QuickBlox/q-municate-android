@@ -51,7 +51,8 @@ public class LoginActivity extends BaseAuthActivity {
     @OnClick(R.id.facebook_connect_button)
     void loginFB(View view) {
         if (checkNetworkAvailableWithError()) {
-            loginFB();
+            loginType = LoginType.FACEBOOK;
+            startSocialLogin();
         }
     }
 
@@ -85,11 +86,6 @@ public class LoginActivity extends BaseAuthActivity {
     private void initFields(Bundle bundle) {
         title = getString(R.string.auth_login_title);
         rememberMeSwitch.setChecked(true);
-    }
-
-    private void loginFB() {
-        loginType = LoginType.FACEBOOK;
-        LoginManager.getInstance().logInWithReadPermissions(this, facebookHelper.generatePermissionsList());
     }
 
     private void login() {

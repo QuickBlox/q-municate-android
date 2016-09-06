@@ -6,8 +6,9 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.qb.gson.Gson;
-import com.qb.gson.GsonBuilder;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_db.models.User;
@@ -112,9 +113,9 @@ public class Utils {
     public static String customDataToString(UserCustomData userCustomData) {
         JSONObject jsonObject = new JSONObject();
 
-        setJsonValue(jsonObject, UserCustomData.TAG_AVATAR_URL, userCustomData.getAvatar_url());
+        setJsonValue(jsonObject, UserCustomData.TAG_AVATAR_URL, userCustomData.getAvatarUrl());
         setJsonValue(jsonObject, UserCustomData.TAG_STATUS, userCustomData.getStatus());
-        setJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT, userCustomData.isIs_import());
+        setJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT, userCustomData.getIsImport());
 
         return jsonObject.toString();
     }
@@ -141,7 +142,7 @@ public class Utils {
 
         try {
             userCustomData = gson.fromJson(userCustomDataString, UserCustomData.class);
-        } catch (com.qb.gson.JsonSyntaxException e) {
+        } catch (JsonSyntaxException e) {
             ErrorUtils.logError(e);
         }
 

@@ -20,6 +20,7 @@ import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragme
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -27,6 +28,7 @@ import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLogoutCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 
 import butterknife.Bind;
@@ -48,6 +50,8 @@ public class SettingsActivity extends BaseLoggableActivity {
     RelativeLayout changePasswordView;
 
     private User user;
+    private FacebookHelper facebookHelper;
+    private TwitterDigitsHelper twitterDigitsHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, SettingsActivity.class);
@@ -120,7 +124,11 @@ public class SettingsActivity extends BaseLoggableActivity {
                                 public void onPositive(MaterialDialog dialog) {
                                     super.onPositive(dialog);
                                     showProgress();
-                                    FacebookHelper.logout();
+
+                                    facebookHelper.logout();
+                                    twitterDigitsHelper.logout();
+                                    AppSession.getSession().closeAndClear();
+                                    DataManager.getInstance().clearAllTables();
                                     QBLogoutCompositeCommand.start(SettingsActivity.this);
                                 }
                             });
@@ -135,12 +143,14 @@ public class SettingsActivity extends BaseLoggableActivity {
     private void initFields() {
         title = getString(R.string.settings_title);
         user = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+        facebookHelper = new FacebookHelper(this);
+        twitterDigitsHelper = new TwitterDigitsHelper(this);
     }
 
     private void fillUI() {
         pushNotificationSwitch.setChecked(appSharedHelper.isEnablePushNotifications());
         changePasswordView.setVisibility(
-                LoginType.FACEBOOK.equals(AppSession.getSession().getLoginType()) ? View.GONE : View.VISIBLE);
+                LoginType.EMAIL.equals(AppSession.getSession().getLoginType()) ? View.VISIBLE : View.GONE);
         fullNameTextView.setText(user.getFullName());
 
         showUserAvatar();

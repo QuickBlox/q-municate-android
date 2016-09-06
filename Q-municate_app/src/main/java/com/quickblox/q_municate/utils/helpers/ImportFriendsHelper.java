@@ -21,18 +21,15 @@ import java.util.List;
 public class ImportFriendsHelper {
 
     public Activity activity;
-    private FacebookHelper facebookHelper;
     private List<InviteFriend> friendsFacebookList;
     private List<InviteFriend> friendsContactsList;
     private int expectedFriendsCallbacks;
     private int realFriendsCallbacks;
 
-    public ImportFriendsHelper(Activity activity, FacebookHelper facebookHelper) {
+    public ImportFriendsHelper(Activity activity) {
         this.activity = activity;
-        this.facebookHelper = facebookHelper;
-        this.facebookHelper.loginWithFacebook();
-        friendsFacebookList = new ArrayList<InviteFriend>();
-        friendsContactsList = new ArrayList<InviteFriend>();
+        friendsFacebookList = new ArrayList<>();
+        friendsContactsList = new ArrayList<>();
     }
 
     public void startGetFriendsListTask(boolean isGetFacebookFriends) {
