@@ -97,7 +97,10 @@ dependencies {
     compile "com.android.support:appcompat-v7:${rootProject.supportVersion}"
     compile "com.android.support:design:${rootProject.supportVersion}"
     compile "com.android.support:recyclerview-v7:${rootProject.supportVersion}"
-    compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
+
+    compile "com.google.android.gms:play-services-base:${rootProject.googlePlayServicesVersion}"
+    compile "com.google.android.gms:play-services-gcm:${rootProject.googlePlayServicesVersion}"
+    compile "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile 'com.crashlytics.android:crashlytics:1.+'
