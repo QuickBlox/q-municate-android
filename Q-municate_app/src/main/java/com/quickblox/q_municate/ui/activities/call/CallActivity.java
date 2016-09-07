@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.activities.call;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -590,7 +589,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case SystemPermissionHelper.PERMISSIONS_REQUEST: {
+            case SystemPermissionHelper.PERMISSIONS_FOR_CALL_REQUEST: {
                 if (grantResults.length > 0) {
                     for (int i = 0; i < permissions.length; i++) {
                         if (grantResults[i] == PackageManager.PERMISSION_DENIED) {

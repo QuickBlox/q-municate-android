@@ -1,15 +1,18 @@
 package com.quickblox.q_municate.ui.activities.chats;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -49,6 +52,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
@@ -125,6 +129,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private BroadcastReceiver updatingDialogBroadcastReceiver;
     private boolean loadMore;
+    private SystemPermissionHelper systemPermissionHelper;
 
     @Override
     protected int getContentResId() {
@@ -144,6 +149,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         registerBroadcastReceivers();
 
         hideSmileLayout();
+
+        checkPermissionSaveFiles();
     }
 
     @OnTextChanged(R.id.message_edittext)
@@ -299,6 +306,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
         appSharedHelper.saveNeedToOpenDialog(false);
         imagePickHelper = new ImagePickHelper();
+        systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
     private void initCustomUI() {
@@ -412,6 +420,47 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         } else {
             setDefaultActionBarLogo(resId);
         }
+    }
+
+    private void checkPermissionSaveFiles() {
+        if (!systemPermissionHelper.isAllPerrmissionsGrantedForSaveFile()){
+            systemPermissionHelper.requestPermissionsForSaveFile();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < permissions.length; i++) {
+                        if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permissions[i])
+                                && grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                            showPermissionSettingsDialog();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void showPermissionSettingsDialog() {
+                TwoButtonsDialogFragment.show(getSupportFragmentManager(), getString(R.string.app_name),
+                        getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
+                        R.string.dlg_ok, R.string.dlg_open_app_settings,
+                        new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                            }
+
+                            @Override
+                            public void onNegative(MaterialDialog dialog) {
+                                super.onNegative(dialog);
+                                systemPermissionHelper.openAppPermissionsSettings();
+                            }
+                        });
     }
 
     protected void loadActionBarLogo(String logoUrl) {

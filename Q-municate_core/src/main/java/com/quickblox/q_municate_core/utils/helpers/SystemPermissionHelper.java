@@ -2,7 +2,10 @@ package com.quickblox.q_municate_core.utils.helpers;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -13,27 +16,30 @@ import java.util.ArrayList;
 
 public class SystemPermissionHelper {
 
-    public static final int PERMISSIONS_REQUEST = 15;
+    public static final int PERMISSIONS_FOR_CALL_REQUEST = 15;
+    public static final int PERMISSIONS_FOR_IMPORT_FRIENDS_REQUEST = 16;
+    public static final int PERMISSIONS_FOR_SAVE_FILE_REQUEST = 17;
 
     private final Activity activity;
+    private ArrayList<RequestPermissionsResultListener> requestPermissionsResultListeners = new ArrayList<>();
 
     public SystemPermissionHelper(Activity activity) {
         this.activity = activity;
     }
 
 
-    public boolean isPermissionDanied(String permission) {
+    public boolean isPermissionDenied(String permission) {
         return ContextCompat.checkSelfPermission(activity.getApplicationContext(), permission) == PackageManager.PERMISSION_DENIED;
     }
 
-    public void requestPermission(String permission) {
+    public void requestPermission(int requestCode, String permission) {
         ActivityCompat.requestPermissions(activity, new String[]{permission},
-                PERMISSIONS_REQUEST);
+                requestCode);
     }
 
-    public void requestPermissions(String... permissions) {
+    public void requestPermissions(int requestCode, String... permissions) {
         ActivityCompat.requestPermissions(activity, permissions,
-                PERMISSIONS_REQUEST);
+                requestCode);
     }
 
     private boolean hasAllPermissionsGranted(@NonNull int[] grantResults) {
@@ -51,7 +57,7 @@ public class SystemPermissionHelper {
 
     public boolean isAllPermissionGranted(String... permissions) {
         for (String permission : permissions) {
-            if (isPermissionDanied(permission)) {
+            if (isPermissionDenied(permission)) {
                 return false;
             }
         }
@@ -59,16 +65,16 @@ public class SystemPermissionHelper {
         return true;
     }
 
-    public void checkAndRequestPermissions(String... permissions) {
+    public void checkAndRequestPermissions(int requestCode, String... permissions) {
         if (collectDaniedPermissions(permissions).length > 0) {
-            requestPermissions(collectDaniedPermissions(permissions));
+            requestPermissions(requestCode, collectDaniedPermissions(permissions));
         }
     }
 
     private String[] collectDaniedPermissions(String... permissions) {
         ArrayList<String> daniedPermissionsList = new ArrayList<>();
         for (String permission : permissions) {
-            if (isPermissionDanied(permission)) {
+            if (isPermissionDenied(permission)) {
                 daniedPermissionsList.add(permission);
             }
         }
@@ -90,13 +96,53 @@ public class SystemPermissionHelper {
 
     public void requestPermissionsForCallByType(QBRTCTypes.QBConferenceType qbConferenceType){
         if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO.equals(qbConferenceType)) {
-            checkAndRequestPermissions(Manifest.permission.RECORD_AUDIO);
+            checkAndRequestPermissions(PERMISSIONS_FOR_CALL_REQUEST, Manifest.permission.RECORD_AUDIO);
         } else {
-            checkAndRequestPermissions(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA);
+            checkAndRequestPermissions(PERMISSIONS_FOR_CALL_REQUEST, Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA);
         }
     }
 
     public void requestPermissionsForImportFriends(){
-        checkAndRequestPermissions(Manifest.permission.READ_CONTACTS);
+        checkAndRequestPermissions(PERMISSIONS_FOR_IMPORT_FRIENDS_REQUEST, Manifest.permission.READ_CONTACTS);
+    }
+
+    public boolean isAllPerrmissionsGrantedForSaveFile(){
+        return isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    public void requestPermissionsForSaveFile(){
+        checkAndRequestPermissions(PERMISSIONS_FOR_SAVE_FILE_REQUEST, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    public void addRequestPermissionsResultListener(RequestPermissionsResultListener permissionsResultListener){
+        if (permissionsResultListener != null){
+            requestPermissionsResultListeners.add(permissionsResultListener);
+        }
+    }
+
+    public void openAppPermissionsSettings(){
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+        intent.setData(uri);
+        activity.getApplicationContext().startActivity(intent);
+    }
+
+    public void removeRequestPermissionsResultListener(RequestPermissionsResultListener permissionsResultListener){
+        requestPermissionsResultListeners.remove(permissionsResultListener);
+    }
+
+    private ArrayList<RequestPermissionsResultListener> getRequestPermissionsResultListeners(){
+        return requestPermissionsResultListeners;
+    }
+
+    public void notifyRequestPermissionsResultListeners (int requestCode, String permissions[], int[] grantResults){
+        for (RequestPermissionsResultListener listener : requestPermissionsResultListeners){
+            listener.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    public interface RequestPermissionsResultListener{
+        void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults);
     }
 }
