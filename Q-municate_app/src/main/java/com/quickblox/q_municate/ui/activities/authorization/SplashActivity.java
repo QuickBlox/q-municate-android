@@ -30,9 +30,6 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO temp. ONLY FOR TEST WITHOUT TESTERS
-        //        Crashlytics.start(this);
-
         if (isNetworkAvailable()) {
             LoginHelper loginHelper = new LoginHelper(this, this);
             loginHelper.checkStartExistSession();
