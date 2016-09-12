@@ -235,7 +235,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onImagePicked(int requestCode, File file) {
         canPerformLogout.set(true);
-        startLoadAttachFile(file);
+        startLoadAttachFile(file, dialog.getDialogId());
     }
 
     @Override
@@ -431,14 +431,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
-    protected void startLoadAttachFile(final File file) {
+    protected void startLoadAttachFile(final File file, final String dialogId) {
         TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
                         showProgress();
-                        QBLoadAttachFileCommand.start(BaseDialogActivity.this, file);
+                        QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
                     }
                 });
     }
@@ -639,7 +639,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void updateMessagesList();
 
-    protected abstract void onFileLoaded(QBFile file);
+    protected abstract void onFileLoaded(QBFile file, String dialogId);
 
     protected abstract void checkMessageSendingPossibility();
 
@@ -713,7 +713,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            onFileLoaded(file);
+            String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
+            onFileLoaded(file, dialogId);
             hideProgress();
         }
     }

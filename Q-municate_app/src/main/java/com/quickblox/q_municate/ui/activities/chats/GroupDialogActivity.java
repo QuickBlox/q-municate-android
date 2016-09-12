@@ -100,7 +100,11 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void onFileLoaded(QBFile file) {
+    protected void onFileLoaded(QBFile file, String dialogId) {
+        if(!dialogId.equals(dialog.getDialogId())){
+            return;
+        }
+
         try {
             ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
         } catch (QBResponseException e) {
