@@ -52,7 +52,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.helpers.SystemPermissionHelper;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
@@ -430,7 +430,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST: {
                 if (grantResults.length > 0) {
@@ -446,21 +445,19 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void showPermissionSettingsDialog() {
-                TwoButtonsDialogFragment.show(getSupportFragmentManager(), getString(R.string.app_name),
-                        getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
-                        R.string.dlg_ok, R.string.dlg_open_app_settings,
-                        new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                super.onPositive(dialog);
-                            }
+        showOpenAppSettingsDialog(getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                    }
 
-                            @Override
-                            public void onNegative(MaterialDialog dialog) {
-                                super.onNegative(dialog);
-                                systemPermissionHelper.openAppPermissionsSettings();
-                            }
-                        });
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        systemPermissionHelper.openAppPermissionsSettings();
+                    }
+                });
     }
 
     protected void loadActionBarLogo(String logoUrl) {
@@ -640,6 +637,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                         finish();
                     }
                 }
+            } else {
+                Log.d("BaseDialogActivity", "service == null");
             }
         }
     }

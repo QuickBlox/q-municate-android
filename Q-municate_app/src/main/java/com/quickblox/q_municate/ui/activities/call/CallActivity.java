@@ -26,7 +26,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate_core.utils.helpers.SystemPermissionHelper;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -145,7 +145,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         initWiFiManagerListener();
         if (ACTION_ANSWER_CALL.equals(getIntent().getAction())){
             checkPermissionsAndStartCall(StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
-//            addConversationFragmentReceiveCall();
         }
     }
 
@@ -160,7 +159,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                 break;
             case OUTCOME_CALL_MADE:
                 checkPermissionsAndStartCall(StartConversationReason.OUTCOME_CALL_MADE);
-//                addConversationCallFragment();
                 break;
         }
     }
@@ -598,11 +596,16 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                     }
                 }
 
-                if(StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)){
-                    addConversationCallFragment();
-                } else {
-                    addConversationFragmentReceiveCall();
-                }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)){
+                            addConversationCallFragment();
+                        } else {
+                            addConversationFragmentReceiveCall();
+                        }
+                    }
+                }, 500);
             }
         }
     }

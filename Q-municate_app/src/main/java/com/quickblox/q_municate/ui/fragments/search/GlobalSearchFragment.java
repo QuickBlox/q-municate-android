@@ -231,8 +231,10 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     }
 
     private void deleteObservers() {
-        dataManager.getUserRequestDataManager().deleteObserver(commonObserver);
-        dataManager.getFriendDataManager().deleteObserver(commonObserver);
+        if(dataManager != null) {
+            dataManager.getUserRequestDataManager().deleteObserver(commonObserver);
+            dataManager.getFriendDataManager().deleteObserver(commonObserver);
+        }
     }
 
     private void clearOldData() {

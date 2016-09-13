@@ -1,4 +1,4 @@
-package com.quickblox.q_municate_core.utils.helpers;
+package com.quickblox.q_municate.utils.helpers;
 
 import android.Manifest;
 import android.app.Activity;
@@ -21,7 +21,6 @@ public class SystemPermissionHelper {
     public static final int PERMISSIONS_FOR_SAVE_FILE_REQUEST = 17;
 
     private final Activity activity;
-    private ArrayList<RequestPermissionsResultListener> requestPermissionsResultListeners = new ArrayList<>();
 
     public SystemPermissionHelper(Activity activity) {
         this.activity = activity;
@@ -66,20 +65,20 @@ public class SystemPermissionHelper {
     }
 
     public void checkAndRequestPermissions(int requestCode, String... permissions) {
-        if (collectDaniedPermissions(permissions).length > 0) {
-            requestPermissions(requestCode, collectDaniedPermissions(permissions));
+        if (collectDeniedPermissions(permissions).length > 0) {
+            requestPermissions(requestCode, collectDeniedPermissions(permissions));
         }
     }
 
-    private String[] collectDaniedPermissions(String... permissions) {
-        ArrayList<String> daniedPermissionsList = new ArrayList<>();
+    private String[] collectDeniedPermissions(String... permissions) {
+        ArrayList<String> deniedPermissionsList = new ArrayList<>();
         for (String permission : permissions) {
             if (isPermissionDenied(permission)) {
-                daniedPermissionsList.add(permission);
+                deniedPermissionsList.add(permission);
             }
         }
 
-        return daniedPermissionsList.toArray(new String[daniedPermissionsList.size()]);
+        return deniedPermissionsList.toArray(new String[deniedPermissionsList.size()]);
     }
 
     public boolean isAllPermissionsGrantedForCallByType(QBRTCTypes.QBConferenceType qbConferenceType) {
@@ -90,16 +89,16 @@ public class SystemPermissionHelper {
         }
     }
 
-    public boolean isAllPermissionsGrantedForImportFriends(){
-        return isAllPermissionGranted(Manifest.permission.READ_CONTACTS);
-    }
-
     public void requestPermissionsForCallByType(QBRTCTypes.QBConferenceType qbConferenceType){
         if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO.equals(qbConferenceType)) {
             checkAndRequestPermissions(PERMISSIONS_FOR_CALL_REQUEST, Manifest.permission.RECORD_AUDIO);
         } else {
             checkAndRequestPermissions(PERMISSIONS_FOR_CALL_REQUEST, Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA);
         }
+    }
+
+    public boolean isAllPermissionsGrantedForImportFriends(){
+        return isAllPermissionGranted(Manifest.permission.READ_CONTACTS);
     }
 
     public void requestPermissionsForImportFriends(){
@@ -114,35 +113,11 @@ public class SystemPermissionHelper {
         checkAndRequestPermissions(PERMISSIONS_FOR_SAVE_FILE_REQUEST, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    public void addRequestPermissionsResultListener(RequestPermissionsResultListener permissionsResultListener){
-        if (permissionsResultListener != null){
-            requestPermissionsResultListeners.add(permissionsResultListener);
-        }
-    }
-
     public void openAppPermissionsSettings(){
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
         intent.setData(uri);
         activity.getApplicationContext().startActivity(intent);
-    }
-
-    public void removeRequestPermissionsResultListener(RequestPermissionsResultListener permissionsResultListener){
-        requestPermissionsResultListeners.remove(permissionsResultListener);
-    }
-
-    private ArrayList<RequestPermissionsResultListener> getRequestPermissionsResultListeners(){
-        return requestPermissionsResultListeners;
-    }
-
-    public void notifyRequestPermissionsResultListeners (int requestCode, String permissions[], int[] grantResults){
-        for (RequestPermissionsResultListener listener : requestPermissionsResultListeners){
-            listener.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    public interface RequestPermissionsResultListener{
-        void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults);
     }
 }

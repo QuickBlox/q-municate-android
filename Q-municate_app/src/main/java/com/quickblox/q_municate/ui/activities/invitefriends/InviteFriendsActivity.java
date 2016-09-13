@@ -1,13 +1,17 @@
 package com.quickblox.q_municate.ui.activities.invitefriends;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.listeners.CounterChangedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
@@ -17,6 +21,7 @@ import com.quickblox.q_municate.utils.helpers.EmailHelper;
 import com.quickblox.q_municate.utils.listeners.simple.SimpleActionModeCallback;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +38,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
     private String[] selectedContactsFriendsArray;
     private ActionMode actionMode;
     private boolean allContactsChecked;
+    private SystemPermissionHelper systemPermissionHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, InviteFriendsActivity.class);
@@ -49,7 +55,11 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
         super.onCreate(savedInstanceState);
         initFields();
         setUpActionBarWithUpButton();
-        initFriendsList();
+        if (systemPermissionHelper.isAllPermissionsGrantedForImportFriends()){
+            initFriendsList();
+        } else {
+            systemPermissionHelper.requestPermissionsForImportFriends();
+        }
     }
 
     @Override
@@ -63,6 +73,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
 
     private void initFields() {
         title = getString(R.string.invite_friends_title);
+        systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
     private void initFriendsList() {
@@ -168,5 +179,41 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
             clearCheckedFriends();
             actionMode = null;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case SystemPermissionHelper.PERMISSIONS_FOR_IMPORT_FRIENDS_REQUEST: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < permissions.length; i++) {
+                        if (Manifest.permission.READ_CONTACTS.equals(permissions[i])) {
+                            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                                initFriendsList();
+                            } else {
+                                showPermissionSettingsDialog();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void showPermissionSettingsDialog() {
+        showOpenAppSettingsDialog(getString(R.string.dlg_need_permission_read_contacts, getString(R.string.app_name)),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        finish();
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        systemPermissionHelper.openAppPermissionsSettings();
+                    }
+                });
     }
 }

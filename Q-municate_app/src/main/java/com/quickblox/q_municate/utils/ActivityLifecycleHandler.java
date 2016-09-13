@@ -1,8 +1,10 @@
 package com.quickblox.q_municate.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.core.helper.Lo;
 import com.quickblox.chat.QBChatService;
@@ -16,14 +18,19 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     private int numberOfActivitiesInForeground;
     private boolean chatDestroyed = false;
 
+    @SuppressLint("LongLogTag")
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        Log.d("ActivityLifecycleHandler", "onActivityCreated " + activity.getClass().getSimpleName());
     }
 
+    @SuppressLint("LongLogTag")
     public void onActivityStarted(Activity activity) {
+        Log.d("ActivityLifecycleHandler", "onActivityStarted " + activity.getClass().getSimpleName());
     }
 
+    @SuppressLint("LongLogTag")
     public void onActivityResumed(Activity activity) {
-        Lo.g("onActivityResumed" + numberOfActivitiesInForeground);
+        Log.d("ActivityLifecycleHandler", "onActivityResumed " + activity.getClass().getSimpleName() + " count of activities = " +  numberOfActivitiesInForeground);
         //Count only our app logeable activity
         boolean activityLogeable = isActivityLogeable(activity);
         chatDestroyed = chatDestroyed && !isLoggedIn();

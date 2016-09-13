@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
@@ -38,6 +39,7 @@ import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
+import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
 import com.quickblox.q_municate.utils.bridges.ConnectionBridge;
@@ -65,6 +67,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
@@ -75,6 +78,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
@@ -115,6 +119,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getContentResId());
+        Log.d("BaseActivity", "onCreate");
 
         initFields();
 
@@ -124,6 +129,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("BaseActivity", "onStop");
         unbindService();
     }
 
@@ -269,6 +275,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("BaseActivity", "onPause");
         unregisterBroadcastReceivers();
         removeActions();
     }
@@ -276,6 +283,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("BaseActivity", "onResume");
         registerBroadcastReceivers();
 
         addActions();
@@ -288,8 +296,15 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("BaseActivity", "onRestart");
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
+        Log.d("BaseActivity", "onStart");
         connectToService();
     }
 
@@ -306,6 +321,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("BaseActivity", "onActivityResult");
         if(requestCode == CallActivity.CALL_ACTIVITY_CLOSE){
             if (resultCode == CallActivity.CALL_ACTIVITY_CLOSE_WIFI_DISABLED) {
                 ToastUtils.longToast(R.string.wifi_disabled);
@@ -314,6 +330,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void initFields() {
+        Log.d("BaseActivity", "initFields()");
         app = App.getInstance();
         appSharedHelper = App.getInstance().getAppSharedHelper();
         activityUIHelper = new ActivityUIHelper(this);
@@ -402,11 +419,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void unbindService() {
         if (bounded) {
+            Log.d("BaseActivity", "unbindService()");
             unbindService(serviceConnection);
+            bounded = false;
         }
     }
 
     private void connectToService() {
+        Log.d("BaseActivity", "connectToService()");
         Intent intent = new Intent(this, QBService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -462,6 +482,17 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         } else {
             setActionBarTitle(title);
         }
+    }
+
+    public void startSplashActivity(){
+        SplashActivity.start(this);
+        finish();
+    }
+
+    protected void showOpenAppSettingsDialog(String dialogMessage, MaterialDialog.ButtonCallback callback) {
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(), getString(R.string.app_name),
+                dialogMessage, getString(R.string.dlg_ok), getString(R.string.dlg_open_app_settings),
+                callback);
     }
 
     @SuppressWarnings("unchecked")
@@ -664,6 +695,17 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         loadDialogs();
     }
 
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+        Log.d("BaseActivity", "onAttachFragment");
+    }
+
+    protected boolean isCurrentSessionValid() {
+        return AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
+                ConstsCore.TOKEN_VALID_TIME_IN_MINUTES));
+    }
+
     protected void loadDialogs() {
         QBLoadDialogsCommand.start(this);
     }
@@ -800,6 +842,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
+            Log.d("BaseActivity", "onServiceConnected");
             bounded = true;
             service = ((QBService.QBServiceBinder) binder).getService();
             onConnectedToService(service);
@@ -807,7 +850,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
+            Log.d("BaseActivity", "onServiceDisconnected");
+            service = null;
         }
     }
 }
