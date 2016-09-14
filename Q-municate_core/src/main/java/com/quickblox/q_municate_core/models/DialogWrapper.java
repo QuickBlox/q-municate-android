@@ -43,10 +43,11 @@ public class DialogWrapper implements Serializable {
     private void fillOpponentUser(Context context, DataManager dataManager,  List<DialogOccupant> dialogOccupantsList,  QBUser currentUser ){
         if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
             opponentUser = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(currentUser), dialogOccupantsList);
-        }else{
-            dataManager.getDialogDataManager().deleteById(dialog.getDialogId());
-        }
 
+            if (opponentUser.getFullName() == null) {
+                dataManager.getDialogDataManager().deleteById(dialog.getDialogId());
+            }
+        }
     }
 
     private void fillTotalCount(Context context, DataManager dataManager,  List<Long> dialogOccupantsIdsList,  QBUser currentUser){
