@@ -55,6 +55,15 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
         super.onCreate(savedInstanceState);
         initFields();
         setUpActionBarWithUpButton();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkPermissionsAndInitFriendsListIfPossible();
+    }
+
+    private void checkPermissionsAndInitFriendsListIfPossible() {
         if (systemPermissionHelper.isAllPermissionsGrantedForImportFriends()){
             initFriendsList();
         } else {

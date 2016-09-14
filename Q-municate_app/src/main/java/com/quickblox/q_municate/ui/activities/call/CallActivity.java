@@ -484,11 +484,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     public void checkPermissionsAndStartCall(StartConversationReason startConversationReason) {
         if (systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)) {
-            if (StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)) {
-                addConversationCallFragment();
-            } else {
-                addConversationFragmentReceiveCall();
-            }
+            startConversationFragment(startConversationReason);
         } else {
             systemPermissionHelper.requestPermissionsForCallByType(qbConferenceType);
         }
@@ -596,17 +592,22 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                     }
                 }
 
+                //postDelayed() is temp fix before fixing this bug https://code.google.com/p/android/issues/detail?id=190966
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if(StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)){
-                            addConversationCallFragment();
-                        } else {
-                            addConversationFragmentReceiveCall();
-                        }
+                        startConversationFragment(startConversationReason);
                     }
                 }, 500);
             }
+        }
+    }
+
+    private void startConversationFragment(StartConversationReason startConversationReason) {
+        if(StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)){
+            addConversationCallFragment();
+        } else {
+            addConversationFragmentReceiveCall();
         }
     }
 

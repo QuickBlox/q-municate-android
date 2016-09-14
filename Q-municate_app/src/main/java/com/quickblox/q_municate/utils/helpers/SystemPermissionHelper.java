@@ -116,6 +116,7 @@ public class SystemPermissionHelper {
     public void openAppPermissionsSettings(){
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
         Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
         intent.setData(uri);
         activity.getApplicationContext().startActivity(intent);

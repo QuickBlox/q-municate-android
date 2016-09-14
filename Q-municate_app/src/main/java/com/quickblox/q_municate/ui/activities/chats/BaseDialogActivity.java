@@ -149,8 +149,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         registerBroadcastReceivers();
 
         hideSmileLayout();
-
-        checkPermissionSaveFiles();
     }
 
     @OnTextChanged(R.id.message_edittext)
@@ -198,6 +196,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onStart() {
         super.onStart();
         createChatLocally();
+        checkPermissionSaveFiles();
     }
 
     @Override

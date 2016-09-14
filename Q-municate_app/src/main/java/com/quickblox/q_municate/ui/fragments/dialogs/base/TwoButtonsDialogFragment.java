@@ -36,12 +36,7 @@ public class TwoButtonsDialogFragment extends DialogFragment {
         TwoButtonsDialogFragment twoButtonsDialog = new TwoButtonsDialogFragment();
         twoButtonsDialog.setCallbacks(callback);
         twoButtonsDialog.setArguments(args);
-
-        if (fm.findFragmentByTag(TAG) == null){
-            fm.beginTransaction().remove(fm.findFragmentByTag(TAG)).commitAllowingStateLoss();
-        }
-
-        fm.beginTransaction().add(twoButtonsDialog, TAG).commitAllowingStateLoss();
+        twoButtonsDialog.show(fm, TAG);
     }
 
     public static void show(FragmentManager fm, String message, MaterialDialog.ButtonCallback callback) {
