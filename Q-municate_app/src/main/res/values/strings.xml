@@ -11,6 +11,7 @@
     <string name="action_bar_feedback">Feedback</string>
     <string name="action_bar_about">About</string>
     <string name="action_bar_search">Search</string>
+    <string name="action_bar_search_hint">Search</string>
     <string name="action_bar_add_chat">Add Chat</string>
     <string name="action_bar_delete_friend">Delete Friend</string>
     <string name="action_bar_add_friend_to_chat">Add friend to Chat</string>

@@ -29,6 +29,8 @@
         <!-- Material Dialog theme -->
         <item name="md_dark_theme">false</item>
 
+        <item name="searchViewStyle">@style/SearchViewStyle</item>
+
     </style>
 
     <style name="AppTheme" parent="Base.AppTheme" />
@@ -49,6 +51,14 @@
         <!-- Hack! -->
         <item name="homeAsUpIndicator">@drawable/abc_ic_ab_back_mtrl_am_alpha</item>
         <!-- ! -->
+    </style>
+
+    <style name="Theme.MyTheme" parent="Theme.AppCompat">
+
+    </style>
+
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="searchHintIcon">@android:color/transparent</item>
     </style>
 
 </resources>

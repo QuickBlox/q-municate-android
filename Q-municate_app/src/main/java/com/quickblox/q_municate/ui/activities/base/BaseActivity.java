@@ -520,8 +520,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void removeFragment() {
-        getSupportFragmentManager().beginTransaction().remove(
-                getSupportFragmentManager().findFragmentById(R.id.container_fragment)).commit();
+        if(!isFinishing()) {
+            getSupportFragmentManager().beginTransaction().remove(
+                    getSupportFragmentManager().findFragmentById(R.id.container_fragment)).commitAllowingStateLoss();
+        }
     }
 
     private FragmentTransaction buildTransaction() {

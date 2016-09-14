@@ -1,21 +1,20 @@
 buildscript {
     repositories {
-        maven {
-            url 'http://download.crashlytics.com/maven'
-        }
+        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 repositories {
-    maven { url 'http://download.crashlytics.com/maven' }
     maven { url 'https://dl.bintray.com/drummer-aidan/maven' }
     maven { url "https://jitpack.io" }
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 android {
@@ -45,6 +44,7 @@ android {
         release {
             minifyEnabled false
             debuggable false
+            ext.enableCrashlytics = true
             signingConfig signingConfigs.release
             buildConfigField "String", "APP_ID", property('prodAppID')
             buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
@@ -59,6 +59,7 @@ android {
 
         debug {
             debuggable true
+            ext.enableCrashlytics = false
             versionNameSuffix ' (debug)'
             buildConfigField "String", "APP_ID", property('devAppID')
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')
@@ -97,10 +98,12 @@ dependencies {
     compile "com.android.support:appcompat-v7:${rootProject.supportVersion}"
     compile "com.android.support:design:${rootProject.supportVersion}"
     compile "com.android.support:recyclerview-v7:${rootProject.supportVersion}"
-    compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
+
+    compile "com.google.android.gms:play-services-base:${rootProject.googlePlayServicesVersion}"
+    compile "com.google.android.gms:play-services-gcm:${rootProject.googlePlayServicesVersion}"
+    compile "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
-    compile 'com.crashlytics.android:crashlytics:1.+'
     compile 'com.flurry.android:analytics:6.2.0'
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
     compile "com.afollestad:material-dialogs:${rootProject.materialDialogsVersion}"
@@ -110,6 +113,9 @@ dependencies {
     compile "com.soundcloud.android:android-crop:${rootProject.cropVersion}@aar"
     compile('com.android.support:cardview-v7:23.2.0') {
         force = true
+    }
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
+        transitive = true;
     }
 }
 

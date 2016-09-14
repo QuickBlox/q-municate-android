@@ -27,6 +27,7 @@ import android.widget.ToggleButton;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.StartConversationReason;
@@ -466,7 +467,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         audioManager = AppRTCAudioManager.create(getActivity(), new AppRTCAudioManager.OnAudioManagerStateListener() {
             @Override
             public void onAudioChangedState(AppRTCAudioManager.AudioDevice audioDevice) {
-                Toast.makeText(getActivity(), "Audio device switched to  " + audioDevice, Toast.LENGTH_SHORT).show();
+                ToastUtils.shortToast("Audio device switched to  " + audioDevice);
             }
         });
         audioManager.init();
