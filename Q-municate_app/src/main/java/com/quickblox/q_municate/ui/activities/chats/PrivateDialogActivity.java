@@ -124,7 +124,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void onFileLoaded(QBFile file) {
+    protected void onFileLoaded(QBFile file, String dialogId) {
+        if(!dialogId.equals(dialog.getDialogId())){
+            return;
+        }
+
         try {
             privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
         } catch (QBResponseException exc) {
