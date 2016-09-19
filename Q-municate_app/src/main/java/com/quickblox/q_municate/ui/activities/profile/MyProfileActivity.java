@@ -223,6 +223,9 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
         newUser.setOldPassword(qbUser.getOldPassword());
         qbUser.setFullName(currentFullName);
         newUser.setFullName(currentFullName);
+        newUser.setFacebookId(qbUser.getFacebookId());
+        newUser.setTwitterId(qbUser.getTwitterId());
+        newUser.setTwitterDigitsId(qbUser.getTwitterDigitsId());
         newUser.setCustomData(Utils.customDataToString(userCustomData));
         return newUser;
     }

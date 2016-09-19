@@ -144,7 +144,7 @@ public class SettingsActivity extends BaseLoggableActivity {
         title = getString(R.string.settings_title);
         user = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
         facebookHelper = new FacebookHelper(this);
-        twitterDigitsHelper = new TwitterDigitsHelper(this);
+        twitterDigitsHelper = new TwitterDigitsHelper();
     }
 
     private void fillUI() {
