@@ -141,7 +141,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
             loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
         facebookHelper = new FacebookHelper(this);
-        twitterDigitsHelper = new TwitterDigitsHelper(this);
+        twitterDigitsHelper = new TwitterDigitsHelper();
         twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
         loginSuccessAction = new LoginSuccessAction();
         socialLoginSuccessAction = new SocialLoginSuccessAction();

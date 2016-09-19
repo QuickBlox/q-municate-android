@@ -11,7 +11,6 @@ import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -44,13 +43,7 @@ public class QBUpdateUserCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
-        int authorizationType = extras.getInt(QBServiceConsts.AUTH_ACTION_TYPE, ConstsCore.NOT_INITIALIZED_VALUE);
-
         Bundle result = new Bundle();
-        if (isLoggedViaSocial(user, authorizationType)) {
-            result.putSerializable(QBServiceConsts.EXTRA_USER, user);
-            return result;
-        }
 
         QBUser newUser = updateUser(user, file);
         result.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
@@ -67,10 +60,6 @@ public class QBUpdateUserCommand extends ServiceCommand {
         boolean isLoggedViaTwitter = !TextUtils.isEmpty(user.getTwitterId());
         boolean isLoggedViaTwitterDigits = !TextUtils.isEmpty(user.getTwitterDigitsId());
         return isLoggedViaFB || isLoggedViaTwitter || isLoggedViaTwitterDigits;
-    }
-
-    private boolean isLoggedViaTD(QBUser user, int authorizationType){
-        return !TextUtils.isEmpty(user.getTwitterDigitsId()) && QBServiceConsts.AUTH_TYPE_LOGIN == authorizationType;
     }
 
     private QBUser updateUser(QBUser user, File file) throws QBResponseException, SmackException.NotConnectedException {

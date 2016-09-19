@@ -151,6 +151,8 @@ public class QBAuthHelper extends BaseHelper {
 
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             user.setPassword(password);
+        } else {
+            user.setPassword(QBAuth.getSession().getToken());
         }
 
         return user;
