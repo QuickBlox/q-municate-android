@@ -4,8 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
+import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.utils.Loggable;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class BaseLoggableActivity extends BaseActivity implements Loggable {
@@ -50,5 +54,15 @@ public abstract class BaseLoggableActivity extends BaseActivity implements Logga
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return canPerformLogout.get();
+    }
+
+    protected void startSplashActivity(){
+        SplashActivity.start(this);
+        finish();
+    }
+
+    protected boolean isCurrentSessionValid() {
+        return AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
+                ConstsCore.TOKEN_VALID_TIME_IN_MINUTES));
     }
 }

@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.fragments.dialogs.base;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
@@ -61,10 +62,22 @@ public class TwoButtonsDialogFragment extends DialogFragment {
                 App.getInstance().getString(positiveText), App.getInstance().getString(negativeText), callback);
     }
 
-    public static void show(FragmentManager fm, String title, String message,
-                            int positiveText, int negativeText, MaterialDialog.ButtonCallback callback) {
-        show(fm, title, message, App.getInstance().getString(positiveText), App.getInstance().getString(negativeText), callback);
+    public static void showDelayed(final FragmentManager fm, final String title, final String message,
+                                   final String positiveText, final String negativeText, final MaterialDialog.ButtonCallback callback, long delay) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                show(fm,
+                        title,
+                        message,
+                        positiveText,
+                        negativeText,
+                        callback);
+            }
+        }, delay);
     }
+
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {

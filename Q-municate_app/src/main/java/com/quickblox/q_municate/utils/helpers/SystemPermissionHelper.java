@@ -10,6 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
+import com.quickblox.core.helper.StringifyArrayList;
+import com.quickblox.q_municate.App;
+import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import java.util.ArrayList;
@@ -105,7 +109,7 @@ public class SystemPermissionHelper {
         checkAndRequestPermissions(PERMISSIONS_FOR_IMPORT_FRIENDS_REQUEST, Manifest.permission.READ_CONTACTS);
     }
 
-    public boolean isAllPerrmissionsGrantedForSaveFile(){
+    public boolean isAllPermissionsGrantedForSaveFile(){
         return isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
@@ -113,12 +117,26 @@ public class SystemPermissionHelper {
         checkAndRequestPermissions(PERMISSIONS_FOR_SAVE_FILE_REQUEST, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    public void openAppPermissionsSettings(){
+    public void collectDeniedPermissionsAndNotifyUser(String permissions[], int[] grantResults){
+        StringifyArrayList<String> deniedPermissions = new StringifyArrayList<>();
+        for (int i = 0; i < permissions.length; i++){
+            if(grantResults[i] == PackageManager.PERMISSION_DENIED){
+                deniedPermissions.add(permissions[i]);
+            }
+        }
+
+        ToastUtils.longToast(activity.getString(deniedPermissions.size() == 1
+                ? R.string.permission_unavailable
+                : R.string.permissions_unavailable,
+                deniedPermissions.getItemsAsString()));
+    }
+
+    public static void openSystemSettings(){
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+        Uri uri = Uri.fromParts("package", App.getInstance().getPackageName(), null);
         intent.setData(uri);
-        activity.getApplicationContext().startActivity(intent);
+        App.getInstance().startActivity(intent);
     }
 }

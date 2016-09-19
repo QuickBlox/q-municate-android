@@ -1,11 +1,9 @@
 package com.quickblox.q_municate.ui.activities.chats;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,6 +28,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
@@ -422,7 +421,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void checkPermissionSaveFiles() {
-        if (!systemPermissionHelper.isAllPerrmissionsGrantedForSaveFile()){
+        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile()){
             systemPermissionHelper.requestPermissionsForSaveFile();
         }
     }
@@ -432,11 +431,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         switch (requestCode) {
             case SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST: {
                 if (grantResults.length > 0) {
-                    for (int i = 0; i < permissions.length; i++) {
-                        if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permissions[i])
-                                && grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                            showPermissionSettingsDialog();
-                        }
+                    if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile()){
+                        showPermissionSettingsDialog();
                     }
                 }
             }
@@ -444,7 +440,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void showPermissionSettingsDialog() {
-        showOpenAppSettingsDialog(getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
+        DialogsUtils.showOpenAppSettingsDialog(
+                getSupportFragmentManager(),
+                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
@@ -454,7 +452,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public void onNegative(MaterialDialog dialog) {
                         super.onNegative(dialog);
-                        systemPermissionHelper.openAppPermissionsSettings();
+                        SystemPermissionHelper.openSystemSettings();
                     }
                 });
     }

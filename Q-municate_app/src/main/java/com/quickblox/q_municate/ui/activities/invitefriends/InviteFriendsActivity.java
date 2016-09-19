@@ -1,9 +1,7 @@
 package com.quickblox.q_municate.ui.activities.invitefriends;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.view.ActionMode;
@@ -12,7 +10,9 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.listeners.CounterChangedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.invitefriends.InviteFriendsAdapter;
@@ -195,14 +195,10 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
         switch (requestCode) {
             case SystemPermissionHelper.PERMISSIONS_FOR_IMPORT_FRIENDS_REQUEST: {
                 if (grantResults.length > 0) {
-                    for (int i = 0; i < permissions.length; i++) {
-                        if (Manifest.permission.READ_CONTACTS.equals(permissions[i])) {
-                            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                                initFriendsList();
-                            } else {
-                                showPermissionSettingsDialog();
-                            }
-                        }
+                    if (systemPermissionHelper.isAllPermissionsGrantedForImportFriends()){
+                        initFriendsList();
+                    } else {
+                        showPermissionSettingsDialog();
                     }
                 }
             }
@@ -210,7 +206,9 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
     }
 
     private void showPermissionSettingsDialog() {
-        showOpenAppSettingsDialog(getString(R.string.dlg_need_permission_read_contacts, getString(R.string.app_name)),
+        DialogsUtils.showOpenAppSettingsDialog(
+                getSupportFragmentManager(),
+                getString(R.string.dlg_need_permission_read_contacts, getString(R.string.app_name)),
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
@@ -221,7 +219,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
                     @Override
                     public void onNegative(MaterialDialog dialog) {
                         super.onNegative(dialog);
-                        systemPermissionHelper.openAppPermissionsSettings();
+                        SystemPermissionHelper.openSystemSettings();
                     }
                 });
     }

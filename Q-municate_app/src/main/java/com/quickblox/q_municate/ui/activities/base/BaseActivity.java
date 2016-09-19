@@ -484,24 +484,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
-    public void startSplashActivity(){
-        SplashActivity.start(this);
-        finish();
-    }
-
-    protected void showOpenAppSettingsDialog(final String dialogMessage, final MaterialDialog.ButtonCallback callback) {
-        //postDelayed() is temp fix before fixing this bug https://code.google.com/p/android/issues/detail?id=190966
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                TwoButtonsDialogFragment.show(getSupportFragmentManager(), getString(R.string.app_name),
-                        dialogMessage, getString(R.string.dlg_ok), getString(R.string.dlg_open_app_settings),
-                        callback);
-            }
-        }, 500);
-
-    }
-
     @SuppressWarnings("unchecked")
     protected <T> T _findViewById(int viewId) {
         return (T) findViewById(viewId);
@@ -708,11 +690,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
         Log.d("BaseActivity", "onAttachFragment");
-    }
-
-    protected boolean isCurrentSessionValid() {
-        return AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
-                ConstsCore.TOKEN_VALID_TIME_IN_MINUTES));
     }
 
     protected void loadDialogs() {
