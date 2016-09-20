@@ -20,11 +20,14 @@ import android.view.View;
 import android.widget.Chronometer;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
+import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -87,6 +90,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private ActionBar actionBar;
     private AudioStreamReceiver audioStreamReceiver;
     private String ACTION_ANSWER_CALL = "action_answer_call";
+    private SystemPermissionHelper systemPermissionHelper;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
             QBRTCSessionDescription qbRtcSessionDescription) {
@@ -141,7 +145,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         audioStreamReceiver = new AudioStreamReceiver();
         initWiFiManagerListener();
         if (ACTION_ANSWER_CALL.equals(getIntent().getAction())){
-            addConversationFragmentReceiveCall();
+            checkPermissionsAndStartCall(StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
         }
     }
 
@@ -155,7 +159,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                 }
                 break;
             case OUTCOME_CALL_MADE:
-                addConversationCallFragment();
+                checkPermissionsAndStartCall(StartConversationReason.OUTCOME_CALL_MADE);
                 break;
         }
     }
@@ -365,6 +369,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         super.onConnectedToService(service);
         if (qbCallChatHelper == null) {
             qbCallChatHelper = (QBCallChatHelper) service.getHelper(QBService.CALL_CHAT_HELPER);
+            systemPermissionHelper = new SystemPermissionHelper(CallActivity.this);
             qbCallChatHelper.addRTCSessionUserCallback(CallActivity.this);
             initCallFragment();
         }
@@ -478,6 +483,14 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
     }
 
+    public void checkPermissionsAndStartCall(StartConversationReason startConversationReason) {
+        if (systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)) {
+            startConversationFragment(startConversationReason);
+        } else {
+            systemPermissionHelper.requestPermissionsForCallByType(qbConferenceType);
+        }
+    }
+
     public void addConversationCallFragment() {
         Log.d(TAG, "addConversationCallFragment()");
 
@@ -566,6 +579,43 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     public void onBackPressed() {
         //blocked back button
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case SystemPermissionHelper.PERMISSIONS_FOR_CALL_REQUEST: {
+                if (grantResults.length > 0) {
+                    if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)){
+                        showToastDeniedPermissions(permissions, grantResults);
+                    }
+                }
+
+                //postDelayed() is temp fix before fixing this bug https://code.google.com/p/android/issues/detail?id=190966
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startConversationFragment(startConversationReason);
+                    }
+                }, 500);
+            }
+        }
+    }
+
+    private void startConversationFragment(StartConversationReason startConversationReason) {
+        if(StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)){
+            addConversationCallFragment();
+        } else {
+            addConversationFragmentReceiveCall();
+        }
+    }
+
+    private void showToastDeniedPermissions(String[] permissions, int[] grantResults) {
+        ArrayList<String> deniedPermissions = systemPermissionHelper
+                .collectDeniedPermissionsFomResult(permissions, grantResults);
+
+        ToastUtils.longToast(
+                getString(R.string.denied_permission_message, StringUtils.createCompositeString(deniedPermissions)));
     }
 
     public void addTCClientConnectionCallback(QBRTCSessionConnectionCallbacks clientConnectionCallbacks) {

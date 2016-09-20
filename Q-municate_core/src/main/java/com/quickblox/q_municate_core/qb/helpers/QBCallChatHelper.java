@@ -165,6 +165,7 @@ public class QBCallChatHelper extends BaseHelper {
             } else {
                 Log.d(TAG, "onReceiveNewSession(). init session.");
                 if (activityClass != null) {
+
                     startCallActivity(qbRtcSession);
                     currentQbRtcSession = qbRtcSession;
                 }

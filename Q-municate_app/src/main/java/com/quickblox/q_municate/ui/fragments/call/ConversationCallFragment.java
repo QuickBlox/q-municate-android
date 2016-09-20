@@ -20,7 +20,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -33,6 +32,7 @@ import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.AppRTCAudioManager;
@@ -91,6 +91,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     private View elementSetVideoButtons;
     private boolean isFrontCameraSelected = true;
     private AppRTCAudioManager audioManager;
+    private SystemPermissionHelper systemPermissionHelper;
 
     public static ConversationCallFragment newInstance(List<QBUser> opponents, String callerName,
             QBRTCTypes.QBConferenceType qbConferenceType,
@@ -128,6 +129,8 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
             Log.d(TAG, "opponents: " + opponents.toString());
         }
 
+        systemPermissionHelper = new SystemPermissionHelper(getActivity());
+
         initViews(view);
         ((CallActivity)getActivity()).initActionBar();
         ((CallActivity)getActivity()).setCallActionBarTitle(StartConversationReason.INCOME_CALL_FOR_ACCEPTION
@@ -154,6 +157,22 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
             cameraToggle.setVisibility(View.GONE);
             cameraToggle.setEnabled(false);
             cameraToggle.setChecked(false);
+        }
+
+        correctButtonsVisibilityByGrantedPermissions();
+    }
+
+    private void correctButtonsVisibilityByGrantedPermissions (){
+        if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)){
+            if(!systemPermissionHelper.isMicriphonePermissionGranted()){
+                micToggleVideoCall.setChecked(false);
+                micToggleVideoCall.setEnabled(false);
+            }
+
+            if(!systemPermissionHelper.isCameraPermissionGranted()){
+                cameraToggle.setChecked(false);
+                cameraToggle.setEnabled(false);
+            }
         }
     }
 
@@ -197,6 +216,8 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
             cameraToggle.setActivated(enability);
         }
         micToggleVideoCall.setActivated(enability);
+
+        correctButtonsVisibilityByGrantedPermissions();
     }
 
 

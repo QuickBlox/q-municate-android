@@ -18,6 +18,7 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
+import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
 import com.quickblox.q_municate_db.models.User;
@@ -173,7 +174,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         stopCallNotification();
 
         ((CallActivity) getActivity())
-                .addConversationFragmentReceiveCall();
+                .checkPermissionsAndStartCall(StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
         Log.d(TAG, "Call is started");
     }
 

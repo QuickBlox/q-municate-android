@@ -49,21 +49,23 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("MainActivity", "onCreate");
+
         initFields();
         setUpActionBarWithUpButton();
 
         checkGCMRegistration();
 
         if (!isChatInitializedAndUserLoggedIn()) {
+            Log.d("MainActivity", "onCreate. !isChatInitializedAndUserLoggedIn()");
             loginChat();
-        } else {
-            checkImportFriends();
         }
 
         launchDialogsListFragment();
     }
 
     private void initFields() {
+        Log.d("MainActivity", "initFields()");
         title = " " + AppSession.getSession().getUser().getFullName();
         gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
@@ -80,6 +82,18 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("MainActivity", "onStart()");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("MainActivity", "onRestart()");
     }
 
     @Override
@@ -117,7 +131,6 @@ public class MainActivity extends BaseLoggableActivity {
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         actualizeCurrentTitle();
-        checkImportFriends();
     }
 
     private void addActions() {
@@ -175,14 +188,8 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void launchDialogsListFragment() {
+        Log.d("MainActivity", "launchDialogsListFragment()");
         setCurrentFragment(DialogsListFragment.newInstance());
-    }
-
-    private void checkImportFriends() {
-        if (!appSharedHelper.isUsersImportInitialized()) {
-            showProgress();
-            startImportFriends();
-        }
     }
 
     private void startImportFriends(){

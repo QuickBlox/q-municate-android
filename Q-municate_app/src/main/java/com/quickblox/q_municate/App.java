@@ -32,12 +32,12 @@ public class App extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
-        initCrashlytics();
+        initFabric();
         initApplication();
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());
     }
 
-    private void initCrashlytics(){
+    private void initFabric(){
         Crashlytics crashlyticsKit = new Crashlytics.Builder()
                 .core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
                 .build();

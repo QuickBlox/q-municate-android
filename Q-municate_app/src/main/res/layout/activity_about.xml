@@ -39,7 +39,13 @@
         android:layout_centerInParent="true"
         android:layout_marginBottom="@dimen/about_vendor_text_margin_bottom"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/TextViewLinkStyle.Green"
+            android:id="@+id/license_button"
+            android:text="@string/about_user_agreement"
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/vendor_textview"
@@ -47,13 +53,7 @@
             android:layout_height="wrap_content"
             android:text="@string/about_vendor"
             android:textColor="@color/text_light_dark"
-            android:textSize="@dimen/text_size_small" />
-
-        <TextView
-            style="@style/TextViewLinkStyle.Green"
-            android:id="@+id/license_button"
-            android:text="@string/about_user_agreement"
-            android:textSize="@dimen/text_size_small" />
+            android:textSize="@dimen/text_size_very_small" />
 
     </LinearLayout>
 

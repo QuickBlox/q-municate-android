@@ -2,8 +2,10 @@ package com.quickblox.q_municate.ui.fragments.chats;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -84,6 +86,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_dialogs_list, container, false);
 
         activateButterKnife(view);
@@ -113,7 +116,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.d(TAG, "onViewCreated");
         initDataLoader(LOADER_ID);
     }
 
@@ -171,9 +174,22 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
+    }
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated");
         addActions();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart()");
+    }
 
     @Override
     public void onResume() {
@@ -261,10 +277,12 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void deleteObservers() {
-        dataManager.getDialogDataManager().deleteObserver(commonObserver);
-        dataManager.getMessageDataManager().deleteObserver(commonObserver);
-        dataManager.getUserDataManager().deleteObserver(commonObserver);
-        dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
+        if (dataManager != null) {
+            dataManager.getDialogDataManager().deleteObserver(commonObserver);
+            dataManager.getMessageDataManager().deleteObserver(commonObserver);
+            dataManager.getUserDataManager().deleteObserver(commonObserver);
+            dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
+        }
     }
 
     private void removeActions() {

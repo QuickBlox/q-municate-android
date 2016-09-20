@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
@@ -49,6 +51,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
@@ -125,6 +128,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private BroadcastReceiver updatingDialogBroadcastReceiver;
     private boolean loadMore;
+    private SystemPermissionHelper systemPermissionHelper;
 
     @Override
     protected int getContentResId() {
@@ -191,6 +195,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onStart() {
         super.onStart();
         createChatLocally();
+        checkPermissionSaveFiles();
     }
 
     @Override
@@ -299,6 +304,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
         appSharedHelper.saveNeedToOpenDialog(false);
         imagePickHelper = new ImagePickHelper();
+        systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
     private void initCustomUI() {
@@ -412,6 +418,43 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         } else {
             setDefaultActionBarLogo(resId);
         }
+    }
+
+    private void checkPermissionSaveFiles() {
+        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile()){
+            systemPermissionHelper.requestPermissionsForSaveFile();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST: {
+                if (grantResults.length > 0) {
+                    if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile()){
+                        showPermissionSettingsDialog();
+                    }
+                }
+            }
+        }
+    }
+
+    private void showPermissionSettingsDialog() {
+        DialogsUtils.showOpenAppSettingsDialog(
+                getSupportFragmentManager(),
+                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
+                    }
+                });
     }
 
     protected void loadActionBarLogo(String logoUrl) {
@@ -591,6 +634,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                         finish();
                     }
                 }
+            } else {
+                Log.d("BaseDialogActivity", "service == null");
             }
         }
     }

@@ -69,7 +69,7 @@ public class FacebookHelper {
     }
 
     public boolean isSessionOpened() {
-        return AccessToken.getCurrentAccessToken() != null;
+        return CoreSharedHelper.getInstance().getFBToken() != null && AccessToken.getCurrentAccessToken() != null;
     }
 
     private class FBAccessTokenTracker extends AccessTokenTracker {

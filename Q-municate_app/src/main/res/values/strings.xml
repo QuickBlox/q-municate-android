@@ -185,7 +185,7 @@
     <!-- About -->
     <string name="about_title">About</string>
     <string name="about_version">Version %1$s</string>
-    <string name="about_vendor">&#169; 2015 QuickBlox</string>
+    <string name="about_vendor">&#169; 2016 QuickBlox</string>
     <string name="about_user_agreement">User Agreement</string>
 
 
@@ -206,6 +206,7 @@
     <string name="switch_camera">Switch camera</string>
     <string name="decline_call">Decline</string>
     <string name="answer_call">Answer</string>
+    <string name="denied_permission_message">Call has been started without an access to %s</string>
 
 
     <!-- Invite Friends -->
@@ -231,9 +232,12 @@
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_ok">OK</string>
     <string name="dlg_cancel">Cancel</string>
+    <string name="dlg_open_app_settings">Settings</string>
     <string name="dlg_done">Done</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
+    <string name="dlg_need_permission_write_storage">%s needs access to your storage so that you can save pictures in devise memory</string>
+    <string name="dlg_need_permission_read_contacts">To invite friends via email %s will need an access to your Contacts</string>
     <string name="dlg_password_changed">Password changed</string>
     <string name="dlg_success_request_facebook">Request sent</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
@@ -274,6 +278,8 @@
     <string name="failed">Failed</string>
     <string name="wifi_disabled">Call was stopped because connection was lost</string>
     <string name="dlg_offline_call">%1$s is calling you!</string>
+    <string name="permission_unavailable">%s is not available now!</string>
+    <string name="permissions_unavailable">%s are not available now!</string>
 
     <plurals name="days">
         <item quantity="one">%1$d day</item>

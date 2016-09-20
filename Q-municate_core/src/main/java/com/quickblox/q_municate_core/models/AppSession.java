@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.models;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.server.BaseService;
@@ -65,12 +66,14 @@ public class AppSession implements Serializable {
             BaseService baseService = QBAuth.getBaseService();
             String token = baseService.getToken();
             if (token == null) {
+                Log.d("AppSession", "token == null");
                 return false;
             }
             Date tokenExpirationDate = baseService.getTokenExpirationDate();
             long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
             return tokenLiveOffset > expirationTime;
         } catch (BaseServiceException e) {
+            Log.d("AppSession", "BaseServiceException: " + e.getMessage());
             // nothing by default
         }
         return false;

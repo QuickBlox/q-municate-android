@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.App;
@@ -85,6 +86,7 @@ public class LoginHelper {
         //check is token valid for about 1 minute
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
+            Log.d(TAG, "runExistSession()");
             existingQbSessionListener.onStartSessionSuccess();
         } else {
             login();
@@ -102,6 +104,7 @@ public class LoginHelper {
     }
 
     public void loginQB() {
+        Log.d(TAG, "loginQB()");
         appSharedHelper.saveUsersImportInitialized(true);
         QBUser qbUser = new QBUser(null, userPassword, userEmail);
         AppSession.getSession().closeAndClear();

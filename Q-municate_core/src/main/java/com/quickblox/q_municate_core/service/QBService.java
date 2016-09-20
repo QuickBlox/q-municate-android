@@ -550,6 +550,8 @@ public class QBService extends Service {
 
     @Override
     public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "onCreate()");
         IntentFilter filter = new IntentFilter();
         filter.addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
         if (broadcastReceiver != null) {
@@ -559,6 +561,7 @@ public class QBService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand");
         String action;
         if (intent != null && (action = intent.getAction()) != null) {
             Log.d(TAG, "service started with resultAction=" + action);
@@ -573,6 +576,7 @@ public class QBService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy()");
         if (broadcastReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         }
@@ -580,6 +584,7 @@ public class QBService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind");
         return binder;
     }
 
