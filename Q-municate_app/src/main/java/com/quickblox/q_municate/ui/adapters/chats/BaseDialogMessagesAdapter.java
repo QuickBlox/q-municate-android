@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -174,11 +175,11 @@ public abstract class BaseDialogMessagesAdapter
 
         @Nullable
         @Bind(R.id.progress_relativelayout)
-        RelativeLayout progressRelativeLayout;
+        FrameLayout progressRelativeLayout;
 
         @Nullable
         @Bind(R.id.attach_message_relativelayout)
-        RelativeLayout attachMessageRelativeLayout;
+        FrameLayout attachMessageRelativeLayout;
 
         @Nullable
         @Bind(R.id.message_textview)
