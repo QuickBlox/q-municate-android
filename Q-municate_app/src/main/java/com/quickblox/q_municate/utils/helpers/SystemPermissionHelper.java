@@ -2,6 +2,7 @@ package com.quickblox.q_municate.utils.helpers;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -117,7 +118,7 @@ public class SystemPermissionHelper {
         checkAndRequestPermissions(PERMISSIONS_FOR_SAVE_FILE_REQUEST, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    public void collectDeniedPermissionsAndNotifyUser(String permissions[], int[] grantResults){
+    public StringifyArrayList<String> collectDeniedPermissionsFomResult(String permissions[], int[] grantResults){
         StringifyArrayList<String> deniedPermissions = new StringifyArrayList<>();
         for (int i = 0; i < permissions.length; i++){
             if(grantResults[i] == PackageManager.PERMISSION_DENIED){
@@ -125,18 +126,15 @@ public class SystemPermissionHelper {
             }
         }
 
-        ToastUtils.longToast(activity.getString(deniedPermissions.size() == 1
-                ? R.string.permission_unavailable
-                : R.string.permissions_unavailable,
-                deniedPermissions.getItemsAsString()));
+        return deniedPermissions;
     }
 
-    public static void openSystemSettings(){
+    public static void openSystemSettings(Context context){
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-        Uri uri = Uri.fromParts("package", App.getInstance().getPackageName(), null);
+        Uri uri = Uri.fromParts("package", context.getPackageName(), null);
         intent.setData(uri);
-        App.getInstance().startActivity(intent);
+        context.startActivity(intent);
     }
 }

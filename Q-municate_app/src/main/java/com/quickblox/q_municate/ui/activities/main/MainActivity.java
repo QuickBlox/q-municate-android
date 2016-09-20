@@ -59,8 +59,6 @@ public class MainActivity extends BaseLoggableActivity {
         if (!isChatInitializedAndUserLoggedIn()) {
             Log.d("MainActivity", "onCreate. !isChatInitializedAndUserLoggedIn()");
             loginChat();
-        } else {
-            checkImportFriends();
         }
 
         launchDialogsListFragment();
@@ -133,7 +131,6 @@ public class MainActivity extends BaseLoggableActivity {
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         actualizeCurrentTitle();
-        checkImportFriends();
     }
 
     private void addActions() {
@@ -193,14 +190,6 @@ public class MainActivity extends BaseLoggableActivity {
     private void launchDialogsListFragment() {
         Log.d("MainActivity", "launchDialogsListFragment()");
         setCurrentFragment(DialogsListFragment.newInstance());
-    }
-
-    private void checkImportFriends() {
-        //disabled import friends by new app logic
-//        if (!appSharedHelper.isUsersImportInitialized()) {
-//            showProgress();
-//            startImportFriends();
-//        }
     }
 
     private void startImportFriends(){

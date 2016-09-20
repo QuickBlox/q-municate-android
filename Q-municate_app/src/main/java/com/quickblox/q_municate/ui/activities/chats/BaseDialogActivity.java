@@ -452,7 +452,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public void onNegative(MaterialDialog dialog) {
                         super.onNegative(dialog);
-                        SystemPermissionHelper.openSystemSettings();
+                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
                     }
                 });
     }

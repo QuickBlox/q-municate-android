@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Chronometer;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
@@ -585,7 +586,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             case SystemPermissionHelper.PERMISSIONS_FOR_CALL_REQUEST: {
                 if (grantResults.length > 0) {
                     if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)){
-                        systemPermissionHelper.collectDeniedPermissionsAndNotifyUser(permissions, grantResults);
+                        showToastDeniedPermissions(permissions, grantResults);
                     }
                 }
 
@@ -606,6 +607,15 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         } else {
             addConversationFragmentReceiveCall();
         }
+    }
+
+    private void showToastDeniedPermissions(String[] permissions, int[] grantResults){
+        StringifyArrayList<String> deniedPermissions =
+                systemPermissionHelper.collectDeniedPermissionsFomResult(permissions, grantResults);
+                ToastUtils.longToast(getString(deniedPermissions.size() == 1
+                        ? R.string.permission_unavailable
+                        : R.string.permissions_unavailable,
+                deniedPermissions.getItemsAsString()));
     }
 
     public void addTCClientConnectionCallback(QBRTCSessionConnectionCallbacks clientConnectionCallbacks) {

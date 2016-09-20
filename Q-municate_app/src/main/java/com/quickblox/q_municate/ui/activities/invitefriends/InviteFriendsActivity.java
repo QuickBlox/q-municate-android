@@ -219,7 +219,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
                     @Override
                     public void onNegative(MaterialDialog dialog) {
                         super.onNegative(dialog);
-                        SystemPermissionHelper.openSystemSettings();
+                        SystemPermissionHelper.openSystemSettings(InviteFriendsActivity.this);
                     }
                 });
     }
