@@ -206,6 +206,7 @@
     <string name="switch_camera">Switch camera</string>
     <string name="decline_call">Decline</string>
     <string name="answer_call">Answer</string>
+    <string name="denied_permission_message">Call has been started without an access to %s</string>
 
 
     <!-- Invite Friends -->

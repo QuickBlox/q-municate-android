@@ -25,6 +25,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
+import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.models.StartConversationReason;
@@ -609,14 +610,12 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
     }
 
-    private void showToastDeniedPermissions(String[] permissions, int[] grantResults){
-        StringifyArrayList<String> deniedPermissions =
-                new StringifyArrayList<>(systemPermissionHelper.collectDeniedPermissionsFomResult(permissions, grantResults));
+    private void showToastDeniedPermissions(String[] permissions, int[] grantResults) {
+        ArrayList<String> deniedPermissions = systemPermissionHelper
+                .collectDeniedPermissionsFomResult(permissions, grantResults);
 
-                ToastUtils.longToast(getString(deniedPermissions.size() == 1
-                        ? R.string.permission_unavailable
-                        : R.string.permissions_unavailable,
-                deniedPermissions.getItemsAsString()));
+        ToastUtils.longToast(
+                getString(R.string.denied_permission_message, StringUtils.createCompositeString(deniedPermissions)));
     }
 
     public void addTCClientConnectionCallback(QBRTCSessionConnectionCallbacks clientConnectionCallbacks) {
