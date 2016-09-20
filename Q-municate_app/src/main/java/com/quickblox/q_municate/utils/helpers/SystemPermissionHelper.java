@@ -7,14 +7,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
-import com.quickblox.core.helper.StringifyArrayList;
-import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import java.util.ArrayList;
@@ -32,10 +27,6 @@ public class SystemPermissionHelper {
     }
 
 
-    public boolean isPermissionDenied(String permission) {
-        return ContextCompat.checkSelfPermission(activity.getApplicationContext(), permission) == PackageManager.PERMISSION_DENIED;
-    }
-
     public void requestPermission(int requestCode, String permission) {
         ActivityCompat.requestPermissions(activity, new String[]{permission},
                 requestCode);
@@ -46,22 +37,13 @@ public class SystemPermissionHelper {
                 requestCode);
     }
 
-    private boolean hasAllPermissionsGranted(@NonNull int[] grantResults) {
-        for (int grantResult : grantResults) {
-            if (grantResult == PackageManager.PERMISSION_DENIED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public boolean isPermissionGranted(String permission) {
         return ContextCompat.checkSelfPermission(activity.getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     public boolean isAllPermissionGranted(String... permissions) {
         for (String permission : permissions) {
-            if (isPermissionDenied(permission)) {
+            if (!isPermissionGranted(permission)) {
                 return false;
             }
         }
@@ -78,7 +60,7 @@ public class SystemPermissionHelper {
     private String[] collectDeniedPermissions(String... permissions) {
         ArrayList<String> deniedPermissionsList = new ArrayList<>();
         for (String permission : permissions) {
-            if (isPermissionDenied(permission)) {
+            if (!isPermissionGranted(permission)) {
                 deniedPermissionsList.add(permission);
             }
         }
@@ -92,6 +74,14 @@ public class SystemPermissionHelper {
         } else {
             return isAllPermissionGranted(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA);
         }
+    }
+
+    public boolean isCameraPermissionGranted(){
+        return isPermissionGranted(Manifest.permission.CAMERA);
+    }
+
+    public boolean isMicriphonePermissionGranted(){
+        return isPermissionGranted(Manifest.permission.RECORD_AUDIO);
     }
 
     public void requestPermissionsForCallByType(QBRTCTypes.QBConferenceType qbConferenceType){
@@ -118,8 +108,8 @@ public class SystemPermissionHelper {
         checkAndRequestPermissions(PERMISSIONS_FOR_SAVE_FILE_REQUEST, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    public StringifyArrayList<String> collectDeniedPermissionsFomResult(String permissions[], int[] grantResults){
-        StringifyArrayList<String> deniedPermissions = new StringifyArrayList<>();
+    public ArrayList<String> collectDeniedPermissionsFomResult(String permissions[], int[] grantResults){
+        ArrayList<String> deniedPermissions = new ArrayList<>();
         for (int i = 0; i < permissions.length; i++){
             if(grantResults[i] == PackageManager.PERMISSION_DENIED){
                 deniedPermissions.add(permissions[i]);

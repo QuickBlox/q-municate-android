@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.fragments.call;
 
-import android.Manifest;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.graphics.Rect;
@@ -21,7 +20,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -166,12 +164,12 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
 
     private void correctButtonsVisibilityByGrantedPermissions (){
         if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)){
-            if(systemPermissionHelper.isPermissionDenied(Manifest.permission.RECORD_AUDIO)){
+            if(!systemPermissionHelper.isMicriphonePermissionGranted()){
                 micToggleVideoCall.setChecked(false);
                 micToggleVideoCall.setEnabled(false);
             }
 
-            if(systemPermissionHelper.isPermissionDenied(Manifest.permission.CAMERA)){
+            if(!systemPermissionHelper.isCameraPermissionGranted()){
                 cameraToggle.setChecked(false);
                 cameraToggle.setEnabled(false);
             }

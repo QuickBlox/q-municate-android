@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.listeners.CounterChangedListener;

@@ -611,7 +611,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     private void showToastDeniedPermissions(String[] permissions, int[] grantResults){
         StringifyArrayList<String> deniedPermissions =
-                systemPermissionHelper.collectDeniedPermissionsFomResult(permissions, grantResults);
+                new StringifyArrayList<>(systemPermissionHelper.collectDeniedPermissionsFomResult(permissions, grantResults));
+
                 ToastUtils.longToast(getString(deniedPermissions.size() == 1
                         ? R.string.permission_unavailable
                         : R.string.permissions_unavailable,
