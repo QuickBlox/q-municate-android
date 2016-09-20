@@ -26,6 +26,9 @@ public class CoreSharedHelper {
         public static final String USER_EMAIL = "user_email";
         public static final String USER_PASSWORD = "user_password";
         public static final String USER_FULL_NAME = "full_name";
+        public static final String USER_FB_ID = "facebook_id";
+        public static final String USER_TWITTER_ID = "twitter_id";
+        public static final String USER_TD_ID = "twitter_digits_id";
 
         public static final String PUSH_NEED_TO_OPEN_DIALOG = "push_need_to_open_dialog";
         public static final String PUSH_DIALOG_ID = "push_dialog_id";
@@ -188,11 +191,39 @@ public class CoreSharedHelper {
         savePref(Constants.USER_FULL_NAME, fullName);
     }
 
+    public void saveFBId(String facebookId){
+        savePref(USER_FB_ID, facebookId);
+    }
+
+    public String getFBId(){
+        return getPref(USER_FB_ID);
+    }
+
+
+    public void saveTwitterId(String twitterId){
+        savePref(USER_TWITTER_ID, twitterId);
+    }
+
+    public String getTwitterId(){
+        return getPref(USER_TWITTER_ID);
+    }
+
+    public void saveTwitterDigitsId(String twitterDigitsId){
+        savePref(USER_TD_ID, twitterDigitsId);
+    }
+
+    public String getTwitterDigitsId(){
+        return getPref(USER_TD_ID);
+    }
+
     public void clearUserData() {
         saveUserId(0);
         saveUserEmail(null);
         saveUserPassword(null);
         saveUserFullName(null);
+        saveFBId(null);
+        saveTwitterId(null);
+        saveTwitterDigitsId(null);
     }
 
     public boolean needToOpenDialog() {

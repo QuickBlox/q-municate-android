@@ -52,6 +52,9 @@ public class AppSession implements Serializable {
         qbUser.setEmail(CoreSharedHelper.getInstance().getUserEmail());
         qbUser.setPassword(CoreSharedHelper.getInstance().getUserPassword());
         qbUser.setFullName(userFullName);
+        qbUser.setFacebookId(CoreSharedHelper.getInstance().getFBId());
+        qbUser.setTwitterId(CoreSharedHelper.getInstance().getTwitterId());
+        qbUser.setTwitterDigitsId(CoreSharedHelper.getInstance().getTwitterDigitsId());
 
         LoginType loginType = LoginType.valueOf(loginTypeRaw);
 
@@ -114,6 +117,9 @@ public class AppSession implements Serializable {
         coreSharedHelper.saveUserEmail(user.getEmail());
         coreSharedHelper.saveUserPassword(user.getPassword());
         coreSharedHelper.saveUserFullName(user.getFullName());
+        coreSharedHelper.saveFBId(user.getFacebookId());
+        coreSharedHelper.saveTwitterId(user.getTwitterId());
+        coreSharedHelper.saveTwitterDigitsId(user.getTwitterDigitsId());
     }
 
     public boolean isLoggedIn() {

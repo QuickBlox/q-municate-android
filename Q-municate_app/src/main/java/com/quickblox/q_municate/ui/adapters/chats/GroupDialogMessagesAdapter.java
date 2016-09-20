@@ -82,19 +82,9 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
             } else {
                 setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
-                viewHolder.timeTextMessageTextView.setText(
-                        DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
+                viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
                 viewHolder.messageTextView.setText(combinationMessage.getBody());
             }
-        }
-
-        if (!State.READ.equals(combinationMessage.getState()) && !ownMessage && baseActivity.isNetworkAvailable()) {
-            combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity,
-                    ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, false);
-        } else if (ownMessage) {
-            combinationMessage.setState(State.READ);
-            dataManager.getMessageDataManager().update(combinationMessage.toMessage(), false);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
