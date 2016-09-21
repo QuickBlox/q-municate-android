@@ -542,7 +542,9 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         if (remoteVideoView != null && remoteVideoTrack == null) {
             fillVideoView(remoteVideoView, videoTrack, true);
         }
-        getActivity().invalidateOptionsMenu();
+        if(getActivity() != null) {
+            getActivity().invalidateOptionsMenu();
+        }
     }
 
     @Override
