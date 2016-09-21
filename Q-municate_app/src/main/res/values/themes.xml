@@ -58,7 +58,8 @@
     </style>
 
     <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
-        <item name="searchHintIcon">@android:color/transparent</item>
+        <item name="searchHintIcon">@null</item>
     </style>
+
 
 </resources>
