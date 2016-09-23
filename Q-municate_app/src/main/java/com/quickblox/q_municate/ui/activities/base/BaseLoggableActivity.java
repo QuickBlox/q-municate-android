@@ -33,7 +33,7 @@ public abstract class BaseLoggableActivity extends BaseActivity implements Logga
         super.onCreate(savedInstanceState);
         Log.d("BaseLoggableActivity", "onCreate");
 
-        if (!isCurrentSessionValid()){
+        if (isNetworkAvailable() && !isCurrentSessionValid()){
             Log.d("BaseLoggableActivity", "!isCurrentSessionValid()");
             startSplashActivity();
         }
