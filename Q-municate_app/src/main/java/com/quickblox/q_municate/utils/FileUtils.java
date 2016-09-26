@@ -7,7 +7,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.legacy.utils.ConstsCore;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.io.ByteArrayOutputStream;

@@ -8,7 +8,7 @@ import android.view.View;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.chats.BaseDialogActivity;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.legacy.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;

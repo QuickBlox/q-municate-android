@@ -8,7 +8,7 @@ import android.util.Log;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.utils.SystemUtils;
 import com.quickblox.q_municate.utils.helpers.notification.ChatNotificationHelper;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.legacy.service.QBServiceConsts;
 import com.quickblox.q_municate_db.models.User;
 
 public class ChatMessageReceiver extends BroadcastReceiver {

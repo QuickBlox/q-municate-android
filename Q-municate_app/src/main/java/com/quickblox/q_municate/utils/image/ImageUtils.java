@@ -26,8 +26,8 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.MimeType;
 import com.quickblox.q_municate.utils.StorageUtil;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.DateUtilsCore;
+import com.quickblox.q_municate_core.legacy.utils.ConstsCore;
+import com.quickblox.q_municate_core.legacy.utils.DateUtilsCore;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.io.BufferedInputStream;

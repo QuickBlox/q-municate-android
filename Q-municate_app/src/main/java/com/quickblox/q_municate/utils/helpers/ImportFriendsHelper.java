@@ -7,9 +7,9 @@ import android.util.Log;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.quickblox.q_municate_core.models.InviteFriend;
-import com.quickblox.q_municate_core.qb.commands.friend.QBImportFriendsCommand;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.legacy.models.InviteFriend;
+import com.quickblox.q_municate_core.legacy.qb.commands.friend.QBImportFriendsCommand;
+import com.quickblox.q_municate_core.legacy.utils.ConstsCore;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -2,7 +2,7 @@ package com.quickblox.q_municate.utils.helpers;
 
 import android.content.Context;
 
-import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
+import com.quickblox.q_municate_core.legacy.utils.helpers.CoreSharedHelper;
 
 public class SharedHelper extends CoreSharedHelper {
 

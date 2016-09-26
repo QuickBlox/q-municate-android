@@ -9,7 +9,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.listeners.OnRecycleItemClickListener;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.legacy.models.AppSession;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;

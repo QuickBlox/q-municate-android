@@ -11,8 +11,8 @@ import com.quickblox.q_municate.utils.listeners.simple.SimpleGlobalLoginListener
 import com.quickblox.q_municate.utils.SystemUtils;
 import com.quickblox.q_municate.utils.helpers.LoginHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.NotificationEvent;
+import com.quickblox.q_municate_core.legacy.models.AppSession;
+import com.quickblox.q_municate_core.legacy.models.NotificationEvent;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 

@@ -5,7 +5,7 @@ import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.legacy.models.AppSession;
 import com.quickblox.users.model.QBUser;
 
 import java.util.regex.Matcher;

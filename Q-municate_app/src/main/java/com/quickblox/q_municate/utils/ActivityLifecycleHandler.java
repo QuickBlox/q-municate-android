@@ -9,9 +9,9 @@ import android.util.Log;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLogoutAndDestroyChatCommand;
+import com.quickblox.q_municate_core.legacy.models.AppSession;
+import com.quickblox.q_municate_core.legacy.qb.commands.chat.QBLoginChatCompositeCommand;
+import com.quickblox.q_municate_core.legacy.qb.commands.chat.QBLogoutAndDestroyChatCommand;
 
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
 

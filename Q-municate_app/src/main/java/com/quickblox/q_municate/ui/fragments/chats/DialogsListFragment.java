@@ -22,8 +22,8 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
 import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.core.loader.BaseLoader;
+import com.quickblox.q_municate_core.legacy.core.command.Command;
+import com.quickblox.q_municate_core.legacy.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
@@ -33,15 +33,15 @@ import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.fragments.search.SearchFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.DialogWrapper;
-import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.DbUtils;
-import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_core.legacy.models.AppSession;
+import com.quickblox.q_municate_core.legacy.models.DialogWrapper;
+import com.quickblox.q_municate_core.legacy.qb.commands.chat.QBDeleteChatCommand;
+import com.quickblox.q_municate_core.legacy.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.legacy.service.QBService;
+import com.quickblox.q_municate_core.legacy.service.QBServiceConsts;
+import com.quickblox.q_municate_core.legacy.utils.ChatUtils;
+import com.quickblox.q_municate_core.legacy.utils.DbUtils;
+import com.quickblox.q_municate_core.legacy.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogOccupantDataManager;
@@ -252,7 +252,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
         dialogsListAdapter.setNewData(dialogsList);
-        dialogsListAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
     }
 

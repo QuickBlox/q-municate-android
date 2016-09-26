@@ -20,11 +20,11 @@ import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_core.legacy.core.command.Command;
+import com.quickblox.q_municate_core.legacy.models.AppSession;
+import com.quickblox.q_municate_core.legacy.models.UserCustomData;
+import com.quickblox.q_municate_core.legacy.service.QBServiceConsts;
+import com.quickblox.q_municate_core.legacy.utils.Utils;
 
 public class MainActivity extends BaseLoggableActivity {
 

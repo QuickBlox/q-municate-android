@@ -6,8 +6,8 @@ import android.util.Log;
 
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.utils.Loggable;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.legacy.models.AppSession;
+import com.quickblox.q_municate_core.legacy.utils.ConstsCore;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;

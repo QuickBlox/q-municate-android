@@ -14,16 +14,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate_core.models.StartConversationReason;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
+import com.quickblox.q_municate_core.legacy.models.StartConversationReason;
+import com.quickblox.q_municate_core.legacy.service.QBServiceConsts;
+import com.quickblox.q_municate_core.legacy.utils.call.RingtonePlayer;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 

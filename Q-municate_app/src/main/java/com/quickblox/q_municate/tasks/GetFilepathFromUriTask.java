@@ -14,7 +14,7 @@ import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment
 import com.quickblox.q_municate.utils.SchemeType;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
-import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
+import com.quickblox.q_municate_core.legacy.core.concurrency.BaseAsyncTask;
 
 import java.io.File;
 import java.io.IOException;

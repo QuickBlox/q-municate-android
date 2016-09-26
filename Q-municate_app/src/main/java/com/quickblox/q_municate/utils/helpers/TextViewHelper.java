@@ -7,7 +7,7 @@ import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.legacy.utils.ConstsCore;
 
 public class TextViewHelper {
 

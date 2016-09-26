@@ -14,7 +14,7 @@ import android.view.InflateException;
 import android.widget.ImageView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.legacy.utils.ConstsCore;
 
 public class MaskedImageView extends ImageView {
 

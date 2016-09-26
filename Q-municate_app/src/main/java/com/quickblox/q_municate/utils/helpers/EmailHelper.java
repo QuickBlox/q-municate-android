@@ -11,8 +11,8 @@ import android.provider.ContactsContract;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.DeviceInfoUtils;
-import com.quickblox.q_municate_core.models.InviteFriend;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.legacy.models.InviteFriend;
+import com.quickblox.q_municate_core.legacy.utils.ConstsCore;
 
 import java.util.ArrayList;
 import java.util.List;
