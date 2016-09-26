@@ -42,6 +42,8 @@ public class CoreSharedHelper {
         public static final String CALL_STARTBITRATE_VALUE = "call_startbitrate_value";
         public static final String CALL_VIDEO_CODEC = "call_video_codec";
         public static final String CALL_AUDIO_CODEC = "call_audio_codec";
+
+        public static final String PERMISSIONS_SAVE_FILE_WAS_REQUESTED = "permission_save_file_was_requested";
     }
 
     protected final SharedPreferences sharedPreferences;
@@ -214,6 +216,14 @@ public class CoreSharedHelper {
 
     public String getTwitterDigitsId(){
         return getPref(USER_TD_ID);
+    }
+
+    public boolean isPermissionsSaveFileWasRequested(){
+        return getPref(Constants.PERMISSIONS_SAVE_FILE_WAS_REQUESTED, false);
+    }
+
+    public void savePermissionsSaveFileWasRequested(boolean requested){
+        savePref(Constants.PERMISSIONS_SAVE_FILE_WAS_REQUESTED, requested);
     }
 
     public void clearUserData() {
