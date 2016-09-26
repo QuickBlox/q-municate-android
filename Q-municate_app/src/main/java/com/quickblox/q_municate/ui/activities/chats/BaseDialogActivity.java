@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
@@ -127,6 +129,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BroadcastReceiver updatingDialogBroadcastReceiver;
     private boolean loadMore;
     private SystemPermissionHelper systemPermissionHelper;
+    private boolean isPermissionsRequstedForAttach;
 
     @Override
     protected int getContentResId() {
@@ -177,7 +180,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
+            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        } else {
+            isPermissionsRequstedForAttach = true;
+            appSharedHelper.savePermissionsSaveFileWasRequested(false);
+            checkPermissionSaveFiles();
+        }
     }
 
     @Override
@@ -643,6 +652,40 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messageEditText.setEnabled(enable);
         smilePanelImageButton.setEnabled(enable);
         attachButton.setEnabled(enable);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST: {
+                if (grantResults.length > 0) {
+                    if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && isPermissionsRequstedForAttach) {
+                        showPermissionSettingsDialog();
+                    } else if (isPermissionsRequstedForAttach){
+                        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+                    }
+                }
+            }
+        }
+    }
+
+    private void showPermissionSettingsDialog() {
+        DialogsUtils.showOpenAppSettingsDialog(
+                getSupportFragmentManager(),
+                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
+                    }
+                });
     }
 
     protected abstract void updateActionBar();
