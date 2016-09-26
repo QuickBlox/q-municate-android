@@ -10,7 +10,6 @@ import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,7 +27,6 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
@@ -421,40 +419,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void checkPermissionSaveFiles() {
-        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile()){
+        boolean permissionSaveFileWasRequested = appSharedHelper.isPermissionsSaveFileWasRequested();
+        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested){
             systemPermissionHelper.requestPermissionsForSaveFile();
+            appSharedHelper.savePermissionsSaveFileWasRequested(true);
         }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST: {
-                if (grantResults.length > 0) {
-                    if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile()){
-                        showPermissionSettingsDialog();
-                    }
-                }
-            }
-        }
-    }
-
-    private void showPermissionSettingsDialog() {
-        DialogsUtils.showOpenAppSettingsDialog(
-                getSupportFragmentManager(),
-                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
-                new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                    }
-
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-                        super.onNegative(dialog);
-                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
-                    }
-                });
     }
 
     protected void loadActionBarLogo(String logoUrl) {
