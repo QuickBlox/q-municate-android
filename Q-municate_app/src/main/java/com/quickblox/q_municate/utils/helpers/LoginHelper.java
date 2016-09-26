@@ -53,14 +53,18 @@ public class LoginHelper {
 
     public void checkStartExistSession() {
         if (needToClearAllData()) {
-            existingQbSessionListener.onStartSessionFail();
+            if (existingQbSessionListener != null) {
+                existingQbSessionListener.onStartSessionFail();
+            }
             return;
         }
 
         if (appSharedHelper.isSavedRememberMe()) {
             startExistSession();
         } else {
-            existingQbSessionListener.onStartSessionFail();
+            if (existingQbSessionListener != null) {
+                existingQbSessionListener.onStartSessionFail();
+            }
         }
     }
 
@@ -70,7 +74,9 @@ public class LoginHelper {
         if ((isEmailEntered && isPasswordEntered) || (isLoggedViaSocial(isPasswordEntered))) {
             runExistSession();
         } else {
-            existingQbSessionListener.onStartSessionFail();
+            if (existingQbSessionListener != null) {
+                existingQbSessionListener.onStartSessionFail();
+            }
         }
     }
 
@@ -87,7 +93,9 @@ public class LoginHelper {
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
             Log.d(TAG, "runExistSession()");
-            existingQbSessionListener.onStartSessionSuccess();
+            if (existingQbSessionListener != null) {
+                existingQbSessionListener.onStartSessionSuccess();
+            }
         } else {
             login();
         }
