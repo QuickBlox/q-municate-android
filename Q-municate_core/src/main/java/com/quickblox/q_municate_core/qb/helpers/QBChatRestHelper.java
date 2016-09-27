@@ -1,10 +1,12 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 
@@ -21,6 +23,7 @@ public class QBChatRestHelper extends BaseHelper {
     private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
 
     private QBChatService chatService;
+    private QBGroupChatHelper groupChatHelper;
     private ConnectionListener connectionListener = new ChatConnectionListener();
 
     public QBChatRestHelper(Context context) {
@@ -31,6 +34,10 @@ public class QBChatRestHelper extends BaseHelper {
             QBChatService.setDefaultPacketReplyTimeout(ConstsCore.DEFAULT_PACKET_REPLY_TIMEOUT);
 
             chatService = QBChatService.getInstance();
+            if(context instanceof QBService ) {
+                QBService service = (QBService)context;
+                groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+            }
             chatService.addConnectionListener(connectionListener);
     }
 
@@ -53,6 +60,18 @@ public class QBChatRestHelper extends BaseHelper {
 
     public boolean isLoggedIn() {
         return chatService != null && chatService.isLoggedIn();
+    }
+
+    private void tryJoinRoomChatsAsync(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (groupChatHelper != null) {
+                    Log.d("QBChatRestHelper", "tryJoinRoomChats");
+                    groupChatHelper.tryJoinRoomChats();
+                }
+            }
+        }).start();
     }
 
     private class ChatConnectionListener implements ConnectionListener {
@@ -83,6 +102,8 @@ public class QBChatRestHelper extends BaseHelper {
 
         @Override
         public void reconnectionSuccessful() {
+            Lo.g("reconnectionSuccessful");
+            tryJoinRoomChatsAsync();
         }
 
         @Override
