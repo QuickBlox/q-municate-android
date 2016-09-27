@@ -270,7 +270,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper{
 
     public void joinRoomChat(QBDialog dialog) throws Exception {
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
-        if (roomChat != null && !roomChat.isJoined()) {
+        if (roomChat != null) {
             DiscussionHistory history = new DiscussionHistory();
             history.setMaxStanzas(0); // without getting messages
             roomChat.join(history);
