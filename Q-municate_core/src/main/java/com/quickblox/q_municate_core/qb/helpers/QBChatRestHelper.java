@@ -23,22 +23,24 @@ public class QBChatRestHelper extends BaseHelper {
     private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
 
     private QBChatService chatService;
-    private QBGroupChatHelper groupChatHelper;
     private ConnectionListener connectionListener = new ChatConnectionListener();
+    private boolean initialized;
 
     public QBChatRestHelper(Context context) {
         super(context);
     }
 
     public synchronized void initChatService() throws XMPPException, SmackException {
-            QBChatService.setDefaultPacketReplyTimeout(ConstsCore.DEFAULT_PACKET_REPLY_TIMEOUT);
+        if(initialized){
+            return;
+        }
 
-            chatService = QBChatService.getInstance();
-            if(context instanceof QBService ) {
-                QBService service = (QBService)context;
-                groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
-            }
-            chatService.addConnectionListener(connectionListener);
+        QBChatService.setDefaultPacketReplyTimeout(ConstsCore.DEFAULT_PACKET_REPLY_TIMEOUT);
+
+        chatService = QBChatService.getInstance();
+        chatService.addConnectionListener(connectionListener);
+
+        initialized = true;
     }
 
     public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
@@ -60,18 +62,6 @@ public class QBChatRestHelper extends BaseHelper {
 
     public boolean isLoggedIn() {
         return chatService != null && chatService.isLoggedIn();
-    }
-
-    private void tryJoinRoomChatsAsync(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (groupChatHelper != null) {
-                    Log.d("QBChatRestHelper", "tryJoinRoomChats");
-                    groupChatHelper.tryJoinRoomChats();
-                }
-            }
-        }).start();
     }
 
     private class ChatConnectionListener implements ConnectionListener {
@@ -102,8 +92,6 @@ public class QBChatRestHelper extends BaseHelper {
 
         @Override
         public void reconnectionSuccessful() {
-            Lo.g("reconnectionSuccessful");
-            tryJoinRoomChatsAsync();
         }
 
         @Override
