@@ -129,7 +129,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BroadcastReceiver updatingDialogBroadcastReceiver;
     private boolean loadMore;
     private SystemPermissionHelper systemPermissionHelper;
-    private boolean isPermissionsRequstedForAttach;
 
     @Override
     protected int getContentResId() {
@@ -183,9 +182,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
             imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
         } else {
-            isPermissionsRequstedForAttach = true;
-            appSharedHelper.savePermissionsSaveFileWasRequested(false);
-            checkPermissionSaveFiles();
+            showPermissionSettingsDialog();
         }
     }
 
@@ -652,22 +649,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messageEditText.setEnabled(enable);
         smilePanelImageButton.setEnabled(enable);
         attachButton.setEnabled(enable);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST: {
-                if (grantResults.length > 0) {
-                    if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && isPermissionsRequstedForAttach) {
-                        showPermissionSettingsDialog();
-                    } else if (isPermissionsRequstedForAttach){
-                        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
-                    }
-                }
-            }
-        }
     }
 
     private void showPermissionSettingsDialog() {
