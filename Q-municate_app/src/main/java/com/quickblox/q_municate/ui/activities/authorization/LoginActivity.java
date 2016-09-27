@@ -11,7 +11,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
-import com.quickblox.q_municate_core.legacy.models.LoginType;
+import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_db.managers.DataManager;
 
 import butterknife.Bind;

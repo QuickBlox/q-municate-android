@@ -17,10 +17,10 @@ import com.quickblox.q_municate.utils.bridges.SnackbarBridge;
 import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate_core.legacy.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.legacy.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.legacy.qb.helpers.QBPrivateChatHelper;
-import com.quickblox.q_municate_core.legacy.service.QBService;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
+import com.quickblox.q_municate_core.service.QBService;
 
 import butterknife.ButterKnife;
 

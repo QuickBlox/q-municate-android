@@ -12,9 +12,9 @@ import android.widget.EditText;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
-import com.quickblox.q_municate_core.legacy.core.command.Command;
-import com.quickblox.q_municate_core.legacy.qb.commands.QBResetPasswordCommand;
-import com.quickblox.q_municate_core.legacy.service.QBServiceConsts;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 

@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.quickblox.q_municate_core.legacy.utils.Utils;
-import com.quickblox.q_municate_core.legacy.utils.helpers.CoreSharedHelper;
+import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate.tasks.QBGCMRegistrationTask;
 
 public class GSMHelper {

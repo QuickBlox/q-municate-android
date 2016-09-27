@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.StringObfuscator;
-import com.quickblox.q_municate_core.legacy.models.LoginType;
+import com.quickblox.q_municate_core.models.LoginType;
 
 import butterknife.Bind;
 import butterknife.OnClick;

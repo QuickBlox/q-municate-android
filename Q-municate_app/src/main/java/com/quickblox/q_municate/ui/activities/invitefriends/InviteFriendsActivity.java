@@ -18,8 +18,8 @@ import com.quickblox.q_municate.ui.adapters.invitefriends.InviteFriendsAdapter;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.EmailHelper;
 import com.quickblox.q_municate.utils.listeners.simple.SimpleActionModeCallback;
-import com.quickblox.q_municate_core.legacy.models.InviteFriend;
-import com.quickblox.q_municate_core.legacy.utils.ConstsCore;
+import com.quickblox.q_municate_core.models.InviteFriend;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 
 import java.util.ArrayList;

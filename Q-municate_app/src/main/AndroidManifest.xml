@@ -191,7 +191,7 @@
 
         <service android:name=".gcm.GCMIntentService" />
         <service
-            android:name="com.quickblox.q_municate_core.legacy.service.QBService"
+            android:name="com.quickblox.q_municate_core.service.QBService"
             android:icon="@drawable/ic_launcher" />
 
     </application>

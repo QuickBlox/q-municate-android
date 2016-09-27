@@ -11,7 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.utils.SystemUtils;
-import com.quickblox.q_municate_core.legacy.models.NotificationEvent;
+import com.quickblox.q_municate_core.models.NotificationEvent;
 
 public class NotificationManagerHelper {
 

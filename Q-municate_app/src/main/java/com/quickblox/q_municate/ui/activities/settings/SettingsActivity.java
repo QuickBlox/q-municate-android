@@ -22,12 +22,12 @@ import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate_core.legacy.core.command.Command;
-import com.quickblox.q_municate_core.legacy.models.AppSession;
-import com.quickblox.q_municate_core.legacy.models.LoginType;
-import com.quickblox.q_municate_core.legacy.qb.commands.rest.QBLogoutCompositeCommand;
-import com.quickblox.q_municate_core.legacy.service.QBServiceConsts;
-import com.quickblox.q_municate_core.legacy.utils.UserFriendUtils;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.qb.commands.rest.QBLogoutCompositeCommand;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 
