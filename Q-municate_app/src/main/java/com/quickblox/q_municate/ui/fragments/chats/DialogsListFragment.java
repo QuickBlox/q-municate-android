@@ -325,6 +325,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void deleteDialog(Dialog dialog) {
+        if(dialog == null || dialog.getDialogId() == null){
+            return;
+        }
         baseActivity.showProgress();
         if (Dialog.Type.GROUP.equals(dialog.getType())) {
             if (groupChatHelper != null) {
