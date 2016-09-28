@@ -280,6 +280,7 @@
     <string name="dlg_offline_call">%1$s is calling you!</string>
     <string name="permission_unavailable">%s is not available now!</string>
     <string name="permissions_unavailable">%s are not available now!</string>
+    <string name="error_cant_delete_chat">Sorry, chat can\'t be deleted. Please try later</string>
 
     <plurals name="days">
         <item quantity="one">%1$d day</item>
