@@ -11,7 +11,6 @@ import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -44,13 +43,7 @@ public class QBUpdateUserCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
-        int authorizationType = extras.getInt(QBServiceConsts.AUTH_ACTION_TYPE, ConstsCore.NOT_INITIALIZED_VALUE);
-
         Bundle result = new Bundle();
-        if (isLoggedViaFB(user, authorizationType)) {
-            result.putSerializable(QBServiceConsts.EXTRA_USER, user);
-            return result;
-        }
 
         QBUser newUser = updateUser(user, file);
         result.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
@@ -58,8 +51,15 @@ public class QBUpdateUserCommand extends ServiceCommand {
         return result;
     }
 
-    private boolean isLoggedViaFB(QBUser user, int authorizationType){
-        return !TextUtils.isEmpty(user.getFacebookId()) && QBServiceConsts.AUTH_TYPE_LOGIN == authorizationType;
+    private boolean isLoggedViaSocial(QBUser user, int authorizationType){
+        return hasSocialIdentifier(user) && QBServiceConsts.AUTH_TYPE_LOGIN == authorizationType;
+    }
+
+    private boolean hasSocialIdentifier(QBUser user){
+        boolean isLoggedViaFB = !TextUtils.isEmpty(user.getFacebookId());
+        boolean isLoggedViaTwitter = !TextUtils.isEmpty(user.getTwitterId());
+        boolean isLoggedViaTwitterDigits = !TextUtils.isEmpty(user.getTwitterDigitsId());
+        return isLoggedViaFB || isLoggedViaTwitter || isLoggedViaTwitterDigits;
     }
 
     private QBUser updateUser(QBUser user, File file) throws QBResponseException, SmackException.NotConnectedException {

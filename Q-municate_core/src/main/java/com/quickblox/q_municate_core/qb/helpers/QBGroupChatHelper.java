@@ -18,6 +18,8 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.StringUtils;
+import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.NotificationType;
@@ -121,8 +123,6 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
         try {
             groupChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            error = context.getString(R.string.dlg_fail_send_msg);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         } catch (IllegalStateException e) {
@@ -141,8 +141,12 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void tryJoinRoomChats(List<QBDialog> qbDialogsList) {
+        tryJoinRoomChatsPage(qbDialogsList, true);
+    }
+
+    public synchronized void tryJoinRoomChatsPage(List<QBDialog> qbDialogsList, boolean needClean) {
         if (!qbDialogsList.isEmpty()) {
-            initGroupDialogsList();
+            initGroupDialogsList(needClean);
             for (QBDialog dialog : qbDialogsList) {
                 if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
                     groupDialogsList.add(dialog);
@@ -161,11 +165,13 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
-    private void initGroupDialogsList() {
+    private void initGroupDialogsList(boolean needClean) {
         if (groupDialogsList == null) {
             groupDialogsList = new ArrayList<QBDialog>();
         } else {
-            groupDialogsList.clear();
+            if (needClean) {
+                groupDialogsList.clear();
+            }
         }
     }
 
@@ -271,11 +277,12 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public QBDialog addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
+        StringifyArrayList<Integer> occupantsIdsList = new StringifyArrayList<>(userIdsList);
         QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(dialogId));
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
-        requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, userIdsList.toArray());
+        requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, occupantsIdsList.getItemsAsString());
         return updateDialog(dialog, requestBuilder);
     }
 

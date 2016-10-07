@@ -22,7 +22,7 @@ import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCSessionConnectionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCSignalingCallback;
 
-import org.webrtc.VideoCapturerAndroid;
+import org.webrtc.CameraVideoCapturer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ public class QBCallChatHelper extends BaseHelper {
             QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         if (currentQbRtcSession != null) {
             currentQbRtcSession.removeSignalingCallback(qbRtcSignalingCallback);
-            currentQbRtcSession.removeSessionnCallbacksListener(qbRtcSessionConnectionCallbacks);
+            currentQbRtcSession.removeSessionCallbacksListener(qbRtcSessionConnectionCallbacks);
             currentQbRtcSession = null;
         }
     }
@@ -94,12 +94,7 @@ public class QBCallChatHelper extends BaseHelper {
     private void setUpCallClient() {
         Log.d(TAG, "setUpCallClient()");
 
-        qbRtcClient.setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
-            @Override
-            public void onCameraError(String error) {
-                Log.e(TAG, "Error on cams, error = " + error);
-            }
-        });
+        qbRtcClient.setCameraErrorHendler(new CameraErrorHandler());
 
         QBRTCConfig.setMaxOpponentsCount(MAX_OPPONENTS_COUNT);
         QBRTCConfig.setDisconnectTime(DISCONNECT_TIME);
@@ -170,6 +165,7 @@ public class QBCallChatHelper extends BaseHelper {
             } else {
                 Log.d(TAG, "onReceiveNewSession(). init session.");
                 if (activityClass != null) {
+
                     startCallActivity(qbRtcSession);
                     currentQbRtcSession = qbRtcSession;
                 }
@@ -204,12 +200,12 @@ public class QBCallChatHelper extends BaseHelper {
         }
 
         @Override
-        public void onReceiveHangUpFromUser(QBRTCSession qbRtcSession, Integer integer) {
+        public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
             Log.d(TAG,
-                    "onReceiveHangUpFromUser(), qbRtcSession.getSession() = " + qbRtcSession.getSessionID());
+                    "onReceiveHangUpFromUser(), qbRtcSession.getSession() = " + qbrtcSession.getSessionID());
 
             if (qbRtcClientSessionCallbacks != null) {
-                qbRtcClientSessionCallbacks.onReceiveHangUpFromUser(qbRtcSession, integer);
+                qbRtcClientSessionCallbacks.onReceiveHangUpFromUser(qbrtcSession, integer, map);
             }
         }
 
@@ -238,6 +234,34 @@ public class QBCallChatHelper extends BaseHelper {
             if (qbRtcClientSessionCallbacks != null) {
                 qbRtcClientSessionCallbacks.onSessionStartClose(qbRtcSession);
             }
+        }
+    }
+
+    class CameraErrorHandler implements CameraVideoCapturer.CameraEventsHandler {
+
+        @Override
+        public void onCameraError(String s) {
+            Log.e(TAG, "Error on cams, error = " + s);
+        }
+
+        @Override
+        public void onCameraFreezed(String s) {
+            Log.e(TAG, "Camera is frozen " + s);
+        }
+
+        @Override
+        public void onCameraOpening(int i) {
+            Log.e(TAG, "Camera orientation = " + i);
+        }
+
+        @Override
+        public void onFirstFrameAvailable() {
+            Log.e(TAG, "Camera first frame available");
+        }
+
+        @Override
+        public void onCameraClosed() {
+            Log.e(TAG, "Camera closed");
         }
     }
 }

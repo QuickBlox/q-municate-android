@@ -3,8 +3,9 @@ package com.quickblox.q_municate_core.qb.helpers;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.facebook.Session;
+import com.facebook.login.LoginManager;
 import com.quickblox.auth.QBAuth;
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
@@ -62,7 +63,16 @@ public class QBAuthHelper extends BaseHelper {
             String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
         QBSession session = QBAuth.createSession();
-        qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+
+        if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
+            qbUser = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret);
+            CoreSharedHelper.getInstance().saveTDServiceProvider(accessToken);
+            CoreSharedHelper.getInstance().saveTDCredentials(accessTokenSecret);
+        } else {
+            qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+            CoreSharedHelper.getInstance().saveFBToken(accessToken);
+        }
+
         qbUser.setPassword(session.getToken());
 
         if (!hasUserCustomData(qbUser)) {
@@ -70,14 +80,15 @@ public class QBAuthHelper extends BaseHelper {
             qbUser = updateUser(qbUser);
         }
 
-        CoreSharedHelper.getInstance().saveFBToken(accessToken);
-
         qbUser.setPassword(session.getToken());
-        String token = QBAuth.getBaseService().getToken();
+        String qbToken = QBAuth.getBaseService().getToken();
 
         saveOwnerUser(qbUser);
 
-        AppSession.startSession(LoginType.FACEBOOK, qbUser, token);
+        AppSession.startSession(socialProvider.equals(QBProvider.FACEBOOK)
+                ? LoginType.FACEBOOK
+                : LoginType.TWITTER_DIGITS,
+                qbUser, qbToken);
 
         return qbUser;
     }
@@ -99,7 +110,7 @@ public class QBAuthHelper extends BaseHelper {
 
         if (file != null) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-            userCustomData.setAvatar_url(qbFile.getPublicUrl());
+            userCustomData.setAvatarUrl(qbFile.getPublicUrl());
             inputUser.setCustomData(Utils.customDataToString(userCustomData));
             qbUser = QBUsers.updateUser(inputUser);
         }
@@ -120,7 +131,8 @@ public class QBAuthHelper extends BaseHelper {
         if (activeSession != null) {
             activeSession.closeAndClear();
         }
-        Session.getActiveSession().closeAndClearTokenInformation();
+
+        LoginManager.getInstance().logOut();
         QBAuth.deleteSession();
     }
 
@@ -139,6 +151,8 @@ public class QBAuthHelper extends BaseHelper {
 
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             user.setPassword(password);
+        } else {
+            user.setPassword(QBAuth.getSession().getToken());
         }
 
         return user;
@@ -154,7 +168,7 @@ public class QBAuthHelper extends BaseHelper {
         newUser.setFullName(user.getFullName());
 
         UserCustomData userCustomData = getUserCustomData(user);
-        userCustomData.setAvatar_url(qbFile.getPublicUrl());
+        userCustomData.setAvatarUrl(qbFile.getPublicUrl());
         newUser.setCustomData(Utils.customDataToString(userCustomData));
 
         return updateUser(newUser);

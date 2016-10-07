@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.facebook.Session;
-import com.facebook.SessionState;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
@@ -33,7 +31,6 @@ public class MainActivity extends BaseLoggableActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private FacebookHelper facebookHelper;
-    private ImportFriendsHelper importFriendsHelper;
     private GSMHelper gsmHelper;
 
     private ImportFriendsSuccessAction importFriendsSuccessAction;
@@ -52,40 +49,51 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initFields(savedInstanceState);
+        Log.d("MainActivity", "onCreate");
+
+        initFields();
         setUpActionBarWithUpButton();
 
         checkGCMRegistration();
 
         if (!isChatInitializedAndUserLoggedIn()) {
+            Log.d("MainActivity", "onCreate. !isChatInitializedAndUserLoggedIn()");
             loginChat();
-        } else {
-            checkImportFriends();
         }
 
         launchDialogsListFragment();
     }
 
-    private void initFields(Bundle savedInstanceState) {
+    private void initFields() {
+        Log.d("MainActivity", "initFields()");
         title = " " + AppSession.getSession().getUser().getFullName();
         gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
-        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+        facebookHelper = new FacebookHelper(MainActivity.this);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (facebookHelper != null) {
-            facebookHelper.onActivityResult(requestCode, resultCode, data);
-        }
+        facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("MainActivity", "onStart()");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("MainActivity", "onRestart()");
     }
 
     @Override
@@ -123,7 +131,6 @@ public class MainActivity extends BaseLoggableActivity {
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         actualizeCurrentTitle();
-        checkImportFriends();
     }
 
     private void addActions() {
@@ -142,8 +149,8 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void checkVisibilityUserIcon() {
         UserCustomData userCustomData = Utils.customDataToObject(AppSession.getSession().getUser().getCustomData());
-        if (!TextUtils.isEmpty(userCustomData.getAvatar_url())) {
-            loadLogoActionBar(userCustomData.getAvatar_url());
+        if (!TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
+            loadLogoActionBar(userCustomData.getAvatarUrl());
         } else {
             setActionBarIcon(ImageUtils.getRoundIconDrawable(this,
                             BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));
@@ -181,30 +188,20 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void launchDialogsListFragment() {
+        Log.d("MainActivity", "launchDialogsListFragment()");
         setCurrentFragment(DialogsListFragment.newInstance());
     }
 
-    private void checkImportFriends() {
-        Log.d("IMPORT_FRIENDS", "checkImportFriends()");
-        if (!appSharedHelper.isUsersImportInitialized()) {
-            showProgress();
-            importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
+    private void startImportFriends(){
+        ImportFriendsHelper importFriendsHelper = new ImportFriendsHelper(MainActivity.this);
+
+        if (facebookHelper.isSessionOpened()){
+            importFriendsHelper.startGetFriendsListTask(true);
+        } else {
+            importFriendsHelper.startGetFriendsListTask(false);
         }
-    }
 
-    private class FacebookSessionStatusCallback implements Session.StatusCallback {
-
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-
-            if (session.isOpened()) {
-                importFriendsHelper.startGetFriendsListTask(true);
-            } else if (!session.isClosed() && !appSharedHelper.isUsersImportInitialized()) {
-                importFriendsHelper.startGetFriendsListTask(false);
-                appSharedHelper.saveUsersImportInitialized(true);
-                hideProgress();
-            }
-        }
+        hideProgress();
     }
 
     private class ImportFriendsSuccessAction implements Command {

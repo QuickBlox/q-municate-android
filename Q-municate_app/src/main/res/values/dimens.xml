@@ -10,15 +10,18 @@
     <dimen name="button_icon_margin">10dp</dimen>
 
     <dimen name="padding_small">5dp</dimen>
+    <dimen name="padding_minimal_material">8dp</dimen>
     <dimen name="padding_medium">10dp</dimen>
     <dimen name="padding_large">15dp</dimen>
 
-    <dimen name="landing_button_height">42dp</dimen>
-    <dimen name="landing_button_width">300dp</dimen>
+    <dimen name="landing_button_height">40dp</dimen>
+    <dimen name="landing_button_width">328dp</dimen>
+    <dimen name="landing_button_text_size">14sp</dimen>
 
     <dimen name="divider_height">1dip</dimen>
     <dimen name="divider_width">1dip</dimen>
 
+    <dimen name="text_size_very_small">13sp</dimen>
     <dimen name="text_size_small">15sp</dimen>
     <dimen name="text_size">18sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
@@ -51,7 +54,7 @@
 
     <dimen name="inf_list_avatar_height">48dp</dimen>
 
-    <dimen name="corners_small_value">3dp</dimen>
+    <dimen name="corners_small_value">6dp</dimen>
     <dimen name="corners_middle_value">10dp</dimen>
     <dimen name="corners_big_value">15dp</dimen>
 
@@ -80,5 +83,8 @@
     <dimen name="about_vendor_text_margin_bottom">22dp</dimen>
 
     <dimen name="grid_item_divider">4dp</dimen>
+
+    <dimen name="fab_margin_right">16dp</dimen>
+    <dimen name="fab_margin_bottom">16dp</dimen>
 
 </resources>

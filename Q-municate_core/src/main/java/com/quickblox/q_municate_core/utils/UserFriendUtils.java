@@ -8,7 +8,7 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.users.model.QBUser;
 
-import org.jivesoftware.smack.packet.RosterPacket;
+import org.jivesoftware.smack.roster.packet.RosterPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,7 +53,7 @@ public class UserFriendUtils {
         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
 
         if (userCustomData != null) {
-            user.setAvatar(userCustomData.getAvatar_url());
+            user.setAvatar(userCustomData.getAvatarUrl());
             user.setStatus(userCustomData.getStatus());
         }
 

@@ -1,5 +1,4 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_main"
@@ -19,50 +18,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:scaleType="fitCenter"
         android:src="@drawable/app_logo_label" />
 
-    <RelativeLayout
-        android:id="@+id/facebook_connect_button"
-        android:layout_width="@dimen/landing_button_width"
-        android:layout_height="@dimen/landing_button_height"
-        android:layout_above="@+id/sign_up_email_button"
-        android:layout_centerInParent="true"
-        android:background="@drawable/selector_button_connect_facebook">
-
-        <TextView
-            style="@style/TextViewDrawableStyle.White"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:textAllCaps="true"
-            android:background="@null"
-            android:drawableLeft="@drawable/ic_fb_white"
-            android:text="@string/landing_connect_with_facebook" />
-
-    </RelativeLayout>
-
     <Button
-        android:id="@+id/sign_up_email_button"
-        android:layout_height="@dimen/landing_button_height"
+        android:id="@+id/twitter_digits_connect_button"
+        style="@style/TextViewDrawableStyle.White"
         android:layout_width="@dimen/landing_button_width"
+        android:layout_height="@dimen/landing_button_height"
         android:layout_above="@+id/login_button"
         android:layout_centerInParent="true"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/selector_button_light_gray"
-        android:padding="10dp"
-        android:text="@string/landing_sign_up"
-        android:textColor="@color/text_light_dark"
-        android:textSize="@dimen/text_size" />
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/selector_button_green_oval"
+        android:text="@string/landing_connect_with_twitter_digits"
+        android:textAllCaps="true"
+        android:textSize="@dimen/landing_button_text_size" />
 
     <TextView
-        style="@style/TextViewLinkStyle.Dark"
         android:id="@+id/login_button"
+        style="@style/TextViewLinkStyle.Dark"
+        android:layout_width="@dimen/landing_button_width"
+        android:layout_height="@dimen/landing_button_height"
         android:layout_above="@+id/app_version_textview"
         android:layout_centerInParent="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/landing_already_have_account"
-        android:textSize="@dimen/text_size_small" />
+        android:textAllCaps="true"
+        android:textSize="@dimen/landing_button_text_size" />
 
     <TextView
         android:id="@+id/app_version_textview"
@@ -72,7 +55,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"
         android:textColor="@color/gray"
-        android:textSize="10sp"
-        tools:text="1.1.1" />
+        android:textSize="12sp" />
 
 </RelativeLayout>

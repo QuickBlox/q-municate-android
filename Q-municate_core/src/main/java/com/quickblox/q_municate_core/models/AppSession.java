@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.models;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.server.BaseService;
@@ -51,6 +52,9 @@ public class AppSession implements Serializable {
         qbUser.setEmail(CoreSharedHelper.getInstance().getUserEmail());
         qbUser.setPassword(CoreSharedHelper.getInstance().getUserPassword());
         qbUser.setFullName(userFullName);
+        qbUser.setFacebookId(CoreSharedHelper.getInstance().getFBId());
+        qbUser.setTwitterId(CoreSharedHelper.getInstance().getTwitterId());
+        qbUser.setTwitterDigitsId(CoreSharedHelper.getInstance().getTwitterDigitsId());
 
         LoginType loginType = LoginType.valueOf(loginTypeRaw);
 
@@ -62,12 +66,14 @@ public class AppSession implements Serializable {
             BaseService baseService = QBAuth.getBaseService();
             String token = baseService.getToken();
             if (token == null) {
+                Log.d("AppSession", "token == null");
                 return false;
             }
             Date tokenExpirationDate = baseService.getTokenExpirationDate();
             long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
             return tokenLiveOffset > expirationTime;
         } catch (BaseServiceException e) {
+            Log.d("AppSession", "BaseServiceException: " + e.getMessage());
             // nothing by default
         }
         return false;
@@ -111,6 +117,9 @@ public class AppSession implements Serializable {
         coreSharedHelper.saveUserEmail(user.getEmail());
         coreSharedHelper.saveUserPassword(user.getPassword());
         coreSharedHelper.saveUserFullName(user.getFullName());
+        coreSharedHelper.saveFBId(user.getFacebookId());
+        coreSharedHelper.saveTwitterId(user.getTwitterId());
+        coreSharedHelper.saveTwitterDigitsId(user.getTwitterDigitsId());
     }
 
     public boolean isLoggedIn() {

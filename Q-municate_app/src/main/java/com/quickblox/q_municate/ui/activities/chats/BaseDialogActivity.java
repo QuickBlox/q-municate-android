@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
@@ -49,6 +51,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
@@ -125,6 +128,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private BroadcastReceiver updatingDialogBroadcastReceiver;
     private boolean loadMore;
+    private SystemPermissionHelper systemPermissionHelper;
 
     @Override
     protected int getContentResId() {
@@ -175,7 +179,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
+            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        } else {
+            showPermissionSettingsDialog();
+        }
     }
 
     @Override
@@ -191,6 +199,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onStart() {
         super.onStart();
         createChatLocally();
+        checkPermissionSaveFiles();
     }
 
     @Override
@@ -235,7 +244,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onImagePicked(int requestCode, File file) {
         canPerformLogout.set(true);
-        startLoadAttachFile(file);
+        startLoadAttachFile(file, dialog.getDialogId());
     }
 
     @Override
@@ -299,6 +308,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
         appSharedHelper.saveNeedToOpenDialog(false);
         imagePickHelper = new ImagePickHelper();
+        systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
     private void initCustomUI() {
@@ -414,6 +424,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
+    private void checkPermissionSaveFiles() {
+        boolean permissionSaveFileWasRequested = appSharedHelper.isPermissionsSaveFileWasRequested();
+        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested){
+            systemPermissionHelper.requestPermissionsForSaveFile();
+            appSharedHelper.savePermissionsSaveFileWasRequested(true);
+        }
+    }
+
     protected void loadActionBarLogo(String logoUrl) {
         ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
@@ -431,14 +449,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
-    protected void startLoadAttachFile(final File file) {
+    protected void startLoadAttachFile(final File file, final String dialogId) {
         TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
                         showProgress();
-                        QBLoadAttachFileCommand.start(BaseDialogActivity.this, file);
+                        QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
                     }
                 });
     }
@@ -591,6 +609,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                         finish();
                     }
                 }
+            } else {
+                Log.d("BaseDialogActivity", "service == null");
             }
         }
     }
@@ -631,6 +651,24 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         attachButton.setEnabled(enable);
     }
 
+    private void showPermissionSettingsDialog() {
+        DialogsUtils.showOpenAppSettingsDialog(
+                getSupportFragmentManager(),
+                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
+                    }
+                });
+    }
+
     protected abstract void updateActionBar();
 
     protected abstract void onConnectServiceLocally(QBService service);
@@ -639,7 +677,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void updateMessagesList();
 
-    protected abstract void onFileLoaded(QBFile file);
+    protected abstract void onFileLoaded(QBFile file, String dialogId);
 
     protected abstract void checkMessageSendingPossibility();
 
@@ -713,7 +751,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            onFileLoaded(file);
+            String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
+            onFileLoaded(file, dialogId);
             hideProgress();
         }
     }

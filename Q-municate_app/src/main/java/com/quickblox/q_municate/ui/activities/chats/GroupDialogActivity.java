@@ -12,12 +12,18 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.CombinationMessage;
+import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
@@ -100,7 +106,11 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void onFileLoaded(QBFile file) {
+    protected void onFileLoaded(QBFile file, String dialogId) {
+        if(!dialogId.equals(dialog.getDialogId())){
+            return;
+        }
+
         try {
             ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
         } catch (QBResponseException e) {
@@ -118,6 +128,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
         int oldMessagesCount = messagesAdapter.getAllItems().size();
 
         this.combinationMessagesList = createCombinationMessagesList();
+        processCombinationMessages();
         messagesAdapter.setList(combinationMessagesList);
 
         checkForScrolling(oldMessagesCount);
@@ -154,6 +165,20 @@ public class GroupDialogActivity extends BaseDialogActivity {
         combinationMessagesList = createCombinationMessagesList();
         if (dialog != null)
         title = dialog.getTitle();
+    }
+
+    private void processCombinationMessages(){
+        QBUser currentUser = AppSession.getSession().getUser();
+        for (CombinationMessage cm :combinationMessagesList){
+            boolean ownMessage = !cm.isIncoming(currentUser.getId());
+            if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
+                cm.setState(State.READ);
+                QBUpdateStatusMessageCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), cm, false);
+            } else if (ownMessage) {
+                cm.setState(State.READ);
+                dataManager.getMessageDataManager().update(cm.toMessage(), false);
+            }
+        }
     }
 
     public void sendMessage(View view) {

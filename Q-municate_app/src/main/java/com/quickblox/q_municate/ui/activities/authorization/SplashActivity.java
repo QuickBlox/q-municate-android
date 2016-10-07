@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.authorization;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.listeners.ExistingQbSessionListener;
@@ -29,14 +30,14 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // TODO temp. ONLY FOR TEST WITHOUT TESTERS
-        //        Crashlytics.start(this);
+        Log.d(TAG, "onCreate");
 
         if (isNetworkAvailable()) {
+            Log.d(TAG, "onCreate checkStartExistSession()");
             LoginHelper loginHelper = new LoginHelper(this, this);
             loginHelper.checkStartExistSession();
         } else if (LoginHelper.isCorrectOldAppSession()) {
+            Log.d(TAG, "onCreate startMainActivity()");
             startMainActivity();
         } else {
             startLandingActivity();

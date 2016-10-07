@@ -35,7 +35,7 @@
 
     <color name="button_general_pressed">#dddddd</color>
 
-    <color name="button_facebook_normal">#3d5b94</color>
+    <color name="button_facebook_normal">#4267B2</color>
     <color name="button_facebook_pressed">#436baa</color>
     <color name="button_light_gray_normal">#f2f2f2</color>
     <color name="button_light_gray_pressed">#e2e2e2</color>

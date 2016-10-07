@@ -4,11 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.facebook.login.LoginManager;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
@@ -42,11 +41,19 @@ public class LoginActivity extends BaseAuthActivity {
         setUpActionBarWithUpButton();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.done_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+    @OnClick(R.id.login_email_button)
+    void loginQB(View view) {
+        if (checkNetworkAvailableWithError()) {
+            login();
+        }
+    }
+
+    @OnClick(R.id.facebook_connect_button)
+    void loginFB(View view) {
+        if (checkNetworkAvailableWithError()) {
+            loginType = LoginType.FACEBOOK;
+            startSocialLogin();
+        }
     }
 
     @Override
@@ -54,11 +61,6 @@ public class LoginActivity extends BaseAuthActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 startLandingScreen();
-                break;
-            case R.id.action_done:
-                if (checkNetworkAvailableWithError()) {
-                    login();
-                }
                 break;
             default:
                 super.onOptionsItemSelected(item);

@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/progress_relativelayout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -15,8 +15,8 @@
         android:id="@+id/centered_progressbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:indeterminate="false"
+        android:layout_gravity="center"
         android:max="100" />
 
-</RelativeLayout>
+</FrameLayout>

@@ -28,25 +28,21 @@ public class QBChatRestHelper extends BaseHelper {
     }
 
     public synchronized void initChatService() throws XMPPException, SmackException {
-        if (!QBChatService.isInitialized()) {
-            QBChatService.init(context);
             QBChatService.setDefaultPacketReplyTimeout(ConstsCore.DEFAULT_PACKET_REPLY_TIMEOUT);
+
             chatService = QBChatService.getInstance();
             chatService.addConnectionListener(connectionListener);
-        }
     }
 
     public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
         if (!chatService.isLoggedIn() && user != null) {
             chatService.login(user);
             chatService.enableCarbons();
-            chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
         }
     }
 
     public synchronized void logout() throws QBResponseException, SmackException.NotConnectedException {
         if (chatService != null) {
-            chatService.stopAutoSendPresence();
             chatService.logout();
         }
     }
@@ -67,8 +63,7 @@ public class QBChatRestHelper extends BaseHelper {
         }
 
         @Override
-        public void authenticated(XMPPConnection connection) {
-
+        public void authenticated(XMPPConnection xmppConnection, boolean b) {
         }
 
         @Override

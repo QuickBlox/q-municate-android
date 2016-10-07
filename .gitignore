@@ -34,6 +34,7 @@ local.properties
 *.ipr
 *~
 *.swp
+gradle.properties
 
 # Mac
 .DS_Store

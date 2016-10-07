@@ -69,6 +69,8 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
         }
 
         if (searchView != null) {
+            searchView.setQueryHint(getString(R.string.action_bar_search_hint));
+
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setOnQueryTextListener(this);
         }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.App;
@@ -52,29 +53,35 @@ public class LoginHelper {
 
     public void checkStartExistSession() {
         if (needToClearAllData()) {
-            existingQbSessionListener.onStartSessionFail();
+            if (existingQbSessionListener != null) {
+                existingQbSessionListener.onStartSessionFail();
+            }
             return;
         }
 
         if (appSharedHelper.isSavedRememberMe()) {
             startExistSession();
         } else {
-            existingQbSessionListener.onStartSessionFail();
+            if (existingQbSessionListener != null) {
+                existingQbSessionListener.onStartSessionFail();
+            }
         }
     }
 
     public void startExistSession() {
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
         boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
-        if ((isEmailEntered && isPasswordEntered) || (isLoggedViaFB(isPasswordEntered))) {
+        if ((isEmailEntered && isPasswordEntered) || (isLoggedViaSocial(isPasswordEntered))) {
             runExistSession();
         } else {
-            existingQbSessionListener.onStartSessionFail();
+            if (existingQbSessionListener != null) {
+                existingQbSessionListener.onStartSessionFail();
+            }
         }
     }
 
-    public boolean isLoggedViaFB(boolean isPasswordEntered) {
-        return isPasswordEntered && LoginType.FACEBOOK.equals(getCurrentLoginType());
+    public boolean isLoggedViaSocial(boolean isPasswordEntered) {
+        return isPasswordEntered && !LoginType.EMAIL.equals(getCurrentLoginType());
     }
 
     public LoginType getCurrentLoginType() {
@@ -85,7 +92,10 @@ public class LoginHelper {
         //check is token valid for about 1 minute
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
-            existingQbSessionListener.onStartSessionSuccess();
+            Log.d(TAG, "runExistSession()");
+            if (existingQbSessionListener != null) {
+                existingQbSessionListener.onStartSessionSuccess();
+            }
         } else {
             login();
         }
@@ -96,7 +106,17 @@ public class LoginHelper {
             loginQB();
         } else if (LoginType.FACEBOOK.equals(getCurrentLoginType())) {
             loginFB();
+        } else if (LoginType.TWITTER_DIGITS.equals(getCurrentLoginType())){
+            loginTD();
         }
+    }
+
+    public void loginQB() {
+        Log.d(TAG, "loginQB()");
+        appSharedHelper.saveUsersImportInitialized(true);
+        QBUser qbUser = new QBUser(null, userPassword, userEmail);
+        AppSession.getSession().closeAndClear();
+        QBLoginCompositeCommand.start(context, qbUser);
     }
 
     public void loginFB() {
@@ -105,11 +125,11 @@ public class LoginHelper {
         QBSocialLoginCommand.start(context, QBProvider.FACEBOOK, fbToken, null);
     }
 
-    public void loginQB() {
-        appSharedHelper.saveUsersImportInitialized(true);
-        QBUser qbUser = new QBUser(null, userPassword, userEmail);
+    private void loginTD() {
+        String tdServiceProvider = appSharedHelper.getTDServiceProvider();
+        String tdCredentials = appSharedHelper.getTDCredentials();
         AppSession.getSession().closeAndClear();
-        QBLoginCompositeCommand.start(context, qbUser);
+        QBSocialLoginCommand.start(context, QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials);
     }
 
     public void loginChat() {

@@ -9,6 +9,7 @@ import static com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper.Const
 
 public class CoreSharedHelper {
 
+
     public class Constants {
 
         public static final String NAME = "Q-municate";
@@ -18,11 +19,16 @@ public class CoreSharedHelper {
         public static final String FIRST_AUTH = "first_auth";
         public static final String QB_TOKEN = "qb_token";
         public static final String FB_TOKEN = "fb_token";
+        public static final String TD_SERVICE_PROVIDER = "x_auth_service_provider";
+        public static final String TD_CREDENTIALS = "x_verify_credentials_authorization";
 
         public static final String USER_ID = "user_id";
         public static final String USER_EMAIL = "user_email";
         public static final String USER_PASSWORD = "user_password";
         public static final String USER_FULL_NAME = "full_name";
+        public static final String USER_FB_ID = "facebook_id";
+        public static final String USER_TWITTER_ID = "twitter_id";
+        public static final String USER_TD_ID = "twitter_digits_id";
 
         public static final String PUSH_NEED_TO_OPEN_DIALOG = "push_need_to_open_dialog";
         public static final String PUSH_DIALOG_ID = "push_dialog_id";
@@ -36,6 +42,8 @@ public class CoreSharedHelper {
         public static final String CALL_STARTBITRATE_VALUE = "call_startbitrate_value";
         public static final String CALL_VIDEO_CODEC = "call_video_codec";
         public static final String CALL_AUDIO_CODEC = "call_audio_codec";
+
+        public static final String PERMISSIONS_SAVE_FILE_WAS_REQUESTED = "permission_save_file_was_requested";
     }
 
     protected final SharedPreferences sharedPreferences;
@@ -137,6 +145,22 @@ public class CoreSharedHelper {
         savePref(Constants.FB_TOKEN, token);
     }
 
+    public void saveTDServiceProvider(String serviceProvider){
+        savePref(TD_SERVICE_PROVIDER, serviceProvider);
+    }
+
+    public String getTDServiceProvider(){
+        return getPref(TD_SERVICE_PROVIDER, null);
+    }
+
+    public void saveTDCredentials(String credentials){
+        savePref(TD_CREDENTIALS, credentials);
+    }
+
+    public String getTDCredentials(){
+        return getPref(TD_CREDENTIALS, null);
+    }
+
     public int getUserId() {
         return getPref(Constants.USER_ID, 0);
     }
@@ -169,11 +193,47 @@ public class CoreSharedHelper {
         savePref(Constants.USER_FULL_NAME, fullName);
     }
 
+    public void saveFBId(String facebookId){
+        savePref(USER_FB_ID, facebookId);
+    }
+
+    public String getFBId(){
+        return getPref(USER_FB_ID);
+    }
+
+
+    public void saveTwitterId(String twitterId){
+        savePref(USER_TWITTER_ID, twitterId);
+    }
+
+    public String getTwitterId(){
+        return getPref(USER_TWITTER_ID);
+    }
+
+    public void saveTwitterDigitsId(String twitterDigitsId){
+        savePref(USER_TD_ID, twitterDigitsId);
+    }
+
+    public String getTwitterDigitsId(){
+        return getPref(USER_TD_ID);
+    }
+
+    public boolean isPermissionsSaveFileWasRequested(){
+        return getPref(Constants.PERMISSIONS_SAVE_FILE_WAS_REQUESTED, false);
+    }
+
+    public void savePermissionsSaveFileWasRequested(boolean requested){
+        savePref(Constants.PERMISSIONS_SAVE_FILE_WAS_REQUESTED, requested);
+    }
+
     public void clearUserData() {
         saveUserId(0);
         saveUserEmail(null);
         saveUserPassword(null);
         saveUserFullName(null);
+        saveFBId(null);
+        saveTwitterId(null);
+        saveTwitterDigitsId(null);
     }
 
     public boolean needToOpenDialog() {

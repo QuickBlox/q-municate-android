@@ -2,8 +2,12 @@ package com.quickblox.q_municate.ui.fragments.base;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
@@ -39,8 +43,10 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        Log.d("BaseFragment", "onAttach");
 
         if (activity instanceof BaseActivity) {
+            Log.d("BaseFragment", "activity instanceof BaseActivity");
             baseActivity = (BaseActivity) activity;
             service = baseActivity.getService();
             friendListHelper = baseActivity.getFriendListHelper();
@@ -68,11 +74,25 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("BaseFragment", "onCreate");
 
         addListeners();
 
         app = App.getInstance();
         failAction = baseActivity.getFailAction();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d("BaseFragment", "onCreateView");
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Log.d("BaseFragment", "onActivityCreated");
+        super.onActivityCreated(savedInstanceState);
     }
 
     public void initActionBar() {
@@ -82,12 +102,14 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     @Override
     public void onResume() {
         super.onResume();
+        Log.d("BaseFragment", "onResume()");
         initActionBar();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d("BaseFragment", "onDestroy()");
         removeListeners();
     }
 

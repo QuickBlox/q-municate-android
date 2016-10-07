@@ -16,6 +16,10 @@ public class StringObfuscator {
         return BuildConfig.AUTH_SECRET;
     }
 
+    public static String getAccountKey(){
+        return BuildConfig.ACCOUNT_KEY;
+    }
+
     public static String getAppVersionName() {
         return BuildConfig.VERSION_NAME;
     }
@@ -28,4 +32,11 @@ public class StringObfuscator {
         return BuildConfig.PUSH_REGISTRATION_APP_ID;
     }
 
+    public static String getTwitterConsumerKey(){
+        return BuildConfig.TWITTER_KEY;
+    }
+
+    public static String getTwitterConsumerSecret(){
+        return BuildConfig.TWITTER_SECRET;
+    }
 }

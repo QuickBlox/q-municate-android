@@ -1,5 +1,6 @@
 package com.quickblox.q_municate_core.models;
 
+import com.google.gson.annotations.SerializedName;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.io.Serializable;
@@ -10,35 +11,33 @@ public class UserCustomData implements Serializable {
     public static String TAG_STATUS = "status";
     public static String TAG_IS_IMPORT = "is_import";
 
-    private String avatar_url;
+    @SerializedName("avatar_url")
+    private String avatarUrl;
+
+    @SerializedName("status")
     private String status;
-    private String is_import;
+
+    @SerializedName("is_import")
+    private String isImport;
+
 
     public UserCustomData() {
-        avatar_url = ConstsCore.EMPTY_STRING;
+        avatarUrl = ConstsCore.EMPTY_STRING;
         status = ConstsCore.EMPTY_STRING;
     }
 
-    public UserCustomData(String avatar_url, String status, String is_import) {
-        this.avatar_url = avatar_url;
+    public UserCustomData(String avatarUrl, String status, String isImport) {
+        this.avatarUrl = avatarUrl;
         this.status = status;
-        this.is_import = is_import;
+        this.isImport = isImport;
     }
 
-    public String isIs_import() {
-        return is_import;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
-    public void setIs_import(String is_import) {
-        this.is_import = is_import;
-    }
-
-    public String getAvatar_url() {
-        return avatar_url;
-    }
-
-    public void setAvatar_url(String avatar_url) {
-        this.avatar_url = avatar_url;
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getStatus() {
@@ -47,5 +46,13 @@ public class UserCustomData implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getIsImport() {
+        return isImport;
+    }
+
+    public void setIsImport(String isImport) {
+        this.isImport = isImport;
     }
 }
