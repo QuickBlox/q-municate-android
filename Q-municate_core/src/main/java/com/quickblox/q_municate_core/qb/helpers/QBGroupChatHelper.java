@@ -18,6 +18,7 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.Lo;
 import com.quickblox.core.helper.StringUtils;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestUpdateBuilder;
@@ -38,7 +39,9 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 
@@ -47,12 +50,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class QBGroupChatHelper extends QBBaseChatHelper {
+public class QBGroupChatHelper extends QBBaseChatHelper{
 
     private static final String TAG = QBGroupChatHelper.class.getSimpleName();
 
     private QBParticipantListener participantListener;
     private List<QBDialog> groupDialogsList;
+    private boolean initialized;
 
     public QBGroupChatHelper(Context context) {
         super(context);
@@ -60,8 +64,13 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void init(QBUser user) {
+        if(initialized){
+            return;
+        }
         super.init(user);
         addSystemMessageListener(new SystemMessageListener());
+        chatService.addConnectionListener(new ChatConnectionListener());
+        initialized = true;
     }
 
     @Override
@@ -261,7 +270,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     public void joinRoomChat(QBDialog dialog) throws Exception {
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
-        if (roomChat != null && !roomChat.isJoined()) {
+        if (roomChat != null) {
             DiscussionHistory history = new DiscussionHistory();
             history.setMaxStanzas(0); // without getting messages
             roomChat.join(history);
@@ -367,6 +376,16 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         checkForSendingNotification(ownMessage, qbChatMessage, user, false);
     }
 
+    private void tryJoinRoomChatsAsync(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Lo.g("tryJoinRoomChatsAsync");
+                tryJoinRoomChats();
+            }
+        }).start();
+    }
+
     private class SystemMessageListener implements QBSystemMessageListener {
 
         @Override
@@ -394,6 +413,43 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             if (validData && currentDialog.getRoomJid().equals(groupChat.getJid())) {
                 notifyUpdatingDialogDetails(presence.getUserId(), QBPresence.Type.online.equals(presence.getType()));
             }
+        }
+    }
+
+    private class ChatConnectionListener implements ConnectionListener {
+
+        @Override
+        public void connected(XMPPConnection connection) {
+
+        }
+
+        @Override
+        public void authenticated(XMPPConnection xmppConnection, boolean b) {
+        }
+
+        @Override
+        public void connectionClosed() {
+
+        }
+
+        @Override
+        public void connectionClosedOnError(Exception e) {
+
+        }
+
+        @Override
+        public void reconnectingIn(int seconds) {
+
+        }
+
+        @Override
+        public void reconnectionSuccessful() {
+            Lo.g("reconnectionSuccessful");
+            tryJoinRoomChatsAsync();
+        }
+
+        @Override
+        public void reconnectionFailed(Exception error) {
         }
     }
 }
