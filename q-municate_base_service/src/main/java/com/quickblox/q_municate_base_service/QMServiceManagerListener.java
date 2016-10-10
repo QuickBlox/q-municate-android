@@ -19,10 +19,4 @@ public interface QMServiceManagerListener {
      */
     boolean isAuthorized();
 
-    /**
-     *  This method called when some QBRequest falling. Use this method for handling errors, like show alert with error.
-     *
-     *  @param QBResponseException instance.
-     */
-     void handleErrorResponse(QBResponseException exception);
 }

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -38,7 +38,7 @@ public class QBCreateGroupDialogCommand extends ServiceCommand {
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
         String photoUrl = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_PHOTO_URL);
 
-        QBDialog dialog = multiChatHelper.createGroupChat(roomName, UserFriendUtils.getFriendIdsFromUsersList(friendList), photoUrl);
+        QBChatDialog  dialog = multiChatHelper.createGroupChat(roomName, UserFriendUtils.getFriendIdsFromUsersList(friendList), photoUrl);
         extras.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
         return extras;
     }

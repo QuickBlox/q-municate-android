@@ -1,32 +1,23 @@
 package com.quickblox.q_municate_base_service;
 
 import com.quickblox.q_municate_base_cache.QMBaseCache;
-import com.quickblox.q_municate_base_cache.model.BaseModel;
 
-public abstract class QMBaseService implements QMMemoryCacheListener {
+public abstract class QMBaseService {
 
     private QMServiceManagerListener serviceManagerListener;
-
-    public void init(){
-        serviceWillStart();
-    }
+    private QMBaseCache cache;
 
     public void init(QMServiceManagerListener serviceManagerListener){
         this.serviceManagerListener = serviceManagerListener;
         serviceWillStart();
     }
 
-    public abstract void init(QMBaseCache<BaseModel> cache);
-
+    public void init(QMServiceManagerListener serviceManagerListener, QMBaseCache cache){
+        this.serviceManagerListener = serviceManagerListener;
+        this.cache = cache;
+        serviceWillStart();
+    }
 
     protected abstract void serviceWillStart();
-
-
-    //Implements QMMemoryCacheListener
-
-    @Override
-    public void free() {
-
-    }
 
 }

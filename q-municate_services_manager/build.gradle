@@ -30,5 +30,4 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(path: ':q-municate_base_service')
     compile project(path: ':q-municate_user_service')
-    compile project(path: ':q-municate_user_service')
 }

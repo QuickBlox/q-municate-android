@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
@@ -223,7 +223,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            QBChatDialog  dialog = (QBChatDialog ) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
             if (dialog != null) {
                 GroupDialogActivity.start(CreateGroupDialogActivity.this, ChatUtils.createLocalDialog(dialog));

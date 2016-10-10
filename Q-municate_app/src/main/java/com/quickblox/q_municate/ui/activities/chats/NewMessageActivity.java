@@ -11,7 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
@@ -209,8 +209,8 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            QBDialog qbDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            startPrivateChat(ChatUtils.createLocalDialog(qbDialog));
+            QBChatDialog  QBChatDialog  = (QBChatDialog ) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            startPrivateChat(ChatUtils.createLocalDialog(QBChatDialog ));
         }
     }
 }

@@ -11,7 +11,7 @@ import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
@@ -119,9 +119,9 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private synchronized void sendNotificationToFriend(QBChatMessage qbChatMessage, int userId) throws QBResponseException {
-        QBDialog qbDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
-        if (qbDialog != null) {
-            privateChatHelper.sendPrivateMessage(qbChatMessage, userId, qbDialog.getDialogId());
+        QBChatDialog  QBChatDialog  = privateChatHelper.createPrivateDialogIfNotExist(userId);
+        if (QBChatDialog  != null) {
+            privateChatHelper.sendPrivateMessage(qbChatMessage, userId, QBChatDialog .getDialogId());
         }
     }
 

@@ -71,7 +71,7 @@ public class QBGCMRegistrationTask extends BaseErrorAsyncTask<GoogleCloudMessagi
         ArrayList<QBSubscription> subscriptions = null;
 
         try {
-            subscriptions = QBPushNotifications.createSubscription(subscription);
+            subscriptions = QBPushNotifications.createSubscription(subscription).perform();
         } catch (QBResponseException e) {
             ErrorUtils.logError(e);
         }

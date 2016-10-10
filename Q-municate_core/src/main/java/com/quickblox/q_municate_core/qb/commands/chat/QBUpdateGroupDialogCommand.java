@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -24,7 +24,7 @@ public class QBUpdateGroupDialogCommand extends ServiceCommand {
         this.multiChatHelper = multiChatHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, File file) {
+    public static void start(Context context, QBChatDialog  dialog, File file) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_GROUP_DIALOG_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         intent.putExtra(QBServiceConsts.EXTRA_FILE, file);
@@ -33,7 +33,7 @@ public class QBUpdateGroupDialogCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        QBChatDialog  dialog = (QBChatDialog ) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
         if(file == null) {

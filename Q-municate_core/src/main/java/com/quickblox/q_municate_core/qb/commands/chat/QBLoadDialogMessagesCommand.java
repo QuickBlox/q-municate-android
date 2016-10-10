@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.chat.Consts;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
@@ -26,7 +26,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         this.baseChatHelper = baseChatHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, long lastDateLoad, boolean loadMore) {
+    public static void start(Context context, QBChatDialog  dialog, long lastDateLoad, boolean loadMore) {
         Intent intent = new Intent(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, null, context,
                 QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
@@ -37,7 +37,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        QBChatDialog  dialog = (QBChatDialog ) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
         boolean loadMore = extras.getBoolean(QBServiceConsts.EXTRA_LOAD_MORE);
 

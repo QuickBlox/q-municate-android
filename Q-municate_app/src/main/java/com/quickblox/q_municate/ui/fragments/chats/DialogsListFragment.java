@@ -17,7 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
@@ -328,7 +328,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if (Dialog.Type.GROUP.equals(dialog.getType())) {
             if (groupChatHelper != null) {
                 try {
-                    QBDialog localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,
+                    QBChatDialog  localDialog = ChatUtils.createQBChatDialogFromLocalDialogWithoutLeaved(dataManager,
                                 dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId()));
                     List<Integer> occupantsIdsList = new ArrayList<>();
                     occupantsIdsList.add(qbUser.getId());

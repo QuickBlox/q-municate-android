@@ -24,7 +24,7 @@ import android.widget.ImageButton;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -281,8 +281,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         if (groupChatHelper != null) {
-            QBDialog qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
-            groupChatHelper.tryJoinRoomChat(qbDialog);
+            QBChatDialog  QBChatDialog  = ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog);
+            groupChatHelper.tryJoinRoomChat(QBChatDialog );
         }
 
         startLoadDialogMessages();
@@ -487,7 +487,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
                 lastDateLoad, loadMore);
     }
 
@@ -627,7 +627,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 Log.d("Fix double message", "baseChatHelper = " + baseChatHelper + "\n dialog = " + dialog);
                 if (baseChatHelper != null && dialog != null) {
                     try {
-                        baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+                        baseChatHelper.createChatLocally(ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
                                 generateBundleToInitDialog());
                     } catch (QBResponseException e) {
                         ErrorUtils.showError(this, e.getMessage());
@@ -642,7 +642,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void closeChatLocally() {
         if (baseChatHelper != null && dialog != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+            baseChatHelper.closeChat(ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
                     generateBundleToInitDialog());
         }
         dialog = null;

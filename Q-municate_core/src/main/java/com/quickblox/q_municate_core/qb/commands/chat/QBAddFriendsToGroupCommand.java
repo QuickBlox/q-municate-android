@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -39,16 +39,16 @@ public class QBAddFriendsToGroupCommand extends ServiceCommand {
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         ArrayList<Integer> friendIdsList = (ArrayList<Integer>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
 
-        QBDialog qbDialog = multiChatHelper.addUsersToDialog(dialogId, friendIdsList);
+        QBChatDialog  QBChatDialog  = multiChatHelper.addUsersToDialog(dialogId, friendIdsList);
 
-        if (qbDialog != null) {
-            Dialog dialog = ChatUtils.createLocalDialog(qbDialog);
+        if (QBChatDialog  != null) {
+            Dialog dialog = ChatUtils.createLocalDialog(QBChatDialog );
             DataManager.getInstance().getDialogDataManager().update(dialog);
-            DbUtils.saveDialogsOccupants(DataManager.getInstance(), qbDialog, true);
+            DbUtils.saveDialogsOccupants(DataManager.getInstance(), QBChatDialog , true);
         }
 
         Bundle returnedBundle = new Bundle();
-        returnedBundle.putSerializable(QBServiceConsts.EXTRA_DIALOG, qbDialog);
+        returnedBundle.putSerializable(QBServiceConsts.EXTRA_DIALOG, QBChatDialog );
 
         return returnedBundle;
     }

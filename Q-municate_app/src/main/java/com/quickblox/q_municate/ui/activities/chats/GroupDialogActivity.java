@@ -173,7 +173,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
             boolean ownMessage = !cm.isIncoming(currentUser.getId());
             if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
                 cm.setState(State.READ);
-                QBUpdateStatusMessageCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), cm, false);
+                QBUpdateStatusMessageCommand.start(this, ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog), cm, false);
             } else if (ownMessage) {
                 cm.setState(State.READ);
                 dataManager.getMessageDataManager().update(cm.toMessage(), false);
