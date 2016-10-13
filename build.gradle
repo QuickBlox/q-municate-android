@@ -4,7 +4,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.1'
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
@@ -49,4 +49,20 @@ ext {
     cropVersion = '1.0.1'
     facebookSdkVersoin = '4.14.1'
     twitterDigitsSdkVersion = '2.0.0'
+
+    // Dependency versions
+    playServicesVersion = '8.4.0'
+    supportV4Version = '23.1.1'
+    appcompatV7Version = '23.1.1'
+    recyclerviewV7Version = '23.2.1'
+    supportAnnotationsVersion = '23.1.1'
+    designVersion = '23.1.1'
+
+    uilVersion = '1.9.0'
+    glideVersion = '3.6.1'
+    pullToRefreshVersion = '3.2.3'
+    stickyListHeaders = '2.7.0'
+    robotoTextViewVersion = '2.4.3'
+    stickersVersion = '0.7.3'
+    crashlyticsVersion = '2.2.2'
 }

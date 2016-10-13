@@ -334,4 +334,9 @@ public class QMUserMemoryCache implements QMUserCache {
             usersMap.put(user.getId().longValue(), user);
         }
     }
+
+    @Override
+    public void clear() {
+        usersMap.clear();
+    }
 }

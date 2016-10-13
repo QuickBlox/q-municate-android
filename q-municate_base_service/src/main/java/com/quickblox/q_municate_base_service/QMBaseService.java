@@ -7,13 +7,8 @@ public abstract class QMBaseService {
     private QMServiceManagerListener serviceManagerListener;
     private QMBaseCache cache;
 
-    public void init(QMServiceManagerListener serviceManagerListener){
-        this.serviceManagerListener = serviceManagerListener;
-        serviceWillStart();
-    }
 
-    public void init(QMServiceManagerListener serviceManagerListener, QMBaseCache cache){
-        this.serviceManagerListener = serviceManagerListener;
+    public void init(QMBaseCache cache){
         this.cache = cache;
         serviceWillStart();
     }

@@ -8,7 +8,7 @@ import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_base_cache.utils.ErrorUtils;
 import com.quickblox.q_municate_user_cache.model.QMUserColumns;
 import com.quickblox.q_municate_user_service.cache.QMUserCache;
 import com.quickblox.users.model.QBUser;
@@ -24,23 +24,12 @@ public class QMUserCacheImpl implements QMUserCache, QMUserColumns {
 
     private static final String TAG = QMUserCacheImpl.class.getSimpleName();
 
-    private static QMUserCacheImpl instance;
     private QMUserDataHelper dataHelper;
     private Dao<QBUser, Long> userDao;
 
-    private QMUserCacheImpl(Context context) {
+    public QMUserCacheImpl(Context context) {
         dataHelper = new QMUserDataHelper(context);
         userDao = dataHelper.getDaoByClass(QBUser.class);
-    }
-
-    public static void init(Context context) {
-        if (null == instance) {
-            instance = new QMUserCacheImpl(context);
-        }
-    }
-
-    public static QMUserCacheImpl getInstance() {
-        return instance;
     }
 
     private QMUserDataHelper getDataHelper() {
@@ -275,7 +264,6 @@ public class QMUserCacheImpl implements QMUserCache, QMUserColumns {
                     for (QBUser user : usersCollection) {
                         createOrUpdateUser(user);
                     }
-
                     return null;
                 }
             });
@@ -345,5 +333,15 @@ public class QMUserCacheImpl implements QMUserCache, QMUserColumns {
         }
 
         return usersList;
+    }
+
+    @Override
+    public void clear() {
+        DeleteBuilder<QBUser, Long> deleteBuilder = userDao.deleteBuilder();
+        try {
+            deleteBuilder.delete();
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
     }
 }

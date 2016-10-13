@@ -1,6 +1,8 @@
 package com.quickblox.q_municate_user_service;
 
 
+import com.quickblox.core.QBSettings;
+import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.core.server.Performer;
 import com.quickblox.extensions.RxJavaPerformProcessor;
 import com.quickblox.q_municate_base_service.QMBaseService;
@@ -9,6 +11,7 @@ import com.quickblox.q_municate_user_service.cache.QMUserCache;
 import com.quickblox.q_municate_user_service.cache.QMUserMemoryCache;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+import com.quickblox.users.query.QueryGetUsers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,14 +25,9 @@ public class QMUserService extends QMBaseService {
 
     private QMUserCache userCache;
 
-    public void init(QMServiceManagerListener serviceManagerListener){
-        this.userCache = new QMUserMemoryCache();
-        super.init(serviceManagerListener) ;
-    }
-
-    public void initWithServiceManager(QMServiceManagerListener serviceManagerListener, QMUserCache userCache){
+    public QMUserService( QMUserCache userCache){
         this.userCache = userCache != null ? userCache : new QMUserMemoryCache();
-        super.init(serviceManagerListener, userCache) ;
+        super.init(userCache) ;
     }
 
     @Override
@@ -312,6 +310,21 @@ public class QMUserService extends QMBaseService {
     }
 
 
+    public Observable<List<QBUser>> getUsers(QBPagedRequestBuilder requestBuilder) {
+        Observable<List<QBUser>> result = null;
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsers(requestBuilder);
+        final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
+        result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
+            @Override
+            public Observable<List<QBUser>> call(List<QBUser> qbUsers) {
+                userCache.createOrUpdateAllUsers(qbUsers);
+                return observable;
+            }
+        });
+        return result;
+    }
+
+
     public Observable<List<QBUser>> getUsersByIDs(final Collection<Integer> usersIds) {
         return  getUsersByIDs(usersIds, true);
     }
@@ -330,7 +343,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByIDs(usersIds, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByIDs(usersIds, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -358,7 +371,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByEmails(usersEmails, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByEmails(usersEmails, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -386,7 +399,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByLogins(usersLogins, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByLogins(usersLogins, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -414,7 +427,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByFacebookId(usersFacebookIds, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByFacebookId(usersFacebookIds, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -442,7 +455,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByTwitterId(usersTwitterIds, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByTwitterId(usersTwitterIds, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -470,7 +483,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByTwitterDigitsId(usersTwitterDigitsIds, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByTwitterDigitsId(usersTwitterDigitsIds, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -498,7 +511,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByFullName(fullName, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByFullName(fullName, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -526,7 +539,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByTags(tags, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByTags(tags, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -554,7 +567,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByPhoneNumbers(usersPhoneNumbers, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByPhoneNumbers(usersPhoneNumbers, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
@@ -582,7 +595,7 @@ public class QMUserService extends QMBaseService {
             return result;
         }
 
-        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByFilter(filterValue, filter, null);
+        Performer<ArrayList<QBUser>> performer = QBUsers.getUsersByFilter(filterValue, filter, new QBPagedRequestBuilder());
         final Observable<List<QBUser>> observable = performer.convertTo(RxJavaPerformProcessor.INSTANCE);
 
         result = observable.flatMap(new Func1<List<QBUser>, Observable<List<QBUser>>>() {
