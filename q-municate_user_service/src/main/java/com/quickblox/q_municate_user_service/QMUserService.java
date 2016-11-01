@@ -17,15 +17,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
 
 public class QMUserService extends QMBaseService {
 
-    private QMUserCache userCache;
+    @Inject
+    protected QMUserCache userCache;
 
-    public QMUserService( QMUserCache userCache){
+    public QMUserService(){
+        super.init(userCache) ;
+    }
+
+    public QMUserService(QMUserCache userCache){
         this.userCache = userCache != null ? userCache : new QMUserMemoryCache();
         super.init(userCache) ;
     }

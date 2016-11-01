@@ -35,14 +35,7 @@ public class AppModule {
     @NotNull
     @Singleton
     QMUserCache provideUserCache(@NotNull Context context){
-        return new QMUserMemoryCache();
-    }
-
-    @Provides
-    @NotNull
-    @Singleton
-    QMUserService provideUserService(QMUserCache userCache){
-        return new QMUserService(userCache);
+        return new QMUserCacheImpl(context);
     }
 
 }
