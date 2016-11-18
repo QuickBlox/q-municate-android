@@ -200,6 +200,11 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
+    public QBUser getUserByColumn(String column, String value) {
+        return null;
+    }
+
+    @Override
     public List<QBUser> getUsersByEmails(final Collection<String> usersEmails) {
         List<QBUser> result = null;
         result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
@@ -322,6 +327,16 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
+    public List<QBUser> getUsersByColumn(String column, String value) {
+        return null;
+    }
+
+    @Override
+    public List<QBUser> getUsersByColumn(String column, Collection<String> values) {
+        return null;
+    }
+
+    @Override
     public void createOrUpdateAllUsers(Collection<QBUser> users) {
         for(QBUser user : users) {
             usersMap.put(user.getId().longValue(), user);
@@ -333,6 +348,61 @@ public class QMUserMemoryCache implements QMUserCache {
         for(QBUser user : users) {
             usersMap.put(user.getId().longValue(), user);
         }
+    }
+
+    @Override
+    public void create(QBUser object) {
+
+    }
+
+    @Override
+    public void createOrUpdate(QBUser object) {
+
+    }
+
+    @Override
+    public void createOrUpdateAll(Collection<QBUser> objectsCollection) {
+
+    }
+
+    @Override
+    public QBUser get(long id) {
+        return null;
+    }
+
+    @Override
+    public List<QBUser> getAll() {
+        return null;
+    }
+
+    @Override
+    public List<QBUser> getAllSorted(String sortedColumn, boolean ascending) {
+        return null;
+    }
+
+    @Override
+    public void update(QBUser object) {
+
+    }
+
+    @Override
+    public void updateAll(Collection<QBUser> objectsCollection) {
+
+    }
+
+    @Override
+    public void delete(QBUser object) {
+
+    }
+
+    @Override
+    public void deleteById(long id) {
+
+    }
+
+    @Override
+    public boolean exists(long id) {
+        return false;
     }
 
     @Override

@@ -2,13 +2,13 @@ package com.example.q_municate_contact_list_cache;
 
 import android.content.Context;
 
+import com.quickblox.chat.model.QBContactEntry;
 import com.quickblox.q_municate_base_cache.QMBaseDataHelper;
-import com.quickblox.q_municate_contact_list_service.model.QBContactListItem;
 
 public class QMContactListDataHelper extends QMBaseDataHelper {
 
     private static final Class<?>[] TABLES = {
-            QBContactListItem.class
+            QBContactEntry.class
     };
 
     public QMContactListDataHelper(Context context) {

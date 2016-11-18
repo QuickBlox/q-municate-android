@@ -1,4 +1,4 @@
-package com.quickblox.q_municate_user_cache.model;
+package com.quickblox.q_municate_user_service.model;
 
 import com.quickblox.q_municate_base_cache.model.QMBaseColumns;
 
