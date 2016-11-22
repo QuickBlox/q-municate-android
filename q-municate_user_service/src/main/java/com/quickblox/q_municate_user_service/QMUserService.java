@@ -289,8 +289,6 @@ public class QMUserService extends QMBaseService {
         return result;
     }
 
-
-
     private Observable<List<QBUser>> getUsersByColumn(final String column, final String value, boolean forceLoad){
         Observable<List<QBUser>> result = null;
 
@@ -352,13 +350,52 @@ public class QMUserService extends QMBaseService {
         Performer<QBUser> result = null;
         switch (column){
             case QMUserColumns.ID:
-                result = QBUsers.getUser( Integer.parseInt(value));
+                result = QBUsers.getUser(Integer.parseInt(value));
+                break;
+            case QMUserColumns.FULL_NAME:
+                result = null;
+                break;
+            case QMUserColumns.EMAIL:
+                result = QBUsers.getUserByEmail(value);
                 break;
             case QMUserColumns.LOGIN:
                 result = QBUsers.getUserByLogin(value);
                 break;
+            case QMUserColumns.PHONE:
+                result = null;
+                break;
+            case QMUserColumns.WEBSITE:
+                result = null;
+                break;
+            case QMUserColumns.LAST_REQUEST_AT:
+                result = null;
+                break;
+            case QMUserColumns.EXTERNAL_ID:
+                result = QBUsers.getUserByExternalId(value);
+                break;
             case QMUserColumns.FACEBOOK_ID:
                 result = QBUsers.getUserByFacebookId(value);
+                break;
+            case QMUserColumns.TWITTER_ID:
+                result = QBUsers.getUserByTwitterId(value);
+                break;
+            case QMUserColumns.TWITTER_DIGITS_ID:
+                result = QBUsers.getUserByTwitterDigitsId(value);
+                break;
+            case QMUserColumns.BLOB_ID:
+                result = null;
+                break;
+            case QMUserColumns.TAGS:
+                result = null;
+                break;
+            case QMUserColumns.PASSWORD:
+                result = null;
+                break;
+            case QMUserColumns.OLD_PASSWORD:
+                result = null;
+                break;
+            case QMUserColumns.CUSTOM_DATE:
+                result = null;
                 break;
         }
         return result;
@@ -367,18 +404,111 @@ public class QMUserService extends QMBaseService {
 
     private Performer<ArrayList<QBUser>> getUsersByColumnFromServer(String column, String value){
         Performer<ArrayList<QBUser>> result = null;
-
+        switch (column){
+            case QMUserColumns.ID:
+                //result = QBUsers.getUsersByIDs(value, new QBPagedRequestBuilder());
+                result = null;
+                break;
+            case QMUserColumns.FULL_NAME:
+                result = QBUsers.getUsersByFullName(value, new QBPagedRequestBuilder());
+                break;
+            case QMUserColumns.EMAIL:
+                result = null;
+                break;
+            case QMUserColumns.LOGIN:
+                result = null;
+                break;
+            case QMUserColumns.PHONE:
+                result = null;
+                break;
+            case QMUserColumns.WEBSITE:
+                result = null;
+                break;
+            case QMUserColumns.LAST_REQUEST_AT:
+                result = null;
+                break;
+            case QMUserColumns.EXTERNAL_ID:
+                result =null;
+                break;
+            case QMUserColumns.FACEBOOK_ID:
+                result = null;
+                break;
+            case QMUserColumns.TWITTER_ID:
+                result = null;
+                break;
+            case QMUserColumns.TWITTER_DIGITS_ID:
+                result = null;
+                break;
+            case QMUserColumns.BLOB_ID:
+                result = null;
+                break;
+            case QMUserColumns.TAGS:
+                result = null;
+                break;
+            case QMUserColumns.PASSWORD:
+                result = null;
+                break;
+            case QMUserColumns.OLD_PASSWORD:
+                result = null;
+                break;
+            case QMUserColumns.CUSTOM_DATE:
+                result = null;
+                break;
+        }
         return result;
     }
 
     private Performer<ArrayList<QBUser>> getUsersByColumnFromServer(String column, Collection<String> values){
         Performer<ArrayList<QBUser>> result = null;
         switch (column){
+            case QMUserColumns.ID:
+                //result = QBUsers.getUsersByIDs(values, new QBPagedRequestBuilder());
+                result = null;
+                break;
+            case QMUserColumns.FULL_NAME:
+                result = null;
+                break;
+            case QMUserColumns.EMAIL:
+                result = QBUsers.getUsersByEmails(values, new QBPagedRequestBuilder());
+                break;
             case QMUserColumns.LOGIN:
                 result = QBUsers.getUsersByLogins(values, new QBPagedRequestBuilder());
                 break;
+            case QMUserColumns.PHONE:
+                result = QBUsers.getUsersByPhoneNumbers(values, new QBPagedRequestBuilder());
+                break;
+            case QMUserColumns.WEBSITE:
+                result = null;
+                break;
+            case QMUserColumns.LAST_REQUEST_AT:
+                result = null;
+                break;
+            case QMUserColumns.EXTERNAL_ID:
+                result = null;
+                break;
             case QMUserColumns.FACEBOOK_ID:
                 result = QBUsers.getUsersByFacebookId(values, new QBPagedRequestBuilder());
+                break;
+            case QMUserColumns.TWITTER_ID:
+                result = QBUsers.getUsersByTwitterId(values, new QBPagedRequestBuilder());
+                break;
+            case QMUserColumns.TWITTER_DIGITS_ID:
+                result = QBUsers.getUsersByTwitterDigitsId(values, new QBPagedRequestBuilder());
+                break;
+            case QMUserColumns.BLOB_ID:
+                result = null;
+                break;
+            case QMUserColumns.TAGS:
+                result = null;
+                break;
+            case QMUserColumns.PASSWORD:
+                result = null;
+                break;
+            case QMUserColumns.OLD_PASSWORD:
+                result = null;
+                break;
+            case QMUserColumns.CUSTOM_DATE:
+                result = null;
                 break;
         }
         return result;

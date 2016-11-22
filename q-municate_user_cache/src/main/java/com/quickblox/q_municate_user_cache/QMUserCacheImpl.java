@@ -26,7 +26,6 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser> implements QMUs
     private QMUserDataHelper dataHelper;
 
     public QMUserCacheImpl(Context context) {
-        super();
         dataHelper = new QMUserDataHelper(context);
         dao = dataHelper.getDaoByClass(QBUser.class);
     }

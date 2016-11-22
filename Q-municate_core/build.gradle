@@ -13,10 +13,17 @@ android {
 
 dependencies {
     //    QuickBlox libs
-    compile "com.quickblox:quickblox-android-sdk-content:${rootProject.qbSdkVersion}"
-    compile "com.quickblox:quickblox-android-sdk-customobjects:${rootProject.qbSdkVersion}"
-    compile "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
-    compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
+    //compile "com.quickblox:quickblox-android-sdk-content:${rootProject.qbSdkVersion}"
+    //compile "com.quickblox:quickblox-android-sdk-customobjects:${rootProject.qbSdkVersion}"
+    //compile "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
+    //compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
+
+    compile project(":quickblox-android-sdk-content" )
+    compile project(":quickblox-android-sdk-customobjects" )
+    compile project(":quickblox-android-sdk-messages" )
+    compile project(":quickblox-android-sdk-videochat-webrtc" )
+
+
     //    Other QuickBlox libs (core + chat) will be connected as transitive dependencies
 
     compile("com.digits.sdk.android:digits:${rootProject.twitterDigitsSdkVersion}@aar") {

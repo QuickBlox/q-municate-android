@@ -6,6 +6,7 @@ import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Predicate;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -21,160 +22,34 @@ public class QMUserMemoryCache implements QMUserCache {
     private Map<Long, QBUser> usersMap = new HashMap<>();
 
     @Override
-    public QBUser getUser(long id) {
+    public void create(QBUser object) {
+        usersMap.put(object.getId().longValue(), object);
+    }
+
+    @Override
+    public void createOrUpdate(QBUser object) {
+        usersMap.put(object.getId().longValue(), object);
+    }
+
+    @Override
+    public void createOrUpdateAll(Collection<QBUser> objectsCollection) {
+        for(QBUser user : objectsCollection) {
+            createOrUpdate(user);
+        }
+    }
+
+    @Override
+    public QBUser get(long id) {
         return usersMap.get(id);
     }
 
     @Override
-    public QBUser getUserByEmail(final String email) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getEmail().equals(email);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public QBUser getUserByLogin(final String login) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getLogin().equals(login);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public QBUser getUserByFacebookId(final String facebookId) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getFacebookId().equals(facebookId);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public QBUser getUserByTwitterId(final String twitterId) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getTwitterId().equals(twitterId);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public QBUser getUserByTwitterDigitsId(final String twitterDigitsId) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getTwitterDigitsId().equals(twitterDigitsId);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public QBUser getUserByExternalID(final String externalId) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getExternalId().equals(externalId);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public QBUser getUserByFullName(final String fullName) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getFullName().equals(fullName);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public QBUser getUserByTag(final String tag) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getTags().contains(tag);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public QBUser getUserByPhoneNumber(final String phoneNumber) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return value.getPhone().equals(phoneNumber);
-            }
-        }).findFirst();
-
-        return result.get();
-    }
-
-    @Override
-    public void createUser(QBUser user) {
-        usersMap.put(user.getId().longValue(), user);
-    }
-
-    @Override
-    public void createOrUpdateUser(QBUser user) {
-        usersMap.put(user.getId().longValue(), user);
-    }
-
-    @Override
-    public void updateUser(QBUser user) {
-        usersMap.put(user.getId().longValue(), user);
-    }
-
-    @Override
-    public void deleteUser(QBUser user) {
-        usersMap.remove(user.getId().longValue());
-    }
-
-    @Override
-    public void deleteUserById(long id) {
-        usersMap.remove(id);
-    }
-
-    @Override
-    public void deleteUserByExternalId(String externalId) {
-
-    }
-
-    @Override
-    public boolean existsUser(long id) {
-        return usersMap.containsKey(id);
-    }
-
-    @Override
-    public List<QBUser> getAllUsers() {
+    public List<QBUser> getAll() {
         return new ArrayList<QBUser>(usersMap.values());
     }
 
     @Override
-    public List<QBUser> getAllUsersSorted(String sortedColumn, boolean ascending) {
+    public List<QBUser> getAllSorted(String sortedColumn, boolean ascending) {
         List<QBUser> result = null;
         result = Stream.of(usersMap.values()).sorted(new Comparator<QBUser>() {
             @Override
@@ -184,6 +59,43 @@ public class QMUserMemoryCache implements QMUserCache {
         }).collect(Collectors.<QBUser>toList());
 
         return result;
+    }
+
+    @Override
+    public void update(QBUser object) {
+        usersMap.put(object.getId().longValue(), object);
+    }
+
+    @Override
+    public void updateAll(Collection<QBUser> objectsCollection) {
+        for(QBUser user : objectsCollection) {
+            update(user);
+        }
+    }
+
+    @Override
+    public void delete(QBUser object) {
+        usersMap.remove(object.getId().longValue());
+    }
+
+    @Override
+    public void deleteById(long id) {
+        usersMap.remove(id);
+    }
+
+    @Override
+    public boolean exists(long id) {
+        return usersMap.containsKey(id);
+    }
+
+    @Override
+    public void clear() {
+        usersMap.clear();
+    }
+
+    @Override
+    public void deleteUserByExternalId(String externalId) {
+
     }
 
     @Override
@@ -200,125 +112,15 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
-    public QBUser getUserByColumn(String column, String value) {
-        return null;
-    }
-
-    @Override
-    public List<QBUser> getUsersByEmails(final Collection<String> usersEmails) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
+    public QBUser getUserByColumn(final String column, final String value) {
+        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
             @Override
-            public boolean test(QBUser value) {
-                return usersEmails.contains(value.getEmail());
+            public boolean test(QBUser user) {
+                return getValueByColumn(user, column).equals(value);
             }
-        }).collect(Collectors.<QBUser>toList());
+        }).findFirst();
 
-        return result;
-    }
-
-    @Override
-    public List<QBUser> getUsersByLogins(final Collection<String> usersLogins) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return usersLogins.contains(value.getLogin());
-            }
-        }).collect(Collectors.<QBUser>toList());
-
-        return result;
-    }
-
-    @Override
-    public List<QBUser> getUsersByFacebookIds(final Collection<String> usersFacebookIds) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return usersFacebookIds.contains(value.getFacebookId());
-            }
-        }).collect(Collectors.<QBUser>toList());
-
-        return result;
-    }
-
-    @Override
-    public List<QBUser> getUsersByTwitterIds(final Collection<String> usersTwitterIds) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return usersTwitterIds.contains(value.getTwitterId());
-            }
-        }).collect(Collectors.<QBUser>toList());
-
-        return result;
-    }
-
-    @Override
-    public List<QBUser> getUsersByTwitterDigitsIds(final Collection<String> usersTwitterDigitsIds) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return usersTwitterDigitsIds.contains(value.getTwitterDigitsId());
-            }
-        }).collect(Collectors.<QBUser>toList());
-
-        return result;
-    }
-
-    @Override
-    public List<QBUser> getUsersByExternalIds(final Collection<String> usersExternalIds) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return usersExternalIds.contains(value.getExternalId());
-            }
-        }).collect(Collectors.<QBUser>toList());
-
-        return result;
-    }
-
-    @Override
-    public List<QBUser> getUsersByFullName(final String fullName) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return fullName.equals(value.getFullName());
-            }
-        }).collect(Collectors.<QBUser>toList());
-
-        return result;
-    }
-
-    @Override
-    public List<QBUser> getUsersByTags(final Collection<String> tags) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return tags.contains(value.getTags());
-            }
-        }).collect(Collectors.<QBUser>toList());
-
-        return result;
-    }
-
-    @Override
-    public List<QBUser> getUsersByPhoneNumbers(final Collection<String> usersPhoneNumbers) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
-            @Override
-            public boolean test(QBUser value) {
-                return usersPhoneNumbers.contains(value.getPhone());
-            }
-        }).collect(Collectors.<QBUser>toList());
-
-        return result;
+        return result.get();
     }
 
     @Override
@@ -327,86 +129,83 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
-    public List<QBUser> getUsersByColumn(String column, String value) {
-        return null;
+    public List<QBUser> getUsersByColumn(final String column, final String value) {
+        List<QBUser> result = null;
+        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
+            @Override
+            public boolean test(QBUser user) {
+                return  getValueByColumn(user, column).equals(value);
+            }
+        }).collect(Collectors.<QBUser>toList());
+
+        return result;
     }
 
     @Override
-    public List<QBUser> getUsersByColumn(String column, Collection<String> values) {
-        return null;
+    public List<QBUser> getUsersByColumn(final String column, final Collection<String> values) {
+        List<QBUser> result = null;
+        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
+            @Override
+            public boolean test(QBUser user) {
+                return values.contains(getValueByColumn(user,column));
+            }
+        }).collect(Collectors.<QBUser>toList());
+
+        return result;
     }
 
-    @Override
-    public void createOrUpdateAllUsers(Collection<QBUser> users) {
-        for(QBUser user : users) {
-            usersMap.put(user.getId().longValue(), user);
+    private String getValueByColumn(QBUser user, String column){
+        String result = null;
+        switch (column){
+            case  QMUserColumns.ID:
+                result = user.getId().toString();
+                break;
+            case QMUserColumns.FULL_NAME:
+                result = user.getFullName();
+                break;
+            case QMUserColumns.EMAIL:
+                result = user.getEmail();
+                break;
+            case QMUserColumns.LOGIN:
+                result = user.getEmail();
+                break;
+            case QMUserColumns.PHONE:
+                result = user.getPhone();
+                break;
+            case QMUserColumns.WEBSITE:
+                result = user.getWebsite();
+                break;
+            case QMUserColumns.LAST_REQUEST_AT:
+                result = user.getLastRequestAt().toString();
+                break;
+            case QMUserColumns.EXTERNAL_ID:
+                result = user.getExternalId();
+                break;
+            case QMUserColumns.FACEBOOK_ID:
+                result = user.getFacebookId();
+                break;
+            case QMUserColumns.TWITTER_ID:
+                result = user.getTwitterId();
+                break;
+            case QMUserColumns.TWITTER_DIGITS_ID:
+                result = user.getTwitterDigitsId();
+                break;
+            case QMUserColumns.BLOB_ID:
+                result = null;
+            case QMUserColumns.TAGS:
+                result = null;
+                break;
+            case QMUserColumns.PASSWORD:
+                result = user.getPassword();
+                break;
+            case QMUserColumns.OLD_PASSWORD:
+                result = user.getOldPassword();
+                break;
+            case QMUserColumns.CUSTOM_DATE:
+                result = user.getCustomData();
+                break;
+
         }
-    }
-
-    @Override
-    public void updateAllUsers(Collection<QBUser> users) {
-        for(QBUser user : users) {
-            usersMap.put(user.getId().longValue(), user);
-        }
-    }
-
-    @Override
-    public void create(QBUser object) {
-
-    }
-
-    @Override
-    public void createOrUpdate(QBUser object) {
-
-    }
-
-    @Override
-    public void createOrUpdateAll(Collection<QBUser> objectsCollection) {
-
-    }
-
-    @Override
-    public QBUser get(long id) {
-        return null;
-    }
-
-    @Override
-    public List<QBUser> getAll() {
-        return null;
-    }
-
-    @Override
-    public List<QBUser> getAllSorted(String sortedColumn, boolean ascending) {
-        return null;
-    }
-
-    @Override
-    public void update(QBUser object) {
-
-    }
-
-    @Override
-    public void updateAll(Collection<QBUser> objectsCollection) {
-
-    }
-
-    @Override
-    public void delete(QBUser object) {
-
-    }
-
-    @Override
-    public void deleteById(long id) {
-
-    }
-
-    @Override
-    public boolean exists(long id) {
-        return false;
-    }
-
-    @Override
-    public void clear() {
-        usersMap.clear();
+        return result;
     }
 }

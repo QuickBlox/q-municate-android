@@ -29,12 +29,6 @@ public abstract class QMAbstractBaseCache<T>  implements QMBaseCache<T>{
         handler = new Handler(Looper.getMainLooper());
     }
 
-    public QMAbstractBaseCache(Dao<T, Long> dao) {
-        handler = new Handler(Looper.getMainLooper());
-        this.dao = dao;
-    }
-
-
     @Override
     public void create(Object object) {
         try {
