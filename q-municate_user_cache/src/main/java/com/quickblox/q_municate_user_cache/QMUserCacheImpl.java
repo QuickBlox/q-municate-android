@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser> implements QMUserCache, QMUserColumns {
+public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser, Long> implements QMUserCache, QMUserColumns {
 
     private static final String TAG = QMUserCacheImpl.class.getSimpleName();
 
@@ -86,24 +86,9 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser> implements QMUs
         return user;
     }
 
-    @Override
-    public List<QBUser> getUsersByColumn(String column, String value) {
-        List<QBUser> usersList  = Collections.emptyList();
-
-        try {
-            QueryBuilder<QBUser, Long> queryBuilder = dao.queryBuilder();
-            queryBuilder.where().eq(column, value);
-            PreparedQuery<QBUser> preparedQuery = queryBuilder.prepare();
-            usersList = dao.query(preparedQuery);
-        } catch (SQLException e) {
-            ErrorUtils.logError(e);
-        }
-
-        return usersList;
-    }
 
     @Override
-    public List<QBUser> getUsersByColumn(String column, Collection<String> values) {
+    public List<QBUser> getByColumn(String column, Collection<String> values) {
         List<QBUser> usersList  = Collections.emptyList();
 
         try {

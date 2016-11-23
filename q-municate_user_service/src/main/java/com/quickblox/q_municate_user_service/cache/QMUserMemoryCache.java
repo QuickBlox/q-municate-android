@@ -39,7 +39,7 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
-    public QBUser get(long id) {
+    public QBUser get(Long id) {
         return usersMap.get(id);
     }
 
@@ -79,12 +79,12 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteById(Long id) {
         usersMap.remove(id);
     }
 
     @Override
-    public boolean exists(long id) {
+    public boolean exists(Long id) {
         return usersMap.containsKey(id);
     }
 
@@ -129,7 +129,7 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
-    public List<QBUser> getUsersByColumn(final String column, final String value) {
+    public List<QBUser> getByColumn(final String column, final String value) {
         List<QBUser> result = null;
         result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
             @Override
@@ -142,7 +142,7 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
-    public List<QBUser> getUsersByColumn(final String column, final Collection<String> values) {
+    public List<QBUser> getByColumn(final String column, final Collection<String> values) {
         List<QBUser> result = null;
         result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
             @Override

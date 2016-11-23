@@ -1,9 +1,11 @@
 package com.quickblox.q_municate_base_cache;
 
+import com.quickblox.users.model.QBUser;
+
 import java.util.Collection;
 import java.util.List;
 
-public interface QMBaseCache<T> {
+public interface QMBaseCache<T, ID> {
 
     void create(T object);
 
@@ -11,11 +13,15 @@ public interface QMBaseCache<T> {
 
     void createOrUpdateAll(Collection<T> objectsCollection);
 
-    T get(long id);
+    T get(ID id);
 
     List<T> getAll();
 
     List<T> getAllSorted(String sortedColumn, boolean ascending);
+
+    List<T> getByColumn(String column, String value);
+
+    List<T> getByColumn(String column, Collection<String> values);
 
     void update(T object);
 
@@ -23,9 +29,9 @@ public interface QMBaseCache<T> {
 
     void delete(T object);
 
-    void deleteById(long id);
+    void deleteById(ID id);
 
-    boolean exists(long id);
+    boolean exists(ID id);
 
     void clear();
 }

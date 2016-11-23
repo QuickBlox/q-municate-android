@@ -127,7 +127,7 @@ public class QMUserService extends QMBaseService {
         result = observable.flatMap(new Func1<Void, Observable<Void>>() {
             @Override
             public Observable<Void> call(Void qbUser) {
-                userCache.deleteById(userId);
+                userCache.deleteById(Long.valueOf(userId));
                 return observable;
             }
         });
@@ -296,7 +296,7 @@ public class QMUserService extends QMBaseService {
             result = Observable.defer(new Func0<Observable<List<QBUser>>>() {
                 @Override
                 public Observable<List<QBUser>> call() {
-                    List<QBUser> qbUsers =  userCache.getUsersByColumn(column, value);
+                    List<QBUser> qbUsers =  userCache.getByColumn(column, value);
                     return  qbUsers.size() == 0 ? getUsersByColumn(column, value, true) : Observable.just(qbUsers);
                 }
             });
@@ -324,7 +324,7 @@ public class QMUserService extends QMBaseService {
             result = Observable.defer(new Func0<Observable<List<QBUser>>>() {
                 @Override
                 public Observable<List<QBUser>> call() {
-                    List<QBUser> qbUsers = userCache.getUsersByColumn(column, values);
+                    List<QBUser> qbUsers = userCache.getByColumn(column, values);
                     return  qbUsers.size() == 0 ? getUsersByColumn(column, values, true): Observable.just(qbUsers);
                 }
             });
@@ -552,39 +552,39 @@ public class QMUserService extends QMBaseService {
     }
 
     private List<QBUser> getUsersByEmailsFromCache(Collection<String> usersEmails) {
-        return userCache.getUsersByColumn(QMUserColumns.EMAIL, usersEmails);
+        return userCache.getByColumn(QMUserColumns.EMAIL, usersEmails);
     }
 
     private List<QBUser> getUsersByLoginsFromCache(Collection<String> usersLogins) {
-        return userCache.getUsersByColumn(QMUserColumns.LOGIN, usersLogins);
+        return userCache.getByColumn(QMUserColumns.LOGIN, usersLogins);
     }
 
     private List<QBUser> getUsersByFacebookIdsFromCache(Collection<String> usersFacebookIds) {
-        return userCache.getUsersByColumn(QMUserColumns.FACEBOOK_ID, usersFacebookIds);
+        return userCache.getByColumn(QMUserColumns.FACEBOOK_ID, usersFacebookIds);
     }
 
     private List<QBUser> getUsersByTwitterIdsFromCache(Collection<String> usersTwitterIds) {
-        return userCache.getUsersByColumn(QMUserColumns.TWITTER_ID, usersTwitterIds);
+        return userCache.getByColumn(QMUserColumns.TWITTER_ID, usersTwitterIds);
     }
 
     private List<QBUser> getUsersByTwitterDigitsIdsFromCache(Collection<String> usersTwitterDigitsIds) {
-        return userCache.getUsersByColumn(QMUserColumns.TWITTER_DIGITS_ID, usersTwitterDigitsIds);
+        return userCache.getByColumn(QMUserColumns.TWITTER_DIGITS_ID, usersTwitterDigitsIds);
     }
 
     private List<QBUser> getUsersByExternalIdsFromCache(Collection<String> usersExternalIds) {
-        return userCache.getUsersByColumn(QMUserColumns.EXTERNAL_ID, usersExternalIds);
+        return userCache.getByColumn(QMUserColumns.EXTERNAL_ID, usersExternalIds);
     }
 
     private List<QBUser> getUsersByFullNameFromCache(String fullName) {
-        return userCache.getUsersByColumn(QMUserColumns.FULL_NAME, fullName);
+        return userCache.getByColumn(QMUserColumns.FULL_NAME, fullName);
     }
 
     private List<QBUser> getUsersByTagsFromCache(Collection<String> tags) {
-        return userCache.getUsersByColumn(QMUserColumns.TAGS, tags);
+        return userCache.getByColumn(QMUserColumns.TAGS, tags);
     }
 
     private List<QBUser> getUsersByPhoneNumbersFromCache(Collection<String> usersPhoneNumbers) {
-        return userCache.getUsersByColumn(QMUserColumns.PHONE, usersPhoneNumbers);
+        return userCache.getByColumn(QMUserColumns.PHONE, usersPhoneNumbers);
     }
 
 }

@@ -14,7 +14,7 @@ import java.util.List;
 
 import rx.Observable;
 
-public interface QMUserCache extends QMBaseCache<QBUser> {
+public interface QMUserCache extends QMBaseCache<QBUser, Long> {
 
     void deleteUserByExternalId(String externalId);
 
@@ -24,7 +24,4 @@ public interface QMUserCache extends QMBaseCache<QBUser> {
 
     List<QBUser> getUsersByFilter(Collection<?> filterValue, String filter);
 
-    List<QBUser> getUsersByColumn(String column, String value);
-
-    List<QBUser> getUsersByColumn(String column, Collection<String> values);
 }

@@ -17,11 +17,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public abstract class QMAbstractBaseCache<T>  implements QMBaseCache<T>{
+public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
 
     private static final String TAG = QMAbstractBaseCache.class.getSimpleName();
 
-    protected Dao<T, Long> dao;
+    protected Dao<T, ID> dao;
 
     private Handler handler;
 
@@ -30,9 +30,9 @@ public abstract class QMAbstractBaseCache<T>  implements QMBaseCache<T>{
     }
 
     @Override
-    public void create(Object object) {
+    public void create(T object) {
         try {
-            dao.create((T) object);
+            dao.create(object);
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "create() - " + e.getMessage());
         }
@@ -66,7 +66,7 @@ public abstract class QMAbstractBaseCache<T>  implements QMBaseCache<T>{
     }
 
     @Override
-    public T get(long id) {
+    public T get(ID id) {
         try {
             return dao.queryForId(id);
         } catch (SQLException e) {
@@ -92,12 +92,44 @@ public abstract class QMAbstractBaseCache<T>  implements QMBaseCache<T>{
         List<T> objectsList = Collections.emptyList();
 
         try {
-            QueryBuilder<T, Long> queryBuilder = dao.queryBuilder();
+            QueryBuilder<T, ID> queryBuilder = dao.queryBuilder();
             queryBuilder.orderBy(sortedColumn, ascending);
             PreparedQuery<T> preparedQuery = queryBuilder.prepare();
             objectsList = dao.query(preparedQuery);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
+        }
+
+        return objectsList;
+    }
+
+    @Override
+    public List<T> getByColumn(String column, String value) {
+        List<T> objectsList  = Collections.emptyList();
+
+        try {
+            QueryBuilder<T, ID> queryBuilder = dao.queryBuilder();
+            queryBuilder.where().eq(column, value);
+            PreparedQuery<T> preparedQuery = queryBuilder.prepare();
+            objectsList= dao.query(preparedQuery);
+        } catch (SQLException e) {
+            com.quickblox.q_municate_base_cache.utils.ErrorUtils.logError(e);
+        }
+
+        return objectsList;
+    }
+
+    @Override
+    public List<T> getByColumn(String column, Collection<String> values) {
+        List<T> objectsList  = Collections.emptyList();
+
+        try {
+            QueryBuilder<T, ID> queryBuilder = dao.queryBuilder();
+            queryBuilder.where().in(column, values);
+            PreparedQuery<T> preparedQuery = queryBuilder.prepare();
+            objectsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            com.quickblox.q_municate_base_cache.utils.ErrorUtils.logError(e);
         }
 
         return objectsList;
@@ -140,7 +172,7 @@ public abstract class QMAbstractBaseCache<T>  implements QMBaseCache<T>{
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteById(ID id) {
         try {
             dao.deleteById(id);
         } catch (SQLException e) {
@@ -149,7 +181,7 @@ public abstract class QMAbstractBaseCache<T>  implements QMBaseCache<T>{
     }
 
     @Override
-    public boolean exists(long id) {
+    public boolean exists(ID id) {
         try {
             return dao.idExists(id);
         } catch (SQLException e) {
@@ -161,7 +193,7 @@ public abstract class QMAbstractBaseCache<T>  implements QMBaseCache<T>{
 
     @Override
     public void clear() {
-        DeleteBuilder<T, Long> deleteBuilder = dao.deleteBuilder();
+        DeleteBuilder<T, ID> deleteBuilder = dao.deleteBuilder();
         try {
             deleteBuilder.delete();
         } catch (SQLException e) {
