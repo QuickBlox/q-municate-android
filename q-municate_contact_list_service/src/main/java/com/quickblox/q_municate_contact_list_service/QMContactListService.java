@@ -10,6 +10,7 @@ import com.quickblox.chat.QBContactList;
 import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
+import com.quickblox.chat.model.QBContactEntry;
 import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.QBSettings;
@@ -19,11 +20,16 @@ import com.quickblox.q_municate_contact_list_service.cache.QMContactListCache;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import rx.Observable;
+import rx.functions.Func0;
 
 public class QMContactListService extends QMBaseService {
 
@@ -76,6 +82,31 @@ public class QMContactListService extends QMBaseService {
         qbContacntList.unsubscribe(userId);
         clearRosterEntry(userId);
         deleteContactRequest(userId);
+    }
+
+    public Observable<List<QBContactEntry>> getAllContacts(boolean forceLoad){
+        Observable<List<QBContactEntry>> result = null;
+
+        if (!forceLoad) {
+            result = Observable.defer(new Func0<Observable<List<QBContactEntry>>>() {
+                @Override
+                public Observable<List<QBContactEntry>> call() {
+                    List<QBContactEntry> qbContacts = contactListCache.getAll();
+                    return  qbContacts.size() == 0 ? getAllContacts(true): Observable.just(qbContacts);
+                }
+            });
+            return result;
+        }
+
+        result = Observable.defer(new Func0<Observable<List<QBContactEntry>>>() {
+            @Override
+            public Observable<List<QBContactEntry>> call() {
+                List<QBContactEntry> list = new ArrayList<QBContactEntry>(qbContacntList.getEntries());
+                return  Observable.just(list);
+            }
+        });
+
+        return result;
     }
 
     private void invite(int userId) throws Exception {
