@@ -646,4 +646,43 @@ public class ChatUtils {
         qbDialog.getOccupants().add(qbChatMessage.getSenderId());
         qbDialog.getOccupants().add(qbChatMessage.getRecipientId());
     }
+
+    public static List<QBChatMessage> createLocalQBChatList(List<Message> messagesList) {
+        List<QBChatMessage> chatMessages = new ArrayList<>();
+        for (Message message : messagesList) {
+            chatMessages.add(createLocalQBMessage(message));
+        }
+        Collections.reverse(chatMessages);
+        return chatMessages;
+    }
+
+    private static QBChatMessage createLocalQBMessage(Message message) {
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setId(message.getMessageId());
+        chatMessage.setDialogId(String.valueOf(message.getDialogOccupant().getDialog().getDialogId()));
+        chatMessage.setDateSent(message.getCreatedDate());//true
+        chatMessage.setSenderId(message.getDialogOccupant().getUser().getUserId());//true
+        chatMessage.setBody(message.getBody());
+        if (message.getAttachment() != null) {
+            chatMessage.addAttachment(createLocalAttachment(message.getAttachment()));
+        }
+        return chatMessage;
+    }
+
+    private static QBAttachment createLocalAttachment(Attachment qbAttachment) {
+        Log.d("AMBRA", "message.getAttachment() != null" + qbAttachment);
+        String attachType;
+        if(qbAttachment.getType() == null){
+            Log.d("AMBRA", "qbAttachment.getType() == null");
+            attachType = QBAttachment.PHOTO_TYPE;
+        } else {
+            attachType = qbAttachment.getType().name();
+        }
+        QBAttachment attachment = new QBAttachment(attachType);
+        attachment.setId(qbAttachment.getAttachmentId());
+        attachment.setUrl(qbAttachment.getRemoteUrl());
+        attachment.setName(qbAttachment.getName());
+        attachment.setSize(qbAttachment.getSize());
+        return attachment;
+    }
 }

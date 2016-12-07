@@ -15,6 +15,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
+import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -146,12 +147,19 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
+        Log.d(TAG, "chatMessages= " + chatMessages);
+        privateChatMessageAdapter = new PrivateChatMessageAdapter(this, chatMessages, combinationMessagesList);
         messagesRecyclerView.addItemDecoration(
-                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+                new StickyRecyclerHeadersDecoration(privateChatMessageAdapter));
         findLastFriendsRequest();
 
-        messagesRecyclerView.setAdapter(messagesAdapter);
+//        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
+//        messagesRecyclerView.addItemDecoration(
+//                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+//        findLastFriendsRequest();
+
+//        messagesRecyclerView.setAdapter(messagesAdapter);
+        messagesRecyclerView.setAdapter(privateChatMessageAdapter);
         scrollMessagesToBottom();
     }
 
@@ -160,14 +168,14 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         initActualExtras();
         checkForCorrectChat();
 
-        int oldMessagesCount = messagesAdapter.getAllItems().size();
+//        int oldMessagesCount = messagesAdapter.getAllItems().size();
 
         this.combinationMessagesList = createCombinationMessagesList();
         Log.d(TAG, "combinationMessagesList = " + combinationMessagesList);
-        messagesAdapter.setList(combinationMessagesList);
-        findLastFriendsRequest();
+//        messagesAdapter.setList(combinationMessagesList);
+//        findLastFriendsRequest();
 
-        checkForScrolling(oldMessagesCount);
+//        checkForScrolling(oldMessagesCount);
     }
 
     private void initActualExtras() {
@@ -242,9 +250,14 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         dataManager.getFriendDataManager().deleteObserver(friendObserver);
     }
 
+//    private void findLastFriendsRequest() {
+//        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+//        messagesAdapter.notifyDataSetChanged();
+//    }
+
     private void findLastFriendsRequest() {
-        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
-        messagesAdapter.notifyDataSetChanged();
+        privateChatMessageAdapter.findLastFriendsRequestMessagesPosition();
+        privateChatMessageAdapter.notifyDataSetChanged();
     }
 
     private void setOnlineStatus(User user) {
@@ -353,9 +366,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            messagesAdapter.notifyItemChanged(operationItemPosition);
-            startLoadDialogMessages();
+//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+//            messagesAdapter.notifyItemChanged(operationItemPosition);
+//            startLoadDialogMessages();
             hideProgress();
         }
     }
@@ -364,9 +377,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            messagesAdapter.notifyItemChanged(operationItemPosition);
-            startLoadDialogMessages();
+//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+//            messagesAdapter.notifyItemChanged(operationItemPosition);
+//            startLoadDialogMessages();
             hideProgress();
         }
     }

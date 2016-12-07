@@ -24,10 +24,12 @@ import android.widget.ImageButton;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
@@ -109,11 +111,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
     protected BaseRecyclerViewAdapter messagesAdapter;
+    protected PrivateChatMessageAdapter privateChatMessageAdapter;
     protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
     protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
     protected ImagePickHelper imagePickHelper;
+    protected List<QBChatMessage> chatMessages;
 
     private Handler mainThreadHandler;
     private View emojiconsFragment;
@@ -517,10 +521,16 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void scrollMessagesWithDelay() {
+//        mainThreadHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                messagesRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
+//            }
+//        }, DELAY_SCROLLING_LIST);
         mainThreadHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                messagesRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
+                messagesRecyclerView.scrollToPosition(privateChatMessageAdapter.getItemCount() - 1);
             }
         }, DELAY_SCROLLING_LIST);
     }
@@ -632,7 +642,15 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
+
+        chatMessages = createListQBChatMessage(messagesList);
+        Log.d("AMBRA", "chatMessages= " + chatMessages);
         return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+    }
+
+    protected List<QBChatMessage> createListQBChatMessage(List<Message> messagesList){
+        //some logic check
+        return ChatUtils.createLocalQBChatList(messagesList);
     }
 
     private void visibleOrHideSmilePanel() {
@@ -765,9 +783,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
 
 
-            if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
-                scrollMessagesToBottom();
-            }
+//            if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
+//                scrollMessagesToBottom();
+//            }
 
             loadMore = false;
 
