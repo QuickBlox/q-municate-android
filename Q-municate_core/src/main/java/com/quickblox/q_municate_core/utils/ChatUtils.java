@@ -31,6 +31,7 @@ import com.quickblox.users.model.QBUser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -652,7 +653,7 @@ public class ChatUtils {
         for (Message message : messagesList) {
             chatMessages.add(createLocalQBMessage(message));
         }
-        Collections.reverse(chatMessages);
+        Collections.sort(chatMessages, new DateComparator());
         return chatMessages;
     }
 
@@ -660,8 +661,8 @@ public class ChatUtils {
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setId(message.getMessageId());
         chatMessage.setDialogId(String.valueOf(message.getDialogOccupant().getDialog().getDialogId()));
-        chatMessage.setDateSent(message.getCreatedDate());//true
-        chatMessage.setSenderId(message.getDialogOccupant().getUser().getUserId());//true
+        chatMessage.setDateSent(message.getCreatedDate());
+        chatMessage.setSenderId(message.getDialogOccupant().getUser().getUserId());
         chatMessage.setBody(message.getBody());
         if (message.getAttachment() != null) {
             chatMessage.addAttachment(createLocalAttachment(message.getAttachment()));
@@ -685,4 +686,13 @@ public class ChatUtils {
         attachment.setSize(qbAttachment.getSize());
         return attachment;
     }
+
+    private static class DateComparator implements Comparator<QBChatMessage> {
+
+        @Override
+        public int compare(QBChatMessage lhs, QBChatMessage rhs) {
+            return ((Long) lhs.getDateSent()).compareTo(rhs.getDateSent());
+        }
+    }
+
 }

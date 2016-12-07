@@ -81,6 +81,11 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
                null);
     }
 
+    public void updateList(List<QBChatMessage> newData) {
+        chatMessages = newData;
+        notifyDataSetChanged();
+    }
+
     public void findLastFriendsRequestMessagesPosition() {
         new FindLastFriendsRequestThread().run();
     }
@@ -109,6 +114,10 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
                 }
             }
         }
+    }
+
+    public void setList(List<CombinationMessage> combinationMessagesList){
+        this.combinationMessagesList = combinationMessagesList;
     }
 
     private class FindLastFriendsRequestThread extends Thread {

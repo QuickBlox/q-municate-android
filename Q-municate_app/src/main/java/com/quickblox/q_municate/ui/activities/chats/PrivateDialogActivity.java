@@ -168,14 +168,15 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         initActualExtras();
         checkForCorrectChat();
 
-//        int oldMessagesCount = messagesAdapter.getAllItems().size();
+        int oldMessagesCount = privateChatMessageAdapter.getItemCount();
 
         this.combinationMessagesList = createCombinationMessagesList();
-        Log.d(TAG, "combinationMessagesList = " + combinationMessagesList);
-//        messagesAdapter.setList(combinationMessagesList);
-//        findLastFriendsRequest();
+        Log.d(TAG, "updateMessagesList combinationMessagesList = " + combinationMessagesList);
+        privateChatMessageAdapter.setList(combinationMessagesList);
+        privateChatMessageAdapter.updateList(chatMessages);
+        findLastFriendsRequest();
 
-//        checkForScrolling(oldMessagesCount);
+        checkForScrolling(oldMessagesCount);
     }
 
     private void initActualExtras() {
@@ -236,8 +237,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
         initActualExtras();
-//        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-//        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
         title = opponentUser.getFullName();
     }
@@ -249,11 +250,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private void deleteObservers() {
         dataManager.getFriendDataManager().deleteObserver(friendObserver);
     }
-
-//    private void findLastFriendsRequest() {
-//        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
-//        messagesAdapter.notifyDataSetChanged();
-//    }
 
     private void findLastFriendsRequest() {
         privateChatMessageAdapter.findLastFriendsRequestMessagesPosition();

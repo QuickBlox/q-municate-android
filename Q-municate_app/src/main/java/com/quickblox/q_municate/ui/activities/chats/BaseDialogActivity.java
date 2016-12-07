@@ -509,7 +509,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void checkForScrolling(int oldMessagesCount) {
-        if (oldMessagesCount != messagesAdapter.getAllItems().size()) {
+        if (oldMessagesCount != privateChatMessageAdapter.getItemCount()) {
             scrollMessagesToBottom();
         }
     }
