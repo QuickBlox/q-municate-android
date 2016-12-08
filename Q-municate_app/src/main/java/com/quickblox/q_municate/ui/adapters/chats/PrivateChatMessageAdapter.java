@@ -22,6 +22,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.DialogNotification;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
@@ -35,7 +36,7 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
     private int lastRequestPosition = EMPTY_POSITION;
     private int lastInfoRequestPosition = EMPTY_POSITION;
 
-    private  List<CombinationMessage> combinationMessagesList;
+    private List<CombinationMessage> combinationMessagesList;
     protected QBUser currentUser;
 
     protected DataManager dataManager;
@@ -45,6 +46,33 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         dataManager = DataManager.getInstance();
         currentUser = AppSession.getSession().getUser();
         this.combinationMessagesList = combinationMessagesList;
+    }
+
+    private CombinationMessage getCombinationMessage(QBChatMessage chatMessage) {
+        for (CombinationMessage message : combinationMessagesList) {
+            if (chatMessage.getId().equals(message.getMessageId())) {
+                return message;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    protected void onBindViewMsgRightHolder(TextMessageHolder holder, QBChatMessage chatMessage, int position) {
+        boolean ownMessage;
+        ownMessage = !isIncoming(chatMessage);
+        ImageView view = (ImageView) holder.itemView.findViewById(R.id.custom_text_view);
+
+        CombinationMessage message = getCombinationMessage(chatMessage);
+
+        if (ownMessage && message != null && message.getState() != null) {
+            setMessageStatus(view, State.DELIVERED.equals(
+                    message.getState()), State.READ.equals(message.getState()));
+        } else if (ownMessage && message != null && message.getState() == null) {
+            view.setImageResource(android.R.color.transparent);
+        }
+
+        super.onBindViewMsgRightHolder(holder, chatMessage, position);
     }
 
     @Override
@@ -78,7 +106,12 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
 
         ImageLoader.getInstance().displayImage(privateUrl, ((ImageAttachHolder) holder).attachImageView,
                 ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageListener((ImageAttachHolder) holder),
-               null);
+                null);
+    }
+
+    @Override
+    protected String getDate(long milliseconds) {
+        return DateUtils.formatDateSimpleTime(milliseconds / 1000);
     }
 
     public void updateList(List<QBChatMessage> newData) {
@@ -116,7 +149,7 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         }
     }
 
-    public void setList(List<CombinationMessage> combinationMessagesList){
+    public void setList(List<CombinationMessage> combinationMessagesList) {
         this.combinationMessagesList = combinationMessagesList;
     }
 
@@ -128,10 +161,10 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         }
     }
 
-    private class ImageListener extends SimpleImageLoadingListener{
+    private class ImageListener extends SimpleImageLoadingListener {
         private ImageAttachHolder holder;
 
-        public ImageListener(ImageAttachHolder holder){
+        public ImageListener(ImageAttachHolder holder) {
             this.holder = holder;
         }
 
@@ -140,5 +173,21 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
             holder.attachImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             holder.attachmentProgressBar.setVisibility(View.GONE);
         }
+    }
+
+    protected void setMessageStatus(ImageView imageView, boolean messageDelivered, boolean messageRead) {
+        imageView.setImageResource(getMessageStatusIconId(messageDelivered, messageRead));
+    }
+
+    protected int getMessageStatusIconId(boolean isDelivered, boolean isRead) {
+        int iconResourceId = 0;
+
+        if (isRead) {
+            iconResourceId = R.drawable.ic_status_mes_sent_received;
+        } else if (isDelivered) {
+            iconResourceId = R.drawable.ic_status_mes_sent;
+        }
+
+        return iconResourceId;
     }
 }
