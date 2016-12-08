@@ -3,11 +3,14 @@ package com.quickblox.q_municate.ui.adapters.chats;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -16,6 +19,9 @@ import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
+import com.quickblox.q_municate.ui.views.maskedimageview.MaskedImageView;
+import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -30,8 +36,11 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import java.util.Collection;
 import java.util.List;
 
+import butterknife.Bind;
+
 public class PrivateChatMessageAdapter extends QBMessagesAdapter implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
     private static final String TAG = PrivateChatMessageAdapter.class.getSimpleName();
+    protected static final int TYPE_REQUEST_MESSAGE = 5;
     private static int EMPTY_POSITION = -1;
     private int lastRequestPosition = EMPTY_POSITION;
     private int lastInfoRequestPosition = EMPTY_POSITION;
@@ -48,13 +57,27 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         this.combinationMessagesList = combinationMessagesList;
     }
 
-    private CombinationMessage getCombinationMessage(QBChatMessage chatMessage) {
-        for (CombinationMessage message : combinationMessagesList) {
-            if (chatMessage.getId().equals(message.getMessageId())) {
-                return message;
-            }
+    private CombinationMessage getCombinationMessage(int position) {
+        return combinationMessagesList.get(position);
+    }
+
+    @Override
+    protected void onBindViewCustomHolder(QBMessageViewHolder holder, QBChatMessage chatMessage, int position) {
+        Log.d(TAG, "onBindViewCustomHolderr");
+
+        CombinationMessage combinationMessage = getCombinationMessage(position);
+        boolean friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
+                combinationMessage.getNotificationType());
+        boolean friendsInfoRequestMessage = combinationMessage
+                .getNotificationType() != null && !friendsRequestMessage;
+
+        if (friendsRequestMessage) {
+            TextView textView = (TextView) holder.itemView.findViewById(R.id.message_textview);
+            TextView timeTextMessageTextView = (TextView) holder.itemView.findViewById(R.id.time_text_message_textview);
+            textView.setText(combinationMessage.getBody());
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
+
         }
-        return null;
     }
 
     @Override
@@ -63,7 +86,7 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         ownMessage = !isIncoming(chatMessage);
         ImageView view = (ImageView) holder.itemView.findViewById(R.id.custom_text_view);
 
-        CombinationMessage message = getCombinationMessage(chatMessage);
+        CombinationMessage message = getCombinationMessage(position);
 
         if (ownMessage && message != null && message.getState() != null) {
             setMessageStatus(view, State.DELIVERED.equals(
@@ -112,6 +135,22 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
     @Override
     protected String getDate(long milliseconds) {
         return DateUtils.formatDateSimpleTime(milliseconds / 1000);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        CombinationMessage combinationMessage = getCombinationMessage(position);
+        if (combinationMessage.getNotificationType() != null) {
+            Log.d(TAG, "combinationMessage.getNotificationType()" + combinationMessage.getNotificationType());
+            return TYPE_REQUEST_MESSAGE;
+        }
+        return super.getItemViewType(position);
+    }
+
+    @Override
+    protected QBMessageViewHolder onCreateCustomViewHolder(ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateCustomViewHolder viewType= " + viewType);
+        return viewType == TYPE_REQUEST_MESSAGE ? new FriendsViewHolder(inflater.inflate(R.layout.item_friends_notification_message, parent, false)) : null;
     }
 
     public void updateList(List<QBChatMessage> newData) {
@@ -189,5 +228,36 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         }
 
         return iconResourceId;
+    }
+
+    protected static class FriendsViewHolder extends QBMessageViewHolder {
+        @Nullable
+        @Bind(R.id.message_textview)
+        TextView messageTextView;
+
+        @Nullable
+        @Bind(R.id.time_text_message_textview)
+        TextView timeTextMessageTextView;
+
+        @Nullable
+        @Bind(R.id.time_attach_message_textview)
+        TextView timeAttachMessageTextView;
+
+        @Nullable
+        @Bind(R.id.accept_friend_imagebutton)
+        ImageView acceptFriendImageView;
+
+        @Nullable
+        @Bind(R.id.divider_view)
+        View dividerView;
+
+        @Nullable
+        @Bind(R.id.reject_friend_imagebutton)
+        ImageView rejectFriendImageView;
+
+
+        public FriendsViewHolder(View view) {
+            super(view);
+        }
     }
 }
