@@ -3,8 +3,8 @@ package com.quickblox.q_municate_core.models;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.quickblox.auth.session.BaseService;
 import com.quickblox.core.exception.BaseServiceException;
-import com.quickblox.core.server.BaseService;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;

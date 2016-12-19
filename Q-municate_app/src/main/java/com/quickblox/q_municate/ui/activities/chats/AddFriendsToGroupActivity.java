@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
@@ -30,10 +30,10 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     public static final int RESULT_ADDED_FRIENDS = 9123;
 
-    private QBDialog qbDialog;
+    private QBChatDialog qbDialog;
     private List<Integer> friendIdsList;
 
-    public static void start(Activity activity, QBDialog qbDialog) {
+    public static void start(Activity activity, QBChatDialog qbDialog) {
         Intent intent = new Intent(activity, AddFriendsToGroupActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, qbDialog);
         activity.startActivityForResult(intent, RESULT_ADDED_FRIENDS);
@@ -66,7 +66,7 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     @Override
     protected List<User> getFriendsList() {
-        qbDialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        qbDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         List<Friend> friendsList = dataManager.getFriendDataManager().getAllForGroupDetails(qbDialog.getOccupants());
         if (!friendsList.isEmpty()) {
             List<Integer> actualFriendIdsList = UserFriendUtils.getFriendIdsListFromList(friendsList);

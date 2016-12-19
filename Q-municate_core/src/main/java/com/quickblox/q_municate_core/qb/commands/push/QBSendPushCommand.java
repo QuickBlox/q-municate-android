@@ -42,7 +42,7 @@ public class QBSendPushCommand extends ServiceCommand {
         QBEvent pushEvent = CoreNotificationHelper.createPushEvent(usersIdsList, message, null);
 
         try {
-            QBPushNotifications.createEvent(pushEvent);
+            QBPushNotifications.createEvent(pushEvent).perform();
         } catch (QBResponseException e) {
             /* ignore message = "No one can receive the message" */
         }

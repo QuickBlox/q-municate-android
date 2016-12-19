@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
@@ -283,7 +283,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
         }
     }
 
-    private void startPrivateChat(QBDialog qbDialog) {
+    private void startPrivateChat(QBChatDialog qbDialog) {
         PrivateDialogActivity.start(UserProfileActivity.this, user, ChatUtils.createLocalDialog(qbDialog));
     }
 
@@ -353,7 +353,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
         @Override
         public void execute(Bundle bundle) throws Exception {
             hideProgress();
-            QBDialog qbDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            QBChatDialog qbDialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             startPrivateChat(qbDialog);
         }
     }

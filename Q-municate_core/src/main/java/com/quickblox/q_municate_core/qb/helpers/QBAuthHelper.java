@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import com.facebook.login.LoginManager;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
-import com.quickblox.auth.model.QBSession;
+import com.quickblox.auth.session.QBSession;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
@@ -37,7 +37,7 @@ public class QBAuthHelper extends BaseHelper {
         QBUser qbUser;
         QBAuth.createSession();
         String password = inputUser.getPassword();
-        qbUser = QBUsers.signIn(inputUser);
+        qbUser = QBUsers.signIn(inputUser).perform();
 
         if (!hasUserCustomData(qbUser)) {
             qbUser.setOldPassword(password);
@@ -62,14 +62,14 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser login(String socialProvider, String accessToken,
             String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
-        QBSession session = QBAuth.createSession();
+        QBSession session = QBAuth.createSession().perform();
 
         if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
-            qbUser = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret);
+            qbUser = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret).perform();
             CoreSharedHelper.getInstance().saveTDServiceProvider(accessToken);
             CoreSharedHelper.getInstance().saveTDCredentials(accessTokenSecret);
         } else {
-            qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+            qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret).perform();
             CoreSharedHelper.getInstance().saveFBToken(accessToken);
         }
 
@@ -106,13 +106,13 @@ public class QBAuthHelper extends BaseHelper {
         stringifyArrayList.add(TAG_ANDROID);
         inputUser.setTags(stringifyArrayList);
 
-        qbUser = QBUsers.signUpSignInTask(inputUser);
+        qbUser = QBUsers.signUpSignInTask(inputUser).perform();
 
         if (file != null) {
-            QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
+            QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null).perform();
             userCustomData.setAvatarUrl(qbFile.getPublicUrl());
             inputUser.setCustomData(Utils.customDataToString(userCustomData));
-            qbUser = QBUsers.updateUser(inputUser);
+            qbUser = QBUsers.updateUser(inputUser).perform();
         }
 
         qbUser.setCustomDataClass(UserCustomData.class);
@@ -147,12 +147,12 @@ public class QBAuthHelper extends BaseHelper {
         inputUser.setPassword(null);
         inputUser.setOldPassword(null);
 
-        user = QBUsers.updateUser(inputUser);
+        user = QBUsers.updateUser(inputUser).perform();
 
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             user.setPassword(password);
         } else {
-            user.setPassword(QBAuth.getSession().getToken());
+            user.setPassword(QBAuth.getSession().perform().getToken());
         }
 
         return user;
@@ -161,7 +161,7 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
         QBUser newUser = new QBUser();
 
-        QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
+        QBFile qbFile = QBContent.uploadFileTask(file, true, null).perform();
         newUser.setId(user.getId());
         newUser.setPassword(user.getPassword());
         newUser.setFileId(qbFile.getId());
@@ -204,7 +204,7 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser changePasswordUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
         String password = inputUser.getPassword();
-        user = QBUsers.updateUser(inputUser);
+        user = QBUsers.updateUser(inputUser).perform();
         user.setPassword(password);
 
         return user;

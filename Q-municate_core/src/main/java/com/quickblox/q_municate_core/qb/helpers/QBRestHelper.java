@@ -24,7 +24,7 @@ public class QBRestHelper extends BaseHelper {
         User resultUser;
 
         try {
-            QBUser user = QBUsers.getUser(userId);
+            QBUser user = QBUsers.getUser(userId).perform();
             resultUser = UserFriendUtils.createLocalUser(user);
         } catch (QBResponseException e) {
             // user not found
@@ -38,7 +38,7 @@ public class QBRestHelper extends BaseHelper {
         User resultUser = null;
 
         try {
-            QBUser user = QBUsers.getUser(userId);
+            QBUser user = QBUsers.getUser(userId).perform();
             resultUser = UserFriendUtils.createLocalUser(user);
         } catch (QBResponseException e) {
             // user not found
@@ -54,7 +54,7 @@ public class QBRestHelper extends BaseHelper {
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
         requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
-        Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle());
+        Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder).perform();
         Collection<User> usersListResult = UserFriendUtils.createUsersList(usersList);
         return usersListResult;
     }
