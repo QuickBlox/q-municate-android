@@ -11,7 +11,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
@@ -33,7 +32,6 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
@@ -44,10 +42,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import static com.quickblox.q_municate_core.utils.ConstsCore.NOTIFICATION_TYPE;
-import static com.quickblox.q_municate_core.utils.ConstsCore.STATE;
-import static com.quickblox.q_municate_core.utils.ConstsCore.USER;
-
 public class PrivateChatMessageAdapter extends QBMessagesAdapter implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
     private static final String TAG = PrivateChatMessageAdapter.class.getSimpleName();
     protected static final int TYPE_REQUEST_MESSAGE = 5;
@@ -56,9 +50,7 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
     private int lastRequestPosition = EMPTY_POSITION;
     private int lastInfoRequestPosition = EMPTY_POSITION;
     private FileUtils fileUtils;
-    private Gson gson;
     private FriendOperationListener friendOperationListener;
-    private List<CombinationMessage> combinationMessagesList;
     private Dialog dialog;
 
     protected final BaseActivity baseActivity;
@@ -66,67 +58,50 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
 
     protected DataManager dataManager;
 
-    public PrivateChatMessageAdapter(BaseActivity baseActivity, List<QBChatMessage> chatMessages, List<CombinationMessage> combinationMessagesList, FriendOperationListener friendOperationListener, Dialog dialog) {
+    public PrivateChatMessageAdapter(BaseActivity baseActivity, List<QBChatMessage> chatMessages, FriendOperationListener friendOperationListener, Dialog dialog) {
         super(baseActivity.getApplicationContext(), chatMessages);
         this.friendOperationListener = friendOperationListener;
         dataManager = DataManager.getInstance();
         currentUser = AppSession.getSession().getUser();
         fileUtils = new FileUtils();
         this.dialog = dialog;
-        this.combinationMessagesList = combinationMessagesList;
         this.baseActivity = baseActivity;
-        gson = new Gson();
-    }
-
-    private CombinationMessage getCombinationMessage(int position) {
-        return combinationMessagesList.get(position);
-    }
-
-    private DialogNotification.Type getDialogNotificationType(QBChatMessage chatMessage) {
-        return gson.fromJson((String) chatMessage.getProperty(NOTIFICATION_TYPE), DialogNotification.Type.class);
-    }
-
-    private State getState(QBChatMessage chatMessage) {
-        return gson.fromJson((String) chatMessage.getProperty(STATE), State.class);
-    }
-
-    private User getUser(QBChatMessage chatMessage) {
-        return gson.fromJson((String) chatMessage.getProperty(USER), User.class);
     }
 
     @Override
     protected void onBindViewCustomHolder(QBMessageViewHolder holder, QBChatMessage chatMessage, int position) {
         Log.d(TAG, "onBindViewCustomHolder chatMessage getBody= " + chatMessage.getBody());
+        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
+        Log.d(TAG, "onBindViewCustomHolder combinationMessage getBody= " + combinationMessage.getBody());
         FriendsViewHolder friendsViewHolder = (FriendsViewHolder) holder;
 
         boolean friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
-                getDialogNotificationType(chatMessage));
-        boolean friendsInfoRequestMessage = getDialogNotificationType(chatMessage) != null && !friendsRequestMessage;
+                combinationMessage.getNotificationType());
+        boolean friendsInfoRequestMessage = combinationMessage.getNotificationType() != null && !friendsRequestMessage;
         TextView textView = (TextView) holder.itemView.findViewById(R.id.message_textview);
         TextView timeTextMessageTextView = (TextView) holder.itemView.findViewById(R.id.time_text_message_textview);
 
         if (friendsRequestMessage) {
-            textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
+            textView.setText(combinationMessage.getBody());
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
-            Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolderr chatMessage getBody= " + chatMessage.getBody());
-            textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
+            Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolderr combinationMessage getBody= " + combinationMessage.getBody());
+            textView.setText(combinationMessage.getBody());
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
 
             lastInfoRequestPosition = position;
         } else {
-            Log.d(TAG, "else onBindViewCustomHolderr chatMessage getBody= " + chatMessage.getBody());
-            textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
+            Log.d(TAG, "else onBindViewCustomHolderr combinationMessage getBody= " + combinationMessage.getBody());
+            textView.setText(combinationMessage.getBody());
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
         }
 
-        if (!State.READ.equals(getState(chatMessage)) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
+        if (!State.READ.equals(combinationMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
             Log.d(TAG, "onBindViewCustomHolder QBUpdateStatusMessageCommand.start");
-            CombinationMessage combinationMessage = getCombinationMessage(position);
             combinationMessage.setState(State.READ);
             QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
         }
@@ -141,18 +116,18 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
             lastRequestPosition = EMPTY_POSITION;
         } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == position)) { // set visible friends actions
             setVisibilityFriendsActions((FriendsViewHolder) holder, View.VISIBLE);
-            initListeners((FriendsViewHolder) holder, position, getUser(chatMessage).getUserId());
+            initListeners((FriendsViewHolder) holder, position, combinationMessage.getDialogOccupant().getUser().getUserId());
         }
     }
 
     @Override
     protected void onBindViewMsgRightHolder(TextMessageHolder holder, QBChatMessage chatMessage, int position) {
-
+        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
         ImageView view = (ImageView) holder.itemView.findViewById(R.id.custom_text_view);
 
-        if (getState(chatMessage) != null) {
+        if (combinationMessage.getState() != null) {
             setMessageStatus(view, State.DELIVERED.equals(
-                    getState(chatMessage)), State.READ.equals(getState(chatMessage)));
+                    combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
         } else {
             view.setImageResource(android.R.color.transparent);
         }
@@ -162,9 +137,10 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
 
     @Override
     protected void onBindViewMsgLeftHolder(TextMessageHolder holder, QBChatMessage chatMessage, int position) {
-        if (!State.READ.equals(getState(chatMessage)) && baseActivity.isNetworkAvailable()) {
+        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
+
+        if (!State.READ.equals(combinationMessage.getState()) && baseActivity.isNetworkAvailable()) {
             Log.d(TAG, "onBindViewMsgLeftHolder");
-            CombinationMessage combinationMessage = getCombinationMessage(position);
             combinationMessage.setState(State.READ);
             QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
         }
@@ -174,6 +150,7 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
     @Override
     protected void onBindViewAttachRightHolder(ImageAttachHolder holder, QBChatMessage chatMessage, int position) {
         resetUI(holder);
+        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
         boolean ownMessage;
         ownMessage = !isIncoming(chatMessage);
 
@@ -182,9 +159,9 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
 
         ImageView view = (ImageView) holder.itemView.findViewById(R.id.msg_signs_attach);
 
-        if (ownMessage && getState(chatMessage) != null) {
+        if (ownMessage && combinationMessage.getState() != null) {
             setMessageStatus(view, State.DELIVERED.equals(
-                    getState(chatMessage)), State.READ.equals(getState(chatMessage)));
+                    combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
         }
 
         super.onBindViewAttachRightHolder(holder, chatMessage, position);
@@ -200,8 +177,8 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
 
     @Override
     public long getHeaderId(int position) {
-        QBChatMessage chatMessage = getItem(position);
-        return DateUtils.toShortDateLong(chatMessage.getDateSent());
+        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        return DateUtils.toShortDateLong(combinationMessage.getCreatedDate());
     }
 
     @Override
@@ -216,8 +193,8 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         View view = holder.itemView;
 
         TextView headerTextView = (TextView) view.findViewById(R.id.header_date_textview);
-        QBChatMessage chatMessages = getItem(position);
-        headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(chatMessages.getDateSent()));
+        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
     }
 
     @Override
@@ -239,9 +216,10 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
 
     @Override
     public int getItemViewType(int position) {
-        QBChatMessage chatMessage = getItem(position);
-        if (getDialogNotificationType(chatMessage) != null) {
-            Log.d(TAG, "combinationMessage.getNotificationType()" + getDialogNotificationType(chatMessage));
+        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+
+        if (combinationMessage.getNotificationType() != null) {
+            Log.d(TAG, "combinationMessage.getNotificationType()" + combinationMessage.getNotificationType());
             return TYPE_REQUEST_MESSAGE;
         }
         return super.getItemViewType(position);
@@ -253,9 +231,8 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         return viewType == TYPE_REQUEST_MESSAGE ? new FriendsViewHolder(inflater.inflate(R.layout.item_friends_notification_message, parent, false)) : null;
     }
 
-    public void updateList(List<QBChatMessage> chatMessages, List<CombinationMessage> combinationMessagesList) {
+    public void updateList(List<QBChatMessage> chatMessages) {
         this.chatMessages = chatMessages;
-        this.combinationMessagesList = combinationMessagesList;
         notifyDataSetChanged();
     }
 
@@ -265,23 +242,23 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
 
     private void findLastFriendsRequest() {
         for (int i = 0; i < getList().size(); i++) {
-            findLastFriendsRequest(i, getList().get(i));
+            findLastFriendsRequest(i, (CombinationMessage) getList().get(i));
         }
     }
 
-    private void findLastFriendsRequest(int position, QBChatMessage chatMessage) {
+    private void findLastFriendsRequest(int position, CombinationMessage combinationMessage) {
         boolean ownMessage;
         boolean friendsRequestMessage;
         boolean isFriend;
 
-        if (getDialogNotificationType(chatMessage) != null) {
-            ownMessage = !isIncoming(chatMessage);
+        if (combinationMessage.getNotificationType() != null) {
+            ownMessage = !combinationMessage.isIncoming(currentUser.getId());
             friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
-                    getDialogNotificationType(chatMessage));
+                    combinationMessage.getNotificationType());
 
             if (friendsRequestMessage && !ownMessage) {
                 isFriend = dataManager.getFriendDataManager().
-                        getByUserId(getUser(chatMessage).getUserId()) != null;
+                        getByUserId(combinationMessage.getDialogOccupant().getUser().getUserId()) != null;
                 if (!isFriend) {
                     lastRequestPosition = position;
                 }
@@ -318,7 +295,8 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
 
     @Override
     protected boolean isIncoming(QBChatMessage chatMessage) {
-        return chatMessage.getSenderId() != null && !chatMessage.getSenderId().equals(currentUser.getId());
+        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
+        return combinationMessage.isIncoming(currentUser.getId());
     }
 
     private class FindLastFriendsRequestThread extends Thread {

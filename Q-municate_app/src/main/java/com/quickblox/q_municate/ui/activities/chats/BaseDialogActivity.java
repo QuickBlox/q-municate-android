@@ -116,10 +116,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected PrivateChatMessageAdapter privateChatMessageAdapter;
     protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
-    protected List<CombinationMessage> combinationMessagesList;
+    protected List combinationMessagesList;
     protected int chatHelperIdentifier;
     protected ImagePickHelper imagePickHelper;
-    protected List<QBChatMessage> chatMessages;
 
     private Handler mainThreadHandler;
     private View emojiconsFragment;
@@ -647,14 +646,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
         Log.d(TAG, "combinationMessages= " + combinationMessages);
-        chatMessages = createListQBChatMessage(combinationMessages);
-        Log.d(TAG, "chatMessages= " + chatMessages);
         return combinationMessages;
-    }
-
-    protected List<QBChatMessage> createListQBChatMessage(List<CombinationMessage> messagesList){
-        //some logic check
-        return ChatUtils.createLocalQBChatList(messagesList);
     }
 
     private void visibleOrHideSmilePanel() {

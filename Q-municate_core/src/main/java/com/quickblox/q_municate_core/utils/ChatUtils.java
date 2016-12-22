@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
@@ -32,7 +31,6 @@ import com.quickblox.users.model.QBUser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -148,7 +146,7 @@ public class ChatUtils {
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
     }
 
-    public static List<ParcelableQBDialog> qbDialogsToParcelableQBDialogs(List<QBDialog> dialogList){
+    public static List<ParcelableQBDialog> qbDialogsToParcelableQBDialogs(List<QBDialog> dialogList) {
         List<ParcelableQBDialog> parcelableDialogList = new ArrayList<ParcelableQBDialog>(dialogList.size());
         for (QBDialog dialog : dialogList) {
             ParcelableQBDialog parcelableQBDialog = new ParcelableQBDialog(dialog);
@@ -158,7 +156,7 @@ public class ChatUtils {
     }
 
 
-    public static List<QBDialog> parcelableQBDialogsToQBDialogs(List<ParcelableQBDialog> parcelableQBDialogsList){
+    public static List<QBDialog> parcelableQBDialogsToQBDialogs(List<ParcelableQBDialog> parcelableQBDialogsList) {
         List<QBDialog> qbDialogsList = new ArrayList<QBDialog>(parcelableQBDialogsList.size());
         for (ParcelableQBDialog parcelableQBDialog : parcelableQBDialogsList) {
             QBDialog qbDialog = parcelableQBDialog.getDialog();
@@ -190,7 +188,7 @@ public class ChatUtils {
 
         if (QBDialogType.PRIVATE.equals(qbDialog.getType())) {
             dialog.setType(Dialog.Type.PRIVATE);
-        } else if (QBDialogType.GROUP.equals(qbDialog.getType())){
+        } else if (QBDialogType.GROUP.equals(qbDialog.getType())) {
             dialog.setType(Dialog.Type.GROUP);
         }
 
@@ -395,7 +393,7 @@ public class ChatUtils {
         return message;
     }
 
-    private static boolean messageIsRead(QBChatMessage qbChatMessage){
+    private static boolean messageIsRead(QBChatMessage qbChatMessage) {
         return qbChatMessage.getReadIds() != null
                 && qbChatMessage.getReadIds().contains(qbChatMessage.getRecipientId());
     }
@@ -578,7 +576,7 @@ public class ChatUtils {
             if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
                 List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                         .getDialogOccupantsListByDialogId(dialog.getDialogId());
-                User currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+                User currentUser = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
                 User opponentUser = getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
                 if (opponentUser.getFullName() != null) {
                     dialog.setTitle(opponentUser.getFullName());
@@ -648,61 +646,4 @@ public class ChatUtils {
         qbDialog.getOccupants().add(qbChatMessage.getSenderId());
         qbDialog.getOccupants().add(qbChatMessage.getRecipientId());
     }
-
-    public static List<QBChatMessage> createLocalQBChatList(List<CombinationMessage> messagesList) {
-        List<QBChatMessage> chatMessages = new ArrayList<>();
-        for (CombinationMessage message : messagesList) {
-            chatMessages.add(createLocalQBMessage(message));
-        }
-        Collections.sort(chatMessages, new DateComparator());
-        return chatMessages;
-    }
-
-    private static QBChatMessage createLocalQBMessage(CombinationMessage message) {
-        QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setId(message.getMessageId());
-        chatMessage.setDialogId(String.valueOf(message.getDialogOccupant().getDialog().getDialogId()));
-        chatMessage.setDateSent(message.getCreatedDate());
-        chatMessage.setSenderId(message.getDialogOccupant().getUser().getUserId());
-        chatMessage.setBody(message.getBody());
-
-        Gson gson = new Gson();
-        String type = gson.toJson(message.getNotificationType());
-        String state = gson.toJson(message.getState());
-        String user = gson.toJson(message.getDialogOccupant().getUser());
-        chatMessage.setProperty(ConstsCore.NOTIFICATION_TYPE, type);
-        chatMessage.setProperty(ConstsCore.STATE, state);
-        chatMessage.setProperty(ConstsCore.USER, user);
-
-        if (message.getAttachment() != null) {
-            chatMessage.addAttachment(createLocalAttachment(message.getAttachment()));
-        }
-        return chatMessage;
-    }
-
-    private static QBAttachment createLocalAttachment(Attachment qbAttachment) {
-        Log.d("AMBRA", "message.getAttachment() != null" + qbAttachment);
-        String attachType;
-        if(qbAttachment.getType() == null){
-            Log.d("AMBRA", "qbAttachment.getType() == null");
-            attachType = QBAttachment.PHOTO_TYPE;
-        } else {
-            attachType = qbAttachment.getType().name();
-        }
-        QBAttachment attachment = new QBAttachment(attachType);
-        attachment.setId(qbAttachment.getAttachmentId());
-        attachment.setUrl(qbAttachment.getRemoteUrl());
-        attachment.setName(qbAttachment.getName());
-        attachment.setSize(qbAttachment.getSize());
-        return attachment;
-    }
-
-    private static class DateComparator implements Comparator<QBChatMessage> {
-
-        @Override
-        public int compare(QBChatMessage lhs, QBChatMessage rhs) {
-            return ((Long) lhs.getDateSent()).compareTo(rhs.getDateSent());
-        }
-    }
-
 }

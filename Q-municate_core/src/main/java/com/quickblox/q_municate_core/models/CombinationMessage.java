@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_core.models;
 
+import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -10,7 +12,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 // Combination DialogNotification and Message (for chats)
-public class CombinationMessage implements Serializable {
+public class CombinationMessage extends QBChatMessage implements Serializable {
 
     private String messageId;
     private DialogOccupant dialogOccupant;
@@ -36,6 +38,8 @@ public class CombinationMessage implements Serializable {
         this.state = message.getState();
         this.body = message.getBody();
         this.createdDate = message.getCreatedDate();
+        this.setDateSent(createdDate);
+        addQBAttachment(attachment);
     }
 
     public Message toMessage() {
@@ -140,6 +144,24 @@ public class CombinationMessage implements Serializable {
         } else {
             return false;
         }
+    }
+
+    private void addQBAttachment(Attachment qbAttachment) {
+        String attachType;
+        if(qbAttachment == null ){
+            return;
+        }
+        if(qbAttachment.getType() == null){
+            attachType = QBAttachment.PHOTO_TYPE;
+        } else {
+            attachType = qbAttachment.getType().name();
+        }
+        QBAttachment attachment = new QBAttachment(attachType);
+        attachment.setId(qbAttachment.getAttachmentId());
+        attachment.setUrl(qbAttachment.getRemoteUrl());
+        attachment.setName(qbAttachment.getName());
+        attachment.setSize(qbAttachment.getSize());
+        this.addAttachment(attachment);
     }
 
     public static class DateComparator implements Comparator<CombinationMessage> {

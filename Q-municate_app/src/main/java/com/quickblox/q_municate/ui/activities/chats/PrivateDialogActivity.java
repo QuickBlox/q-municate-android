@@ -147,8 +147,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        Log.d(TAG, "chatMessages= " + chatMessages);
-        privateChatMessageAdapter = new PrivateChatMessageAdapter(this, chatMessages, combinationMessagesList, friendOperationAction, dialog);
+        privateChatMessageAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, dialog);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(privateChatMessageAdapter));
         findLastFriendsRequest();
@@ -172,7 +171,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         this.combinationMessagesList = createCombinationMessagesList();
         Log.d(TAG, "updateMessagesList combinationMessagesList = " + combinationMessagesList);
-        privateChatMessageAdapter.updateList(chatMessages, combinationMessagesList);
+        privateChatMessageAdapter.updateList(combinationMessagesList);
         findLastFriendsRequest();
 
         checkForScrolling(oldMessagesCount);
