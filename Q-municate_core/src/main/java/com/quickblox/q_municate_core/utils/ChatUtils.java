@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
@@ -133,7 +134,7 @@ public class ChatUtils {
     }
 
     public static String getFullNamesFromOpponentId(DataManager dataManager, Integer userId,
-            String occupantsIdsString) {
+                                                    String occupantsIdsString) {
         List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
         occupantsIdsList.remove(userId);
         return getFullNamesFromOpponentIdsList(dataManager, occupantsIdsList);
@@ -216,7 +217,7 @@ public class ChatUtils {
     }
 
     public static List<Message> createTempLocalMessagesList(DataManager dataManager,
-            List<QBDialog> qbDialogsList, QBDialog currentDialog) {
+                                                            List<QBDialog> qbDialogsList, QBDialog currentDialog) {
         List<Message> messagesList = new ArrayList<>();
 
         for (QBDialog qbDialog : qbDialogsList) {
@@ -527,7 +528,7 @@ public class ChatUtils {
     }
 
     public static List<CombinationMessage> createCombinationMessagesList(List<Message> messagesList,
-            List<DialogNotification> dialogNotificationsList) {
+                                                                         List<DialogNotification> dialogNotificationsList) {
         List<CombinationMessage> combinationMessagesList = new ArrayList<>();
         combinationMessagesList.addAll(getCombinationMessagesListFromMessagesList(messagesList));
         combinationMessagesList.addAll(getCombinationMessagesListFromDialogNotificationsList(
@@ -570,7 +571,7 @@ public class ChatUtils {
     }
 
     public static List<Dialog> fillTitleForPrivateDialogsList(String titleForDeletedUser, DataManager dataManager,
-            List<Dialog> inputDialogsList) {
+                                                              List<Dialog> inputDialogsList) {
         List<Dialog> dialogsList = new ArrayList<>(inputDialogsList.size());
 
         for (Dialog dialog : inputDialogsList) {
@@ -627,7 +628,7 @@ public class ChatUtils {
     }
 
     public static DialogOccupant getUpdatedDialogOccupant(DataManager dataManager, String dialogId,
-            DialogOccupant.Status status, Integer userId) {
+                                                          DialogOccupant.Status status, Integer userId) {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, userId);
         if (dialogOccupant != null) {
             dialogOccupant.setStatus(status);
@@ -648,22 +649,31 @@ public class ChatUtils {
         qbDialog.getOccupants().add(qbChatMessage.getRecipientId());
     }
 
-    public static List<QBChatMessage> createLocalQBChatList(List<Message> messagesList) {
+    public static List<QBChatMessage> createLocalQBChatList(List<CombinationMessage> messagesList) {
         List<QBChatMessage> chatMessages = new ArrayList<>();
-        for (Message message : messagesList) {
+        for (CombinationMessage message : messagesList) {
             chatMessages.add(createLocalQBMessage(message));
         }
         Collections.sort(chatMessages, new DateComparator());
         return chatMessages;
     }
 
-    private static QBChatMessage createLocalQBMessage(Message message) {
+    private static QBChatMessage createLocalQBMessage(CombinationMessage message) {
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setId(message.getMessageId());
         chatMessage.setDialogId(String.valueOf(message.getDialogOccupant().getDialog().getDialogId()));
         chatMessage.setDateSent(message.getCreatedDate());
         chatMessage.setSenderId(message.getDialogOccupant().getUser().getUserId());
         chatMessage.setBody(message.getBody());
+
+        Gson gson = new Gson();
+        String type = gson.toJson(message.getNotificationType());
+        String state = gson.toJson(message.getState());
+        String user = gson.toJson(message.getDialogOccupant().getUser());
+        chatMessage.setProperty(ConstsCore.NOTIFICATION_TYPE, type);
+        chatMessage.setProperty(ConstsCore.STATE, state);
+        chatMessage.setProperty(ConstsCore.USER, user);
+
         if (message.getAttachment() != null) {
             chatMessage.addAttachment(createLocalAttachment(message.getAttachment()));
         }

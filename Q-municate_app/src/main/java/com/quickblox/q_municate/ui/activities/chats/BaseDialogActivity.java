@@ -88,6 +88,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final int DELAY_SCROLLING_LIST = 300;
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
 
+    private static final String TAG = BaseDialogActivity.class.getSimpleName();
+
     @Bind(R.id.messages_swiperefreshlayout)
     SwipeRefreshLayout messageSwipeRefreshLayout;
 
@@ -643,12 +645,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
 
-        chatMessages = createListQBChatMessage(messagesList);
-        Log.d("AMBRA", "chatMessages= " + chatMessages);
-        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+        List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+        Log.d(TAG, "combinationMessages= " + combinationMessages);
+        chatMessages = createListQBChatMessage(combinationMessages);
+        Log.d(TAG, "chatMessages= " + chatMessages);
+        return combinationMessages;
     }
 
-    protected List<QBChatMessage> createListQBChatMessage(List<Message> messagesList){
+    protected List<QBChatMessage> createListQBChatMessage(List<CombinationMessage> messagesList){
         //some logic check
         return ChatUtils.createLocalQBChatList(messagesList);
     }
