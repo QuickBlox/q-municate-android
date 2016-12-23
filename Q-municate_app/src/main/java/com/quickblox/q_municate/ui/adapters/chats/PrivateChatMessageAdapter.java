@@ -21,10 +21,8 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.utils.DateUtils;
-import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -32,8 +30,6 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
-import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.Collection;
@@ -42,30 +38,22 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class PrivateChatMessageAdapter extends QBMessagesAdapter implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
+public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
     private static final String TAG = PrivateChatMessageAdapter.class.getSimpleName();
-    protected static final int TYPE_REQUEST_MESSAGE = 5;
 
     private static int EMPTY_POSITION = -1;
     private int lastRequestPosition = EMPTY_POSITION;
     private int lastInfoRequestPosition = EMPTY_POSITION;
-    private FileUtils fileUtils;
     private FriendOperationListener friendOperationListener;
     private Dialog dialog;
-
-    protected final BaseActivity baseActivity;
-    protected QBUser currentUser;
 
     protected DataManager dataManager;
 
     public PrivateChatMessageAdapter(BaseActivity baseActivity, List<QBChatMessage> chatMessages, FriendOperationListener friendOperationListener, Dialog dialog) {
-        super(baseActivity.getApplicationContext(), chatMessages);
+        super(baseActivity, chatMessages);
         this.friendOperationListener = friendOperationListener;
         dataManager = DataManager.getInstance();
-        currentUser = AppSession.getSession().getUser();
-        fileUtils = new FileUtils();
         this.dialog = dialog;
-        this.baseActivity = baseActivity;
     }
 
     @Override
@@ -288,17 +276,6 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
         });
     }
 
-    protected void resetUI(ImageAttachHolder viewHolder) {
-        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.GONE);
-        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.GONE);
-    }
-
-    @Override
-    protected boolean isIncoming(QBChatMessage chatMessage) {
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
-        return combinationMessage.isIncoming(currentUser.getId());
-    }
-
     private class FindLastFriendsRequestThread extends Thread {
 
         @Override
@@ -361,12 +338,6 @@ public class PrivateChatMessageAdapter extends QBMessagesAdapter implements Stic
                     }
                 }
             };
-        }
-    }
-
-    protected void setViewVisibility(View view, int visibility) {
-        if (view != null) {
-            view.setVisibility(visibility);
         }
     }
 

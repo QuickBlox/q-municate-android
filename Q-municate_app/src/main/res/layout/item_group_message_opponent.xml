@@ -40,7 +40,7 @@
                 android:id="@+id/text_message_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/chat_babble_margin"
+                android:layout_marginRight="@dimen/chat_babbles_margin"
                 android:background="@drawable/left_bubble"
                 android:orientation="vertical"
                 android:padding="5dp"
