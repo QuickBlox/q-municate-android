@@ -147,18 +147,12 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        privateChatMessageAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, dialog);
+        messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, dialog);
         messagesRecyclerView.addItemDecoration(
-                new StickyRecyclerHeadersDecoration(privateChatMessageAdapter));
+                new StickyRecyclerHeadersDecoration(messagesAdapter));
         findLastFriendsRequest();
 
-//        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
-//        messagesRecyclerView.addItemDecoration(
-//                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
-//        findLastFriendsRequest();
-
-//        messagesRecyclerView.setAdapter(messagesAdapter);
-        messagesRecyclerView.setAdapter(privateChatMessageAdapter);
+        messagesRecyclerView.setAdapter(messagesAdapter);
         scrollMessagesToBottom();
     }
 
@@ -167,11 +161,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         initActualExtras();
         checkForCorrectChat();
 
-        int oldMessagesCount = privateChatMessageAdapter.getItemCount();
+        int oldMessagesCount = messagesAdapter.getItemCount();
 
         this.combinationMessagesList = createCombinationMessagesList();
         Log.d(TAG, "updateMessagesList combinationMessagesList = " + combinationMessagesList);
-        privateChatMessageAdapter.updateList(combinationMessagesList);
+        messagesAdapter.updateList(combinationMessagesList);
         findLastFriendsRequest();
 
         checkForScrolling(oldMessagesCount);
@@ -250,8 +244,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void findLastFriendsRequest() {
-        privateChatMessageAdapter.findLastFriendsRequestMessagesPosition();
-        privateChatMessageAdapter.notifyDataSetChanged();
+        ((PrivateChatMessageAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        messagesAdapter.notifyDataSetChanged();
     }
 
     private void setOnlineStatus(User user) {

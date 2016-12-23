@@ -11,6 +11,7 @@ import android.view.View;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
 import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -65,7 +66,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
+        messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList, dialog);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
@@ -125,11 +126,11 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        int oldMessagesCount = messagesAdapter.getAllItems().size();
+        int oldMessagesCount = messagesAdapter.getItemCount();
 
         this.combinationMessagesList = createCombinationMessagesList();
         processCombinationMessages();
-        messagesAdapter.setList(combinationMessagesList);
+        messagesAdapter.updateList(combinationMessagesList);
 
         checkForScrolling(oldMessagesCount);
     }

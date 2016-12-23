@@ -20,6 +20,7 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
     private State state;
     private String body;
     private long createdDate;
+    private QBAttachment qbAttachment;
     private DialogNotification.Type notificationType;
 
     public CombinationMessage(DialogNotification dialogNotification) {
@@ -146,22 +147,22 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
         }
     }
 
-    private void addQBAttachment(Attachment qbAttachment) {
+    private void addQBAttachment(Attachment attachment) {
         String attachType;
-        if(qbAttachment == null ){
+        if(attachment == null ){
             return;
         }
-        if(qbAttachment.getType() == null){
+        if(attachment.getType() == null){
             attachType = QBAttachment.PHOTO_TYPE;
         } else {
-            attachType = qbAttachment.getType().name();
+            attachType = attachment.getType().name();
         }
-        QBAttachment attachment = new QBAttachment(attachType);
-        attachment.setId(qbAttachment.getAttachmentId());
-        attachment.setUrl(qbAttachment.getRemoteUrl());
-        attachment.setName(qbAttachment.getName());
-        attachment.setSize(qbAttachment.getSize());
-        this.addAttachment(attachment);
+        qbAttachment = new QBAttachment(attachType);
+        qbAttachment.setId(attachment.getAttachmentId());
+        qbAttachment.setUrl(attachment.getRemoteUrl());
+        qbAttachment.setName(attachment.getName());
+        qbAttachment.setSize(attachment.getSize());
+        this.addAttachment(qbAttachment);
     }
 
     public static class DateComparator implements Comparator<CombinationMessage> {

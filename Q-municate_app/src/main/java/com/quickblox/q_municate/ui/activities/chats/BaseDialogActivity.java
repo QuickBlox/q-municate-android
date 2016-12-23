@@ -4,13 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,24 +23,24 @@ import android.widget.ImageButton;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
-import com.quickblox.q_municate.utils.DialogsUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
-import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
-import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
-import com.quickblox.q_municate_core.core.loader.BaseLoader;
+import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
+import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
+import com.quickblox.q_municate.utils.DialogsUtils;
+import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -53,7 +52,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
@@ -112,8 +110,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected Resources resources;
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
-    protected BaseRecyclerViewAdapter messagesAdapter;
-    protected PrivateChatMessageAdapter privateChatMessageAdapter;
+    protected BaseChatMessagesAdapter messagesAdapter;
     protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
     protected List combinationMessagesList;
@@ -510,7 +507,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void checkForScrolling(int oldMessagesCount) {
-        if (oldMessagesCount != privateChatMessageAdapter.getItemCount()) {
+        if (oldMessagesCount != messagesAdapter.getItemCount()) {
             scrollMessagesToBottom();
         }
     }
@@ -522,16 +519,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void scrollMessagesWithDelay() {
-//        mainThreadHandler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                messagesRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
-//            }
-//        }, DELAY_SCROLLING_LIST);
         mainThreadHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                messagesRecyclerView.scrollToPosition(privateChatMessageAdapter.getItemCount() - 1);
+                messagesRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
             }
         }, DELAY_SCROLLING_LIST);
     }
@@ -779,9 +770,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
 
 
-//            if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
-//                scrollMessagesToBottom();
-//            }
+            if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
+                scrollMessagesToBottom();
+            }
 
             loadMore = false;
 
