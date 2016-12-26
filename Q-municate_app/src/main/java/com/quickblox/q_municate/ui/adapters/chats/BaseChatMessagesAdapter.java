@@ -54,8 +54,8 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter implements Sticky
 
     @Override
     public long getHeaderId(int position) {
-        QBChatMessage chatMessage = getItem(position);
-        return DateUtils.toShortDateLong(chatMessage.getDateSent());
+        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        return DateUtils.toShortDateLong(combinationMessage.getCreatedDate());
     }
 
     @Override
@@ -70,8 +70,8 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter implements Sticky
         View view = holder.itemView;
 
         TextView headerTextView = (TextView) view.findViewById(R.id.header_date_textview);
-        QBChatMessage chatMessages = getItem(position);
-        headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(chatMessages.getDateSent()));
+        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
     }
 
     @Override

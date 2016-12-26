@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.adapters.chats;
 
 import android.util.Log;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.chat.model.QBChatMessage;
@@ -33,9 +32,9 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         boolean notificationMessage = combinationMessage.getNotificationType() != null;
 
         if (notificationMessage) {
-            Log.d(TAG, "onBindViewCustomHolder notificationMessage= " + (chatMessage.getBody()));
-            viewHolder.messageTextView.setText(chatMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
+            Log.d(TAG, "onBindViewCustomHolder notificationMessage= " + (combinationMessage.getBody()));
+            viewHolder.messageTextView.setText(combinationMessage.getBody());
+            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
         } else {
             Log.d(TAG, "onBindViewCustomHolder else");
         }
@@ -44,7 +43,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     @Override
     protected QBMessageViewHolder onCreateCustomViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateCustomViewHolder viewType= " + viewType);
-        return viewType == TYPE_REQUEST_MESSAGE ? new RequestsViewHolder(inflater.inflate(R.layout.item_friends_notification_message, parent, false)) : null;
+        return viewType == TYPE_REQUEST_MESSAGE ? new RequestsViewHolder(inflater.inflate(R.layout.item_notification_message, parent, false)) : null;
     }
 
     @Override
@@ -62,7 +61,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
 
     @Override
     protected void onBindViewAttachRightHolder(ImageAttachHolder holder, QBChatMessage chatMessage, int position) {
-//        resetUI(holder);
+        resetUI(holder);
 
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
@@ -71,7 +70,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     }
 
     protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, QBChatMessage chatMessage, int position) {
-//        resetUI(holder);
+        resetUI(holder);
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
 
