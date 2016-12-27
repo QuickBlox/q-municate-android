@@ -113,7 +113,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected BaseChatMessagesAdapter messagesAdapter;
     protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
-    protected List combinationMessagesList;
+    protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
     protected ImagePickHelper imagePickHelper;
 

@@ -4,7 +4,6 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.ColorUtils;
@@ -19,22 +18,21 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     private static final String TAG = GroupChatMessagesAdapter.class.getSimpleName();
     private ColorUtils colorUtils;
 
-    public GroupChatMessagesAdapter(BaseActivity baseActivity, List<QBChatMessage> chatMessages, Dialog dialog) {
+    public GroupChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages, Dialog dialog) {
         super(baseActivity, chatMessages);
         this.dialog = dialog;
         colorUtils = new ColorUtils();
     }
 
     @Override
-    protected void onBindViewCustomHolder(QBMessageViewHolder holder, QBChatMessage chatMessage, int position) {
+    protected void onBindViewCustomHolder(QBMessageViewHolder holder, CombinationMessage chatMessage, int position) {
         RequestsViewHolder viewHolder = (RequestsViewHolder) holder;
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
-        boolean notificationMessage = combinationMessage.getNotificationType() != null;
+        boolean notificationMessage = chatMessage.getNotificationType() != null;
 
         if (notificationMessage) {
-            Log.d(TAG, "onBindViewCustomHolder notificationMessage= " + (combinationMessage.getBody()));
-            viewHolder.messageTextView.setText(combinationMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
+            Log.d(TAG, "onBindViewCustomHolder notificationMessage= " + (chatMessage.getBody()));
+            viewHolder.messageTextView.setText(chatMessage.getBody());
+            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
         } else {
             Log.d(TAG, "onBindViewCustomHolder else");
         }
@@ -47,7 +45,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     }
 
     @Override
-    protected void onBindViewMsgLeftHolder(TextMessageHolder holder, QBChatMessage chatMessage, int position) {
+    protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
         CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
         String senderName;
         senderName = combinationMessage.getDialogOccupant().getUser().getFullName();
@@ -60,8 +58,8 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     }
 
     @Override
-    protected void onBindViewAttachRightHolder(ImageAttachHolder holder, QBChatMessage chatMessage, int position) {
-        resetUI(holder);
+    protected void onBindViewAttachRightHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
+//        resetUI(holder);
 
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
@@ -69,8 +67,8 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         super.onBindViewAttachRightHolder(holder, chatMessage, position);
     }
 
-    protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, QBChatMessage chatMessage, int position) {
-        resetUI(holder);
+    protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
+//        resetUI(holder);
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
 

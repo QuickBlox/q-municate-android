@@ -14,7 +14,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBAttachment;
-import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -36,7 +35,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class BaseChatMessagesAdapter extends QBMessagesAdapter implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
+public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessage> implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
     private static final String TAG = BaseChatMessagesAdapter.class.getSimpleName();
     protected static final int TYPE_REQUEST_MESSAGE = 5;
     protected Dialog dialog;
@@ -45,7 +44,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter implements Sticky
 
     protected FileUtils fileUtils;
 
-    BaseChatMessagesAdapter(BaseActivity baseActivity, List<QBChatMessage> chatMessages) {
+    BaseChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
         super(baseActivity.getApplicationContext(), chatMessages);
         this.baseActivity = baseActivity;
         currentUser = AppSession.getSession().getUser();
@@ -54,7 +53,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter implements Sticky
 
     @Override
     public long getHeaderId(int position) {
-        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        CombinationMessage combinationMessage = getItem(position);
         return DateUtils.toShortDateLong(combinationMessage.getCreatedDate());
     }
 
@@ -70,13 +69,13 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter implements Sticky
         View view = holder.itemView;
 
         TextView headerTextView = (TextView) view.findViewById(R.id.header_date_textview);
-        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        CombinationMessage combinationMessage = getItem(position);
         headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
     }
 
     @Override
     public int getItemViewType(int position) {
-        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        CombinationMessage combinationMessage = getItem(position);
         if (combinationMessage.getNotificationType() != null) {
             Log.d(TAG, "getItemViewType TYPE_REQUEST_MESSAGE");
             return TYPE_REQUEST_MESSAGE;
@@ -86,7 +85,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter implements Sticky
 
     @Override
     public void displayAttachment(QBMessageViewHolder holder, int position) {
-        QBChatMessage chatMessage = getItem(position);
+        CombinationMessage chatMessage = getItem(position);
         Collection<QBAttachment> attachments = chatMessage.getAttachments();
         QBAttachment attachment = attachments.iterator().next();
         String privateUrl = QBFile.getPrivateUrlForUID(attachment.getId());
@@ -103,20 +102,12 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter implements Sticky
     }
 
     @Override
-    public String obtainAvatarUrl(int valueType, QBChatMessage chatMessage) {
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
-        return combinationMessage.getDialogOccupant().getUser().getAvatar();
+    public String obtainAvatarUrl(int valueType, CombinationMessage chatMessage) {
+        return chatMessage.getDialogOccupant().getUser().getAvatar();
     }
 
-    public void updateList(List<QBChatMessage> chatMessages) {
+    public void updateList(List<CombinationMessage> chatMessages) {
         addList(chatMessages);
-    }
-
-    @Override
-    public void addList(List<QBChatMessage> items) {
-        chatMessages.clear();
-        chatMessages.addAll(items);
-        notifyDataSetChanged();
     }
 
     @Override
@@ -140,9 +131,8 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter implements Sticky
     }
 
     @Override
-    protected boolean isIncoming(QBChatMessage chatMessage) {
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
-        return combinationMessage.isIncoming(currentUser.getId());
+    protected boolean isIncoming(CombinationMessage chatMessage) {
+        return chatMessage.isIncoming(currentUser.getId());
     }
 
     public class ImageLoadingListener extends SimpleImageLoadingListener {

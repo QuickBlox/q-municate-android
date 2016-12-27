@@ -15,7 +15,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBAttachment;
-import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -49,7 +48,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     protected DataManager dataManager;
 
-    public PrivateChatMessageAdapter(BaseActivity baseActivity, List<QBChatMessage> chatMessages, FriendOperationListener friendOperationListener, Dialog dialog) {
+    public PrivateChatMessageAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages, FriendOperationListener friendOperationListener, Dialog dialog) {
         super(baseActivity, chatMessages);
         this.friendOperationListener = friendOperationListener;
         dataManager = DataManager.getInstance();
@@ -57,41 +56,40 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     }
 
     @Override
-    protected void onBindViewCustomHolder(QBMessageViewHolder holder, QBChatMessage chatMessage, int position) {
+    protected void onBindViewCustomHolder(QBMessageViewHolder holder, CombinationMessage chatMessage, int position) {
         Log.d(TAG, "onBindViewCustomHolder chatMessage getBody= " + chatMessage.getBody());
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
-        Log.d(TAG, "onBindViewCustomHolder combinationMessage getBody= " + combinationMessage.getBody());
+        Log.d(TAG, "onBindViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
         FriendsViewHolder friendsViewHolder = (FriendsViewHolder) holder;
 
         boolean friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
-                combinationMessage.getNotificationType());
-        boolean friendsInfoRequestMessage = combinationMessage.getNotificationType() != null && !friendsRequestMessage;
+                chatMessage.getNotificationType());
+        boolean friendsInfoRequestMessage = chatMessage.getNotificationType() != null && !friendsRequestMessage;
         TextView textView = (TextView) holder.itemView.findViewById(R.id.message_textview);
         TextView timeTextMessageTextView = (TextView) holder.itemView.findViewById(R.id.time_text_message_textview);
 
         if (friendsRequestMessage) {
-            textView.setText(combinationMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
+            textView.setText(chatMessage.getBody());
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
-            Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolderr combinationMessage getBody= " + combinationMessage.getBody());
-            textView.setText(combinationMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
+            Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolderr combinationMessage getBody= " + chatMessage.getBody());
+            textView.setText(chatMessage.getBody());
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
 
             lastInfoRequestPosition = position;
         } else {
-            Log.d(TAG, "else onBindViewCustomHolderr combinationMessage getBody= " + combinationMessage.getBody());
-            textView.setText(combinationMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
+            Log.d(TAG, "else onBindViewCustomHolderr combinationMessage getBody= " + chatMessage.getBody());
+            textView.setText(chatMessage.getBody());
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
         }
 
-        if (!State.READ.equals(combinationMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
+        if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
             Log.d(TAG, "onBindViewCustomHolder QBUpdateStatusMessageCommand.start");
-            combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
+            chatMessage.setState(State.READ);
+            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), chatMessage, true);
         }
         // check if last messageCombination is request messageCombination
         boolean lastRequestMessage = (position == getItemCount() - 1 && friendsRequestMessage);
@@ -104,18 +102,17 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
             lastRequestPosition = EMPTY_POSITION;
         } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == position)) { // set visible friends actions
             setVisibilityFriendsActions((FriendsViewHolder) holder, View.VISIBLE);
-            initListeners((FriendsViewHolder) holder, position, combinationMessage.getDialogOccupant().getUser().getUserId());
+            initListeners((FriendsViewHolder) holder, position, chatMessage.getDialogOccupant().getUser().getUserId());
         }
     }
 
     @Override
-    protected void onBindViewMsgRightHolder(TextMessageHolder holder, QBChatMessage chatMessage, int position) {
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
+    protected void onBindViewMsgRightHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
         ImageView view = (ImageView) holder.itemView.findViewById(R.id.custom_text_view);
 
-        if (combinationMessage.getState() != null) {
+        if (chatMessage.getState() != null) {
             setMessageStatus(view, State.DELIVERED.equals(
-                    combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
+                    chatMessage.getState()), State.READ.equals(chatMessage.getState()));
         } else {
             view.setImageResource(android.R.color.transparent);
         }
@@ -124,21 +121,19 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     }
 
     @Override
-    protected void onBindViewMsgLeftHolder(TextMessageHolder holder, QBChatMessage chatMessage, int position) {
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
+    protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
 
-        if (!State.READ.equals(combinationMessage.getState()) && baseActivity.isNetworkAvailable()) {
+        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
             Log.d(TAG, "onBindViewMsgLeftHolder");
-            combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
+            chatMessage.setState(State.READ);
+            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), chatMessage, true);
         }
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);
     }
 
     @Override
-    protected void onBindViewAttachRightHolder(ImageAttachHolder holder, QBChatMessage chatMessage, int position) {
+    protected void onBindViewAttachRightHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
         resetUI(holder);
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
         boolean ownMessage;
         ownMessage = !isIncoming(chatMessage);
 
@@ -147,15 +142,15 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
         ImageView view = (ImageView) holder.itemView.findViewById(R.id.msg_signs_attach);
 
-        if (ownMessage && combinationMessage.getState() != null) {
+        if (ownMessage && chatMessage.getState() != null) {
             setMessageStatus(view, State.DELIVERED.equals(
-                    combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
+                    chatMessage.getState()), State.READ.equals(chatMessage.getState()));
         }
 
         super.onBindViewAttachRightHolder(holder, chatMessage, position);
     }
 
-    protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, QBChatMessage chatMessage, int position) {
+    protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
         resetUI(holder);
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
@@ -165,7 +160,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     public long getHeaderId(int position) {
-        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        CombinationMessage combinationMessage = getItem(position);
         return DateUtils.toShortDateLong(combinationMessage.getCreatedDate());
     }
 
@@ -181,13 +176,13 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         View view = holder.itemView;
 
         TextView headerTextView = (TextView) view.findViewById(R.id.header_date_textview);
-        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        CombinationMessage combinationMessage = getItem(position);
         headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
     }
 
     @Override
     public void displayAttachment(QBMessageViewHolder holder, int position) {
-        QBChatMessage chatMessage = getItem(position);
+        CombinationMessage chatMessage = getItem(position);
         Collection<QBAttachment> attachments = chatMessage.getAttachments();
         QBAttachment attachment = attachments.iterator().next();
         String privateUrl = QBFile.getPrivateUrlForUID(attachment.getId());
@@ -204,7 +199,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     public int getItemViewType(int position) {
-        CombinationMessage combinationMessage = (CombinationMessage) getItem(position);
+        CombinationMessage combinationMessage = getItem(position);
 
         if (combinationMessage.getNotificationType() != null) {
             Log.d(TAG, "combinationMessage.getNotificationType()" + combinationMessage.getNotificationType());
@@ -217,11 +212,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     protected QBMessageViewHolder onCreateCustomViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateCustomViewHolder viewType= " + viewType);
         return viewType == TYPE_REQUEST_MESSAGE ? new FriendsViewHolder(inflater.inflate(R.layout.item_friends_notification_message, parent, false)) : null;
-    }
-
-    public void updateList(List<QBChatMessage> chatMessages) {
-        this.chatMessages = chatMessages;
-        notifyDataSetChanged();
     }
 
     public void findLastFriendsRequestMessagesPosition() {
