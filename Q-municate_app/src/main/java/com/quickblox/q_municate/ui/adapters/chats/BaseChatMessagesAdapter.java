@@ -91,7 +91,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         String privateUrl = QBFile.getPrivateUrlForUID(attachment.getId());
 
         ImageLoader.getInstance().displayImage(privateUrl, ((ImageAttachHolder) holder).attachImageView,
-                ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener((ImageAttachHolder) holder),
+                ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener((ImageAttachHolder) holder, isIncoming(chatMessage)),
                 null);
     }
 
@@ -115,9 +115,16 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         return DateUtils.formatDateSimpleTime(milliseconds / 1000);
     }
 
-    protected void resetUI(ImageAttachHolder viewHolder) {
+    private void resetAttachUI(ImageAttachHolder viewHolder) {
         setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.GONE);
         setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.GONE);
+    }
+
+    protected void showAttachUI(ImageAttachHolder viewHolder, boolean isIncoming) {
+        if (isIncoming){
+            setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.VISIBLE);
+        }
+        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.VISIBLE);
     }
 
     protected void setViewVisibility(View view, int visibility) {
@@ -140,14 +147,17 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         private ImageAttachHolder viewHolder;
         private Bitmap loadedImageBitmap;
         private String imageUrl;
+        private boolean isIncoming;
 
-        public ImageLoadingListener(ImageAttachHolder viewHolder) {
+        public ImageLoadingListener(ImageAttachHolder viewHolder, boolean isIncoming) {
             this.viewHolder = viewHolder;
+            this.isIncoming = isIncoming;
         }
 
         @Override
         public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
             updateUIAfterLoading();
+            resetAttachUI(viewHolder);
             Log.d(TAG, "onLoadingFailed");
             imageUrl = null;
         }
@@ -159,13 +169,12 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
             this.imageUrl = imageUri;
         }
 
-        private void initMaskedImageView(Bitmap loadedBitmap) {
+        protected void initMaskedImageView(Bitmap loadedBitmap) {
             loadedImageBitmap = loadedBitmap;
             viewHolder.attachImageView.setOnClickListener(receiveImageFileOnClickListener());
             viewHolder.attachImageView.setImageBitmap(loadedImageBitmap);
 
-            setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.VISIBLE);
-            setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.VISIBLE);
+            showAttachUI(viewHolder, isIncoming);
 
             updateUIAfterLoading();
         }

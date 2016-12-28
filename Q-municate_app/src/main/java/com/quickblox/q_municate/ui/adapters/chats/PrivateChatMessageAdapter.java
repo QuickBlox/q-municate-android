@@ -1,26 +1,17 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
 
-import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.model.QBAttachment;
-import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.utils.DateUtils;
-import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
@@ -31,7 +22,6 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.State;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
-import java.util.Collection;
 import java.util.List;
 
 import butterknife.Bind;
@@ -109,6 +99,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     @Override
     protected void onBindViewMsgRightHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
         ImageView view = (ImageView) holder.itemView.findViewById(R.id.custom_text_view);
+        setViewVisibility(holder.avatar, View.GONE);
 
         if (chatMessage.getState() != null) {
             setMessageStatus(view, State.DELIVERED.equals(
@@ -122,6 +113,9 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
+        TextView textView = (TextView) holder.itemView.findViewById(R.id.custom_text_view);
+        setViewVisibility(holder.avatar, View.GONE);
+        setViewVisibility(textView, View.GONE);
 
         if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
             Log.d(TAG, "onBindViewMsgLeftHolder");
@@ -133,7 +127,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void onBindViewAttachRightHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
-        resetUI(holder);
         boolean ownMessage;
         ownMessage = !isIncoming(chatMessage);
 
@@ -151,7 +144,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     }
 
     protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
-        resetUI(holder);
+        setViewVisibility(holder.avatar, View.GONE);
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
 
@@ -181,18 +174,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     }
 
     @Override
-    public void displayAttachment(QBMessageViewHolder holder, int position) {
-        CombinationMessage chatMessage = getItem(position);
-        Collection<QBAttachment> attachments = chatMessage.getAttachments();
-        QBAttachment attachment = attachments.iterator().next();
-        String privateUrl = QBFile.getPrivateUrlForUID(attachment.getId());
-
-        ImageLoader.getInstance().displayImage(privateUrl, ((ImageAttachHolder) holder).attachImageView,
-                ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener((ImageAttachHolder) holder),
-                null);
-    }
-
-    @Override
     protected String getDate(long milliseconds) {
         return DateUtils.formatDateSimpleTime(milliseconds / 1000);
     }
@@ -214,13 +195,18 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         return viewType == TYPE_REQUEST_MESSAGE ? new FriendsViewHolder(inflater.inflate(R.layout.item_friends_notification_message, parent, false)) : null;
     }
 
+    @Override
+    protected void showAttachUI(ImageAttachHolder viewHolder, boolean isIncoming) {
+        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.VISIBLE);
+    }
+
     public void findLastFriendsRequestMessagesPosition() {
         new FindLastFriendsRequestThread().run();
     }
 
     private void findLastFriendsRequest() {
         for (int i = 0; i < getList().size(); i++) {
-            findLastFriendsRequest(i, (CombinationMessage) getList().get(i));
+            findLastFriendsRequest(i, getList().get(i));
         }
     }
 
@@ -271,63 +257,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         @Override
         public void run() {
             findLastFriendsRequest();
-        }
-    }
-
-
-    public class ImageLoadingListener extends SimpleImageLoadingListener {
-
-        private ImageAttachHolder viewHolder;
-        private Bitmap loadedImageBitmap;
-        private String imageUrl;
-
-        public ImageLoadingListener(ImageAttachHolder viewHolder) {
-            this.viewHolder = viewHolder;
-        }
-
-        @Override
-        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-            updateUIAfterLoading();
-            Log.d(TAG, "onLoadingFailed");
-            imageUrl = null;
-        }
-
-        @Override
-        public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
-            initMaskedImageView(loadedBitmap);
-            fileUtils.checkExistsFile(imageUri, loadedBitmap);
-            this.imageUrl = imageUri;
-        }
-
-        private void initMaskedImageView(Bitmap loadedBitmap) {
-            loadedImageBitmap = loadedBitmap;
-            viewHolder.attachImageView.setOnClickListener(receiveImageFileOnClickListener());
-            viewHolder.attachImageView.setImageBitmap(loadedImageBitmap);
-
-            setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.VISIBLE);
-            setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.VISIBLE);
-
-            updateUIAfterLoading();
-        }
-
-        private void updateUIAfterLoading() {
-            if (viewHolder.attachmentProgressBar != null) {
-                setViewVisibility(viewHolder.attachmentProgressBar, View.GONE);
-            }
-        }
-
-        private View.OnClickListener receiveImageFileOnClickListener() {
-            return new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    Log.d(TAG, "receiveImageFileOnClickListener onClick");
-                    if (imageUrl != null) {
-                        view.startAnimation(AnimationUtils.loadAnimation(baseActivity, R.anim.chat_attached_file_click));
-                        PreviewImageActivity.start(baseActivity, imageUrl);
-                    }
-                }
-            };
         }
     }
 

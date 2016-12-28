@@ -41,8 +41,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
                 android:paddingLeft="5dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_status_mes_sent_received"/>
+                android:scaleType="fitCenter"/>
 
         </LinearLayout>
 

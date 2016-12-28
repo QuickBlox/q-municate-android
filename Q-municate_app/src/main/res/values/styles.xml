@@ -127,5 +127,16 @@
         <item name="fabSize">normal</item>
     </style>
 
+    <style name="AvatarImageViewStyle.Right">
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="TextViewTextMsg.Left">
+        <item name="android:textColor">@color/dark_gray</item>
+    </style>
+
+    <style name="TextViewTextMsg.Right">
+        <item name="android:textColor">@color/dark_gray</item>
+    </style>
 
 </resources>

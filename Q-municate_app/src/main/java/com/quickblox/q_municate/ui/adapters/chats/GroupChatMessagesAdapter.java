@@ -46,12 +46,11 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
 
     @Override
     protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
-        CombinationMessage combinationMessage = (CombinationMessage) chatMessage;
         String senderName;
-        senderName = combinationMessage.getDialogOccupant().getUser().getFullName();
+        senderName = chatMessage.getDialogOccupant().getUser().getFullName();
         TextView textView = (TextView) holder.itemView.findViewById(R.id.custom_text_view);
 
-        textView.setTextColor(colorUtils.getRandomTextColorById(combinationMessage.getDialogOccupant().getUser().getUserId()));
+        textView.setTextColor(colorUtils.getRandomTextColorById(chatMessage.getDialogOccupant().getUser().getUserId()));
         textView.setText(senderName);
 
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);
@@ -59,8 +58,6 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
 
     @Override
     protected void onBindViewAttachRightHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
-//        resetUI(holder);
-
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
 
@@ -68,7 +65,6 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     }
 
     protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
-//        resetUI(holder);
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
 
