@@ -15,6 +15,7 @@ import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.NotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -26,6 +27,8 @@ import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
@@ -35,6 +38,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class QBFriendListHelper extends BaseHelper implements Serializable {
 
@@ -189,9 +195,21 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
-        List<User> usersList = (List<User>) restHelper.loadUsers(friendIdsList);
+        //List<User> usersList = (List<User>) restHelper.loadUsers(friendIdsList);
+        //saveUsersAndFriends(usersList);
 
+        Log.d("TAG", "updateFriends  - begin");
+
+        List<QBUser> qbUsers = QMUserService.getInstance().getUsersByIDsList(friendIdsList, new QBPagedRequestBuilder());
+        List<User> usersList = new ArrayList<User>(qbUsers.size());
+        User user = null;
+        for (QBUser qbUser : qbUsers){
+            user = UserFriendUtils.createLocalUser(qbUser);
+            usersList.add(user);
+        }
         saveUsersAndFriends(usersList);
+
+        Log.d("TAG", "updateFriends  - end");
     }
 
     private void updateUsersAndFriends(Collection<Integer> idsList) throws QBResponseException {

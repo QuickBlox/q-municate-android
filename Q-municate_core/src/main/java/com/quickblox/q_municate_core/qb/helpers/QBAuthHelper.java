@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import com.facebook.login.LoginManager;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
-import com.quickblox.auth.model.QBSession;
+import com.quickblox.auth.session.QBSession;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;

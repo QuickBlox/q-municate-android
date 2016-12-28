@@ -9,6 +9,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -24,7 +25,8 @@ public class QBRestHelper extends BaseHelper {
         User resultUser;
 
         try {
-            QBUser user = QBUsers. getUser(userId).perform();
+            //QBUser user = QBUsers. getUser(userId).perform();
+            QBUser user = QMUserService.getInstance().getUserEntity(userId, true);
             resultUser = UserFriendUtils.createLocalUser(user);
         } catch (QBResponseException e) {
             // user not found
@@ -38,7 +40,8 @@ public class QBRestHelper extends BaseHelper {
         User resultUser = null;
 
         try {
-            QBUser user = QBUsers.getUser(userId).perform();
+            //QBUser user = QBUsers.getUser(userId).perform();
+            QBUser user = QMUserService.getInstance().getUserEntity(userId, true);
             resultUser = UserFriendUtils.createLocalUser(user);
         } catch (QBResponseException e) {
             // user not found
@@ -54,7 +57,8 @@ public class QBRestHelper extends BaseHelper {
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
         requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
-        Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle()).perform();
+        //Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle()).perform();
+        Collection<QBUser> usersList = QMUserService.getInstance().getUsersByIDsList(usersIdsList, requestBuilder);
         Collection<User> usersListResult = UserFriendUtils.createUsersList(usersList);
         return usersListResult;
     }

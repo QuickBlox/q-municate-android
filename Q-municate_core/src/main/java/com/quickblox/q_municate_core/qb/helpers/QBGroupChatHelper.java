@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBGroupChat;
+import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBParticipantListener;
 import com.quickblox.chat.listeners.QBSystemMessageListener;
@@ -183,7 +184,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         dialogToCreate.setOccupantsIds(occupantIdsList);
         dialogToCreate.setPhoto(photoUrl);
 
-        QBChatDialog  QBChatDialog  = groupChatManager.createDialog(dialogToCreate);
+        QBChatDialog  QBChatDialog  =  QBRestChatService.createChatDialog(dialogToCreate).perform();
         DbUtils.saveDialogToCache(dataManager, QBChatDialog );
 
         joinRoomChat(QBChatDialog );
@@ -303,7 +304,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     private QBChatDialog  updateDialog(QBChatDialog  dialog, QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
-        QBChatDialog  updatedDialog = groupChatManager.updateDialog(dialog, requestBuilder);
+        QBChatDialog  updatedDialog = QBRestChatService.updateGroupChatDialog(dialog, requestBuilder).perform();
         return updatedDialog;
     }
 

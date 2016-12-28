@@ -12,6 +12,7 @@ import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
+import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.QBSystemMessagesManager;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBIsTypingListener;
@@ -22,6 +23,7 @@ import com.quickblox.chat.listeners.QBSystemMessageListener;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.StringifyArrayList;
@@ -158,7 +160,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     public List<QBChatDialog > getDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
         Log.d("Fix double message", "currentDialog = " + currentDialog);
-        List<QBChatDialog> qbChatDialogsList = QBChatService.getChatDialogs(null, qbRequestGetBuilder, returnedBundle);
+        List<QBChatDialog> qbChatDialogsList = QBRestChatService.getChatDialogs(null, qbRequestGetBuilder).perform();
 
         if (qbChatDialogsList != null && !qbChatDialogsList.isEmpty()) {
             FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbChatDialogsList);
@@ -173,8 +175,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
                                                         Bundle returnedBundle, QBChatDialog  QBChatDialog ,
                                                         long lastDateLoad) throws QBResponseException {
-        List<QBChatMessage> qbMessagesList = QBChatService.getDialogMessages(QBChatDialog ,
-                customObjectRequestBuilder, returnedBundle);
+        List<QBChatMessage> qbMessagesList = QBRestChatService.getDialogMessages(QBChatDialog ,
+                customObjectRequestBuilder).perform();
 
         if (qbMessagesList != null && !qbMessagesList.isEmpty()) {
             DbUtils.saveMessagesToCache(context, dataManager, qbMessagesList, QBChatDialog .getDialogId());
@@ -255,7 +257,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public QBChatDialog  createPrivateChatOnRest(int opponentId) throws QBResponseException {
-        QBChatDialog  dialog = privateChatManager.createDialog(opponentId);
+        QBChatDialog  dialog = DialogUtils.buildPrivateDialog(opponentId); //QBRestChatService.createChatDialog(null).perform();  //privateChatManager.createDialog(opponentId);
         return dialog;
     }
 
@@ -377,7 +379,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         } else {
             StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
             messagesIdsList.add(combinationMessage.getMessageId());
-            QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
+            QBRestChatService.markMessagesAsRead(dialogId, messagesIdsList);
         }
     }
 

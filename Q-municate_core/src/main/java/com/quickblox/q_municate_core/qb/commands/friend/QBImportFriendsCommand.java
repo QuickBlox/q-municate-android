@@ -10,6 +10,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -49,12 +50,13 @@ public class QBImportFriendsCommand extends ServiceCommand {
         List<QBUser> realFriendsContactsList = null;
 
         if (!friendsFacebookList.isEmpty()) {
-            realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder,
-                    params).perform();
+            //realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder, params).perform();
+            realFriendsContactsList = QMUserService.getInstance().getUsersByFacebookIdList(friendsFacebookList, requestBuilder, true);
         }
 
         if (!friendsContactsList.isEmpty()) {
-            realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params).perform();
+            //realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params).perform();
+            realFriendsContactsList = QMUserService.getInstance().getUsersByEmailsList(friendsFacebookList, requestBuilder, true);
         }
 
         List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList,

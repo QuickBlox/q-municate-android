@@ -32,14 +32,14 @@ ext {
     lintAbortOnError = false
 
 //    QuickBlox SDK version
-    qbSdkVersion = '3.0'
+    qbSdkVersion = '3.2'
 
     testRunnerVersion = "0.4.1"
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
-    supportVersion = '23.4.0'
-    googlePlayServicesVersion = '8.1.0'
+    supportVersion = '23.2.1'
+    googlePlayServicesVersion = '9.8.0'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '5.0'
     ormliteCoreVersion = '5.0'
@@ -53,12 +53,12 @@ ext {
     twitterDigitsSdkVersion = '2.0.0'
 
     // Dependency versions
-    playServicesVersion = '8.4.0'
-    supportV4Version = '23.1.1'
-    appcompatV7Version = '23.1.1'
+    playServicesVersion = '9.8.0'
+    supportV4Version = '23.2.1'
+    appcompatV7Version = '23.2.1'
     recyclerviewV7Version = '23.2.1'
-    supportAnnotationsVersion = '23.1.1'
-    designVersion = '23.1.1'
+    supportAnnotationsVersion = '23.2.1'
+    designVersion = '23.2.1'
 
     uilVersion = '1.9.0'
     glideVersion = '3.6.1'
@@ -67,4 +67,5 @@ ext {
     robotoTextViewVersion = '2.4.3'
     stickersVersion = '0.7.3'
     crashlyticsVersion = '2.2.2'
+    firebaseVersion = '9.8.0'
 }

@@ -18,6 +18,7 @@ dependencies {
     //compile "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
     //compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
 
+    compile project(":quickblox-android-sdk-core" )
     compile project(":quickblox-android-sdk-content" )
     compile project(":quickblox-android-sdk-customobjects" )
     compile project(":quickblox-android-sdk-messages" )
@@ -34,7 +35,8 @@ dependencies {
 
     compile "com.facebook.android:facebook-android-sdk:$rootProject.facebookSdkVersoin"
 
-    compile('com.android.support:cardview-v7:23.4.0') {
+    compile('com.android.support:cardview-v7:23.2.1') {
         force = true
     }
+    compile project(path: ':q-municate_user_service')
 }

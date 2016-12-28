@@ -404,7 +404,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void updateCurrentData() {
         QBChatDialog  = ChatUtils.createQBChatDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(QBChatDialog .getDialogId()));
-        occupantsList = dataManager.getUserDataManager().getAllByIds(QBChatDialog .getOccupants());
+        occupantsList = dataManager.getUserDataManager(). getAllByIds(QBChatDialog .getOccupants());
         groupNameCurrent = groupNameEditText.getText().toString();
     }
 

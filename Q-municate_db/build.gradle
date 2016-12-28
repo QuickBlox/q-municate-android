@@ -15,4 +15,5 @@ android {
 dependencies {
     compile "com.j256.ormlite:ormlite-android:${rootProject.ormliteAndroidVersion}"
     compile "com.j256.ormlite:ormlite-core:${rootProject.ormliteCoreVersion}"
+    compile project(path: ':quickblox-android-sdk-core')
 }
