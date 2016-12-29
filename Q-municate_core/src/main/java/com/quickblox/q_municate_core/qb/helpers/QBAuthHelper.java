@@ -7,11 +7,13 @@ import com.facebook.login.LoginManager;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSession;
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.StringifyArrayList;
+import com.quickblox.q_municate_auth_service.QMAuthService;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
@@ -20,6 +22,7 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -35,16 +38,17 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
-        QBAuth.createSession().perform();
+        //QBAuth.createSession().perform();
         String password = inputUser.getPassword();
-        qbUser = QBUsers.signIn(inputUser).perform();
+        //qbUser = QBUsers.signIn(inputUser).perform();
+        qbUser = QMAuthService.getInstance().loginSync(inputUser);
 
         if (!hasUserCustomData(qbUser)) {
             qbUser.setOldPassword(password);
             updateUser(qbUser);
         }
 
-        String token = QBAuth.getBaseService().getToken();
+        String token = QBSessionManager.getInstance().getToken();
         qbUser.setPassword(password);
 
         saveOwnerUser(qbUser);
@@ -62,16 +66,20 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser login(String socialProvider, String accessToken,
             String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
-        QBSession session = QBAuth.createSession().perform();
+        //QBSession session = QBAuth.createSession().perform();
+
+        qbUser = QMAuthService.getInstance().loginSync(socialProvider, accessToken, accessTokenSecret);
 
         if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
-            qbUser = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret).perform();
+            //qbUser = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret).perform();
             CoreSharedHelper.getInstance().saveTDServiceProvider(accessToken);
             CoreSharedHelper.getInstance().saveTDCredentials(accessTokenSecret);
         } else {
-            qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret).perform();
+            //qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret).perform();
             CoreSharedHelper.getInstance().saveFBToken(accessToken);
         }
+
+        QBSession session = QBSessionManager.getInstance().getActiveSession();
 
         qbUser.setPassword(session.getToken());
 
@@ -97,7 +105,7 @@ public class QBAuthHelper extends BaseHelper {
         QBUser qbUser;
         UserCustomData userCustomData = new UserCustomData();
 
-        QBAuth.createSession().perform();
+        //QBAuth.createSession().perform();
         String password = inputUser.getPassword();
         inputUser.setOldPassword(password);
         inputUser.setCustomData(Utils.customDataToString(userCustomData));
@@ -106,7 +114,9 @@ public class QBAuthHelper extends BaseHelper {
         stringifyArrayList.add(TAG_ANDROID);
         inputUser.setTags(stringifyArrayList);
 
-        qbUser = QBUsers.signUpSignInTask(inputUser).perform();
+        //qbUser = QBUsers.signUpSignInTask(inputUser).perform();
+
+        qbUser = QMAuthService.getInstance().signUpLoginSync(inputUser);
 
         if (file != null) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null).perform();
@@ -133,7 +143,8 @@ public class QBAuthHelper extends BaseHelper {
         }
 
         LoginManager.getInstance().logOut();
-        QBAuth.deleteSession().perform();
+        //QBAuth.deleteSession().perform();
+        QMAuthService.getInstance().logoutSync();
     }
 
     public QBUser updateUser(QBUser inputUser) throws QBResponseException {
@@ -147,7 +158,8 @@ public class QBAuthHelper extends BaseHelper {
         inputUser.setPassword(null);
         inputUser.setOldPassword(null);
 
-        user = QBUsers.updateUser(inputUser).perform();
+        //user = QBUsers.updateUser(inputUser).perform();
+        user = QMUserService.getInstance().updateUserEntity(inputUser);
 
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             user.setPassword(password);
@@ -197,14 +209,17 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public void resetPassword(String email) throws QBResponseException {
-        QBAuth.createSession().perform();
-        QBUsers.resetPassword(email).perform();
+        //QBAuth.createSession().perform();
+        //QBUsers.resetPassword(email).perform();
+        QMAuthService.getInstance().resetPasswordSync(email);
+
     }
 
     public QBUser changePasswordUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
         String password = inputUser.getPassword();
-        user = QBUsers.updateUser(inputUser).perform();
+        //user =  QBUsers.updateUser(inputUser).perform();
+        user = QMUserService.getInstance().updateUserEntity(inputUser);
         user.setPassword(password);
 
         return user;

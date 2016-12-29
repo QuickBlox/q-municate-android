@@ -164,7 +164,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         loginSuccessAction = new LoginSuccessAction();
         socialLoginSuccessAction = new SocialLoginSuccessAction();
         failAction = new FailAction();
-        authService = App.getInstance().getAuthService();
+        authService = QMAuthService.getInstance();
         userService = QMUserService.getInstance();
     }
 

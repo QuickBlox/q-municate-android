@@ -28,8 +28,6 @@ public class App extends MultiDexApplication {
     private static App instance;
     private SharedHelper appSharedHelper;
 
-    private QMAuthService authService;
-
     public static App getInstance() {
         return instance;
     }
@@ -86,7 +84,7 @@ public class App extends MultiDexApplication {
     }
 
     private void initServices(){
-        authService = new QMAuthService();
+        QMAuthService.init();
         QMUserCache userCache = new QMUserCacheImpl(this);
         QMUserService.init(userCache);
     }
@@ -95,11 +93,6 @@ public class App extends MultiDexApplication {
         return appSharedHelper == null
                 ? appSharedHelper = new SharedHelper(this)
                 : appSharedHelper;
-    }
-
-
-    public QMAuthService getAuthService() {
-        return authService;
     }
 
 }

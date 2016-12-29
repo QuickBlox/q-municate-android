@@ -4,6 +4,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.auth.session.BaseService;
+import com.quickblox.auth.session.QBSession;
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
@@ -62,21 +64,17 @@ public class AppSession implements Serializable {
     }
 
     public static boolean isSessionExistOrNotExpired(long expirationTime) {
-        try {
-            BaseService baseService = QBAuth.getBaseService();
-            String token = baseService.getToken();
+            //BaseService baseService = QBAuth.getBaseService();
+            //String token = baseService.getToken();
+            String token = QBSessionManager.getInstance().getToken();
             if (token == null) {
                 Log.d("AppSession", "token == null");
                 return false;
             }
-            Date tokenExpirationDate = baseService.getTokenExpirationDate();
+            //Date tokenExpirationDate = baseService.getTokenExpirationDate();
+            Date tokenExpirationDate = QBSessionManager.getInstance().getTokenExpirationDate();
             long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
             return tokenLiveOffset > expirationTime;
-        } catch (BaseServiceException e) {
-            Log.d("AppSession", "BaseServiceException: " + e.getMessage());
-            // nothing by default
-        }
-        return false;
     }
 
     public static AppSession getSession() {

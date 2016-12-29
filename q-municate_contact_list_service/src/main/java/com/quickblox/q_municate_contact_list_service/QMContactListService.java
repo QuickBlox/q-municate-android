@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBContactList;
 import com.quickblox.chat.QBRoster;
@@ -13,7 +14,6 @@ import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBContactEntry;
 import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
-import com.quickblox.core.QBSettings;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_base_service.QMBaseService;
 import com.quickblox.q_municate_contact_list_service.cache.QMContactListCache;

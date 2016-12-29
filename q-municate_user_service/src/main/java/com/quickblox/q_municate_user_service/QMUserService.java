@@ -134,6 +134,15 @@ public class QMUserService extends QMBaseService {
         return result;
     }
 
+    public QBUser updateUserEntity(final QBUser user) throws QBResponseException {
+        QBUser result = null;
+
+        result = QBUsers.updateUser(user).perform();
+        userCache.update(result);
+
+        return result;
+    }
+
     public Observable<Void> deleteUser(final int userId){
         Observable<Void> result = null;
 

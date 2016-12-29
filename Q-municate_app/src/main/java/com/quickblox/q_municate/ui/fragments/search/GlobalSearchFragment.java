@@ -76,7 +76,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     private DataManager dataManager;
     private Observer commonObserver;
     private GlobalSearchAdapter globalSearchAdapter;
-    private List<User> usersList;
+    private List<QBUser> usersList;
     private String searchQuery;
     private boolean excludedMe;
 
@@ -183,7 +183,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         swipyRefreshLayout.setEnabled(false);
     }
 
-    private void initContactsList(List<User> usersList) {
+    private void initContactsList(List<QBUser> usersList) {
         globalSearchAdapter = new GlobalSearchAdapter(baseActivity, usersList);
         globalSearchAdapter.setFriendListHelper(friendListHelper);
         contactsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -193,15 +193,15 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     }
 
     private void initCustomListeners() {
-        globalSearchAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+        globalSearchAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QBUser>() {
 
             @Override
-            public void onItemClicked(View view, User user, int position) {
-                boolean isFriend = dataManager.getFriendDataManager().existsByUserId(user.getUserId());
+            public void onItemClicked(View view, QBUser user, int position) {
+                boolean isFriend = dataManager.getFriendDataManager().existsByUserId(user.getId());
                 boolean outgoingUser = dataManager.getUserRequestDataManager()
-                        .existsByUserId(user.getUserId());
+                        .existsByUserId(user.getId());
                 if (isFriend || outgoingUser) {
-                    UserProfileActivity.start(baseActivity, user.getUserId());
+                    UserProfileActivity.start(baseActivity, user.getId());
                 }
             }
         });
@@ -213,7 +213,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         globalSearchAdapter.setList(usersList);
     }
 
-    private void updateContactsList(List<User> usersList) {
+    private void updateContactsList(List<QBUser> usersList) {
         this.usersList = usersList;
         globalSearchAdapter.setList(usersList);
         globalSearchAdapter.setFilter(searchQuery);
@@ -288,17 +288,17 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
                 @Override
                 public void onNext(List<QBUser> qbUsers) {
 
-                    List<User> usersList = new ArrayList<User>(qbUsers.size());
-                    User user = null;
-                    for (QBUser qbUser : qbUsers){
-                        user = UserFriendUtils.createLocalUser(qbUser);
-                        usersList.add(user);
-                    }
+//                    List<User> usersList = new ArrayList<User>(qbUsers.size());
+//                    User user = null;
+//                    for (QBUser qbUser : qbUsers){
+//                        user = UserFriendUtils.createLocalUser(qbUser);
+//                        usersList.add(user);
+//                    }
 
                     if (qbUsers != null && !qbUsers.isEmpty()) {
-                        checkForExcludeMe(usersList);
+                        checkForExcludeMe(qbUsers);
 
-                        usersList.addAll(usersList);
+                        usersList.addAll(qbUsers);
 
                         updateContactsList(usersList);
                     }
@@ -336,29 +336,29 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     }
 
     private void parseResult(Bundle bundle) {
-        String searchQuery = bundle.getString(QBServiceConsts.EXTRA_CONSTRAINT);
-        totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-
-        if (excludedMe) {
-            totalEntries--;
-        }
-
-        if (GlobalSearchFragment.this.searchQuery.equals(searchQuery)) {
-            Collection<User> newUsersCollection = (Collection<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
-            if (newUsersCollection != null && !newUsersCollection.isEmpty()) {
-                checkForExcludeMe(newUsersCollection);
-
-                usersList.addAll(newUsersCollection);
-
-                updateContactsList(usersList);
-            }
-        } else {
-            search(GlobalSearchFragment.this.searchQuery);
-        }
+//        String searchQuery = bundle.getString(QBServiceConsts.EXTRA_CONSTRAINT);
+//        totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+//
+//        if (excludedMe) {
+//            totalEntries--;
+//        }
+//
+//        if (GlobalSearchFragment.this.searchQuery.equals(searchQuery)) {
+//            Collection<User> newUsersCollection = (Collection<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
+//            if (newUsersCollection != null && !newUsersCollection.isEmpty()) {
+//                checkForExcludeMe(newUsersCollection);
+//
+//                usersList.addAll(newUsersCollection);
+//
+//                updateContactsList(usersList);
+//            }
+//        } else {
+//            search(GlobalSearchFragment.this.searchQuery);
+//        }
     }
 
-    private void checkForExcludeMe(Collection<User> usersCollection) {
-        User me = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+    private void checkForExcludeMe(Collection<QBUser> usersCollection) {
+        QBUser me = AppSession.getSession().getUser();
         if (usersCollection.contains(me)) {
             usersCollection.remove(me);
             excludedMe = true;

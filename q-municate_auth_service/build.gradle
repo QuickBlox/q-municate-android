@@ -22,14 +22,13 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
     //compile 'com.quickblox:quickblox-android-sdk-core:3.0'
-    compile project(":quickblox-android-sdk-core" )
+    compile project(':quickblox-android-sdk-core')
     compile project(path: ':q-municate_base_service')
-    compile project(path: ':Q-municate_core')
 }

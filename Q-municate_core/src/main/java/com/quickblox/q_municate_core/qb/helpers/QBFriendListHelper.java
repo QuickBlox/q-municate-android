@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -38,6 +39,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -60,12 +65,20 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private Timer userLoadingTimer;
     private List<Integer> userLoadingIdsList;
 
+    //ThreadPoolExecutor
+    //
+    private static final int THREAD_POOL_SIZE = 3;
+    private static final int KEEP_ALIVE_TIME = 1;
+    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
+    private ThreadPoolExecutor threadPoolExecutor;
+
     public QBFriendListHelper(Context context) {
         super(context);
     }
 
     public void init(QBPrivateChatHelper privateChatHelper) {
         this.privateChatHelper = privateChatHelper;
+        initThreads();
         restHelper = new QBRestHelper(context);
         dataManager = DataManager.getInstance();
         roster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual,
@@ -73,6 +86,12 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
         userLoadingTimer = new Timer();
+    }
+
+    private void initThreads() {
+        BlockingQueue<Runnable> threadQueue = new LinkedBlockingQueue<>();
+        threadPoolExecutor = new ThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, threadQueue);
+        threadPoolExecutor.allowCoreThreadTimeOut(true);
     }
 
     public void inviteFriend(int userId) throws Exception {
@@ -376,12 +395,17 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private class RosterListener implements QBRosterListener {
 
         @Override
-        public void entriesDeleted(Collection<Integer> userIdsList) {
-            try {
-                deleteFriends(userIdsList);
-            } catch (QBResponseException e) {
-                Log.e(TAG, ENTRIES_DELETED_ERROR, e);
-            }
+        public void entriesDeleted(final Collection<Integer> userIdsList) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        deleteFriends(userIdsList);
+                    } catch (QBResponseException e) {
+                        Log.e(TAG, ENTRIES_DELETED_ERROR, e);
+                    }
+                }
+            });
         }
 
         @Override
@@ -389,12 +413,18 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         }
 
         @Override
-        public void entriesUpdated(Collection<Integer> idsList) {
-            try {
-                updateUsersAndFriends(idsList);
-            } catch (QBResponseException e) {
-                Log.e(TAG, ENTRIES_UPDATING_ERROR, e);
-            }
+        public void entriesUpdated(final Collection<Integer> idsList) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        updateUsersAndFriends(idsList);
+                    } catch (QBResponseException e) {
+                        Log.e(TAG, ENTRIES_UPDATING_ERROR, e);
+                    }
+                }
+            });
+
         }
 
         @Override

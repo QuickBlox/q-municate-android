@@ -39,4 +39,5 @@ dependencies {
         force = true
     }
     compile project(path: ':q-municate_user_service')
+    compile project(path: ':q-municate_auth_service')
 }
