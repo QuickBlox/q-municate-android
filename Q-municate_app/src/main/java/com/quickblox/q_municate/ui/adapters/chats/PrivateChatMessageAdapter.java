@@ -286,10 +286,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         TextView timeTextMessageTextView;
 
         @Nullable
-        @Bind(R.id.time_attach_message_textview)
-        TextView timeAttachMessageTextView;
-
-        @Nullable
         @Bind(R.id.accept_friend_imagebutton)
         ImageView acceptFriendImageView;
 

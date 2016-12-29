@@ -12,7 +12,6 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
-import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;

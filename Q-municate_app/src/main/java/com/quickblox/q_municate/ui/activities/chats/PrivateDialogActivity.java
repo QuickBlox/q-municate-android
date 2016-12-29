@@ -16,7 +16,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
-import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
@@ -35,7 +34,6 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
