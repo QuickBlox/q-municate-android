@@ -252,7 +252,7 @@
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogin. This email has already been taken</string>
     <string name="error_unauthorized">Unauthorized</string>
     <string name="error_unauthorized_from_app">Incorrect Email or Password</string>
-    <string name="dlg_choose_image_from">Select image from…</string>
+    <string name="dlg_choose_image_from">Select attach</string>
     <string name="snackbar_new_message_title">%1$s\nMessage: %2$s</string>
     <string name="snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
     <string name="facebook_exception">Facebook exception: </string>
@@ -299,7 +299,8 @@
 
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
-        <item>Camera</item>
+        <item>Take photo</item>
+        <item>Share Location</item>
     </string-array>
 
 </resources>

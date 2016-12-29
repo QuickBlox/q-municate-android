@@ -2,27 +2,31 @@ package com.quickblox.q_municate.ui.fragments.imagepicker;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
+import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 
 public class ImageSourcePickDialogFragment extends DialogFragment {
 
     private static final int POSITION_GALLERY = 0;
     private static final int POSITION_CAMERA = 1;
+    private static final int POSITION_LOCATION = 2;
 
-    private OnImageSourcePickedListener onImageSourcePickedListener;
+    private OnAttachSourcePickedListener onAttachSourcePickedListener;
 
-    public static void show(FragmentManager fragmentManager, OnImageSourcePickedListener onImageSourcePickedListener) {
+    public static void show(FragmentManager fragmentManager, OnAttachSourcePickedListener onAttachSourcePickedListener) {
         ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
-        fragment.setOnImageSourcePickedListener(onImageSourcePickedListener);
+        fragment.setOnAttachSourcePickedListener(onAttachSourcePickedListener);
         fragment.show(fragmentManager, ImageSourcePickDialogFragment.class.getSimpleName());
     }
 
@@ -37,10 +41,14 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     CharSequence charSequence) {
                 switch (i) {
                     case POSITION_GALLERY:
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                        onAttachSourcePickedListener.onAttachSourcePicked(AttachSource.GALLERY);
                         break;
                     case POSITION_CAMERA:
-                        onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                        onAttachSourcePickedListener.onAttachSourcePicked(AttachSource.CAMERA);
+                        break;
+                    case POSITION_LOCATION:
+                        Log.d("ImageSourcePick","POSITION_LOCATION");
+                        onAttachSourcePickedListener.onAttachSourcePicked(AttachSource.LOCATION);
                         break;
                 }
             }
@@ -52,35 +60,36 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         return dialog;
     }
 
-    public void setOnImageSourcePickedListener(OnImageSourcePickedListener onImageSourcePickedListener) {
-        this.onImageSourcePickedListener = onImageSourcePickedListener;
+    public void setOnAttachSourcePickedListener(OnAttachSourcePickedListener onAttachSourcePickedListener) {
+        this.onAttachSourcePickedListener = onAttachSourcePickedListener;
     }
 
-    public static enum ImageSource {
+    public enum AttachSource {
         GALLERY,
-        CAMERA
+        CAMERA,
+        LOCATION
     }
 
-    public static interface OnImageSourcePickedListener {
+    public interface OnAttachSourcePickedListener {
 
-        void onImageSourcePicked(ImageSource source);
+        void onAttachSourcePicked(AttachSource source);
     }
 
-    public static class LoggableActivityImageSourcePickedListener implements OnImageSourcePickedListener {
+    public static class LoggableActivityAttachSourcePickedListener implements OnAttachSourcePickedListener {
 
         private Activity activity;
         private Fragment fragment;
 
-        public LoggableActivityImageSourcePickedListener(Activity activity) {
+        public LoggableActivityAttachSourcePickedListener(Activity activity) {
             this.activity = activity;
         }
 
-        public LoggableActivityImageSourcePickedListener(Fragment fragment) {
+        public LoggableActivityAttachSourcePickedListener(Fragment fragment) {
             this.fragment = fragment;
         }
 
         @Override
-        public void onImageSourcePicked(ImageSource source) {
+        public void onAttachSourcePicked(AttachSource source) {
             switch (source) {
                 case GALLERY:
                     if (fragment != null) {
@@ -102,6 +111,12 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                         ImageUtils.startCameraForResult(activity);
                     }
                     break;
+                case LOCATION:
+                    if (fragment != null) {
+                        Log.d("ImageSourcePick","START DIALOG");
+                        Intent intent = new Intent(fragment.getContext(), MapsActivity.class);
+                        fragment.getContext().startActivity(intent);
+                    }
             }
         }
 

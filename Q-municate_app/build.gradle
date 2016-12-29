@@ -101,6 +101,7 @@ dependencies {
 
     compile "com.google.android.gms:play-services-base:${rootProject.googlePlayServicesVersion}"
     compile "com.google.android.gms:play-services-gcm:${rootProject.googlePlayServicesVersion}"
+    compile "com.google.android.gms:play-services-maps:${rootProject.googlePlayServicesVersion}"
     compile "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"

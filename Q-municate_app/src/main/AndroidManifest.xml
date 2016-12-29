@@ -151,6 +151,8 @@
         <activity
             android:name=".ui.activities.others.PreviewImageActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.activities.location.MapsActivity"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -193,6 +195,10 @@
         <service
             android:name="com.quickblox.q_municate_core.service.QBService"
             android:icon="@drawable/ic_launcher" />
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyD7UdDsB1Gv-9KOP_Phl7B_qwkXIFwuJH8" />
 
     </application>
 

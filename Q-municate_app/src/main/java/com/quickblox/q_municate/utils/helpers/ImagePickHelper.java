@@ -23,6 +23,6 @@ public class ImagePickHelper {
 
     private void showImageSourcePickerDialog(FragmentManager fm, ImagePickHelperFragment fragment) {
         ImageSourcePickDialogFragment.show(fm,
-                new ImageSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(fragment));
+                new ImageSourcePickDialogFragment.LoggableActivityAttachSourcePickedListener(fragment));
     }
 }
