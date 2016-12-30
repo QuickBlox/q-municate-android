@@ -252,7 +252,7 @@
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogin. This email has already been taken</string>
     <string name="error_unauthorized">Unauthorized</string>
     <string name="error_unauthorized_from_app">Incorrect Email or Password</string>
-    <string name="dlg_choose_image_from">Select attach</string>
+    <string name="dlg_choose_image_from">Select image from…</string>
     <string name="snackbar_new_message_title">%1$s\nMessage: %2$s</string>
     <string name="snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
     <string name="facebook_exception">Facebook exception: </string>
@@ -281,6 +281,7 @@
     <string name="permission_unavailable">%s is not available now!</string>
     <string name="permissions_unavailable">%s are not available now!</string>
     <string name="error_cant_delete_chat">Sorry, chat can\'t be deleted. Please try later</string>
+    <string name="send_location">Send location</string>
 
     <plurals name="days">
         <item quantity="one">%1$d day</item>
@@ -299,8 +300,7 @@
 
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
-        <item>Take photo</item>
-        <item>Share Location</item>
+        <item>Camera</item>
     </string-array>
 
 </resources>

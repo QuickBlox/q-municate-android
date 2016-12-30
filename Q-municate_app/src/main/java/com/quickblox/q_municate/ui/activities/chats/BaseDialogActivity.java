@@ -28,6 +28,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
@@ -67,6 +68,7 @@ import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -75,6 +77,7 @@ import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 import butterknife.OnTextChanged;
 import butterknife.OnTouch;
 
@@ -86,6 +89,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final int TYPING_DELAY = 1000;
     private static final int DELAY_SCROLLING_LIST = 300;
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
+    private static final int REQUEST_CODE_LOCATION = 765;
 
     @Bind(R.id.messages_swiperefreshlayout)
     SwipeRefreshLayout messageSwipeRefreshLayout;
@@ -185,6 +189,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         } else {
             showPermissionSettingsDialog();
         }
+    }
+
+    @OnLongClick(R.id.attach_button)
+    boolean attachLocation(View view) {
+        Log.d("attachLocation", "START MapsActivity");
+        MapsActivity.startForResult(this, REQUEST_CODE_LOCATION);
+        return true;
     }
 
     @Override
@@ -291,6 +302,19 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
 
         startLoadDialogMessages();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_CODE_LOCATION) {
+                if (data != null) {
+                    ArrayList<Double> listDouble = (ArrayList<Double>) data.getSerializableExtra(MapsActivity.EXTRA_LOCATION);
+                    Log.d(TAG, "listDouble= "+ listDouble);
+                }
+            }
+        }
     }
 
     private void initFields() {
@@ -427,7 +451,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void checkPermissionSaveFiles() {
         boolean permissionSaveFileWasRequested = appSharedHelper.isPermissionsSaveFileWasRequested();
-        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested){
+        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested) {
             systemPermissionHelper.requestPermissionsForSaveFile();
             appSharedHelper.savePermissionsSaveFileWasRequested(true);
         }
@@ -682,155 +706,155 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void checkMessageSendingPossibility();
 
-    public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
+public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
 
-        private String dialogId;
+    private String dialogId;
 
-        public CombinationMessageLoader(Context context, DataManager dataManager, String dialogId) {
-            super(context, dataManager);
-            this.dialogId = dialogId;
-        }
-
-        @Override
-        protected List<CombinationMessage> getItems() {
-            return createCombinationMessagesList();
-        }
-
-        private List<CombinationMessage> createCombinationMessagesList() {
-            List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
-            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                    .getDialogNotificationsByDialogId(dialogId);
-            return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-        }
+    public CombinationMessageLoader(Context context, DataManager dataManager, String dialogId) {
+        super(context, dataManager);
+        this.dialogId = dialogId;
     }
 
-    private class MessageObserver implements Observer {
-
-        @Override
-        public void update(Observable observable, Object data) {
-            Log.d("Fix double message", "MessageObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
-                updateMessagesList();
-            }
-        }
+    @Override
+    protected List<CombinationMessage> getItems() {
+        return createCombinationMessagesList();
     }
 
-    private class DialogNotificationObserver implements Observer {
+    private List<CombinationMessage> createCombinationMessagesList() {
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
+        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                .getDialogNotificationsByDialogId(dialogId);
+        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+    }
+}
 
-        @Override
-        public void update(Observable observable, Object data) {
-            Log.d("Fix double message", "DialogNotificationObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            if (data != null && data.equals(DialogNotificationDataManager.OBSERVE_KEY)) {
-                updateMessagesList();
-            }
+private class MessageObserver implements Observer {
+
+    @Override
+    public void update(Observable observable, Object data) {
+        Log.d("Fix double message", "MessageObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
+        if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
+            updateMessagesList();
         }
     }
+}
 
-    private class DialogObserver implements Observer {
+private class DialogNotificationObserver implements Observer {
 
-        @Override
-        public void update(Observable observable, Object data) {
-            Log.d("Fix double message", "DialogObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            if (data != null && data.equals(DialogDataManager.OBSERVE_KEY) && dialog != null) {
-                dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
-                updateActionBar();
-            }
+    @Override
+    public void update(Observable observable, Object data) {
+        Log.d("Fix double message", "DialogNotificationObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
+        if (data != null && data.equals(DialogNotificationDataManager.OBSERVE_KEY)) {
+            updateMessagesList();
         }
     }
+}
 
-    private class TypingTimerTask extends TimerTask {
+private class DialogObserver implements Observer {
 
-        @Override
-        public void run() {
-            isTypingNow = false;
-            sendTypingStatus();
+    @Override
+    public void update(Observable observable, Object data) {
+        Log.d("Fix double message", "DialogObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
+        if (data != null && data.equals(DialogDataManager.OBSERVE_KEY) && dialog != null) {
+            dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
+            updateActionBar();
         }
     }
+}
 
-    public class LoadAttachFileSuccessAction implements Command {
+private class TypingTimerTask extends TimerTask {
 
-        @Override
-        public void execute(Bundle bundle) {
-            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-            onFileLoaded(file, dialogId);
-            hideProgress();
-        }
+    @Override
+    public void run() {
+        isTypingNow = false;
+        sendTypingStatus();
     }
+}
 
-    public class LoadDialogMessagesSuccessAction implements Command {
+public class LoadAttachFileSuccessAction implements Command {
 
-        @Override
-        public void execute(Bundle bundle) {
-            messageSwipeRefreshLayout.setRefreshing(false);
-            int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
-
-
-            if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
-                scrollMessagesToBottom();
-            }
-
-            loadMore = false;
-
-            hideActionBarProgress();
-        }
+    @Override
+    public void execute(Bundle bundle) {
+        QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
+        String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
+        onFileLoaded(file, dialogId);
+        hideProgress();
     }
+}
 
-    public class LoadDialogMessagesFailAction implements Command {
+public class LoadDialogMessagesSuccessAction implements Command {
 
-        @Override
-        public void execute(Bundle bundle) {
-            messageSwipeRefreshLayout.setRefreshing(false);
+    @Override
+    public void execute(Bundle bundle) {
+        messageSwipeRefreshLayout.setRefreshing(false);
+        int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
 
-            loadMore = false;
 
-            hideActionBarProgress();
+        if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
+            scrollMessagesToBottom();
         }
+
+        loadMore = false;
+
+        hideActionBarProgress();
     }
+}
 
-    private class TypingStatusBroadcastReceiver extends BroadcastReceiver {
+public class LoadDialogMessagesFailAction implements Command {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-            int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-            // TODO: now it is possible only for Private chats
-            if (dialog != null && opponentUser != null && userId == opponentUser.getUserId()) {
-                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-                    boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
-                    if (isTyping) {
-                        showTypingStatus();
-                    } else {
-                        hideTypingStatus();
-                    }
+    @Override
+    public void execute(Bundle bundle) {
+        messageSwipeRefreshLayout.setRefreshing(false);
+
+        loadMore = false;
+
+        hideActionBarProgress();
+    }
+}
+
+private class TypingStatusBroadcastReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Bundle extras = intent.getExtras();
+        int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
+        // TODO: now it is possible only for Private chats
+        if (dialog != null && opponentUser != null && userId == opponentUser.getUserId()) {
+            if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+                boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+                if (isTyping) {
+                    showTypingStatus();
+                } else {
+                    hideTypingStatus();
                 }
             }
         }
     }
+}
 
-    private class UpdatingDialogBroadcastReceiver extends BroadcastReceiver {
+private class UpdatingDialogBroadcastReceiver extends BroadcastReceiver {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
-                updateData();
-            }
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
+            updateData();
         }
     }
+}
 
-    private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListener {
+private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListener {
 
-        @Override
-        public void onRefresh() {
-            if (!isNetworkAvailable()) {
-                messageSwipeRefreshLayout.setRefreshing(false);
-                return;
-            }
+    @Override
+    public void onRefresh() {
+        if (!isNetworkAvailable()) {
+            messageSwipeRefreshLayout.setRefreshing(false);
+            return;
+        }
 
-            if (!loadMore) {
-                loadMore = true;
-                startLoadDialogMessages();
-            }
+        if (!loadMore) {
+            loadMore = true;
+            startLoadDialogMessages();
         }
     }
+}
 }

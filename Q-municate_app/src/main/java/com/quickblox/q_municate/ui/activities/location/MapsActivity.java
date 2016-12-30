@@ -1,10 +1,13 @@
 package com.quickblox.q_municate.ui.activities.location;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,20 +18,27 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import com.quickblox.q_municate.R;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements LocationListener, OnMapReadyCallback {
     private static final String TAG = MapsActivity.class.getSimpleName();
+    public static final String EXTRA_LOCATION = "qb_locations";
 
     private GoogleMap googleMap;
-    private Location lastLocation;
+    private LatLng lastPosition = new LatLng(50, 36);
     private Marker myMarker;
+
+    public static void startForResult(Activity activity, int code) {
+        Intent intent = new Intent(activity, MapsActivity.class);
+        activity.startActivityForResult(intent, code);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_map);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -66,6 +76,15 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
     }
 
+    private void sendLocation(LatLng position) {
+        ArrayList<Double> location = new ArrayList<>(2);
+        location.add(position.latitude);
+        location.add(position.longitude);
+        Intent result = new Intent();
+        result.putExtra(EXTRA_LOCATION, location);
+        setResult(RESULT_OK, result);
+    }
+
 
     private void setUpMapIfNeeded(GoogleMap googleMapUpdated) {
         if (googleMap == null) {
@@ -74,7 +93,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                 Log.d(TAG, "setup googleMap");
                 googleMap.setMyLocationEnabled(true);
                 googleMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(50, 36))
+                        .position(lastPosition)
                         .title("Marker")
                         .draggable(true)
                         .snippet("Hello")
@@ -85,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                     @Override
                     public boolean onMarkerClick(Marker marker) {
 
-
+                        Log.d(TAG,  "onMarkerClick" );
                         return false;
                     }
                 });
@@ -105,11 +124,21 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
                         LatLng position = marker.getPosition();
+                        lastPosition = position;
                         Log.d(TAG,  "onMarkerDragEnd Lat " + position.latitude + ", Long " + position.longitude);
                     }
                 });
 
             }
+        }
+    }
+    public void onClickSendLocation(View view) {
+        switch (view.getId()) {
+            case R.id.check_in_button:
+                sendLocation(lastPosition);
+                Log.d(TAG,  "onClickSendLocation Lat " + lastPosition.latitude + ", Long " + lastPosition.longitude);
+                finish();
+                break;
         }
     }
 }
