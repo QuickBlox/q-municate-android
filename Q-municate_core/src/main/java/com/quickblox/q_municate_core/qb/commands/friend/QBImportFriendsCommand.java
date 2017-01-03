@@ -50,11 +50,11 @@ public class QBImportFriendsCommand extends ServiceCommand {
 
         if (!friendsFacebookList.isEmpty()) {
             realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder,
-                    params);
+                    params).perform();
         }
 
         if (!friendsContactsList.isEmpty()) {
-            realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params);
+            realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params).perform();
         }
 
         List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList,

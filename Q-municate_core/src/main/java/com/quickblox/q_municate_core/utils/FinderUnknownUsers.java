@@ -2,7 +2,7 @@ package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -18,19 +18,19 @@ import java.util.Set;
 public class FinderUnknownUsers {
 
     private Context context;
-    private QBDialog dialog;
-    private List<QBDialog> dialogsList;
+    private QBChatDialog dialog;
+    private List<QBChatDialog> dialogsList;
     private Set<Integer> loadIdsSet;
     private QBUser currentUser;
     private QBRestHelper restHelper;
     private DataManager dataManager;
 
-    public FinderUnknownUsers(Context context, QBUser currentUser, List<QBDialog> dialogsList) {
+    public FinderUnknownUsers(Context context, QBUser currentUser, List<QBChatDialog> dialogsList) {
         init(context, currentUser);
         this.dialogsList = dialogsList;
     }
 
-    public FinderUnknownUsers(Context context, QBUser currentUser, QBDialog dialog) {
+    public FinderUnknownUsers(Context context, QBUser currentUser, QBChatDialog dialog) {
         init(context, currentUser);
         this.dialog = dialog;
     }
@@ -51,8 +51,8 @@ public class FinderUnknownUsers {
         }
     }
 
-    private void findUserInDialogsList(List<QBDialog> dialogsList) {
-        for (QBDialog dialog : dialogsList) {
+    private void findUserInDialogsList(List<QBChatDialog> dialogsList) {
+        for (QBChatDialog dialog : dialogsList) {
             findUserInDialog(dialog);
         }
         if (!loadIdsSet.isEmpty()) {
@@ -78,7 +78,7 @@ public class FinderUnknownUsers {
         }
     }
 
-    private void findUserInDialog(QBDialog dialog) {
+    private void findUserInDialog(QBChatDialog dialog) {
         List<Integer> occupantsList = dialog.getOccupants();
         for (int occupantId : occupantsList) {
             boolean isUserInBase = dataManager.getUserDataManager().exists(occupantId);

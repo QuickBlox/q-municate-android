@@ -4,11 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.core.QBSettings;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -98,7 +98,7 @@ public class ChatUtils {
         return TextUtils.join(OCCUPANT_IDS_DIVIDER, occupantIdsList);
     }
 
-    public static QBDialog getExistPrivateDialog(DataManager dataManager, int opponentId) {
+    public static QBChatDialog getExistPrivateDialog(DataManager dataManager, int opponentId) {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantForPrivateChat(opponentId);
 
@@ -115,7 +115,7 @@ public class ChatUtils {
 
         if (user == null) {
             try {
-                QBUser qbUser = QBUsers.getUser(userId);
+                QBUser qbUser = QBUsers.getUser(userId).perform();
                 user = UserFriendUtils.createLocalUser(qbUser);
                 dataManager.getUserDataManager().createOrUpdate(user);
             } catch (QBResponseException e) {
@@ -146,9 +146,9 @@ public class ChatUtils {
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
     }
 
-    public static List<ParcelableQBDialog> qbDialogsToParcelableQBDialogs(List<QBDialog> dialogList){
+    public static List<ParcelableQBDialog> qbDialogsToParcelableQBDialogs(List<QBChatDialog> dialogList){
         List<ParcelableQBDialog> parcelableDialogList = new ArrayList<ParcelableQBDialog>(dialogList.size());
-        for (QBDialog dialog : dialogList) {
+        for (QBChatDialog dialog : dialogList) {
             ParcelableQBDialog parcelableQBDialog = new ParcelableQBDialog(dialog);
             parcelableDialogList.add(parcelableQBDialog);
         }
@@ -156,10 +156,10 @@ public class ChatUtils {
     }
 
 
-    public static List<QBDialog> parcelableQBDialogsToQBDialogs(List<ParcelableQBDialog> parcelableQBDialogsList){
-        List<QBDialog> qbDialogsList = new ArrayList<QBDialog>(parcelableQBDialogsList.size());
+    public static List<QBChatDialog> parcelableQBDialogsToQBDialogs(List<ParcelableQBDialog> parcelableQBDialogsList){
+        List<QBChatDialog> qbDialogsList = new ArrayList<QBChatDialog>(parcelableQBDialogsList.size());
         for (ParcelableQBDialog parcelableQBDialog : parcelableQBDialogsList) {
-            QBDialog qbDialog = parcelableQBDialog.getDialog();
+            QBChatDialog qbDialog = parcelableQBDialog.getDialog();
             qbDialogsList.add(qbDialog);
         }
         return qbDialogsList;
@@ -175,7 +175,7 @@ public class ChatUtils {
         return new User();
     }
 
-    public static Dialog createLocalDialog(QBDialog qbDialog) {
+    public static Dialog createLocalDialog(QBChatDialog qbDialog) {
         Dialog dialog = new Dialog();
         dialog.setDialogId(qbDialog.getDialogId());
         dialog.setRoomJid(qbDialog.getRoomJid());
@@ -195,10 +195,10 @@ public class ChatUtils {
         return dialog;
     }
 
-    public static List<Dialog> createLocalDialogsList(List<QBDialog> qbDialogsList) {
+    public static List<Dialog> createLocalDialogsList(List<QBChatDialog> qbDialogsList) {
         List<Dialog> dialogsList = new ArrayList<>(qbDialogsList.size());
 
-        for (QBDialog qbDialog : qbDialogsList) {
+        for (QBChatDialog qbDialog : qbDialogsList) {
             dialogsList.add(createLocalDialog(qbDialog));
         }
 
@@ -215,10 +215,10 @@ public class ChatUtils {
     }
 
     public static List<Message> createTempLocalMessagesList(DataManager dataManager,
-            List<QBDialog> qbDialogsList, QBDialog currentDialog) {
+            List<QBChatDialog> qbDialogsList, QBChatDialog currentDialog) {
         List<Message> messagesList = new ArrayList<>();
 
-        for (QBDialog qbDialog : qbDialogsList) {
+        for (QBChatDialog qbDialog : qbDialogsList) {
             // dialog is opened
             Log.d("Fix double message", "currentDialog = " + currentDialog);
             if (currentDialog != null && qbDialog.getDialogId().equals(currentDialog.getDialogId())) {
@@ -278,8 +278,8 @@ public class ChatUtils {
         return message;
     }
 
-    public static List<QBDialog> createQBDialogsListFromDialogsList(DataManager dataManager, List<Dialog> dialogsList) {
-        List<QBDialog> qbDialogsList = new ArrayList<>(dialogsList.size());
+    public static List<QBChatDialog> createQBDialogsListFromDialogsList(DataManager dataManager, List<Dialog> dialogsList) {
+        List<QBChatDialog> qbDialogsList = new ArrayList<>(dialogsList.size());
 
         for (Dialog dialog : dialogsList) {
             qbDialogsList.add(createQBDialogFromLocalDialog(dataManager, dialog));
@@ -288,7 +288,7 @@ public class ChatUtils {
         return qbDialogsList;
     }
 
-    public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBDialog qbDialog, boolean onlyNewOccupant) {
+    public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBChatDialog qbDialog, boolean onlyNewOccupant) {
         List<DialogOccupant> dialogOccupantsList = new ArrayList<>(qbDialog.getOccupants().size());
 
         for (Integer userId : qbDialog.getOccupants()) {
@@ -337,22 +337,22 @@ public class ChatUtils {
         return idsList;
     }
 
-    public static QBDialog createQBDialogFromLocalDialog(DataManager dataManager, Dialog dialog) {
+    public static QBChatDialog createQBDialogFromLocalDialog(DataManager dataManager, Dialog dialog) {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        QBDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
+        QBChatDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
         return qbDialog;
     }
 
-    public static QBDialog createQBDialogFromLocalDialogWithoutLeaved(DataManager dataManager, Dialog dialog) {
+    public static QBChatDialog createQBDialogFromLocalDialogWithoutLeaved(DataManager dataManager, Dialog dialog) {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getActualDialogOccupantsByDialog(dialog.getDialogId());
-        QBDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
+        QBChatDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
         return qbDialog;
     }
 
-    private static QBDialog createQBDialogFromLocalDialog(Dialog dialog, List<DialogOccupant> dialogOccupantsList) {
-        QBDialog qbDialog = new QBDialog();
+    private static QBChatDialog createQBDialogFromLocalDialog(Dialog dialog, List<DialogOccupant> dialogOccupantsList) {
+        QBChatDialog qbDialog = new QBChatDialog();
         qbDialog.setDialogId(dialog.getDialogId());
         qbDialog.setRoomJid(dialog.getRoomJid());
         qbDialog.setPhoto(dialog.getPhoto());
@@ -641,7 +641,7 @@ public class ChatUtils {
         return dialogOccupant;
     }
 
-    public static void addOccupantsToQBDialog(QBDialog qbDialog, QBChatMessage qbChatMessage) {
+    public static void addOccupantsToQBDialog(QBChatDialog qbDialog, QBChatMessage qbChatMessage) {
         qbDialog.setOccupantsIds(new ArrayList<Integer>(2));
         qbDialog.getOccupants().add(qbChatMessage.getSenderId());
         qbDialog.getOccupants().add(qbChatMessage.getRecipientId());
