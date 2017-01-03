@@ -105,18 +105,18 @@ public class GroupDialogActivity extends BaseDialogActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
-            return;
-        }
-
-        try {
-            ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
-        } catch (QBResponseException e) {
-            ErrorUtils.showError(this, e);
-        }
-    }
+//    @Override
+//    protected void onFileLoaded(QBFile file, String dialogId) {
+//        if(!dialogId.equals(dialog.getDialogId())){
+//            return;
+//        }
+//
+//        try {
+//            ((QBGroupChatHelper) chatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
+//        } catch (QBResponseException e) {
+//            ErrorUtils.showError(this, e);
+//        }
+//    }
 
     @Override
     protected Bundle generateBundleToInitDialog() {

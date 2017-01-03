@@ -121,7 +121,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private synchronized void sendNotificationToFriend(QBChatMessage qbChatMessage, int userId) throws QBResponseException {
         QBChatDialog qbDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
         if (qbDialog != null) {
-            privateChatHelper.sendPrivateMessage(qbChatMessage, userId, qbDialog.getDialogId());
+            privateChatHelper.sendChatMessage(qbChatMessage, userId, qbDialog.getDialogId());
         }
     }
 

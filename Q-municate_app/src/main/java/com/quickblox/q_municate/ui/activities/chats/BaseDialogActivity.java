@@ -10,7 +10,6 @@ import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -45,8 +44,6 @@ import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogMessagesCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -110,7 +107,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected ImageUtils imageUtils;
     protected BaseRecyclerViewAdapter messagesAdapter;
     protected User opponentUser;
-    protected QBBaseChatHelper baseChatHelper;
+    protected QBBaseChatHelper chatHelper;
     protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
     protected ImagePickHelper imagePickHelper;
@@ -493,7 +490,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void sendTypingStatus() {
-        baseChatHelper.sendTypingStatusToServer(opponentUser.getUserId(), isTypingNow);
+        chatHelper.sendTypingStatusToServer(opponentUser.getUserId(), isTypingNow);
     }
 
     private void setSmilePanelIcon(int resourceId) {
@@ -528,13 +525,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void sendMessage(boolean privateMessage) {
         boolean error = false;
         try {
-            if (privateMessage) {
-                ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(
-                        messageEditText.getText().toString(), opponentUser.getUserId());
-            } else {
-                ((QBGroupChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
-                        messageEditText.getText().toString());
-            }
+//            if (privateMessage) {
+//                ((QBPrivateChatHelper) chatHelper).sendChatMessage(
+//                        messageEditText.getText().toString(), opponentUser.getUserId());
+//            } else {
+//                ((QBGroupChatHelper) chatHelper).sendGroupMessage(dialog.getRoomJid(),
+//                        messageEditText.getText().toString());
+//            }
+            chatHelper.sendChatMessage(messageEditText.getText().toString(), ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog));
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
             error = true;
@@ -598,11 +596,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private void createChatLocally() {
         if (isNetworkAvailable()) {
             if (service != null) {
-                baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
-                Log.d("Fix double message", "baseChatHelper = " + baseChatHelper + "\n dialog = " + dialog);
-                if (baseChatHelper != null && dialog != null) {
+                chatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
+                Log.d("Fix double message", "chatHelper = " + chatHelper + "\n dialog = " + dialog);
+                if (chatHelper != null && dialog != null) {
                     try {
-                        baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+                        chatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
                                 generateBundleToInitDialog());
                     } catch (QBResponseException e) {
                         ErrorUtils.showError(this, e.getMessage());
@@ -616,8 +614,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void closeChatLocally() {
-        if (baseChatHelper != null && dialog != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+        if (chatHelper != null && dialog != null) {
+            chatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
                     generateBundleToInitDialog());
         }
         dialog = null;
@@ -677,7 +675,17 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void updateMessagesList();
 
-    protected abstract void onFileLoaded(QBFile file, String dialogId);
+    protected void onFileLoaded(QBFile file, String dialogId){
+        if(!dialogId.equals(dialog.getDialogId())){
+            return;
+        }
+
+        try {
+            chatHelper.sendMessageWithAttachImage(file, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog));
+        } catch (QBResponseException exc) {
+            ErrorUtils.showError(this, exc);
+        }
+    }
 
     protected abstract void checkMessageSendingPossibility();
 

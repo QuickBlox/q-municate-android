@@ -2,10 +2,8 @@ package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.quickblox.chat.QBChat;
-import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -44,9 +42,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     @Override
-    public synchronized QBPrivateChat createChatLocally(QBChatDialog dialog, Bundle additional) throws QBResponseException {
-        Log.d("Fix double message", "createChatLocally from " + QBPrivateChatHelper.class.getSimpleName());
-        Log.d("Fix double message", "dialog = " + dialog);
+    public synchronized QBChatDialog createChatLocally(QBChatDialog dialog, Bundle additional) throws QBResponseException {
         currentDialog = dialog;
         int opponentId = additional.getInt(QBServiceConsts.EXTRA_OPPONENT_ID);
         return createPrivateChatIfNotExist(opponentId);
@@ -54,27 +50,9 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
     @Override
     public synchronized void closeChat(QBChatDialog qbDialog, Bundle additional) {
-        Log.d("Fix double message", "closeChat " + QBPrivateChatHelper.class.getSimpleName());
         if (currentDialog != null && currentDialog.getDialogId().equals(qbDialog.getDialogId())) {
             currentDialog = null;
         }
-    }
-
-    public void sendPrivateMessage(String message, int userId) throws QBResponseException {
-        sendPrivateMessage(null, message, userId);
-    }
-
-    public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QBResponseException {
-        sendPrivateMessage(file, context.getString(R.string.dlg_attached_last_message), userId);
-    }
-
-    private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
-        QBChatMessage qbChatMessage = getQBChatMessage(message, file);
-        String dialogId = null;
-        if (currentDialog != null) {
-            dialogId = currentDialog.getDialogId();
-        }
-        sendPrivateMessage(qbChatMessage, userId, dialogId);
     }
 
     public void onPrivateMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {

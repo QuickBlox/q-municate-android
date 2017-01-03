@@ -123,18 +123,18 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         setOnlineStatus(opponentUser);
     }
 
-    @Override
-    protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
-            return;
-        }
-
-        try {
-            privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
-        } catch (QBResponseException exc) {
-            ErrorUtils.showError(this, exc);
-        }
-    }
+//    @Override
+//    protected void onFileLoaded(QBFile file, String dialogId) {
+//        if(!dialogId.equals(dialog.getDialogId())){
+//            return;
+//        }
+//
+//        try {
+//            privateChatHelper.sendMessageWithAttachImage(file, opponentUser.getUserId());
+//        } catch (QBResponseException exc) {
+//            ErrorUtils.showError(this, exc);
+//        }
+//    }
 
     @Override
     protected Bundle generateBundleToInitDialog() {

@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.quickblox.chat.JIDHelper;
 import com.quickblox.chat.QBChat;
-import com.quickblox.chat.QBGroupChat;
+//import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.exception.QBChatException;
-import com.quickblox.chat.listeners.QBParticipantListener;
+//import com.quickblox.chat.listeners.QBParticipantListener;
+import com.quickblox.chat.listeners.QBChatDialogParticipantListener;
 import com.quickblox.chat.listeners.QBSystemMessageListener;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
@@ -19,7 +21,6 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.helper.StringUtils;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
@@ -52,7 +53,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     private static final String TAG = QBGroupChatHelper.class.getSimpleName();
 
-    private QBParticipantListener participantListener;
+    private QBChatDialogParticipantListener participantListener;
     private List<QBChatDialog> groupDialogsList;
 
     public QBGroupChatHelper(Context context) {
@@ -66,7 +67,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     @Override
-    public synchronized QBChat createChatLocally(QBChatDialog dialog, Bundle additional) throws QBResponseException {
+    public synchronized QBChatDialog createChatLocally(QBChatDialog dialog, Bundle additional) throws QBResponseException {
         Log.d("Fix double message", "createChatLocally from " + QBGroupChatHelper.class.getSimpleName());
         Log.d("Fix double message", "dialog = " + dialog);
         currentDialog = dialog;
@@ -100,8 +101,10 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             }
         }
 
+        //TODO need remove for not own messages
         DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, State.DELIVERED, true);
         DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
+        //TODO end
 
         checkForSendingNotification(ownMessage, qbChatMessage, user, false);
     }
@@ -387,12 +390,12 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
-    private class ParticipantListener implements QBParticipantListener {
+    private class ParticipantListener implements QBChatDialogParticipantListener {
 
         @Override
-        public void processPresence(QBGroupChat groupChat, QBPresence presence) {
+        public void processPresence(String dialogId, QBPresence presence) {
             boolean validData = currentDialog != null && presence.getUserId() != null;
-            if (validData && currentDialog.getRoomJid().equals(groupChat.getJid())) {
+            if (validData && currentDialog.getRoomJid().equals(JIDHelper.INSTANCE.getRoomJidByDialogId(dialogId))) {
                 notifyUpdatingDialogDetails(presence.getUserId(), QBPresence.Type.online.equals(presence.getType()));
             }
         }
