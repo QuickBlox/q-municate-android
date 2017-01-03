@@ -1,7 +1,6 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
-import android.os.Bundle;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
@@ -10,7 +9,6 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.QMUserService;
-import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.Collection;
@@ -26,7 +24,7 @@ public class QBRestHelper extends BaseHelper {
 
         try {
             //QBUser user = QBUsers. getUser(userId).perform();
-            QBUser user = QMUserService.getInstance().getUserEntity(userId, true);
+            QBUser user = QMUserService.getInstance().getUserSync(userId, true);
             resultUser = UserFriendUtils.createLocalUser(user);
         } catch (QBResponseException e) {
             // user not found
@@ -41,7 +39,7 @@ public class QBRestHelper extends BaseHelper {
 
         try {
             //QBUser user = QBUsers.getUser(userId).perform();
-            QBUser user = QMUserService.getInstance().getUserEntity(userId, true);
+            QBUser user = QMUserService.getInstance().getUserSync(userId, true);
             resultUser = UserFriendUtils.createLocalUser(user);
         } catch (QBResponseException e) {
             // user not found
@@ -58,7 +56,7 @@ public class QBRestHelper extends BaseHelper {
         requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
         requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
         //Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle()).perform();
-        Collection<QBUser> usersList = QMUserService.getInstance().getUsersByIDsList(usersIdsList, requestBuilder);
+        Collection<QBUser> usersList = QMUserService.getInstance().getUsersByIDsSync(usersIdsList, requestBuilder);
         Collection<User> usersListResult = UserFriendUtils.createUsersList(usersList);
         return usersListResult;
     }

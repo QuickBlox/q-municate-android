@@ -1,21 +1,16 @@
 package com.quickblox.q_municate_user_service;
 
 
-import com.quickblox.core.PerformProcessor;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.core.request.QBRequestBuilder;
 import com.quickblox.core.server.Performer;
 import com.quickblox.extensions.RxJavaPerformProcessor;
 import com.quickblox.q_municate_base_service.QMBaseService;
-import com.quickblox.q_municate_base_service.QMServiceManagerListener;
 import com.quickblox.q_municate_user_service.cache.QMUserCache;
 import com.quickblox.q_municate_user_service.cache.QMUserMemoryCache;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.users.query.QueryGetUsers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +51,10 @@ public class QMUserService extends QMBaseService {
     protected void serviceWillStart() {
     }
 
+    public QMUserCache getUserCache() {
+        return userCache;
+    }
+
     public Observable<QBUser> getUser(final int userId){
         return getUser(userId, true);
     }
@@ -64,8 +63,8 @@ public class QMUserService extends QMBaseService {
         return  getUserByColumn(QMUserColumns.ID, String.valueOf(userId), forceLoad);
     }
 
-    public QBUser getUserEntity(final int userId, boolean forceLoad) throws QBResponseException {
-        return  getUserByColumnEntity(QMUserColumns.ID, String.valueOf(userId), forceLoad);
+    public QBUser getUserSync(final int userId, boolean forceLoad) throws QBResponseException {
+        return  getUserByColumnSync(QMUserColumns.ID, String.valueOf(userId), forceLoad);
     }
 
     public Observable<QBUser> getUserByLogin(final String login){
@@ -134,7 +133,7 @@ public class QMUserService extends QMBaseService {
         return result;
     }
 
-    public QBUser updateUserEntity(final QBUser user) throws QBResponseException {
+    public QBUser updateUserSync(final QBUser user) throws QBResponseException {
         QBUser result = null;
 
         result = QBUsers.updateUser(user).perform();
@@ -197,8 +196,8 @@ public class QMUserService extends QMBaseService {
         return  getUsersByIDs(usersIds, requestBuilder, true);
     }
 
-    public  List<QBUser> getUsersByIDsList(final Collection<Integer> usersIds, final QBPagedRequestBuilder requestBuilder) throws QBResponseException {
-        return getUsersByIDsList(usersIds,requestBuilder, true);
+    public  List<QBUser> getUsersByIDsSync(final Collection<Integer> usersIds, final QBPagedRequestBuilder requestBuilder) throws QBResponseException {
+        return getUsersByIDsSync(usersIds,requestBuilder, true);
     }
 
 //    public Performer<ArrayList<QBUser>> getUsersByIDsPerformer(final Collection<Integer> usersIds, final QBPagedRequestBuilder requestBuilder){
@@ -233,12 +232,12 @@ public class QMUserService extends QMBaseService {
         return result;
     }
 
-    public  List<QBUser> getUsersByIDsList(final Collection<Integer> usersIds, final QBPagedRequestBuilder requestBuilder, boolean forceLoad) throws QBResponseException {
+    public  List<QBUser> getUsersByIDsSync(final Collection<Integer> usersIds, final QBPagedRequestBuilder requestBuilder, boolean forceLoad) throws QBResponseException {
         List<QBUser> result = null;
 
         if (!forceLoad) {
             List<QBUser> qbUsers = userCache.getUsersByIDs(usersIds);
-            return qbUsers.size() == 0 ? getUsersByIDsList(usersIds, requestBuilder, true) : qbUsers;
+            return qbUsers.size() == 0 ? getUsersByIDsSync(usersIds, requestBuilder, true) : qbUsers;
         }
 
         result = QBUsers.getUsersByIDs(usersIds, requestBuilder).perform();
@@ -294,12 +293,12 @@ public class QMUserService extends QMBaseService {
 //
 //      }
 
-    public List<QBUser> getUsersByFacebookIdList(final Collection<String> usersFacebookIds, final QBPagedRequestBuilder requestBuilder,  boolean forceLoad) throws QBResponseException {
-        return getUsersByColumnList(QMUserColumns.FACEBOOK_ID, usersFacebookIds, requestBuilder, forceLoad);
+    public List<QBUser> getUsersByFacebookIdSync(final Collection<String> usersFacebookIds, final QBPagedRequestBuilder requestBuilder, boolean forceLoad) throws QBResponseException {
+        return getUsersByColumnSync(QMUserColumns.FACEBOOK_ID, usersFacebookIds, requestBuilder, forceLoad);
     }
 
-    public List<QBUser>  getUsersByEmailsList(final Collection<String> usersEmails, final QBPagedRequestBuilder requestBuilder, boolean forceLoad) throws QBResponseException {
-        return getUsersByColumnList(QMUserColumns.EMAIL, usersEmails, requestBuilder, forceLoad);
+    public List<QBUser> getUsersByEmailsSync(final Collection<String> usersEmails, final QBPagedRequestBuilder requestBuilder, boolean forceLoad) throws QBResponseException {
+        return getUsersByColumnSync(QMUserColumns.EMAIL, usersEmails, requestBuilder, forceLoad);
     }
 
 
@@ -392,12 +391,12 @@ public class QMUserService extends QMBaseService {
         return result;
     }
 
-    private QBUser getUserByColumnEntity(final String column, final String value,  boolean forceLoad) throws QBResponseException {
+    private QBUser getUserByColumnSync(final String column, final String value, boolean forceLoad) throws QBResponseException {
         QBUser result = null;
 
         if (!forceLoad) {
            QBUser qbUser = userCache.getUserByColumn(column, value);
-           return  qbUser == null ? getUserByColumnEntity(column, value, true) : qbUser;
+           return  qbUser == null ? getUserByColumnSync(column, value, true) : qbUser;
         }
 
         result = getUserByColumnFromServer(column,value).perform();
@@ -462,12 +461,12 @@ public class QMUserService extends QMBaseService {
     }
 
 
-    public List<QBUser>  getUsersByColumnList(final String column, final Collection<String> values, final QBPagedRequestBuilder requestBuilder,  boolean forceLoad) throws QBResponseException {
+    public List<QBUser> getUsersByColumnSync(final String column, final Collection<String> values, final QBPagedRequestBuilder requestBuilder, boolean forceLoad) throws QBResponseException {
         List<QBUser> result = null;
 
         if (!forceLoad) {
                     List<QBUser> qbUsers = userCache.getByColumn(column, values);
-                    return  qbUsers.size() == 0 ? getUsersByColumnList(column, values, requestBuilder, true):qbUsers;
+                    return  qbUsers.size() == 0 ? getUsersByColumnSync(column, values, requestBuilder, true):qbUsers;
         }
 
         result = getUsersByColumnFromServer(column, values, requestBuilder).perform();

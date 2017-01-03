@@ -159,7 +159,7 @@ public class QBAuthHelper extends BaseHelper {
         inputUser.setOldPassword(null);
 
         //user = QBUsers.updateUser(inputUser).perform();
-        user = QMUserService.getInstance().updateUserEntity(inputUser);
+        user = QMUserService.getInstance().updateUserSync(inputUser);
 
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             user.setPassword(password);
@@ -219,7 +219,7 @@ public class QBAuthHelper extends BaseHelper {
         QBUser user;
         String password = inputUser.getPassword();
         //user =  QBUsers.updateUser(inputUser).perform();
-        user = QMUserService.getInstance().updateUserEntity(inputUser);
+        user = QMUserService.getInstance().updateUserSync(inputUser);
         user.setPassword(password);
 
         return user;

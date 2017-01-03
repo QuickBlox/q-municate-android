@@ -2,7 +2,6 @@ package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -43,9 +42,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class QBFriendListHelper extends BaseHelper implements Serializable {
 
@@ -219,7 +215,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
         Log.d("TAG", "updateFriends  - begin");
 
-        List<QBUser> qbUsers = QMUserService.getInstance().getUsersByIDsList(friendIdsList, new QBPagedRequestBuilder());
+        List<QBUser> qbUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, new QBPagedRequestBuilder());
         List<User> usersList = new ArrayList<User>(qbUsers.size());
         User user = null;
         for (QBUser qbUser : qbUsers){
