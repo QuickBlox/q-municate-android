@@ -137,6 +137,19 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     @Override
+    protected void onLocationLoaded(String url, String dialogId) {
+        if(!dialogId.equals(dialog.getDialogId())){
+            return;
+        }
+
+        try {
+            privateChatHelper.sendPrivateMessageWithAttachLocation(url, opponentUser.getUserId());
+        } catch (QBResponseException exc) {
+            ErrorUtils.showError(this, exc);
+        }
+    }
+
+    @Override
     protected Bundle generateBundleToInitDialog() {
         Bundle bundle = new Bundle();
         bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentUser.getUserId());

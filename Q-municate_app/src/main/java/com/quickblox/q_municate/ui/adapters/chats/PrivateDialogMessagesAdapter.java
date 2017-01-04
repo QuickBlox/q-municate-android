@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -12,6 +13,7 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.State;
@@ -91,6 +93,10 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                         combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }
 
+            if(combinationMessage.getAttachment().getType() == Attachment.Type.LOCATION){
+                Log.d("PrivateAdapter", "Attachment.Type.LOCATION");
+                displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
+            }
             displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
         } else {
             resetUI(viewHolder);

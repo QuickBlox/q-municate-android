@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -116,6 +117,11 @@ public class GroupDialogActivity extends BaseDialogActivity {
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }
+    }
+
+    @Override
+    protected void onLocationLoaded(String url, String dialogId) {
+        Log.d("GroupDialogActivity", "url= " + url);
     }
 
     @Override

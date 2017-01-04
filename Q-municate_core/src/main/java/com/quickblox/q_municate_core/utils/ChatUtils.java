@@ -48,6 +48,10 @@ public class ChatUtils {
         return ConstsCore.EMPTY_STRING;
     }
 
+    public static final String getLocationPath(ArrayList<Double> locations){
+        return MapUtils.generateMapStaticURL(locations.get(0), locations.get(1));
+    }
+
     public static String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = ConstsCore.EMPTY_STRING;
         Collection<QBAttachment> attachmentCollection = chatMessage.getAttachments();

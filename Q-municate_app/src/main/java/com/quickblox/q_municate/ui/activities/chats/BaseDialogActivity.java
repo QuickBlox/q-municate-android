@@ -310,8 +310,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CODE_LOCATION) {
                 if (data != null) {
-                    ArrayList<Double> listDouble = (ArrayList<Double>) data.getSerializableExtra(MapsActivity.EXTRA_LOCATION);
-                    Log.d(TAG, "listDouble= "+ listDouble);
+                    ArrayList<Double> locationsList = (ArrayList<Double>) data.getSerializableExtra(MapsActivity.EXTRA_LOCATION);
+                    Log.d(TAG, "listDouble= "+ locationsList);
+                    String locationURL = ChatUtils.getLocationPath(locationsList);
+                    onLocationLoaded(locationURL, dialog.getDialogId());
                 }
             }
         }
@@ -703,6 +705,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected abstract void updateMessagesList();
 
     protected abstract void onFileLoaded(QBFile file, String dialogId);
+
+    protected abstract void onLocationLoaded(String url, String dialogId);
 
     protected abstract void checkMessageSendingPossibility();
 

@@ -49,6 +49,7 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -196,13 +197,16 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         DbUtils.deleteDialogLocal(dataManager, dialogId);
     }
 
-    protected QBChatMessage getQBChatMessage(String body, QBFile qbFile) {
+    protected QBChatMessage getQBChatMessage(String body, QBFile qbFile, String url) {
         long time = DateUtilsCore.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
 
         if (qbFile != null) {
             QBAttachment attachment = getAttachment(qbFile);
+            chatMessage.addAttachment(attachment);
+        } else if(url != null){
+            QBAttachment attachment = getAttachment(url);
             chatMessage.addAttachment(attachment);
         }
 
@@ -223,6 +227,16 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         attachment.setContentType(contentType);
         attachment.setUrl(file.getPublicUrl());
         attachment.setSize(file.getSize());
+
+        return attachment;
+    }
+
+    private QBAttachment getAttachment(String url) {
+        String contentType = "image/jpeg";
+
+        QBAttachment attachment = new QBAttachment(QBAttachment.URL_KEY);
+        attachment.setContentType(contentType);
+        attachment.setUrl(url);
 
         return attachment;
     }
@@ -344,12 +358,22 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         if (qbChatMessage.getAttachments()!= null && !qbChatMessage.getAttachments().isEmpty()) {
             Attachment attachment = new Attachment();
-            attachment.setType(Attachment.Type.PICTURE);
+            if(getAttachmentType(qbChatMessage.getAttachments()).equals(QBAttachment.URL_KEY)){
+                Log.d("QBBaseChatHelper", "attachment.setType(Attachment.Type.LOCATION)");
+                attachment.setType(Attachment.Type.LOCATION);
+            } else {
+                attachment.setType(Attachment.Type.PICTURE);
+            }
             attachment.setRemoteUrl(attachUrl);
             message.setAttachment(attachment);
         }
 
         return message;
+    }
+
+    private String getAttachmentType(Collection<QBAttachment> attachments){
+        QBAttachment attachment = attachments.iterator().next();
+        return attachment.getType();
     }
 
     public void updateStatusNotificationMessageRead(String dialogId, CombinationMessage combinationMessage) throws Exception {

@@ -49,6 +49,7 @@ import butterknife.Bind;
 public abstract class BaseDialogMessagesAdapter
         extends BaseRecyclerViewAdapter<CombinationMessage, BaseClickListenerViewHolder<CombinationMessage>> implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
 
+    private static final String mapStaticPath = "https://maps.googleapis.com/maps/api/staticmap?&zoom=15&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C50.014394,%2036.229572&key=AIzaSyC68nhqEWQaXQJqr422kpimzR7XuJuRndg";
     protected static final int TYPE_REQUEST_MESSAGE = 0;
     protected static final int TYPE_OWN_MESSAGE = 1;
     protected static final int TYPE_OPPONENT_MESSAGE = 2;
@@ -70,6 +71,8 @@ public abstract class BaseDialogMessagesAdapter
         fileUtils = new FileUtils();
         currentUser = AppSession.getSession().getUser();
     }
+//https://maps.googleapis.com/maps/api/staticmap?&amp;zoom=15&amp;size=600x300&amp;maptype=roadmap&amp;markers=color:blue%7Clabel:S%7C50.014394,%2036.229572&amp;key=AIzaSyC68nhqEWQaXQJqr422kpimzR7XuJuRnd
+//https://maps.googleapis.com/maps/api/staticmap?&zoom=15&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C50.014394,%2036.229572&key=AIzaSyC68nhqEWQaXQJqr422kpimzR7XuJuRndg";
 
     @Override
     public long getHeaderId(int position) {
