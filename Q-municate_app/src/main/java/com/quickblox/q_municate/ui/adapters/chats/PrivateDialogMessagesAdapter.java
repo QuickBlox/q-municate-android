@@ -57,6 +57,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     @Override
     public void onBindViewHolder(BaseClickListenerViewHolder<CombinationMessage> baseClickListenerViewHolder, int position) {
         CombinationMessage combinationMessage = getItem(position);
+        Log.d("PrivateAdapterZZ", "combinationMessage= " + combinationMessage);
         boolean ownMessage = !combinationMessage.isIncoming(currentUser.getId());
 
         ViewHolder viewHolder = (ViewHolder) baseClickListenerViewHolder;
@@ -92,12 +93,13 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 setMessageStatus(viewHolder.attachDeliveryStatusImageView, State.DELIVERED.equals(
                         combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }
-
+            Log.d("PrivateAdapterZZ", "combinationMessage.getAttachment().getType()" + combinationMessage.getAttachment().getType());
             if(combinationMessage.getAttachment().getType() == Attachment.Type.LOCATION){
-                Log.d("PrivateAdapter", "Attachment.Type.LOCATION");
+                Log.d("PrivateAdapterZZ", "Attachment.Type.LOCATION");
                 displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
+            } else {
+                displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
             }
-            displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
         } else {
             resetUI(viewHolder);
 

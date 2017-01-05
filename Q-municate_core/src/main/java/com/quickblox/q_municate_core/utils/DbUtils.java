@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
@@ -137,7 +138,7 @@ public class DbUtils {
                         qbChatMessage.getAttachments());
                 Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0));
                 message.setAttachment(attachment);
-
+                Log.d("DbUtilsZZ", "saveMessageOrNotificationToCache Attachment= " + attachment);
                 dataManager.getAttachmentDataManager().createOrUpdate(attachment, notify);
             }
 

@@ -115,6 +115,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public void sendPrivateMessage(QBChatMessage qbChatMessage, int opponentId, String dialogId) throws QBResponseException {
+        Log.d("QBBaseChatHelperZZ", "sendPrivateMessage qbChatMessage getAttachments= " + qbChatMessage.getAttachments());
         addNecessaryPropertyForQBChatMessage(qbChatMessage, dialogId);
 
         sendPrivateMessage(qbChatMessage, opponentId);
@@ -131,6 +132,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         String error = null;
         try {
             if (privateChat != null) {
+                Log.d("QBBaseChatHelperZZ", "privateChat.sendMessage qbChatMessage getAttachments= " + qbChatMessage.getAttachments());
                 privateChat.sendMessage(qbChatMessage);
             }
         } catch (SmackException.NotConnectedException e) {
@@ -172,8 +174,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
-                                                        Bundle returnedBundle, QBDialog qbDialog,
-                                                        long lastDateLoad) throws QBResponseException {
+                                                 Bundle returnedBundle, QBDialog qbDialog,
+                                                 long lastDateLoad) throws QBResponseException {
         List<QBChatMessage> qbMessagesList = QBChatService.getDialogMessages(qbDialog,
                 customObjectRequestBuilder, returnedBundle);
 
@@ -205,7 +207,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         if (qbFile != null) {
             QBAttachment attachment = getAttachment(qbFile);
             chatMessage.addAttachment(attachment);
-        } else if(url != null){
+        } else if (url != null) {
             QBAttachment attachment = getAttachment(url);
             chatMessage.addAttachment(attachment);
         }
@@ -233,15 +235,16 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     private QBAttachment getAttachment(String url) {
         String contentType = "image/jpeg";
-
+        Log.d("QBBaseChatHelperZZ", "getAttachment URL_KEY");
         QBAttachment attachment = new QBAttachment(QBAttachment.URL_KEY);
         attachment.setContentType(contentType);
         attachment.setUrl(url);
+        attachment.setId("15586");
 
         return attachment;
     }
 
-    public void sendTypingStatusToServer(int opponentId, boolean startTyping)  {
+    public void sendTypingStatusToServer(int opponentId, boolean startTyping) {
         try {
             QBPrivateChat privateChat = createPrivateChatIfNotExist(opponentId);
             if (startTyping) {
@@ -283,7 +286,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void checkForSendingNotification(boolean ownMessage, QBChatMessage qbChatMessage, User user,
-            boolean isPrivateChat) {
+                                               boolean isPrivateChat) {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         if (qbChatMessage.getId() == null || dialogId == null) {
             return;
@@ -303,7 +306,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     private void sendNotificationBroadcast(String action, QBChatMessage chatMessage, User user, String dialogId,
-            boolean isPrivateMessage) {
+                                           boolean isPrivateMessage) {
         Intent intent = new Intent(action);
         String messageBody = chatMessage.getBody();
         String extraChatMessage;
@@ -331,6 +334,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected Message parseReceivedMessage(QBChatMessage qbChatMessage) {
+        Log.d("QBBaseChatHelperZZ", "parseReceivedMessage");
         long dateSent = ChatUtils.getMessageDateSent(qbChatMessage);
         String attachUrl = ChatUtils.getAttachUrlIfExists(qbChatMessage);
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
@@ -356,10 +360,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         message.setDialogOccupant(dialogOccupant);
 
-        if (qbChatMessage.getAttachments()!= null && !qbChatMessage.getAttachments().isEmpty()) {
+        if (qbChatMessage.getAttachments() != null && !qbChatMessage.getAttachments().isEmpty()) {
             Attachment attachment = new Attachment();
-            if(getAttachmentType(qbChatMessage.getAttachments()).equals(QBAttachment.URL_KEY)){
-                Log.d("QBBaseChatHelper", "attachment.setType(Attachment.Type.LOCATION)");
+            if (getAttachmentType(qbChatMessage.getAttachments()).equals(QBAttachment.URL_KEY)) {
+                Log.d("QBBaseChatHelperZZ", "attachment.setType(Attachment.Type.LOCATION)");
                 attachment.setType(Attachment.Type.LOCATION);
             } else {
                 attachment.setType(Attachment.Type.PICTURE);
@@ -371,7 +375,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return message;
     }
 
-    private String getAttachmentType(Collection<QBAttachment> attachments){
+    private String getAttachmentType(Collection<QBAttachment> attachments) {
         QBAttachment attachment = attachments.iterator().next();
         return attachment.getType();
     }
@@ -382,13 +386,13 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public void updateStatusMessageRead(String dialogId, CombinationMessage combinationMessage,
-            boolean forPrivate) throws Exception {
+                                        boolean forPrivate) throws Exception {
         updateStatusMessageReadServer(dialogId, combinationMessage, forPrivate);
         DbUtils.updateStatusMessageLocal(dataManager, combinationMessage.toMessage());
     }
 
     public void updateStatusMessageReadServer(String dialogId, CombinationMessage combinationMessage,
-            boolean fromPrivate) throws Exception {
+                                              boolean fromPrivate) throws Exception {
         if (fromPrivate) {
             QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getUserId());
             if (privateChat != null) {

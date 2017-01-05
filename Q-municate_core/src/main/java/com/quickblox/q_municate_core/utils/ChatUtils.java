@@ -422,6 +422,7 @@ public class ChatUtils {
     }
 
     public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
+        Log.d("ChatUtilsZZ", "createLocalAttachment");
         Attachment attachment = new Attachment();
         attachment.setAttachmentId(qbAttachment.getId());
         attachment.setRemoteUrl(qbAttachment.getUrl());

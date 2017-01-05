@@ -19,10 +19,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends FragmentActivity implements LocationListener, OnMapReadyCallback {
+public class MapsActivity extends BaseLoggableActivity implements LocationListener, OnMapReadyCallback {
     private static final String TAG = MapsActivity.class.getSimpleName();
     public static final String EXTRA_LOCATION = "qb_locations";
 
@@ -36,9 +37,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_map;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
