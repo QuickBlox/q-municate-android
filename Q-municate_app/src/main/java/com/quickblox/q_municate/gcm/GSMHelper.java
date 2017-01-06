@@ -37,7 +37,7 @@ public class GSMHelper {
     }
 
     public void registerInBackground() {
-        new QBGCMRegistrationTask(activity).execute(googleCloudMessaging);
+//        new QBGCMRegistrationTask(activity).execute(googleCloudMessaging);
     }
 
     public boolean isDeviceRegisteredWithUser() {
