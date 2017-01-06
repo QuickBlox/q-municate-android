@@ -53,6 +53,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
+import com.quickblox.q_municate_core.utils.MapUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
@@ -310,10 +311,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CODE_LOCATION) {
                 if (data != null) {
-                    ArrayList<Double> locationsList = (ArrayList<Double>) data.getSerializableExtra(MapsActivity.EXTRA_LOCATION);
-                    Log.d(TAG, "listDouble= "+ locationsList);
-                    String locationURL = ChatUtils.getLocationPath(locationsList);
-                    onLocationLoaded(locationURL, dialog.getDialogId());
+                    Bundle extras = data.getExtras();
+                    double latitude = extras.getDouble(MapsActivity.EXTRA_LOCATION_LATITUDE);
+                    double longitude = extras.getDouble(MapsActivity.EXTRA_LOCATION_LONGITUDE);
+                    Log.d(TAG, "listDouble= "+ latitude + ", " + longitude);
+                    String locationURL = MapUtils.generateMapStaticURL(latitude, longitude);
+                    Log.d(TAG, "locationURL= "+ locationURL);
+//                    onLocationLoaded(locationURL, dialog.getDialogId());
                 }
             }
         }

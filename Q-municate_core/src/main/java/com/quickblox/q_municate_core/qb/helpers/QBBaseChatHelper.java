@@ -235,11 +235,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     private QBAttachment getAttachment(String url) {
         String contentType = "image/jpeg";
-        Log.d("QBBaseChatHelperZZ", "getAttachment URL_KEY");
-        QBAttachment attachment = new QBAttachment(QBAttachment.URL_KEY);
+        QBAttachment attachment = new QBAttachment(Attachment.Type.LOCATION.toString().toLowerCase());
         attachment.setContentType(contentType);
         attachment.setUrl(url);
-        attachment.setId("15586");
+        attachment.setId(String.valueOf(url.hashCode()));
 
         return attachment;
     }
@@ -362,8 +361,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         if (qbChatMessage.getAttachments() != null && !qbChatMessage.getAttachments().isEmpty()) {
             Attachment attachment = new Attachment();
-            if (getAttachmentType(qbChatMessage.getAttachments()).equals(QBAttachment.URL_KEY)) {
-                Log.d("QBBaseChatHelperZZ", "attachment.setType(Attachment.Type.LOCATION)");
+            if (getAttachmentType(qbChatMessage.getAttachments()).equalsIgnoreCase(Attachment.Type.LOCATION.toString())) {
                 attachment.setType(Attachment.Type.LOCATION);
             } else {
                 attachment.setType(Attachment.Type.PICTURE);

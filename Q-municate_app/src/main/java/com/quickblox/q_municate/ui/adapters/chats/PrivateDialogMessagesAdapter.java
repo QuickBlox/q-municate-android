@@ -1,15 +1,14 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
-import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
+import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -57,7 +56,6 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     @Override
     public void onBindViewHolder(BaseClickListenerViewHolder<CombinationMessage> baseClickListenerViewHolder, int position) {
         CombinationMessage combinationMessage = getItem(position);
-        Log.d("PrivateAdapterZZ", "combinationMessage= " + combinationMessage);
         boolean ownMessage = !combinationMessage.isIncoming(currentUser.getId());
 
         ViewHolder viewHolder = (ViewHolder) baseClickListenerViewHolder;
@@ -93,9 +91,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 setMessageStatus(viewHolder.attachDeliveryStatusImageView, State.DELIVERED.equals(
                         combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }
-            Log.d("PrivateAdapterZZ", "combinationMessage.getAttachment().getType()" + combinationMessage.getAttachment().getType());
-            if(combinationMessage.getAttachment().getType() == Attachment.Type.LOCATION){
-                Log.d("PrivateAdapterZZ", "Attachment.Type.LOCATION");
+            if (combinationMessage.getAttachment().getType() == Attachment.Type.LOCATION) {
                 displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
             } else {
                 displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);

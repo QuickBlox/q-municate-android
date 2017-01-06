@@ -48,10 +48,6 @@ public class ChatUtils {
         return ConstsCore.EMPTY_STRING;
     }
 
-    public static final String getLocationPath(ArrayList<Double> locations){
-        return MapUtils.generateMapStaticURL(locations.get(0), locations.get(1));
-    }
-
     public static String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = ConstsCore.EMPTY_STRING;
         Collection<QBAttachment> attachmentCollection = chatMessage.getAttachments();
@@ -422,10 +418,14 @@ public class ChatUtils {
     }
 
     public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
-        Log.d("ChatUtilsZZ", "createLocalAttachment");
         Attachment attachment = new Attachment();
+        String remoteUrl = qbAttachment.getUrl();
+        if (qbAttachment.getType().equalsIgnoreCase(Attachment.Type.LOCATION.toString())) {
+            attachment.setType(Attachment.Type.LOCATION);
+            remoteUrl = remoteUrl.replaceAll("&amp;(?!&)", "&");
+        }
         attachment.setAttachmentId(qbAttachment.getId());
-        attachment.setRemoteUrl(qbAttachment.getUrl());
+        attachment.setRemoteUrl(remoteUrl);
         attachment.setName(qbAttachment.getName());
         attachment.setSize(qbAttachment.getSize());
         return attachment;

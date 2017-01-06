@@ -25,7 +25,8 @@ import java.util.ArrayList;
 
 public class MapsActivity extends BaseLoggableActivity implements LocationListener, OnMapReadyCallback {
     private static final String TAG = MapsActivity.class.getSimpleName();
-    public static final String EXTRA_LOCATION = "qb_locations";
+    public static final String EXTRA_LOCATION_LATITUDE = "location_latitude";
+    public static final String EXTRA_LOCATION_LONGITUDE = "location_longitude";
 
     private GoogleMap googleMap;
     private LatLng lastPosition = new LatLng(50, 36);
@@ -82,11 +83,12 @@ public class MapsActivity extends BaseLoggableActivity implements LocationListen
     }
 
     private void sendLocation(LatLng position) {
-        ArrayList<Double> location = new ArrayList<>(2);
-        location.add(position.latitude);
-        location.add(position.longitude);
+        Bundle extras = new Bundle();
+        extras.putDouble(EXTRA_LOCATION_LATITUDE, position.latitude);
+        extras.putDouble(EXTRA_LOCATION_LONGITUDE, position.longitude);
+
         Intent result = new Intent();
-        result.putExtra(EXTRA_LOCATION, location);
+        result.putExtras(extras);
         setResult(RESULT_OK, result);
     }
 
