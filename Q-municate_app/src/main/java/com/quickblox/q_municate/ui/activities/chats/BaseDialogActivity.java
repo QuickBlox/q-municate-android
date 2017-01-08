@@ -315,9 +315,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     double latitude = extras.getDouble(MapsActivity.EXTRA_LOCATION_LATITUDE);
                     double longitude = extras.getDouble(MapsActivity.EXTRA_LOCATION_LONGITUDE);
                     Log.d(TAG, "listDouble= "+ latitude + ", " + longitude);
-                    String locationURL = MapUtils.generateMapStaticURL(latitude, longitude);
+                    String locationURL = MapUtils.generateMapStaticURI(latitude, longitude);
                     Log.d(TAG, "locationURL= "+ locationURL);
-//                    onLocationLoaded(locationURL, dialog.getDialogId());
+                    onLocationLoaded(locationURL, dialog.getDialogId());
                 }
             }
         }
