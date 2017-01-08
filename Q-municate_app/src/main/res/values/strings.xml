@@ -301,6 +301,7 @@
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
         <item>Camera</item>
+        <item>Location</item>
     </string-array>
 
 </resources>

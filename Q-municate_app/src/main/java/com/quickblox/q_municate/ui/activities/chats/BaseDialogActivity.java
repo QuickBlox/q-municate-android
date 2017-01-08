@@ -4,13 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,19 +27,19 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.location.MapsActivity;
-import com.quickblox.q_municate.utils.DialogsUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
-import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
-import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
+import com.quickblox.q_municate.utils.DialogsUtils;
+import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -52,8 +51,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
-import com.quickblox.q_municate_core.utils.MapUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
@@ -69,7 +66,6 @@ import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -78,7 +74,6 @@ import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.OnClick;
-import butterknife.OnLongClick;
 import butterknife.OnTextChanged;
 import butterknife.OnTouch;
 
@@ -90,7 +85,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final int TYPING_DELAY = 1000;
     private static final int DELAY_SCROLLING_LIST = 300;
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
-    private static final int REQUEST_CODE_LOCATION = 765;
 
     @Bind(R.id.messages_swiperefreshlayout)
     SwipeRefreshLayout messageSwipeRefreshLayout;
@@ -186,17 +180,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
         if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
-            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_LOCATION_REQUEST_CODE);
         } else {
             showPermissionSettingsDialog();
         }
-    }
-
-    @OnLongClick(R.id.attach_button)
-    boolean attachLocation(View view) {
-        Log.d("attachLocation", "START MapsActivity");
-        MapsActivity.startForResult(this, REQUEST_CODE_LOCATION);
-        return true;
     }
 
     @Override
@@ -255,9 +242,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
+    public void onImagePicked(int requestCode, File file, String url) {
         canPerformLogout.set(true);
-        startLoadAttachFile(file, dialog.getDialogId());
+            startLoadAttachFile(file, url, dialog.getDialogId());
     }
 
     @Override
@@ -303,24 +290,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
 
         startLoadDialogMessages();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_CODE_LOCATION) {
-                if (data != null) {
-                    Bundle extras = data.getExtras();
-                    double latitude = extras.getDouble(MapsActivity.EXTRA_LOCATION_LATITUDE);
-                    double longitude = extras.getDouble(MapsActivity.EXTRA_LOCATION_LONGITUDE);
-                    Log.d(TAG, "listDouble= "+ latitude + ", " + longitude);
-                    String locationURL = MapUtils.generateMapStaticURI(latitude, longitude);
-                    Log.d(TAG, "locationURL= "+ locationURL);
-                    onLocationLoaded(locationURL, dialog.getDialogId());
-                }
-            }
-        }
     }
 
     private void initFields() {
@@ -480,14 +449,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
-    protected void startLoadAttachFile(final File file, final String dialogId) {
+    protected void startLoadAttachFile(final File file, final String url, final String dialogId) {
         TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        showProgress();
-                        QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
+                        if (url != null) {
+                            onLocationLoaded(url, dialogId);
+                        } else {
+                            showProgress();
+                            QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
+                        }
                     }
                 });
     }

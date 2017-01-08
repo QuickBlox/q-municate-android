@@ -8,9 +8,11 @@ public class MapUtils {
     private static final String SIZE = "600x300";
     private static final String MAPTYPE = "roadmap";
     private static final String COLOR = "blue";
-
     //api static map key should be generated in your developers google console
     private static final String KEY = "AIzaSyC68nhqEWQaXQJqr422kpimzR7XuJuRndg";
+
+    public static final String EXTRA_LOCATION_LATITUDE = "location_latitude";
+    public static final String EXTRA_LOCATION_LONGITUDE = "location_longitude";
 
     public static String generateMapStaticURI(double latitude, double longitude) {
         Uri.Builder builder = new Uri.Builder();

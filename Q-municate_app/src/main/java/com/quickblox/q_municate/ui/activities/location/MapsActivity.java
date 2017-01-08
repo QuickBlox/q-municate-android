@@ -20,22 +20,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
+import com.quickblox.q_municate_core.utils.MapUtils;
 
 import java.util.ArrayList;
 
 public class MapsActivity extends BaseLoggableActivity implements LocationListener, OnMapReadyCallback {
     private static final String TAG = MapsActivity.class.getSimpleName();
-    public static final String EXTRA_LOCATION_LATITUDE = "location_latitude";
-    public static final String EXTRA_LOCATION_LONGITUDE = "location_longitude";
 
     private GoogleMap googleMap;
     private LatLng lastPosition = new LatLng(50, 36);
     private Marker myMarker;
-
-    public static void startForResult(Activity activity, int code) {
-        Intent intent = new Intent(activity, MapsActivity.class);
-        activity.startActivityForResult(intent, code);
-    }
 
     @Override
     protected int getContentResId() {
@@ -84,8 +78,8 @@ public class MapsActivity extends BaseLoggableActivity implements LocationListen
 
     private void sendLocation(LatLng position) {
         Bundle extras = new Bundle();
-        extras.putDouble(EXTRA_LOCATION_LATITUDE, position.latitude);
-        extras.putDouble(EXTRA_LOCATION_LONGITUDE, position.longitude);
+        extras.putDouble(MapUtils.EXTRA_LOCATION_LATITUDE, position.latitude);
+        extras.putDouble(MapUtils.EXTRA_LOCATION_LONGITUDE, position.longitude);
 
         Intent result = new Intent();
         result.putExtras(extras);
