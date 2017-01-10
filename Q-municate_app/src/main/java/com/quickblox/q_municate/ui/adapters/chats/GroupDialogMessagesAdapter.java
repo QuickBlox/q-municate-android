@@ -12,6 +12,7 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.State;
 
@@ -79,7 +80,12 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             if (combinationMessage.getAttachment() != null) {
                 viewHolder.timeAttachMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
                 setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-                displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
+
+                if (combinationMessage.getAttachment().getType() == Attachment.Type.LOCATION) {
+                    displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
+                } else {
+                    displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
+                }
             } else {
                 setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
                 viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
