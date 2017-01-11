@@ -4,7 +4,7 @@ import com.quickblox.q_municate_base_cache.model.QMBaseColumns;
 
 public interface QMUserColumns extends QMBaseColumns{
 
-    String TABLE_NAME = "user";
+    String TABLE_NAME = "qb_user";
     String ID = "id";
     String FULL_NAME = "full_name";
     String EMAIL = "email";
@@ -21,4 +21,6 @@ public interface QMUserColumns extends QMBaseColumns{
     String PASSWORD = "password";
     String OLD_PASSWORD = "old_password";
     String CUSTOM_DATE = "custom_date";
+    String AVATAR = "avatar";
+    String STATUS = "status";
 }

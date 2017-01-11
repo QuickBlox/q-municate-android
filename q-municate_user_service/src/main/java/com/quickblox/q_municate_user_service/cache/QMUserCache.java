@@ -5,6 +5,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_base_cache.QMBaseCache;
 import com.quickblox.q_municate_base_cache.model.QMBaseColumns;
 import com.quickblox.q_municate_base_cache.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.sql.SQLException;
@@ -14,14 +15,14 @@ import java.util.List;
 
 import rx.Observable;
 
-public interface QMUserCache extends QMBaseCache<QBUser, Long> {
+public interface QMUserCache extends QMBaseCache<QMUser, Long> {
 
     void deleteUserByExternalId(String externalId);
 
-    List<QBUser> getUsersByIDs(Collection<Integer> idsList);
+    List<QMUser> getUsersByIDs(Collection<Integer> idsList);
 
-    QBUser getUserByColumn(String column, String value);
+    QMUser getUserByColumn(String column, String value);
 
-    List<QBUser> getUsersByFilter(Collection<?> filterValue, String filter);
+    List<QMUser> getUsersByFilter(Collection<?> filterValue, String filter);
 
 }

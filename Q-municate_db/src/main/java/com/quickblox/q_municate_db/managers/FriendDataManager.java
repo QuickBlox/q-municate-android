@@ -6,8 +6,10 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -17,9 +19,9 @@ public class FriendDataManager extends BaseManager<Friend> {
 
     private static final String TAG = FriendDataManager.class.getSimpleName();
 
-    private Dao<User, Long> userDao;
+    private Dao<QMUser, Long> userDao;
 
-    public FriendDataManager(Dao<Friend, Long> friendDao, Dao<User, Long> userDao) {
+    public FriendDataManager(Dao<Friend, Long> friendDao, Dao<QMUser, Long> userDao) {
         super(friendDao, FriendDataManager.class.getSimpleName());
         this.userDao = userDao;
     }
@@ -29,7 +31,7 @@ public class FriendDataManager extends BaseManager<Friend> {
 
         try {
             QueryBuilder<Friend, Long> queryBuilder = dao.queryBuilder();
-            queryBuilder.where().eq(User.Column.ID, userId);
+            queryBuilder.where().eq(QMUserColumns.ID, userId);
             PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
             friend = dao.queryForFirst(preparedQuery);
         } catch (SQLException e) {
@@ -44,7 +46,7 @@ public class FriendDataManager extends BaseManager<Friend> {
 
         try {
             QueryBuilder<Friend, Long> queryBuilder = dao.queryBuilder();
-            queryBuilder.where().in(User.Column.ID, idsList);
+            queryBuilder.where().in(QMUserColumns.ID, idsList);
             PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
             friendsList = dao.query(preparedQuery);
         } catch (SQLException e) {
@@ -57,7 +59,7 @@ public class FriendDataManager extends BaseManager<Friend> {
     public void deleteByUserId(int userId) {
         try {
             DeleteBuilder<Friend, Long> deleteBuilder = dao.deleteBuilder();
-            deleteBuilder.where().eq(User.Column.ID, userId);
+            deleteBuilder.where().eq(QMUserColumns.ID, userId);
             deleteBuilder.delete();
         } catch (SQLException e) {
             ErrorUtils.logError(e);
@@ -75,7 +77,7 @@ public class FriendDataManager extends BaseManager<Friend> {
 
         try {
             QueryBuilder<Friend, Long> queryBuilder = dao.queryBuilder();
-            queryBuilder.where().notIn(User.Column.ID, idsList);
+            queryBuilder.where().notIn(QMUserColumns.ID, idsList);
             PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
             friendsList = dao.query(preparedQuery);
         } catch (SQLException e) {
@@ -91,8 +93,8 @@ public class FriendDataManager extends BaseManager<Friend> {
         try {
             QueryBuilder<Friend, Long> friendQueryBuilder = dao.queryBuilder();
 
-            QueryBuilder<User, Long> userQueryBuilder = userDao.queryBuilder();
-            userQueryBuilder.orderByRaw(User.Column.FULL_NAME + " COLLATE NOCASE");
+            QueryBuilder<QMUser, Long> userQueryBuilder = userDao.queryBuilder();
+            userQueryBuilder.orderByRaw(QMUserColumns.FULL_NAME + " COLLATE NOCASE");
 
             friendQueryBuilder.join(userQueryBuilder);
 

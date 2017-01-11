@@ -24,8 +24,10 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -58,14 +60,14 @@ public class ChatUtils {
         return attachURL;
     }
 
-    public static String getSelectedFriendsFullNamesFromMap(List<User> usersList) {
+    public static String getSelectedFriendsFullNamesFromMap(List<QMUser> usersList) {
         if (usersList.isEmpty()) {
             return "";
         }
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (User user : usersList) {
+        for (QMUser user : usersList) {
             stringBuilder.append(user.getFullName()).append(OCCUPANT_IDS_DIVIDER).append(" ");
         }
 
@@ -112,16 +114,23 @@ public class ChatUtils {
     }
 
     public static String getFullNameById(DataManager dataManager, int userId) {
-        User user = dataManager.getUserDataManager().get(userId);
+//        QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
+//
+//        if (user == null) {
+//            try {
+//                QBUser qbUser = QBUsers.getUser(userId).perform();
+//                user = UserFriendUtils.createLocalUser(qbUser);
+//                dataManager.getUserDataManager().createOrUpdate(user);
+//            } catch (QBResponseException e) {
+//                ErrorUtils.logError(e);
+//            }
+//        }
 
-        if (user == null) {
-            try {
-                QBUser qbUser = QBUsers.getUser(userId).perform();
-                user = UserFriendUtils.createLocalUser(qbUser);
-                dataManager.getUserDataManager().createOrUpdate(user);
-            } catch (QBResponseException e) {
-                ErrorUtils.logError(e);
-            }
+        QMUser user = null;
+        try {
+            user = QMUserService.getInstance().getUserSync(userId, true);
+        } catch (QBResponseException e) {
+            user = null;
         }
 
         return user != null ? user.getFullName() : "";
@@ -166,14 +175,14 @@ public class ChatUtils {
         return qbDialogsList;
     }
 
-    public static User getOpponentFromPrivateDialog(User currentUser, List<DialogOccupant> occupantsList) {
+    public static QMUser getOpponentFromPrivateDialog(QMUser currentUser, List<DialogOccupant> occupantsList) {
         for (DialogOccupant dialogOccupant : occupantsList) {
             if (dialogOccupant != null && dialogOccupant.getUser() != null
-                    && currentUser.getUserId() != dialogOccupant.getUser().getUserId()) {
+                    && currentUser.getId() != dialogOccupant.getUser().getId()) {
                 return dialogOccupant.getUser();
             }
         }
-        return new User();
+        return new QMUser();
     }
 
     public static Dialog createLocalDialog(QBChatDialog  QBChatDialog ) {
@@ -234,7 +243,7 @@ public class ChatUtils {
             boolean onlyMeInDialog = QBChatDialog .getOccupants().size() == 1;
 
             if (dialogOccupant == null && onlyMeInDialog) {
-                User user = dataManager.getUserDataManager().get(AppSession.getSession().getUser().getId());
+                QMUser user =  QMUserService.getInstance().getUserCache().get((long)AppSession.getSession().getUser().getId());
                 DbUtils.saveDialogOccupant(dataManager,
                         createDialogOccupant(dataManager, QBChatDialog .getDialogId(), user));
                 dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(QBChatDialog .getDialogId(), AppSession.getSession().getUser().getId());
@@ -297,7 +306,7 @@ public class ChatUtils {
             if (onlyNewOccupant) {
                 dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(QBChatDialog .getDialogId(), userId);
                 if (dialogOccupant == null) {
-                    dialogOccupant = createDialogOccupant(dataManager, QBChatDialog .getDialogId(), dataManager.getUserDataManager().get(userId));
+                    dialogOccupant = createDialogOccupant(dataManager, QBChatDialog .getDialogId(),QMUserService.getInstance().getUserCache().get((long)userId));
                 } else {
                     dialogOccupant.setStatus(DialogOccupant.Status.ACTUAL);
                 }
@@ -305,7 +314,7 @@ public class ChatUtils {
             } else {
                 dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(QBChatDialog .getDialogId(), userId);
                 if (dialogOccupant == null) {
-                    User user = dataManager.getUserDataManager().get(userId);
+                    QMUser user =  QMUserService.getInstance().getUserCache().get((long)userId);
                     if (user == null) {
                         user = QBRestHelper.loadAndSaveUser(userId);
                     }
@@ -332,7 +341,7 @@ public class ChatUtils {
         List<Integer> idsList = new ArrayList<>(dialogOccupantsList.size());
 
         for (DialogOccupant dialogOccupant : dialogOccupantsList) {
-            idsList.add(dialogOccupant.getUser().getUserId());
+            idsList.add(dialogOccupant.getUser().getId());
         }
 
         return idsList;
@@ -369,16 +378,16 @@ public class ChatUtils {
             List<DialogOccupant> dialogOccupantsList) {
         ArrayList<Integer> occupantsIdsList = new ArrayList<>(dialogOccupantsList.size());
         for (DialogOccupant dialogOccupant : dialogOccupantsList) {
-            occupantsIdsList.add(dialogOccupant.getUser().getUserId());
+            occupantsIdsList.add(dialogOccupant.getUser().getId());
         }
         return occupantsIdsList;
     }
 
     public static ArrayList<Integer> createOccupantsIdsFromUsersList(
-            List<User> usersList) {
+            List<QMUser> usersList) {
         ArrayList<Integer> occupantsIdsList = new ArrayList<>(usersList.size());
-        for (User user : usersList) {
-            occupantsIdsList.add(user.getUserId());
+        for (QMUser user : usersList) {
+            occupantsIdsList.add(user.getId());
         }
         return occupantsIdsList;
     }
@@ -503,7 +512,7 @@ public class ChatUtils {
 
         for (DialogNotification dialogNotification : dialogNotificationsList) {
             if (!State.READ.equals(dialogNotification.getState())
-                    && currentQbUser.getId() != dialogNotification.getDialogOccupant().getUser().getUserId()) {
+                    && currentQbUser.getId() != dialogNotification.getDialogOccupant().getUser().getId()) {
                 dialogNotification.setState(State.READ);
                 updateDialogNotificationsList.add(dialogNotification);
             }
@@ -517,7 +526,7 @@ public class ChatUtils {
 
         for (Message message : messagesList) {
             if (!State.READ.equals(message.getState())
-                    && currentQbUser.getId() != message.getDialogOccupant().getUser().getUserId()) {
+                    && currentQbUser.getId() != message.getDialogOccupant().getUser().getId()) {
                 message.setState(State.READ);
                 updateMessagesList.add(message);
             }
@@ -577,8 +586,8 @@ public class ChatUtils {
             if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
                 List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                         .getDialogOccupantsListByDialogId(dialog.getDialogId());
-                User currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
-                User opponentUser = getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
+                QMUser currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+                QMUser opponentUser = getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
                 if (opponentUser.getFullName() != null) {
                     dialog.setTitle(opponentUser.getFullName());
                     dialogsList.add(dialog);
@@ -609,7 +618,7 @@ public class ChatUtils {
         List<DialogOccupant> updatedDialogOccupantsList = new ArrayList<>(dialogOccupantIdsList.size());
 
         for (Integer userId : dialogOccupantIdsList) {
-            User user = dataManager.getUserDataManager().get(userId);
+            QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
             if (user == null) {
                 user = QBRestHelper.loadAndSaveUser(userId);
             }
@@ -635,7 +644,7 @@ public class ChatUtils {
         return dialogOccupant;
     }
 
-    public static DialogOccupant createDialogOccupant(DataManager dataManager, String dialogId, User user) {
+    public static DialogOccupant createDialogOccupant(DataManager dataManager, String dialogId, QMUser user) {
         DialogOccupant dialogOccupant = new DialogOccupant();
         dialogOccupant.setUser(user);
         dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(dialogId));

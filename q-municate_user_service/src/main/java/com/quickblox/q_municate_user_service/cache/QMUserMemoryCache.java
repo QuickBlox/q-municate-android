@@ -5,7 +5,7 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Predicate;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;
 import com.quickblox.users.model.QBUser;
 
@@ -19,62 +19,62 @@ import java.util.Map;
 
 public class QMUserMemoryCache implements QMUserCache {
 
-    private Map<Long, QBUser> usersMap = new HashMap<>();
+    private Map<Long, QMUser> usersMap = new HashMap<>();
 
     @Override
-    public void create(QBUser object) {
+    public void create(QMUser object) {
         usersMap.put(object.getId().longValue(), object);
     }
 
     @Override
-    public void createOrUpdate(QBUser object) {
+    public void createOrUpdate(QMUser object) {
         usersMap.put(object.getId().longValue(), object);
     }
 
     @Override
-    public void createOrUpdateAll(Collection<QBUser> objectsCollection) {
-        for(QBUser user : objectsCollection) {
+    public void createOrUpdateAll(Collection<QMUser> objectsCollection) {
+        for(QMUser user : objectsCollection) {
             createOrUpdate(user);
         }
     }
 
     @Override
-    public QBUser get(Long id) {
+    public QMUser get(Long id) {
         return usersMap.get(id);
     }
 
     @Override
-    public List<QBUser> getAll() {
-        return new ArrayList<QBUser>(usersMap.values());
+    public List<QMUser> getAll() {
+        return new ArrayList<QMUser>(usersMap.values());
     }
 
     @Override
-    public List<QBUser> getAllSorted(String sortedColumn, boolean ascending) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).sorted(new Comparator<QBUser>() {
+    public List<QMUser> getAllSorted(String sortedColumn, boolean ascending) {
+        List<QMUser> result = null;
+        result = Stream.of(usersMap.values()).sorted(new Comparator<QMUser>() {
             @Override
-            public int compare(QBUser o1, QBUser o2) {
+            public int compare(QMUser o1, QMUser o2) {
                 return 0;
             }
-        }).collect(Collectors.<QBUser>toList());
+        }).collect(Collectors.<QMUser>toList());
 
         return result;
     }
 
     @Override
-    public void update(QBUser object) {
+    public void update(QMUser object) {
         usersMap.put(object.getId().longValue(), object);
     }
 
     @Override
-    public void updateAll(Collection<QBUser> objectsCollection) {
-        for(QBUser user : objectsCollection) {
+    public void updateAll(Collection<QMUser> objectsCollection) {
+        for(QMUser user : objectsCollection) {
             update(user);
         }
     }
 
     @Override
-    public void delete(QBUser object) {
+    public void delete(QMUser object) {
         usersMap.remove(object.getId().longValue());
     }
 
@@ -99,23 +99,23 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
-    public List<QBUser> getUsersByIDs(final Collection<Integer> idsList) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
+    public List<QMUser> getUsersByIDs(final Collection<Integer> idsList) {
+        List<QMUser> result = null;
+        result = Stream.of(usersMap.values()).filter(new Predicate<QMUser>() {
             @Override
-            public boolean test(QBUser value) {
+            public boolean test(QMUser value) {
                 return idsList.contains(value.getId());
             }
-        }).collect(Collectors.<QBUser>toList());
+        }).collect(Collectors.<QMUser>toList());
 
         return result;
     }
 
     @Override
-    public QBUser getUserByColumn(final String column, final String value) {
-        Optional<QBUser> result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
+    public QMUser getUserByColumn(final String column, final String value) {
+        Optional<QMUser> result = Stream.of(usersMap.values()).filter(new Predicate<QMUser>() {
             @Override
-            public boolean test(QBUser user) {
+            public boolean test(QMUser user) {
                 return getValueByColumn(user, column).equals(value);
             }
         }).findFirst();
@@ -124,32 +124,32 @@ public class QMUserMemoryCache implements QMUserCache {
     }
 
     @Override
-    public List<QBUser> getUsersByFilter(Collection<?> filterValue, String filter) {
+    public List<QMUser> getUsersByFilter(Collection<?> filterValue, String filter) {
         return null;
     }
 
     @Override
-    public List<QBUser> getByColumn(final String column, final String value) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
+    public List<QMUser> getByColumn(final String column, final String value) {
+        List<QMUser> result = null;
+        result = Stream.of(usersMap.values()).filter(new Predicate<QMUser>() {
             @Override
-            public boolean test(QBUser user) {
+            public boolean test(QMUser user) {
                 return  getValueByColumn(user, column).equals(value);
             }
-        }).collect(Collectors.<QBUser>toList());
+        }).collect(Collectors.<QMUser>toList());
 
         return result;
     }
 
     @Override
-    public List<QBUser> getByColumn(final String column, final Collection<String> values) {
-        List<QBUser> result = null;
-        result = Stream.of(usersMap.values()).filter(new Predicate<QBUser>() {
+    public List<QMUser> getByColumn(final String column, final Collection<String> values) {
+        List<QMUser> result = null;
+        result = Stream.of(usersMap.values()).filter(new Predicate<QMUser>() {
             @Override
-            public boolean test(QBUser user) {
+            public boolean test(QMUser user) {
                 return values.contains(getValueByColumn(user,column));
             }
-        }).collect(Collectors.<QBUser>toList());
+        }).collect(Collectors.<QMUser>toList());
 
         return result;
     }

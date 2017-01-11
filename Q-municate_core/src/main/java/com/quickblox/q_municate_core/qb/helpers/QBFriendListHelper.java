@@ -28,6 +28,7 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
@@ -215,10 +216,10 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
         Log.d("TAG", "updateFriends  - begin");
 
-        List<QBUser> qbUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, new QBPagedRequestBuilder());
-        List<User> usersList = new ArrayList<User>(qbUsers.size());
+        List<QMUser> qmUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, new QBPagedRequestBuilder());
+        List<User> usersList = new ArrayList<User>(qmUsers.size());
         User user = null;
-        for (QBUser qbUser : qbUsers){
+        for (QBUser qbUser : qmUsers){
             user = UserFriendUtils.createLocalUser(qbUser);
             usersList.add(user);
         }
@@ -281,18 +282,18 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         dataManager.getUserRequestDataManager().deleteByUserId(userId);
     }
 
-    private void saveUser(User user) {
+    private void saveUser(QMUser user) {
         dataManager.getUserDataManager().createOrUpdate(user);
     }
 
-    private void saveUsersAndFriends(Collection<User> usersCollection) {
-        for (User user : usersCollection) {
+    private void saveUsersAndFriends(Collection<QMUser> usersCollection) {
+        for (QMUser user : usersCollection) {
             saveUser(user);
             saveFriend(user);
         }
     }
 
-    private void saveFriend(User user) {
+    private void saveFriend(QMUser user) {
         dataManager.getFriendDataManager().createOrUpdate(new Friend(user));
     }
 
@@ -318,8 +319,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     @Nullable
-    private User loadAndSaveUser(int userId) {
-        User user = QBRestHelper.loadUser(userId);
+    private QMUser loadAndSaveUser(int userId) {
+        QMUser user = QBRestHelper.loadUser(userId);
 
         if (user == null) {
             return null;

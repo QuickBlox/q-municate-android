@@ -7,8 +7,6 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
-import com.quickblox.q_municate_db.managers.base.BaseManager;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 
 import java.sql.SQLException;
@@ -34,7 +32,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             dao.create(object);
         } catch (SQLException e) {
-            ErrorUtils.logError(TAG, "create() - " + e.getMessage());
+            //ErrorUtils.logError(TAG, "create() - " + e.getMessage());
         }
     }
 
@@ -44,7 +42,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             dao.createOrUpdate((T) object);
         } catch (SQLException e) {
-            ErrorUtils.logError(TAG, "createOrUpdateAll(Object) - " + e.getMessage());
+            //ErrorUtils.logError(TAG, "createOrUpdateAll(Object) - " + e.getMessage());
         }
     }
 
@@ -61,7 +59,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
                 }
             });
         } catch (Exception e) {
-            ErrorUtils.logError(TAG, "createOrUpdateAll(Collection) - " + e.getMessage());
+            //ErrorUtils.logError(TAG, "createOrUpdateAll(Collection) - " + e.getMessage());
         }
     }
 
@@ -70,7 +68,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             return dao.queryForId(id);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            //ErrorUtils.logError(e);
         }
 
         return null;
@@ -81,7 +79,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             return dao.queryForAll();
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            //ErrorUtils.logError(e);
         }
 
         return Collections.emptyList();
@@ -97,7 +95,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
             PreparedQuery<T> preparedQuery = queryBuilder.prepare();
             objectsList = dao.query(preparedQuery);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            //ErrorUtils.logError(e);
         }
 
         return objectsList;
@@ -141,7 +139,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             dao.update((T) object);
        } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            //ErrorUtils.logError(e);
         }
     }
 
@@ -158,7 +156,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
                 }
             });
         } catch (Exception e) {
-            ErrorUtils.logError(TAG, "updateAll(Collection) - " + e.getMessage());
+            //ErrorUtils.logError(TAG, "updateAll(Collection) - " + e.getMessage());
         }
     }
 
@@ -167,7 +165,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             dao.delete((T) object);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            //ErrorUtils.logError(e);
         }
     }
 
@@ -176,7 +174,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             dao.deleteById(id);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            //ErrorUtils.logError(e);
         }
     }
 
@@ -185,7 +183,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             return dao.idExists(id);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            //ErrorUtils.logError(e);
         }
 
         return false;
@@ -197,7 +195,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         try {
             deleteBuilder.delete();
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            //ErrorUtils.logError(e);
         }
     }
 }

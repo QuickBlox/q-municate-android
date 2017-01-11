@@ -9,6 +9,7 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.util.Collection;
@@ -19,13 +20,13 @@ public class QBRestHelper extends BaseHelper {
         super(context);
     }
 
-    public static User loadUser(int userId) {
-        User resultUser;
+    public static QMUser loadUser(int userId) {
+        QMUser resultUser;
 
         try {
             //QBUser user = QBUsers. getUser(userId).perform();
-            QBUser user = QMUserService.getInstance().getUserSync(userId, true);
-            resultUser = UserFriendUtils.createLocalUser(user);
+            QMUser user = QMUserService.getInstance().getUserSync(userId, true);
+            resultUser = user;
         } catch (QBResponseException e) {
             // user not found
             resultUser = UserFriendUtils.createDeletedUser(userId);
@@ -34,13 +35,13 @@ public class QBRestHelper extends BaseHelper {
         return resultUser;
     }
 
-    public static User loadAndSaveUser(int userId) {
-        User resultUser = null;
+    public static QMUser loadAndSaveUser(int userId) {
+        QMUser resultUser = null;
 
         try {
             //QBUser user = QBUsers.getUser(userId).perform();
-            QBUser user = QMUserService.getInstance().getUserSync(userId, true);
-            resultUser = UserFriendUtils.createLocalUser(user);
+            QMUser user = QMUserService.getInstance().getUserSync(userId, true);
+            resultUser = user;
         } catch (QBResponseException e) {
             // user not found
             resultUser = UserFriendUtils.createDeletedUser(userId);
@@ -51,13 +52,12 @@ public class QBRestHelper extends BaseHelper {
         return resultUser;
     }
 
-    public Collection<User> loadUsers(Collection<Integer> usersIdsList) throws QBResponseException {
+    public Collection<QMUser> loadUsers(Collection<Integer> usersIdsList) throws QBResponseException {
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
         requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
         //Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle()).perform();
-        Collection<QBUser> usersList = QMUserService.getInstance().getUsersByIDsSync(usersIdsList, requestBuilder);
-        Collection<User> usersListResult = UserFriendUtils.createUsersList(usersList);
-        return usersListResult;
+        Collection<QMUser> usersList = QMUserService.getInstance().getUsersByIDsSync(usersIdsList, requestBuilder);
+        return usersList;
     }
 }

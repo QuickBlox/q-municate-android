@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.quickblox.auth.session.QBSessionManager;
+import com.quickblox.auth.session.QBSettings;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
@@ -34,6 +36,7 @@ public class AboutActivity extends BaseLoggableActivity {
         initFields();
         setUpActionBarWithUpButton();
         fillUI();
+        QBSessionManager.getInstance().isManuallyCreated()
     }
 
     private void initFields() {

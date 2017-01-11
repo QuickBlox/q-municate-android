@@ -9,6 +9,7 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_base_cache.QMAbstractBaseCache;
 import com.quickblox.q_municate_base_cache.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;
 import com.quickblox.q_municate_user_service.cache.QMUserCache;
 import com.quickblox.users.model.QBUser;
@@ -19,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser, Long> implements QMUserCache, QMUserColumns {
+public class QMUserCacheImpl extends QMAbstractBaseCache<QMUser, Long> implements QMUserCache, QMUserColumns {
 
     private static final String TAG = QMUserCacheImpl.class.getSimpleName();
 
@@ -27,7 +28,7 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser, Long> implement
 
     public QMUserCacheImpl(Context context) {
         dataHelper = new QMUserDataHelper(context);
-        dao = dataHelper.getDaoByClass(QBUser.class);
+        dao = dataHelper.getDaoByClass(QMUser.class);
     }
 
     private QMUserDataHelper getDataHelper() {
@@ -37,9 +38,9 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser, Long> implement
     @Override
     public void deleteUserByExternalId(String externalId) {
         try {
-            DeleteBuilder<QBUser, Long> deleteBuilder = dao.deleteBuilder();
+            DeleteBuilder<QMUser, Long> deleteBuilder = dao.deleteBuilder();
             deleteBuilder.where().eq(EXTERNAL_ID,externalId);
-            PreparedDelete<QBUser> preparedQuery = deleteBuilder.prepare();
+            PreparedDelete<QMUser> preparedQuery = deleteBuilder.prepare();
             dao.delete(preparedQuery);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
@@ -48,13 +49,13 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser, Long> implement
 
 
 
-    public List<QBUser> getUsersByIDs(Collection<Integer> idsList) {
-        List<QBUser> usersList  = Collections.emptyList();
+    public List<QMUser> getUsersByIDs(Collection<Integer> idsList) {
+        List<QMUser> usersList  = Collections.emptyList();
 
         try {
-            QueryBuilder<QBUser, Long> queryBuilder = dao.queryBuilder();
+            QueryBuilder<QMUser, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().in(ID, idsList);
-            PreparedQuery<QBUser> preparedQuery = queryBuilder.prepare();
+            PreparedQuery<QMUser> preparedQuery = queryBuilder.prepare();
             usersList = dao.query(preparedQuery);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
@@ -66,18 +67,18 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser, Long> implement
 
 
     @Override
-    public List<QBUser> getUsersByFilter(Collection<?> filterValue, String filter) {
+    public List<QMUser> getUsersByFilter(Collection<?> filterValue, String filter) {
         return null;
     }
 
     @Override
-    public  QBUser getUserByColumn(String column, String value) {
-        QBUser user = null;
+    public  QMUser getUserByColumn(String column, String value) {
+        QMUser user = null;
 
         try {
-            QueryBuilder<QBUser, Long> queryBuilder = dao.queryBuilder();
+            QueryBuilder<QMUser, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().eq(column, value);
-            PreparedQuery<QBUser> preparedQuery = queryBuilder.prepare();
+            PreparedQuery<QMUser> preparedQuery = queryBuilder.prepare();
             user = dao.queryForFirst(preparedQuery);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
@@ -88,13 +89,13 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QBUser, Long> implement
 
 
     @Override
-    public List<QBUser> getByColumn(String column, Collection<String> values) {
-        List<QBUser> usersList  = Collections.emptyList();
+    public List<QMUser> getByColumn(String column, Collection<String> values) {
+        List<QMUser> usersList  = Collections.emptyList();
 
         try {
-            QueryBuilder<QBUser, Long> queryBuilder = dao.queryBuilder();
+            QueryBuilder<QMUser, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().in(column, values);
-            PreparedQuery<QBUser> preparedQuery = queryBuilder.prepare();
+            PreparedQuery<QMUser> preparedQuery = queryBuilder.prepare();
             usersList = dao.query(preparedQuery);
         } catch (SQLException e) {
             ErrorUtils.logError(e);

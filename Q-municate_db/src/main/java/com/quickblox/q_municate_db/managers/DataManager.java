@@ -10,15 +10,16 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.Social;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 public class DataManager {
 
     private static DataManager instance;
     private DataHelper dataHelper;
 
-    private UserDataManager userDataManager;
+   // private UserDataManager userDataManager;
     private FriendDataManager friendDataManager;
     private SocialDataManager socialDataManager;
     private UserRequestDataManager userRequestDataManager;
@@ -50,20 +51,20 @@ public class DataManager {
         dataHelper.clearTables();
     }
 
-    public UserDataManager getUserDataManager() {
-        if (userDataManager == null) {
-            userDataManager = new UserDataManager(
-                    getDataHelper().getDaoByClass(User.class),
-                    getDataHelper().getDaoByClass(DialogOccupant.class));
-        }
-        return userDataManager;
-    }
+//    public UserDataManager getUserDataManager() {
+//        if (userDataManager == null) {
+//            userDataManager = new UserDataManager(
+//                    getDataHelper().getDaoByClass(User.class),
+//                    getDataHelper().getDaoByClass(DialogOccupant.class));
+//        }
+//        return userDataManager;
+//    }
 
     public FriendDataManager getFriendDataManager() {
         if (friendDataManager == null) {
             friendDataManager = new FriendDataManager(
                     getDataHelper().getDaoByClass(Friend.class),
-                    getDataHelper().getDaoByClass(User.class));
+                    getDataHelper().getDaoByClass(QMUser.class));
         }
         return friendDataManager;
     }
