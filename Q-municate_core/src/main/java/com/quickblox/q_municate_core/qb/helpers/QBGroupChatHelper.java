@@ -140,6 +140,12 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 
+    public void sendGroupMessageWithAttachLocation(String roomJidId, String url) throws QBResponseException {
+        QBChatMessage chatMessage = getQBChatMessage(context.getString(R.string.dlg_attached_last_message),
+                null, url);
+        sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
+    }
+
     public void tryJoinRoomChats(List<QBDialog> qbDialogsList) {
         tryJoinRoomChatsPage(qbDialogsList, true);
     }

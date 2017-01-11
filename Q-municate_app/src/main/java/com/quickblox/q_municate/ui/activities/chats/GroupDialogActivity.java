@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -108,22 +109,29 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
-            return;
-        }
-
-        try {
-            ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
-        } catch (QBResponseException e) {
-            ErrorUtils.showError(this, e);
-        }
+        sendGroupMessageWithAttach(dialogId, file, null);
     }
 
     @Override
     protected void onLocationLoaded(String url, String dialogId) {
         Log.d("GroupDialogActivity", "url= " + url);
+        sendGroupMessageWithAttach(dialogId, null, url);
     }
 
+    private void sendGroupMessageWithAttach(String dialogId, QBFile file, String url) {
+        if (!dialogId.equals(dialog.getDialogId())) {
+            return;
+        }
+        try {
+            if (file != null) {
+                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
+            } else if (!TextUtils.isEmpty(url)) {
+                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachLocation(dialog.getRoomJid(), url);
+            }
+        } catch (QBResponseException exc) {
+            ErrorUtils.showError(this, exc);
+        }
+    }
     @Override
     protected Bundle generateBundleToInitDialog() {
         return null;

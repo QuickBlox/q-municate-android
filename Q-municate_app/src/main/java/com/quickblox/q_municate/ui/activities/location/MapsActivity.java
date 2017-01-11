@@ -74,12 +74,16 @@ public class MapsActivity extends BaseLoggableActivity
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        title = "Location";
+        setUpActionBarWithUpButton();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        if (googleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        }
     }
 
     @Override

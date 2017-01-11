@@ -35,4 +35,6 @@
             android:text="@string/send_current_location" />
     </FrameLayout>
 
+    <include layout="@layout/toolbar" />
+
 </FrameLayout>
