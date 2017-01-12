@@ -29,8 +29,6 @@ android {
         multiDexEnabled = true
     }
 
-//     before release need to enable Crashlytics
-
     signingConfigs {
         release {
             storeFile file(property('prodStoreFile'))
@@ -50,7 +48,6 @@ android {
             buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('prodAccountKey')
-            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
             buildConfigField "String", "TWITTER_KEY", property('prodTwitterDigitsConsumerKey')
             buildConfigField "String", "TWITTER_SECRET", property('prodTwitterDigitsConsumerSecret')
             resValue "string", "twitterDigitsApiKey", property('prodTwittedDigitsApiKey')
@@ -66,7 +63,6 @@ android {
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('devAccountKey')
-            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
             buildConfigField "String", "TWITTER_KEY", property('devTwitterDigitsConsumerKey')
             buildConfigField "String", "TWITTER_SECRET", property('devTwitterDigitsConsumerSecret')
             resValue "string", "twitterDigitsApiKey", property('devTwittedDigitsApiKey')
@@ -127,3 +123,5 @@ def changeApkFileName(variant) {
         output.outputFile = new File(file.parent, newName)
     }
 }
+
+apply plugin: 'com.google.gms.google-services'

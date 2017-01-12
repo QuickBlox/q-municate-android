@@ -13,7 +13,6 @@ import android.view.View;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
@@ -31,7 +30,6 @@ public class MainActivity extends BaseLoggableActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private FacebookHelper facebookHelper;
-    private GSMHelper gsmHelper;
 
     private ImportFriendsSuccessAction importFriendsSuccessAction;
     private ImportFriendsFailAction importFriendsFailAction;
@@ -54,8 +52,6 @@ public class MainActivity extends BaseLoggableActivity {
         initFields();
         setUpActionBarWithUpButton();
 
-        checkGCMRegistration();
-
         if (!isChatInitializedAndUserLoggedIn()) {
             Log.d("MainActivity", "onCreate. !isChatInitializedAndUserLoggedIn()");
             loginChat();
@@ -67,7 +63,6 @@ public class MainActivity extends BaseLoggableActivity {
     private void initFields() {
         Log.d("MainActivity", "initFields()");
         title = " " + AppSession.getSession().getUser().getFullName();
-        gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
         facebookHelper = new FacebookHelper(MainActivity.this);
@@ -101,7 +96,6 @@ public class MainActivity extends BaseLoggableActivity {
         actualizeCurrentTitle();
         super.onResume();
         addActions();
-        checkGCMRegistration();
     }
 
     private void actualizeCurrentTitle() {
@@ -171,16 +165,6 @@ public class MainActivity extends BaseLoggableActivity {
     private void performImportFriendsSuccessAction() {
         appSharedHelper.saveUsersImportInitialized(true);
         hideProgress();
-    }
-
-    private void checkGCMRegistration() {
-        if (gsmHelper.checkPlayServices()) {
-            if (!gsmHelper.isDeviceRegisteredWithUser()) {
-                gsmHelper.registerInBackground();
-            }
-        } else {
-            Log.i(TAG, "No valid Google Play Services APK found.");
-        }
     }
 
     private void performImportFriendsFailAction(Bundle bundle) {

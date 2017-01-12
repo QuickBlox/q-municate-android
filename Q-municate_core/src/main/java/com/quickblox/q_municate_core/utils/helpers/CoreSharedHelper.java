@@ -260,22 +260,6 @@ public class CoreSharedHelper {
         savePref(Constants.PUSH_USER_ID, userId);
     }
 
-    public String getPushRegistrationId() {
-        return getPref(Constants.PUSH_REGISTRATION_ID, null);
-    }
-
-    public void savePushRegistrationId(String registrationId) {
-        savePref(Constants.PUSH_REGISTRATION_ID, registrationId);
-    }
-
-    public int getPushAppVersion() {
-        return getPref(Constants.PUSH_APP_VERSION, 0);
-    }
-
-    public void savePushAppVersion(int appVersion) {
-        savePref(Constants.PUSH_APP_VERSION, appVersion);
-    }
-
     public boolean getCallHwCodec(boolean defValue) {
         return getPref(Constants.CALL_HW_CODEC, defValue);
     }
