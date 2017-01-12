@@ -397,8 +397,13 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     private class GroupChatMessageListener implements QBMessageListener<QBGroupChat> {
 
         @Override
-        public void processMessage(QBGroupChat groupChat, QBChatMessage chatMessage) {
-            onGroupMessageReceived(groupChat, chatMessage);
+        public void processMessage(final QBGroupChat groupChat, final QBChatMessage chatMessage) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    onGroupMessageReceived(groupChat, chatMessage);
+                }
+            });
         }
 
         @Override
@@ -410,15 +415,20 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
 
         @Override
-        public void processMessage(QBPrivateChat privateChat, final QBChatMessage chatMessage) {
-            if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
-                for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
-                    notificationChatListener.onReceivedNotification((String) chatMessage.getProperty(
-                            ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
+        public void processMessage(final QBPrivateChat privateChat, final QBChatMessage chatMessage) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
+                        for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
+                            notificationChatListener.onReceivedNotification((String) chatMessage.getProperty(
+                                    ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
+                        }
+                    } else {
+                        onPrivateMessageReceived(privateChat, chatMessage);
+                    }
                 }
-            } else {
-                onPrivateMessageReceived(privateChat, chatMessage);
-            }
+            });
         }
 
         @Override

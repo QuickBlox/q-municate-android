@@ -35,10 +35,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class QBFriendListHelper extends BaseHelper implements Serializable {
 
@@ -50,12 +46,6 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private static final String ENTRIES_DELETED_ERROR = "Failed to delete friends";
     private static final String SUBSCRIPTION_ERROR = "Failed to confirm subscription";
     private static final String ROSTER_INIT_ERROR = "ROSTER isn't initialized. Please make relogin";
-
-    //ThreadPoolExecutor
-    private static final int THREAD_POOL_SIZE = 3;
-    private static final int KEEP_ALIVE_TIME = 1;
-    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
-    private ThreadPoolExecutor threadPoolExecutor;
 
     private QBRestHelper restHelper;
     private QBRoster roster;
@@ -69,7 +59,6 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     public void init(QBPrivateChatHelper privateChatHelper) {
-        initThreads();
         this.privateChatHelper = privateChatHelper;
         restHelper = new QBRestHelper(context);
         dataManager = DataManager.getInstance();
@@ -78,12 +67,6 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
         userLoadingTimer = new Timer();
-    }
-
-    private void initThreads() {
-        BlockingQueue<Runnable> threadQueue = new LinkedBlockingQueue<>();
-        threadPoolExecutor = new ThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, threadQueue);
-        threadPoolExecutor.allowCoreThreadTimeOut(true);
     }
 
     public void inviteFriend(int userId) throws Exception {
@@ -386,7 +369,6 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
                     }
                 }
             });
-
         }
 
         @Override
