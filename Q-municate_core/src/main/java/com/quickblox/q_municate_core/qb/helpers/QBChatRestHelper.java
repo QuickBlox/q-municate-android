@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.helpers;
 import android.content.Context;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.connections.tcp.QBTcpConfigurationBuilder;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -28,10 +29,16 @@ public class QBChatRestHelper extends BaseHelper {
     }
 
     public synchronized void initChatService() throws XMPPException, SmackException {
-            QBChatService.setDefaultPacketReplyTimeout(ConstsCore.DEFAULT_PACKET_REPLY_TIMEOUT);
+        QBChatService.setDefaultPacketReplyTimeout(ConstsCore.DEFAULT_PACKET_REPLY_TIMEOUT);
 
-            chatService = QBChatService.getInstance();
-            chatService.addConnectionListener(connectionListener);
+        QBChatService.ConfigurationBuilder configurationBuilder = new QBChatService.ConfigurationBuilder();
+        configurationBuilder.setSocketTimeout(0);
+        QBChatService.setConfigurationBuilder(configurationBuilder);
+
+
+        chatService = QBChatService.getInstance();
+
+        chatService.addConnectionListener(connectionListener);
     }
 
     public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
