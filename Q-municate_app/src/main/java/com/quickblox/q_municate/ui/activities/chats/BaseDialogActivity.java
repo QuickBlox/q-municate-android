@@ -23,7 +23,7 @@ import android.widget.ImageButton;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -285,7 +285,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         if (groupChatHelper != null) {
-            QBDialog qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
+            QBChatDialog qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
             groupChatHelper.tryJoinRoomChat(qbDialog);
         }
 

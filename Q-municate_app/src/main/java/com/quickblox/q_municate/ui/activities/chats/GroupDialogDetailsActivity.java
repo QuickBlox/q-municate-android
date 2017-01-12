@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
@@ -83,7 +83,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private Object actionMode;
     private boolean isNeedUpdateImage;
     private Uri imageUri;
-    private QBDialog qbDialog;
+    private QBChatDialog qbDialog;
     private String groupNameCurrent;
     private String photoUrlOld;
     private String groupNameOld;
@@ -444,7 +444,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void sendNotificationToGroup(boolean leavedFromDialog) {
         for (DialogNotification.Type messagesNotificationType : currentNotificationTypeList) {
             try {
-                QBDialog localDialog = qbDialog;
+                QBChatDialog localDialog = qbDialog;
                 if (qbDialog != null) {
                     localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,
                             dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
@@ -605,7 +605,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         @Override
         public void execute(Bundle bundle) {
-            qbDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            qbDialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
             updateCurrentData();
             updateOldGroupData();

@@ -19,7 +19,6 @@ import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
-import com.quickblox.core.server.BaseService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
