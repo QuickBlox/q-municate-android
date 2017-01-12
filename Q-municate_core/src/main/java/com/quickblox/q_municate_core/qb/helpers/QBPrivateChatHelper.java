@@ -68,12 +68,12 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         sendPrivateMessage(file, context.getString(R.string.dlg_attached_last_message), userId, null);
     }
 
-    public void sendPrivateMessageWithAttachLocation(String url, int userId) throws QBResponseException {
-        sendPrivateMessage(null, context.getString(R.string.dlg_attached_last_message), userId, url);
+    public void sendPrivateMessageWithAttachLocation(String location, int userId) throws QBResponseException {
+        sendPrivateMessage(null, context.getString(R.string.dlg_attached_last_message), userId, location);
     }
 
-    private void sendPrivateMessage(QBFile file, String message, int userId, String url) throws QBResponseException {
-        QBChatMessage qbChatMessage = getQBChatMessage(message, file, url);
+    private void sendPrivateMessage(QBFile file, String message, int userId, String location) throws QBResponseException {
+        QBChatMessage qbChatMessage = getQBChatMessage(message, file, location);
         String dialogId = null;
         if (currentDialog != null) {
             dialogId = currentDialog.getDialogId();

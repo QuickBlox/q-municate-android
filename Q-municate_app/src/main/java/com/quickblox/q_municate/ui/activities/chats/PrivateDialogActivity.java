@@ -130,19 +130,19 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void onLocationLoaded(String url, String dialogId) {
-        sendPrivateMessageWithAttach(dialogId, null, url);
+    protected void onLocationLoaded(String location, String dialogId) {
+        sendPrivateMessageWithAttach(dialogId, null, location);
     }
 
-    private void sendPrivateMessageWithAttach(String dialogId, QBFile file, String url) {
+    private void sendPrivateMessageWithAttach(String dialogId, QBFile file, String location) {
         if (!dialogId.equals(dialog.getDialogId())) {
             return;
         }
         try {
             if (file != null) {
                 privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
-            } else if (!TextUtils.isEmpty(url)) {
-                privateChatHelper.sendPrivateMessageWithAttachLocation(url, opponentUser.getUserId());
+            } else if (!TextUtils.isEmpty(location)) {
+                privateChatHelper.sendPrivateMessageWithAttachLocation(location, opponentUser.getUserId());
             }
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);

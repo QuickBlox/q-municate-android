@@ -67,8 +67,8 @@ public class ImagePickHelperFragment extends Fragment {
                     Bundle bundle = data.getExtras();
                     double latitude = bundle.getDouble(MapUtils.EXTRA_LOCATION_LATITUDE);
                     double longitude = bundle.getDouble(MapUtils.EXTRA_LOCATION_LONGITUDE);
-                    String locationURL = MapUtils.generateMapStaticURI(latitude, longitude);
-                    listener.onImagePicked(requestCode, null, locationURL);
+                    String location = MapUtils.generateLocationData(latitude, longitude);
+                    listener.onImagePicked(requestCode, null, location);
                 }
             } else {
                 if (requestCode == ImageUtils.CAMERA_REQUEST_CODE && (data == null || data.getData() == null)) {

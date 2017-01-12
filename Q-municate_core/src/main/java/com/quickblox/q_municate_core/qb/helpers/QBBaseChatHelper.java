@@ -201,7 +201,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         DbUtils.deleteDialogLocal(dataManager, dialogId);
     }
 
-    protected QBChatMessage getQBChatMessage(String body, QBFile qbFile, String url) {
+    protected QBChatMessage getQBChatMessage(String body, QBFile qbFile, String location) {
         long time = DateUtilsCore.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
@@ -209,8 +209,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         if (qbFile != null) {
             QBAttachment attachment = getAttachment(qbFile);
             chatMessage.addAttachment(attachment);
-        } else if (url != null) {
-            QBAttachment attachment = getAttachment(url);
+        } else if (location != null) {
+            QBAttachment attachment = getAttachment(location);
             chatMessage.addAttachment(attachment);
         }
 
@@ -235,12 +235,12 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return attachment;
     }
 
-    private QBAttachment getAttachment(String url) {
+    private QBAttachment getAttachment(String location) {
         String contentType = "image/jpeg";
         QBAttachment attachment = new QBAttachment(Attachment.Type.LOCATION.toString().toLowerCase());
         attachment.setContentType(contentType);
-        attachment.setUrl(url);
-        attachment.setId(String.valueOf(url.hashCode()));
+        attachment.setData(location);
+        attachment.setId(String.valueOf(location.hashCode()));
 
         return attachment;
     }

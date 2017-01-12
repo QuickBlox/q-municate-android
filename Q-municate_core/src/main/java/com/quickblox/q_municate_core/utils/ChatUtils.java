@@ -422,7 +422,7 @@ public class ChatUtils {
         String remoteUrl = qbAttachment.getUrl();
         if (qbAttachment.getType().equalsIgnoreCase(Attachment.Type.LOCATION.toString())) {
             attachment.setType(Attachment.Type.LOCATION);
-            remoteUrl = remoteUrl.replaceAll("&amp;(?!&)", "&");
+            remoteUrl = MapUtils.getRemoteUri(qbAttachment.getData());
         }
         attachment.setAttachmentId(qbAttachment.getId());
         attachment.setRemoteUrl(remoteUrl);

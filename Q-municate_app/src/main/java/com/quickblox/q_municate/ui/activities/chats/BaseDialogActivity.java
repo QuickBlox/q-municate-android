@@ -242,9 +242,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file, String url) {
+    public void onImagePicked(int requestCode, File file, String location) {
         canPerformLogout.set(true);
-            startLoadAttachFile(file, url, dialog.getDialogId());
+            startLoadAttachFile(file, location, dialog.getDialogId());
     }
 
     @Override
@@ -449,14 +449,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
-    protected void startLoadAttachFile(final File file, final String url, final String dialogId) {
+    protected void startLoadAttachFile(final File file, final String location, final String dialogId) {
         TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        if (url != null) {
-                            onLocationLoaded(url, dialogId);
+                        if (location != null) {
+                            onLocationLoaded(location, dialogId);
                         } else {
                             showProgress();
                             QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
@@ -683,7 +683,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void onFileLoaded(QBFile file, String dialogId);
 
-    protected abstract void onLocationLoaded(String url, String dialogId);
+    protected abstract void onLocationLoaded(String location, String dialogId);
 
     protected abstract void checkMessageSendingPossibility();
 
