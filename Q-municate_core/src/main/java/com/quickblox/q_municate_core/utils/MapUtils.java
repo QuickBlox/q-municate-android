@@ -3,6 +3,8 @@ package com.quickblox.q_municate_core.utils;
 import android.net.Uri;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class MapUtils {
     private static final String URI_SCHEME_MAP = "https://maps.googleapis.com/maps/api/staticmap?";
@@ -29,17 +31,20 @@ public class MapUtils {
 
     public static String generateLocationData(double latitude, double longitude) {
 //         "data":"{\"lat\":\"50.014141\",\"lng\":\"36.229058\"}"
-        String s = "";
-        return s;
+        JsonObject innerObject = new JsonObject();
+        innerObject.addProperty("lat", String.valueOf(latitude));
+        innerObject.addProperty("lng", String.valueOf(longitude));
+
+        return innerObject.toString();
     }
 
     public static String getRemoteUri(String location) {
-        String locations = "\"lat\":\"50.014141\",\"lng\":\"36.229058\"";
-        //"lat":"50.014141","lng":"36.229058"
-        String lat = location.substring(7, 16);
-        String lng = location.substring(25, 34);
-        Gson gson = new Gson();
+//        String locations = "{\"lat\":\"50.014141\",\"lng\":\"36.229058\"}";
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jo = (JsonObject)jsonParser.parse(location);
+        double lat = jo.get("lat").getAsDouble();
+        double lng = jo.get("lng").getAsDouble();
 
-        return generateURI().replaceAll("&amp;(?!&)", "&");
+        return generateURI(lat, lng).replaceAll("&amp;(?!&)", "&");
     }
 }
