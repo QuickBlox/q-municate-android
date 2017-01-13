@@ -43,7 +43,7 @@ public class DataManager {
         return instance;
     }
 
-    private DataHelper getDataHelper() {
+    public DataHelper getDataHelper() {
         return dataHelper;
     }
 

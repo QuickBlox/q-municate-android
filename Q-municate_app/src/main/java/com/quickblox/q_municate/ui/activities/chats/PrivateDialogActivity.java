@@ -30,8 +30,10 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
@@ -51,7 +53,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private int operationItemPosition;
     private final String TAG = "PrivateDialogActivity";
 
-    public static void start(Context context, User opponent, Dialog dialog) {
+    public static void start(Context context, QMUser opponent, Dialog dialog) {
         Intent intent = new Intent(context, PrivateDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
@@ -130,7 +132,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         }
 
         try {
-            privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
+            privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getId());
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
@@ -139,7 +141,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected Bundle generateBundleToInitDialog() {
         Bundle bundle = new Bundle();
-        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentUser.getUserId());
+        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentUser.getId());
         return bundle;
     }
 
@@ -171,7 +173,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void initActualExtras() {
-        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+        opponentUser = (QMUser) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
     }
 
@@ -179,7 +181,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     public void notifyChangedUserStatus(int userId, boolean online) {
         super.notifyChangedUserStatus(userId, online);
 
-        if (opponentUser != null && opponentUser.getUserId() == userId) {
+        if (opponentUser != null && opponentUser.getId() == userId) {
             setOnlineStatus(opponentUser);
         }
     }
@@ -194,7 +196,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(
-                opponentUser.getUserId()) != null;
+                opponentUser.getId()) != null;
         if (!isFriend && item.getItemId() != android.R.id.home) {
             ToastUtils.longToast(R.string.dialog_user_is_not_friend);
             return true;
@@ -214,13 +216,13 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void checkMessageSendingPossibility() {
-        boolean enable = dataManager.getFriendDataManager().existsByUserId(opponentUser.getUserId()) && isNetworkAvailable();
+        boolean enable = dataManager.getFriendDataManager().existsByUserId(opponentUser.getId()) && isNetworkAvailable();
         checkMessageSendingPossibility(enable);
     }
 
     @OnClick(R.id.toolbar)
     void openProfile(View view) {
-        UserProfileActivity.start(this, opponentUser.getUserId());
+        UserProfileActivity.start(this, opponentUser.getId());
     }
 
     private void initFields() {
@@ -247,13 +249,13 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         messagesAdapter.notifyDataSetChanged();
     }
 
-    private void setOnlineStatus(User user) {
+    private void setOnlineStatus(QMUser user) {
         if (user != null) {
             if (friendListHelper != null) {
-                String offlineStatus = getString(R.string.last_seen, DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
-                        DateUtils.formatDateSimpleTime(user.getLastLogin()));
+                String offlineStatus = getString(R.string.last_seen, DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
+                        DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime()));
                 setActionBarSubtitle(
-                        OnlineStatusUtils.getOnlineStatus(this, friendListHelper.isUserOnline(user.getUserId()), offlineStatus));
+                        OnlineStatusUtils.getOnlineStatus(this, friendListHelper.isUserOnline(user.getId()), offlineStatus));
             }
         }
     }
@@ -262,7 +264,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         sendMessage(true);
     }
 
-    private void callToUser(User user, QBRTCTypes.QBConferenceType qbConferenceType) {
+    private void callToUser(QMUser user, QBRTCTypes.QBConferenceType qbConferenceType) {
         if (!isChatInitializedAndUserLoggedIn()) {
             ToastUtils.longToast(R.string.call_chat_service_is_initializing);
             return;
@@ -302,7 +304,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void showRejectUserDialog(final int userId) {
-        User user = DataManager.getInstance().getUserDataManager().get(userId);
+        QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
         if (user == null) {
             return;
         }

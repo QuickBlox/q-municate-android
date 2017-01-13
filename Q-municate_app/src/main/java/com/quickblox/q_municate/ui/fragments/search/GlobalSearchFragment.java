@@ -41,8 +41,9 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.managers.UserRequestDataManager;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -274,7 +275,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 
             QMUserService.getInstance().getUsersByFullName(searchQuery, requestBuilder, true).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new rx.Observer<List<QBUser>>() {
+                    .subscribe(new rx.Observer<List<QMUser>>() {
 
                 @Override
                 public void onCompleted() {
@@ -286,7 +287,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
                 }
 
                 @Override
-                public void onNext(List<QBUser> qbUsers) {
+                public void onNext(List<QMUser> qbUsers) {
 
 //                    List<User> usersList = new ArrayList<User>(qbUsers.size());
 //                    User user = null;
@@ -357,7 +358,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 //        }
     }
 
-    private void checkForExcludeMe(Collection<QBUser> usersCollection) {
+    private void checkForExcludeMe(Collection<QMUser> usersCollection) {
         QBUser me = AppSession.getSession().getUser();
         if (usersCollection.contains(me)) {
             usersCollection.remove(me);
@@ -411,7 +412,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         public void execute(Bundle bundle) {
             int userId = bundle.getInt(QBServiceConsts.EXTRA_FRIEND_ID);
 
-            User addedUser = dataManager.getUserDataManager().get(userId);
+            QMUser addedUser = QMUserService.getInstance().getUserCache().get((long)userId);
             globalSearchAdapter.notifyDataSetChanged();
 
             baseActivity.hideProgress();

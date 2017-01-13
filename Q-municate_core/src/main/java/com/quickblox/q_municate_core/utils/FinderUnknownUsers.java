@@ -6,8 +6,10 @@ import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.util.Collection;
@@ -65,12 +67,12 @@ public class FinderUnknownUsers {
         try {
             if (loadIdsSet.size() == oneElement) {
                 int userId = loadIdsSet.iterator().next();
-                User user = QBRestHelper.loadUser(userId);
-                dataManager.getUserDataManager().createOrUpdate(user);
+                QMUser user = QBRestHelper.loadUser(userId);
+                QMUserService.getInstance().getUserCache().createOrUpdate(user);
             } else {
-                Collection<User> userCollection = restHelper.loadUsers(loadIdsSet);
+                Collection<QMUser> userCollection = restHelper.loadUsers(loadIdsSet);
                 if (userCollection != null) {
-                    dataManager.getUserDataManager().createOrUpdateAll(userCollection);
+                    QMUserService.getInstance().getUserCache().createOrUpdateAll(userCollection);
                 }
             }
         } catch (QBResponseException e) {
@@ -81,7 +83,7 @@ public class FinderUnknownUsers {
     private void findUserInDialog(QBChatDialog  dialog) {
         List<Integer> occupantsList = dialog.getOccupants();
         for (int occupantId : occupantsList) {
-            boolean isUserInBase = dataManager.getUserDataManager().exists(occupantId);
+            boolean isUserInBase = QMUserService.getInstance().getUserCache().exists((long)occupantId);
             if (!isUserInBase && currentUser.getId() != occupantId) {
                 loadIdsSet.add(occupantId);
             }

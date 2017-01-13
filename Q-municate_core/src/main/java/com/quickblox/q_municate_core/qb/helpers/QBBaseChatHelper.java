@@ -44,8 +44,10 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -270,7 +272,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return existingPrivateDialog;
     }
 
-    protected void checkForSendingNotification(boolean ownMessage, QBChatMessage qbChatMessage, User user,
+    protected void checkForSendingNotification(boolean ownMessage, QBChatMessage qbChatMessage, QMUser user,
             boolean isPrivateChat) {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         if (qbChatMessage.getId() == null || dialogId == null) {
@@ -290,7 +292,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
     }
 
-    private void sendNotificationBroadcast(String action, QBChatMessage chatMessage, User user, String dialogId,
+    private void sendNotificationBroadcast(String action, QBChatMessage chatMessage, QMUser user, String dialogId,
             boolean isPrivateMessage) {
         Intent intent = new Intent(action);
         String messageBody = chatMessage.getBody();
@@ -336,7 +338,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             if (dialog != null) {
                 dialogOccupant.setDialog(dialog);
             }
-            User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
+            QMUser user = QMUserService.getInstance().getUserCache().get((long)qbChatMessage.getSenderId());
             if (user != null) {
                 dialogOccupant.setUser(user);
             }
@@ -368,12 +370,12 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     public void updateStatusMessageReadServer(String dialogId, CombinationMessage combinationMessage,
             boolean fromPrivate) throws Exception {
         if (fromPrivate) {
-            QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getUserId());
+            QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getId());
             if (privateChat != null) {
                 QBChatMessage qbChatMessage = new QBChatMessage();
                 qbChatMessage.setId(combinationMessage.getMessageId());
                 qbChatMessage.setDialogId(dialogId);
-                qbChatMessage.setSenderId(combinationMessage.getDialogOccupant().getUser().getUserId());
+                qbChatMessage.setSenderId(combinationMessage.getDialogOccupant().getUser().getId());
                 privateChat.readMessage(qbChatMessage);
             }
         } else {

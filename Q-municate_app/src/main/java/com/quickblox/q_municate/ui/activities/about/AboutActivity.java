@@ -36,7 +36,6 @@ public class AboutActivity extends BaseLoggableActivity {
         initFields();
         setUpActionBarWithUpButton();
         fillUI();
-        QBSessionManager.getInstance().isManuallyCreated()
     }
 
     private void initFields() {

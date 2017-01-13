@@ -3,12 +3,13 @@ package com.quickblox.q_municate_user_cache;
 import android.content.Context;
 
 import com.quickblox.q_municate_base_cache.QMBaseDataHelper;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 public class QMUserDataHelper extends QMBaseDataHelper {
 
     private static final Class<?>[] TABLES = {
-            QBUser.class
+            QMUser.class
     };
 
     public QMUserDataHelper(Context context) {

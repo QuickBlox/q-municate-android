@@ -18,7 +18,8 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
+//import com.quickblox.q_municate_db.models.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     }
 
     @Override
-    protected List<User> getFriendsList() {
+    protected List<QMUser> getFriendsList() {
         QBChatDialog  = (QBChatDialog ) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         List<Friend> friendsList = dataManager.getFriendDataManager().getAllForGroupDetails(QBChatDialog .getOccupants());
         if (!friendsList.isEmpty()) {
@@ -89,7 +90,7 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     @Override
     protected void performDone() {
-        List<User> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
+        List<QMUser> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
         if (!selectedFriendsList.isEmpty()) {
             boolean joined = groupChatHelper != null && groupChatHelper.isDialogJoined(QBChatDialog );
             if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError() && joined) {
@@ -110,10 +111,10 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     }
 
     private void initCustomListeners() {
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QMUser>() {
 
             @Override
-            public void onItemClicked(View view, User entity, int position) {
+            public void onItemClicked(View view, QMUser entity, int position) {
                 ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
             }
         });

@@ -28,10 +28,12 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
@@ -62,7 +64,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
     private DataManager dataManager;
     private int userId;
-    private User user;
+    private QMUser user;
     private Observer userObserver;
     private boolean removeContactAndChatHistory;
 
@@ -92,7 +94,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
         dataManager = DataManager.getInstance();
         canPerformLogout.set(true);
         userId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
-        user = dataManager.getUserDataManager().get(userId);
+        user = QMUserService.getInstance().getUserCache().get((long)userId);
         userObserver = new UserObserver();
     }
 
@@ -123,7 +125,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
     @OnClick(R.id.send_message_button)
     void sendMessage(View view) {
-        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
             PrivateDialogActivity.start(UserProfileActivity.this, user, dialogOccupant.getDialog());
         } else {
@@ -161,7 +163,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
     @Override
     public void notifyChangedUserStatus(int userId, boolean online) {
         super.notifyChangedUserStatus(userId, online);
-        if (user.getUserId() == userId) {
+        if (user.getId() == userId) {
             setOnlineStatus(online);
         }
     }
@@ -173,11 +175,11 @@ public class UserProfileActivity extends BaseLoggableActivity {
     }
 
     private void addObservers() {
-        dataManager.getUserDataManager().addObserver(userObserver);
+        ((Observable)QMUserService.getInstance().getUserCache()).addObserver(userObserver);
     }
 
     private void deleteObservers() {
-        dataManager.getUserDataManager().deleteObserver(userObserver);
+        ((Observable)QMUserService.getInstance().getUserCache()).deleteObserver(userObserver);
     }
 
     private void addActions() {
@@ -208,14 +210,14 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
     private void setOnlineStatus() {
         if (friendListHelper != null) {
-            setOnlineStatus(friendListHelper.isUserOnline(user.getUserId()));
+            setOnlineStatus(friendListHelper.isUserOnline(user.getId()));
         }
     }
 
     private void setOnlineStatus(boolean online) {
         String offlineStatus = getString(R.string.last_seen,
-                DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
-                DateUtils.formatDateSimpleTime(user.getLastLogin()));
+                DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
+                DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime()));
         timestampTextView.setText(OnlineStatusUtils.getOnlineStatus(this, online, offlineStatus));
     }
 
@@ -247,7 +249,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
                         super.onPositive(dialog);
                         showProgress();
                         if (isUserFriendOrUserRequest()) {
-                            QBRemoveFriendCommand.start(UserProfileActivity.this, user.getUserId());
+                            QBRemoveFriendCommand.start(UserProfileActivity.this, user.getId());
                         } else {
                             deleteChat();
                         }
@@ -274,7 +276,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
     }
 
     private void deleteChat() {
-        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant == null){
             finish();
         } else {
@@ -288,13 +290,13 @@ public class UserProfileActivity extends BaseLoggableActivity {
     }
 
     private boolean isUserFriendOrUserRequest() {
-        boolean isFriend = dataManager.getFriendDataManager().existsByUserId(user.getUserId());
-        boolean isUserRequest = dataManager.getUserRequestDataManager().existsByUserId(user.getUserId());
+        boolean isFriend = dataManager.getFriendDataManager().existsByUserId(user.getId());
+        boolean isUserRequest = dataManager.getUserRequestDataManager().existsByUserId(user.getId());
         return isFriend || isUserRequest;
     }
 
     private boolean isChatExists() {
-        return dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId()) != null;
+        return dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId()) != null;
     }
 
     private void callToUser(QBRTCTypes.QBConferenceType qbConferenceType) {
@@ -303,7 +305,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
             return;
         }
 
-        boolean isFriend = DataManager.getInstance().getFriendDataManager().existsByUserId(user.getUserId());
+        boolean isFriend = DataManager.getInstance().getFriendDataManager().existsByUserId(user.getId());
         if (!isFriend) {
             ToastUtils.longToast(R.string.dialog_user_is_not_friend);
             return;
@@ -318,8 +320,8 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(UserDataManager.OBSERVE_KEY)) {
-                user = DataManager.getInstance().getUserDataManager().get(userId);
+            if (data != null && data.equals(QMUserCacheImpl.OBSERVE_KEY)) {
+                user =  QMUserService.getInstance().getUserCache().get((long)userId);
                 initUIWithUsersData();
             }
         }

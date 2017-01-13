@@ -16,36 +16,37 @@ import com.quickblox.q_municate.utils.helpers.TextViewHelper;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 
 import butterknife.Bind;
 
-public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerViewHolder<User>> {
+public class FriendsAdapter extends BaseFilterAdapter<QMUser, BaseClickListenerViewHolder<QMUser>> {
 
     private boolean withFirstLetter;
     private QBFriendListHelper qbFriendListHelper;
 
-    public FriendsAdapter(BaseActivity baseActivity, List<User> usersList, boolean withFirstLetter) {
+    public FriendsAdapter(BaseActivity baseActivity, List<QMUser> usersList, boolean withFirstLetter) {
         super(baseActivity, usersList);
         this.withFirstLetter = withFirstLetter;
     }
 
     @Override
-    protected boolean isMatch(User item, String query) {
+    protected boolean isMatch(QMUser item, String query) {
         return item.getFullName() != null && item.getFullName().toLowerCase().contains(query);
     }
 
     @Override
-    public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseClickListenerViewHolder<QMUser> onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(this, layoutInflater.inflate(R.layout.item_friend, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(BaseClickListenerViewHolder<User> baseClickListenerViewHolder, final int position) {
-        User user = getItem(position);
+    public void onBindViewHolder(BaseClickListenerViewHolder<QMUser> baseClickListenerViewHolder, final int position) {
+        QMUser user = getItem(position);
         ViewHolder viewHolder = (ViewHolder) baseClickListenerViewHolder;
 
         if (withFirstLetter) {
@@ -70,7 +71,7 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
         notifyDataSetChanged();
     }
 
-    private void initFirstLetter(ViewHolder viewHolder, int position, User user) {
+    private void initFirstLetter(ViewHolder viewHolder, int position, QMUser user) {
         if (TextUtils.isEmpty(user.getFullName())) {
             return;
         }
@@ -82,7 +83,7 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
             setLetterVisible(viewHolder, firstLatter);
         } else {
             Character beforeFirstLatter;
-            User beforeUser = getItem(position - 1);
+            QMUser beforeUser = getItem(position - 1);
             if (beforeUser != null && beforeUser.getFullName() != null) {
                 beforeFirstLatter = beforeUser.getFullName().toUpperCase().charAt(0);
 
@@ -98,8 +99,8 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
         viewHolder.firstLatterTextView.setVisibility(View.VISIBLE);
     }
 
-    private void setLabel(ViewHolder viewHolder, User user) {
-        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getUserId());
+    private void setLabel(ViewHolder viewHolder, QMUser user) {
+        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getId());
 
         if (isMe(user)) {
             online = true;
@@ -110,18 +111,18 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
             viewHolder.labelTextView.setTextColor(baseActivity.getResources().getColor(R.color.green));
         } else {
             viewHolder.labelTextView.setText(baseActivity.getString(R.string.last_seen,
-                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
-                    DateUtils.formatDateSimpleTime(user.getLastLogin())));
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
+                    DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime())));
             viewHolder.labelTextView.setTextColor(baseActivity.getResources().getColor(R.color.dark_gray));
         }
     }
 
-    private boolean isMe(User inputUser) {
+    private boolean isMe(QMUser inputUser) {
         QBUser currentUser = AppSession.getSession().getUser();
-        return currentUser.getId() == inputUser.getUserId();
+        return currentUser.getId() == inputUser.getId();
     }
 
-    protected static class ViewHolder extends BaseViewHolder<User> {
+    protected static class ViewHolder extends BaseViewHolder<QMUser> {
 
         @Bind(R.id.first_latter_textview)
         TextView firstLatterTextView;

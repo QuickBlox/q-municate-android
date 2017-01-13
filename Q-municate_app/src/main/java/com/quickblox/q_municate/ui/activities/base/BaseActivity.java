@@ -67,8 +67,10 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -630,7 +632,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private void checkOpeningDialog() {
         if (appSharedHelper.needToOpenDialog() && isChatInitializedAndUserLoggedIn()) {
             Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
-            User user = DataManager.getInstance().getUserDataManager().get(appSharedHelper.getPushUserId());
+            QMUser user = QMUserService.getInstance().getUserCache().get((long)appSharedHelper.getPushUserId());
 
             if (dialog != null && user != null) {
                 if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
@@ -656,7 +658,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return isAppInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
-    public void startPrivateChatActivity(User user, Dialog dialog) {
+    public void startPrivateChatActivity(QMUser user, Dialog dialog) {
         PrivateDialogActivity.start(this, user, dialog);
     }
 

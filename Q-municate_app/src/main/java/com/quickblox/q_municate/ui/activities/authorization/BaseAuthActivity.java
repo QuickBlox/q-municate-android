@@ -43,9 +43,10 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -356,26 +357,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         inputUser.setPassword(null);
         inputUser.setOldPassword(null);
 
-        //user = QBUsers.updateUser(inputUser).perform();
-        userService.updateUser(inputUser).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()). subscribe(new Observer<QBUser>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // handle errors
-                    }
-
-                    @Override
-                    public void onNext(QBUser qbUser) {
-                        //user = qbUser;
-                    }
-                });
-
-        user = inputUser;
+        user = QBUsers.updateUser(inputUser).perform();
 
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             user.setPassword(password);
@@ -387,8 +369,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
     }
 
     private void saveOwnerUser(QBUser qbUser) {
-        User user = UserFriendUtils.createLocalUser(qbUser, User.Role.OWNER);
-        DataManager.getInstance().getUserDataManager().createOrUpdate(user);
+        QMUser user = QMUser.convert(qbUser);
+        QMUserService.getInstance().getUserCache().createOrUpdate(user);
     }
 
     private UserCustomData getUserCustomData(QBUser user) {

@@ -21,8 +21,9 @@ import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -59,8 +60,8 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     private void saveOwnerUser(QBUser qbUser) {
-        User user = UserFriendUtils.createLocalUser(qbUser, User.Role.OWNER);
-        DataManager.getInstance().getUserDataManager().createOrUpdate(user);
+        QMUser user = UserFriendUtils.createLocalUser(qbUser);
+        QMUserService.getInstance().getUserCache().createOrUpdate(user);
     }
 
     public QBUser login(String socialProvider, String accessToken,
@@ -158,8 +159,8 @@ public class QBAuthHelper extends BaseHelper {
         inputUser.setPassword(null);
         inputUser.setOldPassword(null);
 
-        //user = QBUsers.updateUser(inputUser).perform();
-        user = QMUserService.getInstance().updateUserSync(inputUser);
+        QMUser qmUser = QMUser.convert(inputUser);
+        user = QMUserService.getInstance().updateUserSync(qmUser);
 
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             user.setPassword(password);
@@ -218,8 +219,8 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser changePasswordUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
         String password = inputUser.getPassword();
-        //user =  QBUsers.updateUser(inputUser).perform();
-        user = QMUserService.getInstance().updateUserSync(inputUser);
+        QMUser qmUser = QMUser.convert(inputUser);
+        user = QMUserService.getInstance().updateUserSync(qmUser);
         user.setPassword(password);
 
         return user;

@@ -33,7 +33,8 @@ import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.AppRTCAudioManager;
 import com.quickblox.videochat.webrtc.QBMediaStreamManager;
@@ -177,7 +178,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     }
 
     private void displayOpponentAvatar() {
-        User opponent = ((CallActivity) getActivity()).getOpponentAsUserFromDB(opponents.get(0).getId());
+        QMUser opponent = ((CallActivity) getActivity()).getOpponentAsUserFromDB(opponents.get(0).getId());
         if (StartConversationReason.INCOME_CALL_FOR_ACCEPTION.equals(startConversationReason) && !isVideoCall){
             avatarAndNameView.setVisibility(View.VISIBLE);
             ImageLoader.getInstance().displayImage(opponent.getAvatar(), avatarImageview, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);

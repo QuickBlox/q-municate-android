@@ -9,6 +9,8 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_base_cache.QMAbstractBaseCache;
 import com.quickblox.q_municate_base_cache.utils.ErrorUtils;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;
 import com.quickblox.q_municate_user_service.cache.QMUserCache;
@@ -27,8 +29,10 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QMUser, Long> implement
     private QMUserDataHelper dataHelper;
 
     public QMUserCacheImpl(Context context) {
-        dataHelper = new QMUserDataHelper(context);
-        dao = dataHelper.getDaoByClass(QMUser.class);
+        OBSERVE_KEY = QMUserCacheImpl.class.getSimpleName();
+        //dataHelper = new QMUserDataHelper(context);
+        //dao = dataHelper.getDaoByClass(QMUser.class);
+        dao = DataManager.getInstance().getDataHelper().getDaoByClass(QMUser.class);
     }
 
     private QMUserDataHelper getDataHelper() {
@@ -42,6 +46,7 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QMUser, Long> implement
             deleteBuilder.where().eq(EXTERNAL_ID,externalId);
             PreparedDelete<QMUser> preparedQuery = deleteBuilder.prepare();
             dao.delete(preparedQuery);
+            notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

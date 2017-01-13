@@ -23,7 +23,8 @@ import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.util.List;
@@ -109,7 +110,7 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<QBUser, BaseClickList
 
     private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, QBUser user) {
         String status;
-        User pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getId());
+        QMUser pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getId());
 
         if (pendingUser != null) {
             status = resources.getString(R.string.search_pending_request_status);
@@ -125,7 +126,7 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<QBUser, BaseClickList
 
     private boolean isFriendOrPending(QBUser user) {
         Friend friend = dataManager.getFriendDataManager().getByUserId(user.getId());
-        User pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getId());
+        QMUser pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getId());
         return friend != null || pendingUser != null;
     }
 

@@ -36,6 +36,7 @@ import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
 //import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
@@ -85,7 +86,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     public void onGroupMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
-        QMUser user =   DataManager.getInstance().getUserDataManager().get(qbChatMessage.getSenderId());
+        QMUser user = QMUserService.getInstance().getUserCache().get((long)qbChatMessage.getSenderId());
         Message message = parseReceivedMessage(qbChatMessage);
 
         boolean ownMessage = !message.isIncoming(chatCreator.getId());
@@ -364,7 +365,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         DbUtils.saveTempMessage(dataManager, message);
 
         boolean ownMessage = !message.isIncoming(chatCreator.getId());
-        User user = DataManager.getInstance().getUserDataManager().get(qbChatMessage.getSenderId());
+        QMUser user = QMUserService.getInstance().getUserCache().get((long)qbChatMessage.getSenderId());
         checkForSendingNotification(ownMessage, qbChatMessage, user, false);
     }
 

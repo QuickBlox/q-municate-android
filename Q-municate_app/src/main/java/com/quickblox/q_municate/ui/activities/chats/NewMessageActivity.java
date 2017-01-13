@@ -27,7 +27,8 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
+//import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
 
     private DataManager dataManager;
     private FriendsAdapter friendsAdapter;
-    private User selectedUser;
+    private QMUser selectedUser;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, NewMessageActivity.class);
@@ -150,10 +151,10 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     }
 
     private void initCustomListeners() {
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QMUser>() {
 
             @Override
-            public void onItemClicked(View view, User user, int position) {
+            public void onItemClicked(View view, QMUser user, int position) {
                 super.onItemClicked(view, user, position);
                 selectedUser = user;
                 checkForOpenChat(user);
@@ -175,8 +176,8 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
         updateBroadcastActionList();
     }
 
-    private void checkForOpenChat(User user) {
-        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
+    private void checkForOpenChat(QMUser user) {
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
             startPrivateChat(dialogOccupant.getDialog());
         } else {

@@ -68,7 +68,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             } else {
                 senderName = combinationMessage.getDialogOccupant().getUser().getFullName();
                 avatarUrl = combinationMessage.getDialogOccupant().getUser().getAvatar();
-                viewHolder.nameTextView.setTextColor(colorUtils.getRandomTextColorById(combinationMessage.getDialogOccupant().getUser().getUserId()));
+                viewHolder.nameTextView.setTextColor(colorUtils.getRandomTextColorById(combinationMessage.getDialogOccupant().getUser().getId()));
                 viewHolder.nameTextView.setText(senderName);
             }
 

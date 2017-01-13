@@ -13,11 +13,14 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Observable;
 import java.util.concurrent.Callable;
 
-public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
+public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements QMBaseCache<T, ID>{
 
     private static final String TAG = QMAbstractBaseCache.class.getSimpleName();
+
+    public static String OBSERVE_KEY;
 
     protected Dao<T, ID> dao;
 
@@ -27,10 +30,21 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
         handler = new Handler(Looper.getMainLooper());
     }
 
+    public void notifyObservers(final Object data) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                setChanged();
+                QMAbstractBaseCache.super.notifyObservers(data);
+            }
+        });
+    }
+
     @Override
     public void create(T object) {
         try {
             dao.create(object);
+            notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
             //ErrorUtils.logError(TAG, "create() - " + e.getMessage());
         }
@@ -41,6 +55,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
     public void createOrUpdate(Object object) {
         try {
             dao.createOrUpdate((T) object);
+            notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
             //ErrorUtils.logError(TAG, "createOrUpdateAll(Object) - " + e.getMessage());
         }
@@ -55,6 +70,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
                     for (Object object : objectsCollection) {
                         createOrUpdate(object);
                     }
+                    notifyObservers(OBSERVE_KEY);
                    return null;
                 }
             });
@@ -152,6 +168,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
                     for (Object object : objectsCollection) {
                         update(object);
                     }
+                    notifyObservers(OBSERVE_KEY);
                     return null;
                 }
             });
@@ -164,6 +181,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
     public void delete(Object object) {
         try {
             dao.delete((T) object);
+            notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
             //ErrorUtils.logError(e);
         }
@@ -173,6 +191,7 @@ public abstract class QMAbstractBaseCache<T, ID>  implements QMBaseCache<T, ID>{
     public void deleteById(ID id) {
         try {
             dao.deleteById(id);
+            notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
             //ErrorUtils.logError(e);
         }

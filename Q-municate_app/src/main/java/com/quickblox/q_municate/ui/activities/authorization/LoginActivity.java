@@ -7,12 +7,15 @@ import android.support.v7.widget.SwitchCompat;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import butterknife.Bind;
 import butterknife.OnCheckedChanged;
@@ -99,8 +102,7 @@ public class LoginActivity extends BaseAuthActivity {
                 userEmail, userPassword)) {
 
             showProgress();
-
-            boolean ownerUser = DataManager.getInstance().getUserDataManager().isUserOwner(userEmail);
+            boolean ownerUser =   QBSessionManager.getInstance().getSessionParameters() != null && userEmail.equals(QBSessionManager.getInstance().getSessionParameters().getUserEmail());
             if (!ownerUser) {
                 DataManager.getInstance().clearAllTables();
             }

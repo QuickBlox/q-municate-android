@@ -24,7 +24,7 @@ import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -217,8 +217,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         Log.d("TAG", "updateFriends  - begin");
 
         List<QMUser> qmUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, new QBPagedRequestBuilder());
-        List<User> usersList = new ArrayList<User>(qmUsers.size());
-        User user = null;
+        List<QMUser> usersList = new ArrayList<QMUser>(qmUsers.size());
+        QMUser user = null;
         for (QBUser qbUser : qmUsers){
             user = UserFriendUtils.createLocalUser(qbUser);
             usersList.add(user);
@@ -237,7 +237,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private void updateFriend(int userId) throws QBResponseException {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
-        User newUser = loadAndSaveUser(userId);
+        QMUser newUser = loadAndSaveUser(userId);
 
         if (newUser == null) {
             return;
@@ -252,11 +252,11 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
             createUserRequest(newUser, UserRequest.RequestStatus.OUTGOING);
         } else {
             saveFriend(newUser);
-            deleteUserRequestByUser(newUser.getUserId());
+            deleteUserRequestByUser(newUser.getId());
         }
     }
 
-    private void createUserRequest(User user, UserRequest.RequestStatus requestStatus) {
+    private void createUserRequest(QMUser user, UserRequest.RequestStatus requestStatus) {
         long currentTime = DateUtilsCore.getCurrentTime();
         UserRequest userRequest = new UserRequest(currentTime, null, requestStatus, user);
         dataManager.getUserRequestDataManager().createOrUpdate(userRequest);
@@ -283,7 +283,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private void saveUser(QMUser user) {
-        dataManager.getUserDataManager().createOrUpdate(user);
+        QMUserService.getInstance().getUserCache().createOrUpdate(user);
     }
 
     private void saveUsersAndFriends(Collection<QMUser> usersCollection) {
@@ -368,8 +368,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
     private void loadAndSaveUsers(Collection<Integer> userList, UserRequest.RequestStatus status) throws QBResponseException {
         if (!userList.isEmpty()) {
-            List<User> loadedUserList = (List<User>) restHelper.loadUsers(userList);
-            for (User user : loadedUserList) {
+            List<QMUser> loadedUserList = (List<QMUser>) restHelper.loadUsers(userList);
+            for (QMUser user : loadedUserList) {
                 saveUser(user);
                 createUserRequest(user, status);
             }
@@ -426,11 +426,11 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
         @Override
         public void presenceChanged(QBPresence presence) {
-            User user = dataManager.getUserDataManager().get(presence.getUserId());
+            QMUser user =  QMUserService.getInstance().getUserCache().get((long)presence.getUserId());
             if (user == null) {
                 ErrorUtils.logError(TAG, PRESENCE_CHANGE_ERROR + presence.getUserId());
             } else {
-                notifyUserStatusChanged(user.getUserId());
+                notifyUserStatusChanged(user.getId());
             }
         }
     }
