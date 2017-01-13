@@ -57,7 +57,6 @@ android {
 
         debug {
             debuggable true
-            ext.enableCrashlytics = false
             versionNameSuffix ' (debug)'
             buildConfigField "String", "APP_ID", property('devAppID')
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')
