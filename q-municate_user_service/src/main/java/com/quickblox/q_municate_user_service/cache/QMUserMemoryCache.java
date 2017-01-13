@@ -16,8 +16,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
-public class QMUserMemoryCache implements QMUserCache {
+public class QMUserMemoryCache extends Observable implements QMUserCache {
 
     private Map<Long, QMUser> usersMap = new HashMap<>();
 

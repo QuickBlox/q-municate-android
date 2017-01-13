@@ -220,7 +220,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         List<QMUser> usersList = new ArrayList<QMUser>(qmUsers.size());
         QMUser user = null;
         for (QBUser qbUser : qmUsers){
-            user = UserFriendUtils.createLocalUser(qbUser);
+            user = QMUser.convert(qbUser);
             usersList.add(user);
         }
         saveUsersAndFriends(usersList);

@@ -1,9 +1,11 @@
 package com.quickblox.q_municate_user_service.model;
 
+import com.google.gson.annotations.SerializedName;
 import com.quickblox.q_municate_user_service.utils.Utils;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -34,7 +36,26 @@ public class QMUser extends QBUser {
     }
 
     public static QMUser convert(QBUser qbUser){
-        QMUser result = (QMUser) qbUser;
+        QMUser result = new QMUser();
+        result.setId(qbUser.getId());
+        result.setFullName(qbUser.getFullName());
+        result.setEmail(qbUser.getEmail());
+        result.setLogin(qbUser.getLogin());
+        result.setPhone(qbUser.getPhone());
+        result.setWebsite(qbUser.getWebsite());
+        result.setLastRequestAt(qbUser.getLastRequestAt());
+        result.setExternalId(qbUser.getExternalId());
+        result.setFacebookId(qbUser.getFacebookId());
+        result.setTwitterId(qbUser.getTwitterId());
+        result.setTwitterDigitsId(qbUser.getTwitterDigitsId());
+        result.setFileId(qbUser.getFileId());
+        result.setTags(qbUser.getTags());
+        result.setPassword(qbUser.getPassword());
+        result.setOldPassword(qbUser.getOldPassword());
+        result.setCustomData(qbUser.getCustomData());
+        result.setCreatedAt(qbUser.getCreatedAt());
+        result.setUpdatedAt(qbUser.getUpdatedAt());
+
         final QMUserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
         result.setAvatar(userCustomData.getAvatarUrl());
         result.setStatus(userCustomData.getStatus());
