@@ -424,6 +424,9 @@ public class ChatUtils {
             attachment.setType(Attachment.Type.LOCATION);
             remoteUrl = MapUtils.getRemoteUri(qbAttachment.getData());
         }
+        if(qbAttachment.getId() == null){
+            qbAttachment.setId(String.valueOf(qbAttachment.getData().hashCode()));
+        }
         attachment.setAttachmentId(qbAttachment.getId());
         attachment.setRemoteUrl(remoteUrl);
         attachment.setName(qbAttachment.getName());
