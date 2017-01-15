@@ -87,14 +87,15 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             viewHolder.timeAttachMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
+            Attachment attachment = combinationMessage.getAttachment();
             if (ownMessage && combinationMessage.getState() != null) {
                 setMessageStatus(viewHolder.attachDeliveryStatusImageView, State.DELIVERED.equals(
                         combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }
-            if (combinationMessage.getAttachment().getType() == Attachment.Type.LOCATION) {
-                displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
+            if (attachment.getType() == Attachment.Type.LOCATION) {
+                displayAttachImage(attachment.getRemoteUrl(), attachment.getAdditionalInfo(), viewHolder);
             } else {
-                displayAttachImageById(combinationMessage.getAttachment().getAttachmentId(), viewHolder);
+                displayAttachImageById(attachment.getAttachmentId(), viewHolder);
             }
         } else {
             resetUI(viewHolder);

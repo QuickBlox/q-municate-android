@@ -1,8 +1,10 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -21,6 +23,7 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
+import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
@@ -59,11 +62,13 @@ public abstract class BaseDialogMessagesAdapter
     protected Dialog dialog;
     protected ColorUtils colorUtils;
     protected QBUser currentUser;
+    protected Context context;
 
     private FileUtils fileUtils;
 
     public BaseDialogMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> objectsList) {
         super(baseActivity, objectsList);
+        context = baseActivity.getApplicationContext();
         dataManager = DataManager.getInstance();
         imageUtils = new ImageUtils(baseActivity);
         colorUtils = new ColorUtils();
@@ -97,12 +102,12 @@ public abstract class BaseDialogMessagesAdapter
 
     protected void displayAttachImageById(String attachId, final ViewHolder viewHolder) {
         String privateUrl = QBFile.getPrivateUrlForUID(attachId);
-        displayAttachImage(privateUrl, viewHolder);
+        displayAttachImage(privateUrl, null, viewHolder);
     }
 
-    protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder) {
+    protected void displayAttachImage(String attachUrl, String location, final ViewHolder viewHolder) {
         ImageLoader.getInstance().displayImage(attachUrl, viewHolder.attachImageView,
-                ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener(viewHolder),
+                ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener(viewHolder, location),
                 new SimpleImageLoadingProgressListener(viewHolder));
     }
 
@@ -229,9 +234,11 @@ public abstract class BaseDialogMessagesAdapter
         private ViewHolder viewHolder;
         private Bitmap loadedImageBitmap;
         private String imageUrl;
+        private String location;
 
-        public ImageLoadingListener(ViewHolder viewHolder) {
+        public ImageLoadingListener(ViewHolder viewHolder, String location) {
             this.viewHolder = viewHolder;
+            this.location = location;
         }
 
         @Override
@@ -275,6 +282,10 @@ public abstract class BaseDialogMessagesAdapter
 
                 @Override
                 public void onClick(View view) {
+                    if(location != null){
+                        Log.d("BaseDialogAdapter", "location= " + location);
+                        MapsActivity.startMapForResult(context);
+                    } else
                     if (imageUrl != null) {
                         view.startAnimation(AnimationUtils.loadAnimation(baseActivity, R.anim.chat_attached_file_click));
                         PreviewImageActivity.start(baseActivity, imageUrl);

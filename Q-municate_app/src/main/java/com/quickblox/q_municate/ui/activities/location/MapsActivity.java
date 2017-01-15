@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.ui.activities.location;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -54,6 +55,12 @@ public class MapsActivity extends BaseLoggableActivity
     private LatLng latLng;
     private Marker currLocationMarker;
     private boolean isLocationServiceOn = true;
+
+    public static void startMapForResult(Context context){
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 
     @Bind(R.id.map_textview)
     TextView sendTextView;
