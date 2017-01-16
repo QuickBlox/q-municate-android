@@ -7,7 +7,7 @@ import android.util.Log;
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
@@ -44,7 +44,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     @Override
-    public synchronized QBPrivateChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
+    public synchronized QBPrivateChat createChatLocally(QBChatDialog dialog, Bundle additional) throws QBResponseException {
         Log.d("Fix double message", "createChatLocally from " + QBPrivateChatHelper.class.getSimpleName());
         Log.d("Fix double message", "dialog = " + dialog);
         currentDialog = dialog;
@@ -53,7 +53,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     @Override
-    public synchronized void closeChat(QBDialog qbDialog, Bundle additional) {
+    public synchronized void closeChat(QBChatDialog qbDialog, Bundle additional) {
         Log.d("Fix double message", "closeChat " + QBPrivateChatHelper.class.getSimpleName());
         if (currentDialog != null && currentDialog.getDialogId().equals(qbDialog.getDialogId())) {
             currentDialog = null;
@@ -61,15 +61,19 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     public void sendPrivateMessage(String message, int userId) throws QBResponseException {
-        sendPrivateMessage(null, message, userId);
+        sendPrivateMessage(null, message, userId, null);
     }
 
     public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QBResponseException {
-        sendPrivateMessage(file, context.getString(R.string.dlg_attached_last_message), userId);
+        sendPrivateMessage(file, context.getString(R.string.dlg_attached_last_message), userId, null);
     }
 
-    private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
-        QBChatMessage qbChatMessage = getQBChatMessage(message, file);
+    public void sendPrivateMessageWithAttachLocation(String location, int userId) throws QBResponseException {
+        sendPrivateMessage(null, context.getString(R.string.dlg_attached_last_message), userId, location);
+    }
+
+    private void sendPrivateMessage(QBFile file, String message, int userId, String location) throws QBResponseException {
+        QBChatMessage qbChatMessage = getQBChatMessage(message, file, location);
         String dialogId = null;
         if (currentDialog != null) {
             dialogId = currentDialog.getDialogId();
@@ -83,7 +87,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
             User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
             Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
             if (dialog == null) {
-                QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
+                QBChatDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
                 ChatUtils.addOccupantsToQBDialog(qbDialog, qbChatMessage);
                 DbUtils.saveDialogToCache(dataManager, qbDialog);
             }
@@ -98,7 +102,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         QBFile file = null;
 
         try {
-            file = QBContent.uploadFileTask(inputFile, true, (String) null);
+            file = QBContent.uploadFileTask(inputFile, true, (String) null).perform();
         } catch (QBResponseException exc) {
             throw new Exception(context.getString(R.string.dlg_fail_upload_attach));
         }
@@ -119,7 +123,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
         Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
         if (dialog == null) {
-            QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
+            QBChatDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
             ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(chatCreator.getId(), qbChatMessage.getSenderId());
             qbDialog.setOccupantsIds(occupantsIdsList);
             DbUtils.saveDialogToCache(dataManager, qbDialog);

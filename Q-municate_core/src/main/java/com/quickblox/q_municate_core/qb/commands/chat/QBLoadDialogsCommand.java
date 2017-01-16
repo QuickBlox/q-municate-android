@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
@@ -86,12 +86,12 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         threadPool.allowCoreThreadTimeOut(true);
     }
 
-    private boolean loadAllDialogsByType(QBDialogType dialogsType,  Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, List<QBDialog> allDialogsList, int pageNumber) throws QBResponseException {
+    private boolean loadAllDialogsByType(QBDialogType dialogsType,  Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, List<QBChatDialog> allDialogsList, int pageNumber) throws QBResponseException {
         boolean needToLoadMore = false;
 
         qbRequestGetBuilder.setSkip(allDialogsList.size());
             qbRequestGetBuilder.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, dialogsType.getCode());
-            List<QBDialog> newDialogsList = dialogsType == QBDialogType.PRIVATE
+            List<QBChatDialog> newDialogsList = dialogsType == QBDialogType.PRIVATE
                     ? getPrivateDialogs(qbRequestGetBuilder, returnedBundle)
                     : getGroupDialogs(qbRequestGetBuilder, returnedBundle);
             allDialogsList.addAll(newDialogsList);
@@ -106,10 +106,10 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return needToLoadMore;
     }
 
-    private List<QBDialog> loadAllDialogs(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
-        List<QBDialog> allDialogsList = null;
-        List<QBDialog> allDialogsListPrivate = new ArrayList<>();
-        List<QBDialog> allDialogsListGroup = new ArrayList<>();
+    private List<QBChatDialog> loadAllDialogs(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
+        List<QBChatDialog> allDialogsList = null;
+        List<QBChatDialog> allDialogsListPrivate = new ArrayList<>();
+        List<QBChatDialog> allDialogsListGroup = new ArrayList<>();
         boolean needToLoadMorePrivate = true;
         boolean needToLoadMoreGroup = true;
         int pageNumber = 0;
@@ -150,15 +150,15 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return allDialogsList;
     }
 
-    private List<QBDialog> getPrivateDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
+    private List<QBChatDialog> getPrivateDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
         return privateChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
     }
 
-    private List<QBDialog> getGroupDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
+    private List<QBChatDialog> getGroupDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
         return multiChatHelper.getDialogs(qbRequestGetBuilder, returnedBundle);
     }
 
-    private void tryJoinRoomChatsPage(final List<QBDialog> dialogsList, final boolean needClean) {
+    private void tryJoinRoomChatsPage(final List<QBChatDialog> dialogsList, final boolean needClean) {
         threadPool.execute(new Runnable() {
 
             @Override

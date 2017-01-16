@@ -1,10 +1,11 @@
 package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -34,7 +35,7 @@ public class DbUtils {
         return dialogOccupant;
     }
 
-    public static void saveDialogToCache(DataManager dataManager, QBDialog qbDialog) {
+    public static void saveDialogToCache(DataManager dataManager, QBChatDialog qbDialog) {
         Dialog dialog = ChatUtils.createLocalDialog(qbDialog);
         dataManager.getDialogDataManager().createOrUpdate(dialog);
 
@@ -43,8 +44,8 @@ public class DbUtils {
         }
     }
 
-    public static void saveDialogsToCache(DataManager dataManager, List<QBDialog> qbDialogsList,
-            QBDialog currentDialog) {
+    public static void saveDialogsToCache(DataManager dataManager, List<QBChatDialog> qbDialogsList,
+            QBChatDialog currentDialog) {
         dataManager.getDialogDataManager().createOrUpdateAll(ChatUtils.createLocalDialogsList(qbDialogsList));
 
         saveDialogsOccupants(dataManager, qbDialogsList);
@@ -52,8 +53,8 @@ public class DbUtils {
         saveTempMessages(dataManager, qbDialogsList, currentDialog);
     }
 
-    public static void saveTempMessages(DataManager dataManager, List<QBDialog> qbDialogsList,
-            QBDialog currentDialog) {
+    public static void saveTempMessages(DataManager dataManager, List<QBChatDialog> qbDialogsList,
+            QBChatDialog currentDialog) {
         dataManager.getMessageDataManager()
                 .createOrUpdateAll(ChatUtils.createTempLocalMessagesList(dataManager, qbDialogsList, currentDialog));
     }
@@ -64,7 +65,7 @@ public class DbUtils {
                 message.getCreatedDate(), true);
     }
 
-    public static List<DialogOccupant> saveDialogsOccupants(DataManager dataManager, QBDialog qbDialog, boolean onlyNewOccupant) {
+    public static List<DialogOccupant> saveDialogsOccupants(DataManager dataManager, QBChatDialog qbDialog, boolean onlyNewOccupant) {
         List<DialogOccupant> dialogOccupantsList = ChatUtils.createDialogOccupantsList(dataManager, qbDialog, onlyNewOccupant);
         if (!dialogOccupantsList.isEmpty()) {
             dataManager.getDialogOccupantDataManager().createOrUpdateAll(dialogOccupantsList);
@@ -76,8 +77,8 @@ public class DbUtils {
         dataManager.getDialogOccupantDataManager().createOrUpdate(dialogOccupant);
     }
 
-    public static void saveDialogsOccupants(DataManager dataManager, List<QBDialog> qbDialogsList) {
-        for (QBDialog qbDialog : qbDialogsList) {
+    public static void saveDialogsOccupants(DataManager dataManager, List<QBChatDialog> qbDialogsList) {
+        for (QBChatDialog qbDialog : qbDialogsList) {
             saveDialogsOccupants(dataManager, qbDialog, false);
         }
     }
@@ -137,7 +138,7 @@ public class DbUtils {
                         qbChatMessage.getAttachments());
                 Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0));
                 message.setAttachment(attachment);
-
+                Log.d("DbUtilsZZ", "saveMessageOrNotificationToCache Attachment= " + attachment);
                 dataManager.getAttachmentDataManager().createOrUpdate(attachment, notify);
             }
 
@@ -209,13 +210,13 @@ public class DbUtils {
         dataManager.getDialogOccupantDataManager().update(dialogOccupant);
     }
 
-    public static void updateDialogsOccupantsStatusesIfNeeded(DataManager dataManager, List<QBDialog> qbDialogsList) {
-        for (QBDialog qbDialog : qbDialogsList) {
+    public static void updateDialogsOccupantsStatusesIfNeeded(DataManager dataManager, List<QBChatDialog> qbDialogsList) {
+        for (QBChatDialog qbDialog : qbDialogsList) {
             updateDialogOccupantsStatusesIfNeeded(dataManager, qbDialog);
         }
     }
 
-    public static void updateDialogOccupantsStatusesIfNeeded(DataManager dataManager, QBDialog qbDialog) {
+    public static void updateDialogOccupantsStatusesIfNeeded(DataManager dataManager, QBChatDialog qbDialog) {
         List<DialogOccupant> oldDialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(qbDialog.getDialogId());
         List<DialogOccupant> updatedDialogOccupantsList = new ArrayList<>();
         List<DialogOccupant> newDialogOccupantsList = dataManager.getDialogOccupantDataManager().getActualDialogOccupantsByIds(

@@ -12,7 +12,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven { url= "file://Users/Roman/workspaceForTest/quickblox-android-sdk-releases" }
+        maven { url "file://Users/roman/QuickBlox/StudioProjects/SDK-REPO/quickblox-android-sdk-releases" }
         maven { url 'https://maven.fabric.io/public' }
     }
 }
@@ -32,12 +32,12 @@ ext {
     lintAbortOnError = false
 
 //    QuickBlox SDK version
-    qbSdkVersion = '2.6.1'
+    qbSdkVersion = '3.3.0'
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
     supportVersion = '23.4.0'
-    googlePlayServicesVersion = '8.1.0'
+    googlePlayServicesVersion = '10.0.1'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '4.48'
     ormliteCoreVersion = '4.48'

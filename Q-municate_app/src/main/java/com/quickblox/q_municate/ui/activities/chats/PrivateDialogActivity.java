@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -124,12 +125,24 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
+        sendPrivateMessageWithAttach(dialogId, file, null);
+    }
+
+    @Override
+    protected void onLocationLoaded(String location, String dialogId) {
+        sendPrivateMessageWithAttach(dialogId, null, location);
+    }
+
+    private void sendPrivateMessageWithAttach(String dialogId, QBFile file, String location) {
+        if (!dialogId.equals(dialog.getDialogId())) {
             return;
         }
-
         try {
-            privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
+            if (file != null) {
+                privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
+            } else if (!TextUtils.isEmpty(location)) {
+                privateChatHelper.sendPrivateMessageWithAttachLocation(location, opponentUser.getUserId());
+            }
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }

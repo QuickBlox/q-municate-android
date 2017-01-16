@@ -3,7 +3,7 @@ package com.quickblox.q_municate_core.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -20,14 +20,14 @@ public class ParcelableQBDialog implements Parcelable {
             return new ParcelableQBDialog[size];
         }
     };
-    private QBDialog dialog;
+    private QBChatDialog dialog;
 
-    public ParcelableQBDialog(QBDialog dialog) {
+    public ParcelableQBDialog(QBChatDialog dialog) {
         this.dialog = dialog;
     }
 
     public ParcelableQBDialog(Parcel inputParcel) {
-        dialog = new QBDialog(inputParcel.readString());
+        dialog = new QBChatDialog(inputParcel.readString());
         dialog.setName(inputParcel.readString());
         dialog.setType(QBDialogType.parseByCode(inputParcel.readInt()));
         dialog.setRoomJid(inputParcel.readString());
@@ -38,7 +38,7 @@ public class ParcelableQBDialog implements Parcelable {
         dialog.setOccupantsIds(Utils.toArrayList(occupantArray));
     }
 
-    public QBDialog getDialog() {
+    public QBChatDialog getDialog() {
         return dialog;
     }
 
