@@ -10,13 +10,14 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBAttachment;
-import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
+import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
@@ -28,7 +29,6 @@ import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
-import java.util.Collection;
 import java.util.List;
 
 import butterknife.Bind;
@@ -77,24 +77,19 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     public int getItemViewType(int position) {
         CombinationMessage combinationMessage = getItem(position);
         if (combinationMessage.getNotificationType() != null) {
-            Log.d(TAG, "getItemViewType TYPE_REQUEST_MESSAGE");
+            Log.d(TAG, "getItemViewType TYPE_REQUEST_MESSAGE combinationMessage.getNotificationType()" + combinationMessage.getNotificationType());
             return TYPE_REQUEST_MESSAGE;
         }
         return super.getItemViewType(position);
     }
 
     @Override
-    public void displayAttachment(QBMessageViewHolder holder, int position) {
+    protected RequestListener getRequestListener(QBMessageViewHolder holder, int position) {
         CombinationMessage chatMessage = getItem(position);
-        Collection<QBAttachment> attachments = chatMessage.getAttachments();
-        QBAttachment attachment = attachments.iterator().next();
-        String privateUrl = QBFile.getPrivateUrlForUID(attachment.getId());
+        QBAttachment attachment = chatMessage.getAttachments().iterator().next();
 
-        ImageLoader.getInstance().displayImage(privateUrl, ((ImageAttachHolder) holder).attachImageView,
-                ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener((ImageAttachHolder) holder, isIncoming(chatMessage)),
-                null);
+        return new ImageRequestListener((ImageAttachHolder) holder, attachment.getData(), isIncoming(chatMessage));
     }
-
 
     @Override
     public void displayAvatarImage(String url, ImageView imageView) {
@@ -104,10 +99,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     @Override
     public String obtainAvatarUrl(int valueType, CombinationMessage chatMessage) {
         return chatMessage.getDialogOccupant().getUser().getAvatar();
-    }
-
-    public void updateList(List<CombinationMessage> chatMessages) {
-        addList(chatMessages);
     }
 
     @Override
@@ -121,7 +112,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     }
 
     protected void showAttachUI(ImageAttachHolder viewHolder, boolean isIncoming) {
-        if (isIncoming){
+        if (isIncoming) {
             setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.VISIBLE);
         }
         setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.VISIBLE);
@@ -142,31 +133,34 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         return chatMessage.isIncoming(currentUser.getId());
     }
 
-    public class ImageLoadingListener extends SimpleImageLoadingListener {
-
+    public class ImageRequestListener implements RequestListener<String, GlideBitmapDrawable> {
         private ImageAttachHolder viewHolder;
         private Bitmap loadedImageBitmap;
         private String imageUrl;
+        private String location;
         private boolean isIncoming;
 
-        public ImageLoadingListener(ImageAttachHolder viewHolder, boolean isIncoming) {
+        public ImageRequestListener(ImageAttachHolder viewHolder, String location, boolean isIncoming) {
             this.viewHolder = viewHolder;
+            this.location = location;
             this.isIncoming = isIncoming;
         }
 
         @Override
-        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+        public boolean onException(Exception e, String model, Target target, boolean isFirstResource) {
             updateUIAfterLoading();
             resetAttachUI(viewHolder);
             Log.d(TAG, "onLoadingFailed");
             imageUrl = null;
+            return false;
         }
 
         @Override
-        public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
-            initMaskedImageView(loadedBitmap);
-            fileUtils.checkExistsFile(imageUri, loadedBitmap);
+        public boolean onResourceReady(GlideBitmapDrawable loadedBitmap, String imageUri, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
+            initMaskedImageView(loadedBitmap.getBitmap());
+            fileUtils.checkExistsFile(imageUri, loadedBitmap.getBitmap());
             this.imageUrl = imageUri;
+            return false;
         }
 
         protected void initMaskedImageView(Bitmap loadedBitmap) {
@@ -190,8 +184,10 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
 
                 @Override
                 public void onClick(View view) {
-                    Log.d(TAG, "receiveImageFileOnClickListener onClick");
-                    if (imageUrl != null) {
+                    if (location != null) {
+                        Log.d("BaseDialogAdapter", "location= " + location);
+                        MapsActivity.startMapForResult(context, location);
+                    } else if (imageUrl != null) {
                         view.startAnimation(AnimationUtils.loadAnimation(baseActivity, R.anim.chat_attached_file_click));
                         PreviewImageActivity.start(baseActivity, imageUrl);
                     }

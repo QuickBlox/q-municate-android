@@ -7,12 +7,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.util.Pair;
 
 import com.quickblox.q_municate.tasks.GetFilepathFromUriTask;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
-import com.quickblox.q_municate_core.utils.MapUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
+
 
 public class ImagePickHelperFragment extends Fragment {
 
@@ -65,9 +68,10 @@ public class ImagePickHelperFragment extends Fragment {
             if (requestCode == ImageUtils.IMAGE_LOCATION_REQUEST_CODE) {
                 if (data != null) {
                     Bundle bundle = data.getExtras();
-                    double latitude = bundle.getDouble(MapUtils.EXTRA_LOCATION_LATITUDE);
-                    double longitude = bundle.getDouble(MapUtils.EXTRA_LOCATION_LONGITUDE);
-                    String location = MapUtils.generateLocationData(latitude, longitude);
+                    double latitude = bundle.getDouble(ConstsCore.EXTRA_LOCATION_LATITUDE);
+                    double longitude = bundle.getDouble(ConstsCore.EXTRA_LOCATION_LONGITUDE);
+                    String location = LocationUtils.generateLocationJson(new Pair<>(ConstsCore.LATITUDE_PARAM, latitude),
+                            new Pair<>(ConstsCore.LONGITUDE_PARAM, longitude));
                     listener.onImagePicked(requestCode, null, location);
                 }
             } else {

@@ -47,7 +47,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void onBindViewCustomHolder(QBMessageViewHolder holder, CombinationMessage chatMessage, int position) {
-        Log.d(TAG, "onBindViewCustomHolder chatMessage getBody= " + chatMessage.getBody());
         Log.d(TAG, "onBindViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
         FriendsViewHolder friendsViewHolder = (FriendsViewHolder) holder;
 
@@ -63,7 +62,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
-            Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolderr combinationMessage getBody= " + chatMessage.getBody());
+            Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
             textView.setText(chatMessage.getBody());
             timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
 
@@ -138,6 +137,8 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         if (ownMessage && chatMessage.getState() != null) {
             setMessageStatus(view, State.DELIVERED.equals(
                     chatMessage.getState()), State.READ.equals(chatMessage.getState()));
+        } else {
+            view.setImageResource(android.R.color.transparent);
         }
 
         super.onBindViewAttachRightHolder(holder, chatMessage, position);
@@ -171,11 +172,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         TextView headerTextView = (TextView) view.findViewById(R.id.header_date_textview);
         CombinationMessage combinationMessage = getItem(position);
         headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
-    }
-
-    @Override
-    protected String getDate(long milliseconds) {
-        return DateUtils.formatDateSimpleTime(milliseconds / 1000);
     }
 
     @Override

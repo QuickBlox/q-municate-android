@@ -176,7 +176,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         this.combinationMessagesList = createCombinationMessagesList();
         Log.d(TAG, "updateMessagesList combinationMessagesList = " + combinationMessagesList);
-        messagesAdapter.updateList(combinationMessagesList);
+        messagesAdapter.addList(combinationMessagesList);
         findLastFriendsRequest();
 
         checkForScrolling(oldMessagesCount);

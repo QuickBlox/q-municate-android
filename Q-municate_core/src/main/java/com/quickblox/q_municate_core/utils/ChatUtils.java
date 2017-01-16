@@ -6,8 +6,8 @@ import android.util.Log;
 
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.model.QBAttachment;
-import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -25,6 +25,7 @@ import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -417,13 +418,13 @@ public class ChatUtils {
                 .concat(QBSettings.getInstance().getChatEndpoint());
     }
 
-    public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
+    public static Attachment createLocalAttachment(QBAttachment qbAttachment, Context context) {
         Attachment attachment = new Attachment();
         String remoteUrl = qbAttachment.getUrl();
         if (qbAttachment.getType().equalsIgnoreCase(Attachment.Type.LOCATION.toString())) {
             attachment.setType(Attachment.Type.LOCATION);
             attachment.setAdditionalInfo(qbAttachment.getData());
-            remoteUrl = MapUtils.getRemoteUri(qbAttachment.getData());
+            remoteUrl = LocationUtils.getRemoteUri(qbAttachment.getData(), context);
         }
         if(qbAttachment.getId() == null){
             qbAttachment.setId(String.valueOf(qbAttachment.getData().hashCode()));

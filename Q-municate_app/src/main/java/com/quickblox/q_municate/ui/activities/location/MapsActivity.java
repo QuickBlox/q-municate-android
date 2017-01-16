@@ -35,7 +35,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
-import com.quickblox.q_municate_core.utils.MapUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -140,7 +141,7 @@ public class MapsActivity extends BaseLoggableActivity
             return null;
         }
         Log.d(TAG, "getReceivedLocation");
-        Pair<Double, Double> latLngPair = MapUtils.getLatLngFromJson(location);
+        Pair<Double, Double> latLngPair = LocationUtils.getLatLngFromJson(location);
 
         return new LatLng(latLngPair.first, latLngPair.second);
     }
@@ -326,8 +327,8 @@ public class MapsActivity extends BaseLoggableActivity
 
     private void sendLocation(LatLng position) {
         Bundle extras = new Bundle();
-        extras.putDouble(MapUtils.EXTRA_LOCATION_LATITUDE, position.latitude);
-        extras.putDouble(MapUtils.EXTRA_LOCATION_LONGITUDE, position.longitude);
+        extras.putDouble(ConstsCore.EXTRA_LOCATION_LATITUDE, position.latitude);
+        extras.putDouble(ConstsCore.EXTRA_LOCATION_LONGITUDE, position.longitude);
 
         Intent result = new Intent();
         result.putExtras(extras);

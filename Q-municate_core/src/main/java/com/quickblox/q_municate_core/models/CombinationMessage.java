@@ -162,6 +162,7 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
         qbAttachment.setUrl(attachment.getRemoteUrl());
         qbAttachment.setName(attachment.getName());
         qbAttachment.setSize(attachment.getSize());
+        qbAttachment.setData(attachment.getAdditionalInfo());
         this.addAttachment(qbAttachment);
     }
 

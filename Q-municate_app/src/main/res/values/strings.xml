@@ -294,6 +294,10 @@
         AIzaSyD7UdDsB1Gv-9KOP_Phl7B_qwkXIFwuJH8
     </string>
 
+    <string name="google_static_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyC68nhqEWQaXQJqr422kpimzR7XuJuRndg
+    </string>
+
     <plurals name="days">
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>

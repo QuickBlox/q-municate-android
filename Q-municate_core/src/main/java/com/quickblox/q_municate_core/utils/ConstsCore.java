@@ -42,4 +42,10 @@ public class ConstsCore {
     public static final String NOTIFICATION_TYPE = "notificationType";
     public static final String STATE = "state";
     public static final String USER = "user";
+
+    //    Location
+    public static final String EXTRA_LOCATION_LATITUDE = "location_latitude";
+    public static final String EXTRA_LOCATION_LONGITUDE = "location_longitude";
+    public static final String LATITUDE_PARAM = "lat";
+    public static final String LONGITUDE_PARAM = "lng";
 }

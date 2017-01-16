@@ -143,7 +143,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
         this.combinationMessagesList = createCombinationMessagesList();
         processCombinationMessages();
-        messagesAdapter.updateList(combinationMessagesList);
+        messagesAdapter.addList(combinationMessagesList);
 
         checkForScrolling(oldMessagesCount);
     }
