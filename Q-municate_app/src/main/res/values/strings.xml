@@ -281,6 +281,7 @@
     <string name="permission_unavailable">%s is not available now!</string>
     <string name="permissions_unavailable">%s are not available now!</string>
     <string name="error_cant_delete_chat">Sorry, chat can\'t be deleted. Please try later</string>
+    <string name="location_title">Location</string>
     <string name="send_current_location">Send my location</string>
     <string name="send_selected_location">Send selected location</string>
 

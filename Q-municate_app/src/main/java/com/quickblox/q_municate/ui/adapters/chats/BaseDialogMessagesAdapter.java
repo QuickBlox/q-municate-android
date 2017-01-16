@@ -284,7 +284,7 @@ public abstract class BaseDialogMessagesAdapter
                 public void onClick(View view) {
                     if(location != null){
                         Log.d("BaseDialogAdapter", "location= " + location);
-                        MapsActivity.startMapForResult(context);
+                        MapsActivity.startMapForResult(context, location);
                     } else
                     if (imageUrl != null) {
                         view.startAnimation(AnimationUtils.loadAnimation(baseActivity, R.anim.chat_attached_file_click));

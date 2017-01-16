@@ -9,7 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.util.Log;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +50,7 @@ public class MapsActivity extends BaseLoggableActivity
     private static final String TAG = MapsActivity.class.getSimpleName();
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final String EXTRA_LOCATION_DATA = "location_data";
 
     private boolean permissionDenied = false;
 
@@ -55,9 +60,11 @@ public class MapsActivity extends BaseLoggableActivity
     private LatLng latLng;
     private Marker currLocationMarker;
     private boolean isLocationServiceOn = true;
+    private String location;
 
-    public static void startMapForResult(Context context){
+    public static void startMapForResult(Context context, String location) {
         Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(EXTRA_LOCATION_DATA, location);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
@@ -65,8 +72,11 @@ public class MapsActivity extends BaseLoggableActivity
     @Bind(R.id.map_textview)
     TextView sendTextView;
 
+    @Bind(R.id.map_framelayout)
+    FrameLayout sendLocationPanel;
+
     @OnClick(R.id.map_framelayout)
-    void smilePanelImageButtonClicked() {
+    void sendLocationButtonClicked() {
         sendLocation(latLng);
     }
 
@@ -80,9 +90,34 @@ public class MapsActivity extends BaseLoggableActivity
         super.onCreate(savedInstanceState);
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        title = "Location";
+        title = getString(R.string.location_title);
+
+        initView();
         setUpActionBarWithUpButton();
+        mapFragment.getMapAsync(this);
+    }
+
+    private void initView() {
+        if (getIntent().getExtras() != null) {
+            location = getIntent().getExtras().getString(EXTRA_LOCATION_DATA);
+            sendLocationPanel.setVisibility(View.GONE);
+            setLocationButtonPosition(true);
+        } else {
+            setLocationButtonPosition(false);
+        }
+    }
+
+    private void setLocationButtonPosition(boolean toBottom) {
+        View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        // position on right bottom
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        if (toBottom) {
+            params.setMargins(0, 0, 30, 30);
+        } else {
+            params.setMargins(0, 0, 180, 180);
+        }
     }
 
     @Override
@@ -98,6 +133,16 @@ public class MapsActivity extends BaseLoggableActivity
         googleMap = map;
         googleMap.setOnMyLocationButtonClickListener(this);
         enableMyLocation();
+    }
+
+    private LatLng getReceivedLocation() {
+        if (location == null) {
+            return null;
+        }
+        Log.d(TAG, "getReceivedLocation");
+        Pair<Double, Double> latLngPair = MapUtils.getLatLngFromJson(location);
+
+        return new LatLng(latLngPair.first, latLngPair.second);
     }
 
     private boolean checkPermission() {
@@ -193,7 +238,12 @@ public class MapsActivity extends BaseLoggableActivity
                 googleApiClient);
         if (mLastLocation != null) {
 
-            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            if (location == null) {
+                latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            } else {
+                isLocationServiceOn = false;
+                latLng = getReceivedLocation();
+            }
 
             currLocationMarker = googleMap.addMarker(buildMarkerOptions(latLng));
             googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
@@ -218,7 +268,7 @@ public class MapsActivity extends BaseLoggableActivity
                 }
             });
         }
-
+        cameraUpdate(latLng.latitude, latLng.longitude);
         buildRequestLocation();
     }
 

@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.utils;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.support.v4.util.Pair;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -42,8 +43,14 @@ public class MapUtils {
 
     public static String getRemoteUri(String location) {
 //        String locations = "{\"lat\":\"50.014141\",\"lng\":\"36.229058\"}";
+        Pair<Double, Double> latLng = getLatLngFromJson(location);
+
+        return generateURI(latLng.first, latLng.second).replaceAll("&amp;(?!&)", "&");
+    }
+
+    public static Pair<Double, Double> getLatLngFromJson(String location) {
         if (!isJSONValid(location)) {
-            return "";
+            return new Pair<>(0.0, 0.0);
         }
 
         JsonParser jsonParser = new JsonParser();
@@ -53,10 +60,10 @@ public class MapUtils {
         JsonElement lngJE = jo.get("lng");
 
 
-        double lat = (latJE == null) ? 0 : latJE.getAsDouble();
-        double lng = (lngJE == null) ? 0 : lngJE.getAsDouble();
+        double lat = (latJE == null) ? 0.0 : latJE.getAsDouble();
+        double lng = (lngJE == null) ? 0.0 : lngJE.getAsDouble();
 
-        return generateURI(lat, lng).replaceAll("&amp;(?!&)", "&");
+        return new Pair<>(lat, lng);
     }
 
     private static boolean isJSONValid(String jsonInString) {
