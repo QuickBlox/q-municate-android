@@ -33,12 +33,12 @@ ext {
     lintAbortOnError = false
 
 //    QuickBlox SDK version
-    qbSdkVersion = '3.2.0'
+    qbSdkVersion = '3.3.0'
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
     supportVersion = '23.4.0'
-    googlePlayServicesVersion = '9.8.0'
+    googlePlayServicesVersion = '10.0.1'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '4.48'
     ormliteCoreVersion = '4.48'
