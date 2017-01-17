@@ -242,48 +242,54 @@ public abstract class BaseAuthActivity extends BaseActivity {
         appSharedHelper.saveSavedRememberMe(true);
         appSharedHelper.saveUsersImportInitialized(true);
         QBUser user = new QBUser(null, userPassword, userEmail);
-        AppSession.getSession().closeAndClear();
+        //AppSession.getSession().closeAndClear();
+
+
+        ServiceManager serviceManager = new ServiceManager(this);
+        serviceManager.login(user);
+
+
         //QBLoginCompositeCommand.start(this, user);
-        authService.login(user).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                    Log.d(TAG, "onError" + e.getMessage());
-            }
-
-            @Override
-            public void onNext(QBUser qbUser) {
-
-                //String password = qbUser.getPassword();
-                String password = userPassword;
-
-                if (!hasUserCustomData(qbUser)) {
-                    qbUser.setOldPassword(password);
-                    try {
-                        updateUser(qbUser);
-                    } catch (QBResponseException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                String token = QBSessionManager.getInstance().getToken();
-                qbUser.setPassword(password);
-
-                saveOwnerUser(qbUser);
-
-                AppSession.startSession(LoginType.EMAIL, qbUser, token);
-
-                startMainActivity(qbUser);
-
-                // send analytics data
-                GoogleAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this, qbUser, "User Sign In");
-                FlurryAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this);
-            }
-        });
+//        authService.login(user).subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
+//            @Override
+//            public void onCompleted() {
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                    Log.d(TAG, "onError" + e.getMessage());
+//            }
+//
+//            @Override
+//            public void onNext(QBUser qbUser) {
+//
+//                //String password = qbUser.getPassword();
+//                String password = userPassword;
+//
+//                if (!hasUserCustomData(qbUser)) {
+//                    qbUser.setOldPassword(password);
+//                    try {
+//                        updateUser(qbUser);
+//                    } catch (QBResponseException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                String token = QBSessionManager.getInstance().getToken();
+//                qbUser.setPassword(password);
+//
+//                saveOwnerUser(qbUser);
+//
+//                AppSession.startSession(LoginType.EMAIL, qbUser, token);
+//
+//                startMainActivity(qbUser);
+//
+//                // send analytics data
+//                GoogleAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this, qbUser, "User Sign In");
+//                FlurryAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this);
+//            }
+//        });
     }
 
     protected void performLoginSuccessAction(Bundle bundle) {
@@ -372,7 +378,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
         QMUser user = QMUser.convert(qbUser);
         QMUserService.getInstance().getUserCache().createOrUpdate(user);
     }
-
     private UserCustomData getUserCustomData(QBUser user) {
         if (TextUtils.isEmpty(user.getCustomData())) {
             return new UserCustomData();
@@ -386,6 +391,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
             return new UserCustomData();
         }
     }
+
 
     private class LoginSuccessAction implements Command {
 
