@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.messages.services.SubscribeService;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -28,12 +29,17 @@ public class QBLogoutCompositeCommand extends CompositeServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         try {
             super.perform(extras);
+            unSubscribeFromPushes();
             resetCacheData();
             resetSharedPreferences();
         } catch (Exception e) {
             ErrorUtils.logError(TAG, e);
         }
         return extras;
+    }
+
+    private void unSubscribeFromPushes() {
+        SubscribeService.unSubscribeFromPushes(context);
     }
 
     private void resetCacheData() {

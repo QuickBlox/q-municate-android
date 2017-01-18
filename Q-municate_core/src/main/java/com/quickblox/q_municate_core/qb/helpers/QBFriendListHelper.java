@@ -11,7 +11,7 @@ import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class QBFriendListHelper extends BaseHelper implements Serializable {
+public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializable {
 
     private static final int LOADING_DELAY = 500;
 
@@ -119,7 +119,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private synchronized void sendNotificationToFriend(QBChatMessage qbChatMessage, int userId) throws QBResponseException {
-        QBDialog qbDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
+        QBChatDialog qbDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
         if (qbDialog != null) {
             privateChatHelper.sendPrivateMessage(qbChatMessage, userId, qbDialog.getDialogId());
         }
@@ -358,12 +358,17 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private class RosterListener implements QBRosterListener {
 
         @Override
-        public void entriesDeleted(Collection<Integer> userIdsList) {
-            try {
-                deleteFriends(userIdsList);
-            } catch (QBResponseException e) {
-                Log.e(TAG, ENTRIES_DELETED_ERROR, e);
-            }
+        public void entriesDeleted(final Collection<Integer> userIdsList) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        deleteFriends(userIdsList);
+                    } catch (QBResponseException e) {
+                        Log.e(TAG, ENTRIES_DELETED_ERROR, e);
+                    }
+                }
+            });
         }
 
         @Override
@@ -371,12 +376,17 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         }
 
         @Override
-        public void entriesUpdated(Collection<Integer> idsList) {
-            try {
-                updateUsersAndFriends(idsList);
-            } catch (QBResponseException e) {
-                Log.e(TAG, ENTRIES_UPDATING_ERROR, e);
-            }
+        public void entriesUpdated(final Collection<Integer> idsList) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        updateUsersAndFriends(idsList);
+                    } catch (QBResponseException e) {
+                        Log.e(TAG, ENTRIES_UPDATING_ERROR, e);
+                    }
+                }
+            });
         }
 
         @Override

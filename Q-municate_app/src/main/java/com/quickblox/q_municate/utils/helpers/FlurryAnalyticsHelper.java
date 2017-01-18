@@ -3,7 +3,7 @@ package com.quickblox.q_municate.utils.helpers;
 import android.content.Context;
 
 import com.flurry.android.FlurryAgent;
-import com.quickblox.core.QBSettings;
+import com.quickblox.auth.session.QBSettings;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -41,7 +41,7 @@ public class QBFindUsersCommand extends ServiceCommand {
         requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
 
         Bundle requestParams = new Bundle();
-        Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
+        Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams).perform();
         Collection<User> userCollection = UserFriendUtils.createUsersList(userList);
 //        userCollection.remove(UserFriendUtils.createLocalUser(currentUser));
 

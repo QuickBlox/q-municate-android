@@ -29,8 +29,6 @@ android {
         multiDexEnabled = true
     }
 
-//     before release need to enable Crashlytics
-
     signingConfigs {
         release {
             storeFile file(property('prodStoreFile'))
@@ -50,26 +48,25 @@ android {
             buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('prodAccountKey')
-            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('prodPushRegistrationAppID')
             buildConfigField "String", "TWITTER_KEY", property('prodTwitterDigitsConsumerKey')
             buildConfigField "String", "TWITTER_SECRET", property('prodTwitterDigitsConsumerSecret')
             resValue "string", "twitterDigitsApiKey", property('prodTwittedDigitsApiKey')
             resValue "string", "facebookAppId", property('prodFacebookAppID')
+            resValue "string", "sender_id", property('prodPushRegistrationAppID')
         }
 
         debug {
             debuggable true
-            ext.enableCrashlytics = false
             versionNameSuffix ' (debug)'
             buildConfigField "String", "APP_ID", property('devAppID')
             buildConfigField "String", "AUTH_KEY", property('devAuthKey')
             buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('devAccountKey')
-            buildConfigField "String", "PUSH_REGISTRATION_APP_ID", property('devPushRegistrationAppID')
             buildConfigField "String", "TWITTER_KEY", property('devTwitterDigitsConsumerKey')
             buildConfigField "String", "TWITTER_SECRET", property('devTwitterDigitsConsumerSecret')
             resValue "string", "twitterDigitsApiKey", property('devTwittedDigitsApiKey')
             resValue "string", "facebookAppId", property('devFacebookAppID')
+            resValue "string", "sender_id", property('devPushRegistrationAppID')
         }
     }
 
@@ -100,7 +97,6 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${rootProject.supportVersion}"
 
     compile "com.google.android.gms:play-services-base:${rootProject.googlePlayServicesVersion}"
-    compile "com.google.android.gms:play-services-gcm:${rootProject.googlePlayServicesVersion}"
     compile "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
@@ -126,3 +122,5 @@ def changeApkFileName(variant) {
         output.outputFile = new File(file.parent, newName)
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
