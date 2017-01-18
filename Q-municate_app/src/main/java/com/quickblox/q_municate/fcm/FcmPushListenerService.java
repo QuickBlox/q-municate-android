@@ -12,6 +12,12 @@ import java.util.Map;
 public class FcmPushListenerService extends QBFcmPushListenerService {
     private String TAG = FcmPushListenerService.class.getSimpleName();
 
+    private ChatNotificationHelper chatNotificationHelper;
+
+    public FcmPushListenerService() {
+        this.chatNotificationHelper = new ChatNotificationHelper(this);
+    }
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
@@ -26,6 +32,6 @@ public class FcmPushListenerService extends QBFcmPushListenerService {
         extras.putString(ChatNotificationHelper.USER_ID, (String) data.get(ChatNotificationHelper.USER_ID));
         extras.putString(ChatNotificationHelper.DIALOG_ID, (String) data.get(ChatNotificationHelper.DIALOG_ID));
 
-        new ChatNotificationHelper(this).parseChatMessage(extras);
+        chatNotificationHelper.parseChatMessage(extras);
     }
 }
