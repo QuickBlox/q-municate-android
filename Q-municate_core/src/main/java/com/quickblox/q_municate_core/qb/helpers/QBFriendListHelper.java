@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class QBFriendListHelper extends BaseHelper implements Serializable {
+public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializable {
 
     private static final int LOADING_DELAY = 500;
 
