@@ -61,6 +61,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
                 returnedBundle, dialog, lastDateLoad);
 
         Bundle bundleResult = new Bundle();
+        bundleResult.putLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES, lastDateLoad);
         bundleResult.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES, (java.io.Serializable) dialogMessagesList);
         bundleResult.putInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, dialogMessagesList != null
                 ?  dialogMessagesList.size() : ConstsCore.ZERO_INT_VALUE);

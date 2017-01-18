@@ -55,6 +55,32 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         return dialogNotificationsList;
     }
 
+    public List<DialogNotification> getDialogNotificationsByDialogIdAfterDate(String dialogId, long createdDate) {
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>();
+
+        try {
+            QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao
+                    .queryBuilder();
+            messageQueryBuilder.where().ge(DialogNotification.Column.CREATED_DATE, createdDate);
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
+                    .queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
+    }
+
     public DialogNotification getLastDialogNotificationByDialogId(List<Long> dialogOccupantsList) {
         DialogNotification dialogNotification = null;
 

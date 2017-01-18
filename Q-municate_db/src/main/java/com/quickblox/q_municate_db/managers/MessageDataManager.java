@@ -152,6 +152,30 @@ public class MessageDataManager extends BaseManager<Message> {
         return messagesList;
     }
 
+    public List<Message> getMessagesByDialogIdAfterDate(String dialogId, long createdDate){
+        List<Message> messagesList = new ArrayList<>();
+
+        try {
+            QueryBuilder<Message, Long> messageQueryBuilder = dao.queryBuilder();
+            messageQueryBuilder.where().ge(Message.Column.CREATED_DATE, createdDate);
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
+            messagesList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return messagesList;
+    }
+
     public void deleteTempMessages(List<Long> dialogOccupantsIdsList) {
         try {
             DeleteBuilder<Message, Long> deleteBuilder = dao.deleteBuilder();

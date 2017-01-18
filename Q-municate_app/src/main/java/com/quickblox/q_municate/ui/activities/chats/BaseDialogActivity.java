@@ -25,6 +25,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -67,6 +68,7 @@ import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -505,8 +507,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void checkForScrolling(int oldMessagesCount) {
-        if (oldMessagesCount != messagesAdapter.getAllItems().size()) {
-            scrollMessagesToBottom();
+        if (oldMessagesCount != messagesAdapter.getAllItems().size() && !loadMore) {
+            scrollMessagesWithDelay();
+        } else if (loadMore){
+            scrollMessagesToPosition(messagesAdapter.getAllItems().size() - oldMessagesCount+5);
         }
     }
 
@@ -764,15 +768,35 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             messageSwipeRefreshLayout.setRefreshing(false);
             int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
 
+//            long lastMessageDate = bundle.getLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES);
 
             if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
-                scrollMessagesToBottom();
+//                if (lastMessageDate != 0) {
+//                    combinationMessagesList.addAll(prepareLoadedCombinationMessages(lastMessageDate));
+//                    messagesAdapter.setList(combinationMessagesList);
+//                    messagesRecyclerView.scrollToPosition(totalEntries);
+//                    messagesAdapter.addAll(prepareLoadedCombinationMessages(lastMessageDate));
+//                scrollMessagesToBottom();
+//                }
+                updateMessagesList();
+//                scrollMessagesToPosition(totalEntries);
             }
 
             loadMore = false;
 
             hideActionBarProgress();
         }
+    }
+
+    private void scrollMessagesToPosition(int position){
+        messagesRecyclerView.scrollToPosition(position);
+    }
+
+    private List<CombinationMessage> prepareLoadedCombinationMessages(long lastMessageDate) {
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogIdAfterDate(dialog.getDialogId(), lastMessageDate);
+        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                .getDialogNotificationsByDialogIdAfterDate(dialog.getDialogId(), lastMessageDate);
+        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
     }
 
     public class LoadDialogMessagesFailAction implements Command {
