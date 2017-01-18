@@ -768,18 +768,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             messageSwipeRefreshLayout.setRefreshing(false);
             int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
 
-//            long lastMessageDate = bundle.getLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES);
 
             if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
-//                if (lastMessageDate != 0) {
-//                    combinationMessagesList.addAll(prepareLoadedCombinationMessages(lastMessageDate));
-//                    messagesAdapter.setList(combinationMessagesList);
-//                    messagesRecyclerView.scrollToPosition(totalEntries);
-//                    messagesAdapter.addAll(prepareLoadedCombinationMessages(lastMessageDate));
-//                scrollMessagesToBottom();
-//                }
-                updateMessagesList();
-//                scrollMessagesToPosition(totalEntries);
+                scrollMessagesToBottom();
             }
 
             loadMore = false;
@@ -790,13 +781,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void scrollMessagesToPosition(int position){
         messagesRecyclerView.scrollToPosition(position);
-    }
-
-    private List<CombinationMessage> prepareLoadedCombinationMessages(long lastMessageDate) {
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogIdAfterDate(dialog.getDialogId(), lastMessageDate);
-        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogIdAfterDate(dialog.getDialogId(), lastMessageDate);
-        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
     }
 
     public class LoadDialogMessagesFailAction implements Command {
