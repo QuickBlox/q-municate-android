@@ -20,7 +20,7 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
     private State state;
     private String body;
     private long createdDate;
-    private QBAttachmentExtended qbAttachment;
+    private QBAttachment qbAttachment;
     private DialogNotification.Type notificationType;
 
     public CombinationMessage(DialogNotification dialogNotification) {
@@ -157,7 +157,7 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
         } else {
             attachType = attachment.getType().name();
         }
-        qbAttachment = new QBAttachmentExtended(attachType);
+        qbAttachment = new QBAttachment(attachType);
         qbAttachment.setId(attachment.getAttachmentId());
         qbAttachment.setUrl(attachment.getRemoteUrl());
         qbAttachment.setName(attachment.getName());

@@ -144,12 +144,22 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         super.onBindViewAttachRightHolder(holder, chatMessage, position);
     }
 
+    @Override
     protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
         setViewVisibility(holder.avatar, View.GONE);
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
 
+        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
+            Log.d(TAG, "onBindViewAttachLeftHolder");
+            chatMessage.setState(State.READ);
+            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), chatMessage, true);
+        }
         super.onBindViewAttachLeftHolder(holder, chatMessage, position);
+    }
+
+    private void updateMessageState(){
+
     }
 
     @Override

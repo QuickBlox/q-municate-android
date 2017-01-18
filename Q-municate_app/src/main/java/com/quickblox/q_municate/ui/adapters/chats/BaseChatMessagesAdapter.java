@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -21,7 +20,6 @@ import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
-import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -89,11 +87,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         QBAttachment attachment = chatMessage.getAttachments().iterator().next();
 
         return new ImageRequestListener((ImageAttachHolder) holder, attachment.getData(), isIncoming(chatMessage));
-    }
-
-    @Override
-    public void displayAvatarImage(String url, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(url, imageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
     @Override
