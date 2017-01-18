@@ -19,7 +19,6 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.helper.StringUtils;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
@@ -249,8 +248,12 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         QBGroupChat groupChat = groupChatManager.getGroupChat(dialog.getRoomJid());
         if (groupChat == null && dialog.getRoomJid() != null) {
             groupChat = groupChatManager.createGroupChat(dialog.getRoomJid());
+        }
+
+        if (groupChat != null) {
             groupChat.addMessageListener(groupChatMessageListener);
         }
+
         return groupChat;
     }
 
@@ -377,14 +380,19 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     private class SystemMessageListener implements QBSystemMessageListener {
 
         @Override
-        public void processMessage(QBChatMessage qbChatMessage) {
-            String notificationTypeString = (String) qbChatMessage
-                    .getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE);
-            NotificationType notificationType = NotificationType.parseByValue(
-                    Integer.parseInt(notificationTypeString));
-            if (NotificationType.GROUP_CHAT_CREATE.equals(notificationType)) {
-                createDialogByNotification(qbChatMessage, DialogNotification.Type.CREATE_DIALOG);
-            }
+        public void processMessage(final QBChatMessage qbChatMessage) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    String notificationTypeString = (String) qbChatMessage
+                            .getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE);
+                    NotificationType notificationType = NotificationType.parseByValue(
+                            Integer.parseInt(notificationTypeString));
+                    if (NotificationType.GROUP_CHAT_CREATE.equals(notificationType)) {
+                        createDialogByNotification(qbChatMessage, DialogNotification.Type.CREATE_DIALOG);
+                    }
+                }
+            });
         }
 
         @Override

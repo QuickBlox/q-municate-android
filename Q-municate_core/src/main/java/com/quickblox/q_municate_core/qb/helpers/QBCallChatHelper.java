@@ -246,7 +246,7 @@ public class QBCallChatHelper extends BaseHelper {
 
         @Override
         public void onCameraDisconnected() {
-
+            Log.e(TAG, "Camera disconnected");
         }
 
         @Override
@@ -256,7 +256,7 @@ public class QBCallChatHelper extends BaseHelper {
 
         @Override
         public void onCameraOpening(String s) {
-            Log.e(TAG, "Camera orientation = " + s);
+            Log.e(TAG, "Camera opening = " + s);
         }
 
         @Override
