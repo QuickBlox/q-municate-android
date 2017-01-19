@@ -94,11 +94,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         return chatMessage.getDialogOccupant().getUser().getAvatar();
     }
 
-    @Override
-    protected String getDate(long milliseconds) {
-        return DateUtils.formatDateSimpleTime(milliseconds / 1000);
-    }
-
     private void resetAttachUI(ImageAttachHolder viewHolder) {
         setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.GONE);
         setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.GONE);

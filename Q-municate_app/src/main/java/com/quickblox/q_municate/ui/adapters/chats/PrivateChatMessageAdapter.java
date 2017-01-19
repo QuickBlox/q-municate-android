@@ -122,15 +122,9 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void onBindViewAttachRightHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
-        boolean ownMessage;
-        ownMessage = !isIncoming(chatMessage);
-
-        TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
-        attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
-
         ImageView view = (ImageView) holder.itemView.findViewById(R.id.msg_signs_attach);
 
-        if (ownMessage && chatMessage.getState() != null) {
+        if (chatMessage.getState() != null) {
             setMessageStatus(view, State.DELIVERED.equals(
                     chatMessage.getState()), State.READ.equals(chatMessage.getState()));
         } else {
@@ -143,14 +137,12 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     @Override
     protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
         setViewVisibility(holder.avatar, View.GONE);
-        TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
-        attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
 
         updateMessageState(chatMessage);
         super.onBindViewAttachLeftHolder(holder, chatMessage, position);
     }
 
-    private void updateMessageState(CombinationMessage chatMessage){
+    private void updateMessageState(CombinationMessage chatMessage) {
         if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
             Log.d(TAG, "updateMessageState");
             chatMessage.setState(State.READ);

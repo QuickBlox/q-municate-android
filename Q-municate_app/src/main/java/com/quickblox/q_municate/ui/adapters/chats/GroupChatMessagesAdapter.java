@@ -55,19 +55,4 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
 
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);
     }
-
-    @Override
-    protected void onBindViewAttachRightHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
-        TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
-        attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
-
-        super.onBindViewAttachRightHolder(holder, chatMessage, position);
-    }
-
-    protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
-        TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
-        attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
-
-        super.onBindViewAttachLeftHolder(holder, chatMessage, position);
-    }
 }
