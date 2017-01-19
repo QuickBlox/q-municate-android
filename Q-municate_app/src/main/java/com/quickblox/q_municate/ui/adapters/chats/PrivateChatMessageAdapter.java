@@ -116,11 +116,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         setViewVisibility(holder.avatar, View.GONE);
         setViewVisibility(textView, View.GONE);
 
-        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
-            Log.d(TAG, "onBindViewMsgLeftHolder");
-            chatMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), chatMessage, true);
-        }
+        updateMessageState(chatMessage);
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);
     }
 
@@ -150,16 +146,16 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         TextView attachTime = (TextView) holder.itemView.findViewById(R.id.msg_text_time_attach);
         attachTime.setText(DateUtils.formatDateSimpleTime(chatMessage.getDateSent()));
 
-        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
-            Log.d(TAG, "onBindViewAttachLeftHolder");
-            chatMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), chatMessage, true);
-        }
+        updateMessageState(chatMessage);
         super.onBindViewAttachLeftHolder(holder, chatMessage, position);
     }
 
-    private void updateMessageState(){
-
+    private void updateMessageState(CombinationMessage chatMessage){
+        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
+            Log.d(TAG, "updateMessageState");
+            chatMessage.setState(State.READ);
+            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), chatMessage, true);
+        }
     }
 
     @Override

@@ -8,7 +8,7 @@
     android:orientation="horizontal">
 
     <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
-        style="@style/AvatarImageViewStyle"
+        style="@style/AvatarImageViewStyle.Common"
         android:id="@+id/avatar_imageview"
         android:layout_width="@dimen/inf_list_avatar_height"
         android:layout_height="@dimen/inf_list_avatar_height"
