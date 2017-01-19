@@ -149,7 +149,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
-        findLastFriendsRequest();
+        findLastFriendsRequest(true);
 
         messagesRecyclerView.setAdapter(messagesAdapter);
         scrollMessagesToBottom();
@@ -165,9 +165,14 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         this.combinationMessagesList = createCombinationMessagesList();
         Log.d(TAG, "combinationMessagesList = " + combinationMessagesList);
         messagesAdapter.setList(combinationMessagesList);
-        findLastFriendsRequest();
+        findLastFriendsRequest(true);
 
         checkForScrolling(oldMessagesCount);
+    }
+
+    @Override
+    protected void additionalActionsAfterLoadMessages() {
+        findLastFriendsRequest(false);
     }
 
     private void initActualExtras() {
@@ -242,9 +247,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         dataManager.getFriendDataManager().deleteObserver(friendObserver);
     }
 
-    private void findLastFriendsRequest() {
+    private void findLastFriendsRequest(boolean needNotifyAdapter) {
         ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
-        messagesAdapter.notifyDataSetChanged();
+        if (needNotifyAdapter) {
+            messagesAdapter.notifyDataSetChanged();
+        }
     }
 
     private void setOnlineStatus(User user) {

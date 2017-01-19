@@ -150,6 +150,11 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
+    protected void additionalActionsAfterLoadMessages() {
+        processCombinationMessages();
+    }
+
+    @Override
     protected void checkMessageSendingPossibility() {
         checkMessageSendingPossibility(isNetworkAvailable());
     }

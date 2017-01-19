@@ -55,13 +55,13 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         return dialogNotificationsList;
     }
 
-    public List<DialogNotification> getDialogNotificationsByDialogIdAfterDate(String dialogId, long createdDate) {
+    public List<DialogNotification> getDialogNotificationsByDialogIdBeforeDate(String dialogId, long createdDate) {
         List<DialogNotification> dialogNotificationsList = new ArrayList<>();
 
         try {
             QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao
                     .queryBuilder();
-            messageQueryBuilder.where().ge(DialogNotification.Column.CREATED_DATE, createdDate);
+            messageQueryBuilder.where().lt(DialogNotification.Column.CREATED_DATE, createdDate);
 
             QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
                     .queryBuilder();

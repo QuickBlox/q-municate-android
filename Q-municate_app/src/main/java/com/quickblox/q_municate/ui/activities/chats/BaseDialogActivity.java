@@ -10,7 +10,6 @@ import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,16 +24,17 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.CollectionsUtils;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
+import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
@@ -68,7 +68,6 @@ import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -507,10 +506,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void checkForScrolling(int oldMessagesCount) {
-        if (oldMessagesCount != messagesAdapter.getAllItems().size() && !loadMore) {
-            scrollMessagesWithDelay();
-        } else if (loadMore){
-            scrollMessagesToPosition(messagesAdapter.getAllItems().size() - oldMessagesCount+5);
+        if (oldMessagesCount != messagesAdapter.getAllItems().size()) {
+            scrollMessagesToBottom();
         }
     }
 
@@ -629,13 +626,26 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected List<CombinationMessage> createCombinationMessagesList() {
         if (dialog == null) {
-            Log.d("PrivateDialogActivity", "dialog = " + dialog);
+            Log.d("BaseDialogActivity", "dialog = " + dialog);
             return null;
         }
 
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
+        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+    }
+
+    protected List <CombinationMessage> buildCombinationMessagesListBeforeDate(long createDate){
+        if (dialog == null) {
+            Log.d("BaseDialogActivity", "dialog = " + dialog);
+            return null;
+        }
+
+        List<Message> messagesList = dataManager.getMessageDataManager()
+                .getMessagesByDialogIdBeforeDate(dialog.getDialogId(), createDate);
+        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                .getDialogNotificationsByDialogIdBeforeDate(dialog.getDialogId(), createDate);
         return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
     }
 
@@ -684,6 +694,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected abstract void onFileLoaded(QBFile file, String dialogId);
 
     protected abstract void checkMessageSendingPossibility();
+
+    protected abstract void additionalActionsAfterLoadMessages();
 
     public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
 
@@ -765,22 +777,57 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            messageSwipeRefreshLayout.setRefreshing(false);
-            int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
+            final int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES,
+                    ConstsCore.ZERO_INT_VALUE);
+            final long lastMessageDate = bundle.getLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES,
+                    ConstsCore.ZERO_INT_VALUE);
 
+            final List<CombinationMessage> sortedLoadedCombinationMessagesList =
+                    buildCombinationMessagesListBeforeDate(lastMessageDate);
 
-            if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
-                scrollMessagesToBottom();
+            if (messagesAdapter != null && totalEntries != ConstsCore.ZERO_INT_VALUE) {
+
+                (new BaseAsyncTask<Void, Void, Boolean>() {
+                    @Override
+                    public Boolean performInBackground(Void... params) throws Exception {
+                        boolean isFirstLoadingMessages = lastMessageDate == ConstsCore.ZERO_INT_VALUE;
+                        if (isFirstLoadingMessages){
+                            combinationMessagesList = createCombinationMessagesList();
+                        } else {
+                            combinationMessagesList = CollectionsUtils.addItemsInBeginList(combinationMessagesList,
+                                    sortedLoadedCombinationMessagesList);
+                        }
+                        additionalActionsAfterLoadMessages();
+                        return isFirstLoadingMessages;
+                    }
+
+                    @Override
+                    public void onResult(Boolean aBoolean) {
+                        loadMore = false;
+                        if (aBoolean){
+                            messagesAdapter.setList(combinationMessagesList);
+                            scrollMessagesToBottom();
+                        } else {
+                            messagesAdapter.addAllInBegin(sortedLoadedCombinationMessagesList);
+                        }
+
+                        messageSwipeRefreshLayout.setRefreshing(false);
+                        hideActionBarProgress();
+                    }
+
+                    @Override
+                    public void onException(Exception e) {
+                        ErrorUtils.showError(BaseDialogActivity.this, e);
+                    }
+
+                }).execute();
+
+            } else {
+                messageSwipeRefreshLayout.setRefreshing(false);
+                hideActionBarProgress();
+                loadMore = false;
             }
-
-            loadMore = false;
-
-            hideActionBarProgress();
         }
-    }
-
-    private void scrollMessagesToPosition(int position){
-        messagesRecyclerView.scrollToPosition(position);
     }
 
     public class LoadDialogMessagesFailAction implements Command {

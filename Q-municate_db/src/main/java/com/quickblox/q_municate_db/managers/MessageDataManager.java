@@ -152,12 +152,12 @@ public class MessageDataManager extends BaseManager<Message> {
         return messagesList;
     }
 
-    public List<Message> getMessagesByDialogIdAfterDate(String dialogId, long createdDate){
+    public List<Message> getMessagesByDialogIdBeforeDate(String dialogId, long createdDate){
         List<Message> messagesList = new ArrayList<>();
 
         try {
             QueryBuilder<Message, Long> messageQueryBuilder = dao.queryBuilder();
-            messageQueryBuilder.where().ge(Message.Column.CREATED_DATE, createdDate);
+            messageQueryBuilder.where().lt(Message.Column.CREATED_DATE, createdDate);
 
             QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
 
