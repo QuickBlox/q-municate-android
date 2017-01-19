@@ -32,7 +32,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         if (notificationMessage) {
             Log.d(TAG, "onBindViewCustomHolder notificationMessage= " + (chatMessage.getBody()));
             viewHolder.messageTextView.setText(chatMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
+            viewHolder.timeTextMessageTextView.setText(getDate(chatMessage.getCreatedDate()));
         } else {
             Log.d(TAG, "onBindViewCustomHolder else");
         }

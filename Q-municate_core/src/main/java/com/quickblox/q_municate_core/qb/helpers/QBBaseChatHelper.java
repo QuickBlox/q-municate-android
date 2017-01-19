@@ -55,7 +55,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class QBBaseChatHelper extends BaseHelper {
+public abstract class QBBaseChatHelper extends BaseThreadPoolHelper {
 
     private static final String TAG = QBBaseChatHelper.class.getSimpleName();
 
