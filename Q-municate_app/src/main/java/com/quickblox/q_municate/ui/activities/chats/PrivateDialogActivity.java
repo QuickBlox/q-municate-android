@@ -173,7 +173,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
             @Override
             public void onResult(Boolean aBoolean) {
                 messagesAdapter.setList(combinationMessagesList);
-                findLastFriendsRequest();
+                findLastFriendsRequest(true);
 
                 checkForScrolling(oldMessagesCount);
         }
