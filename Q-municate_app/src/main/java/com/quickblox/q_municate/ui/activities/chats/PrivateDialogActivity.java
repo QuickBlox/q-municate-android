@@ -21,6 +21,7 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
@@ -160,14 +161,29 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         initActualExtras();
         checkForCorrectChat();
 
-        int oldMessagesCount = messagesAdapter.getAllItems().size();
+        final int oldMessagesCount = messagesAdapter.getAllItems().size();
 
-        this.combinationMessagesList = createCombinationMessagesList();
-        Log.d(TAG, "combinationMessagesList = " + combinationMessagesList);
-        messagesAdapter.setList(combinationMessagesList);
-        findLastFriendsRequest(true);
+        (new BaseAsyncTask<Void, Void, Boolean>() {
+            @Override
+            public Boolean performInBackground(Void... params) throws Exception {
+                combinationMessagesList = createCombinationMessagesList();
+                return true;
+            }
 
-        checkForScrolling(oldMessagesCount);
+            @Override
+            public void onResult(Boolean aBoolean) {
+                messagesAdapter.setList(combinationMessagesList);
+                findLastFriendsRequest();
+
+                checkForScrolling(oldMessagesCount);
+        }
+
+            @Override
+            public void onException(Exception e) {
+                ErrorUtils.showError(PrivateDialogActivity.this, e);
+            }
+
+        }).execute();
     }
 
     @Override
