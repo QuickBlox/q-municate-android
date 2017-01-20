@@ -235,12 +235,12 @@ public class MapsActivity extends BaseLoggableActivity
         if (checkPermission()) {
             return;
         }
-        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 googleApiClient);
-        if (mLastLocation != null) {
+        if (lastLocation != null) {
 
             if (location == null) {
-                latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
             } else {
                 isLocationServiceOn = false;
                 latLng = getReceivedLocation();
@@ -268,8 +268,8 @@ public class MapsActivity extends BaseLoggableActivity
                     cameraUpdate(latLng.latitude, latLng.longitude);
                 }
             });
+            cameraUpdate(latLng.latitude, latLng.longitude);
         }
-        cameraUpdate(latLng.latitude, latLng.longitude);
         buildRequestLocation();
     }
 
