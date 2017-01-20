@@ -3,7 +3,10 @@ package com.quickblox.q_municate.ui.adapters.chats;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -13,6 +16,7 @@ import android.widget.TextView;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.quickblox.chat.listeners.QBChatDialogMessageListener;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -20,6 +24,7 @@ import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
+import com.quickblox.q_municate.utils.TextViewClickMovement;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -27,7 +32,11 @@ import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -41,6 +50,8 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     protected final BaseActivity baseActivity;
 
     protected FileUtils fileUtils;
+
+    private transient Set<TextViewClickMovement.OnTextViewClickMovementListener> textViewLinkClickListeners = new CopyOnWriteArraySet<>();
 
     BaseChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
         super(baseActivity.getBaseContext(), chatMessages);
@@ -69,6 +80,20 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         TextView headerTextView = (TextView) view.findViewById(R.id.header_date_textview);
         CombinationMessage combinationMessage = getItem(position);
         headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
+    }
+
+    @Override
+    protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
+        super.onBindViewMsgLeftHolder(holder, chatMessage, position);
+        holder.messageTextView.setLinksClickable(true);
+        holder.messageTextView.setMovementMethod(new TextViewClickMovement(new TextViewLinkClickListener(), context));
+    }
+
+    @Override
+    protected void onBindViewMsgRightHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
+        super.onBindViewMsgRightHolder(holder, chatMessage, position);
+        holder.messageTextView.setLinksClickable(true);
+        holder.messageTextView.setMovementMethod(new TextViewClickMovement(new TextViewLinkClickListener(), context));
     }
 
     @Override
@@ -119,6 +144,22 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     @Override
     protected boolean isIncoming(CombinationMessage chatMessage) {
         return chatMessage.isIncoming(currentUser.getId());
+    }
+
+    public void addMsgTextViewLinkClickListener(TextViewClickMovement.OnTextViewClickMovementListener listener) {
+        if (listener == null) {
+            return;
+        }
+
+        textViewLinkClickListeners.add(listener);
+    }
+
+    public void removeMsgTextViewLinkClickListener(TextViewClickMovement.OnTextViewClickMovementListener listener) {
+        textViewLinkClickListeners.remove(listener);
+    }
+
+    public Collection<TextViewClickMovement.OnTextViewClickMovementListener> getMessageTextViewLinkClickListeners() {
+        return Collections.unmodifiableCollection(textViewLinkClickListeners);
     }
 
     public class ImageRequestListener implements RequestListener<String, GlideBitmapDrawable> {
@@ -209,6 +250,23 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         public RequestsViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    private class TextViewLinkClickListener implements TextViewClickMovement.OnTextViewClickMovementListener {
+
+        @Override
+        public void onLinkClicked(String linkText, TextViewClickMovement.LinkType linkType) {
+            for (TextViewClickMovement.OnTextViewClickMovementListener listener : getMessageTextViewLinkClickListeners()){
+                listener.onLinkClicked(linkText, linkType);
+            }
+        }
+
+        @Override
+        public void onLongClick(String text) {
+            for (TextViewClickMovement.OnTextViewClickMovementListener listener : getMessageTextViewLinkClickListeners()){
+                listener.onLongClick(text);
+            }
         }
     }
 }

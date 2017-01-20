@@ -28,12 +28,11 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
-import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
-import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.TextViewClickMovement;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
@@ -116,6 +115,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
     protected ImagePickHelper imagePickHelper;
+    protected MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
 
     private Handler mainThreadHandler;
     private View emojiconsFragment;
@@ -225,6 +225,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         removeActions();
         deleteObservers();
         unregisterBroadcastReceivers();
+        messagesAdapter.removeMsgTextViewLinkClickListener(messagesTextViewLinkClickListener);
     }
 
     @Override
@@ -311,6 +312,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         appSharedHelper.saveNeedToOpenDialog(false);
         imagePickHelper = new ImagePickHelper();
         systemPermissionHelper = new SystemPermissionHelper(this);
+        messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
     }
 
     private void initCustomUI() {
@@ -843,4 +845,16 @@ private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListe
         }
     }
 }
+    protected class MessagesTextViewLinkClickListener implements TextViewClickMovement.OnTextViewClickMovementListener{
+
+        @Override
+        public void onLinkClicked(String linkText, TextViewClickMovement.LinkType linkType) {
+            canPerformLogout.set(false);
+        }
+
+        @Override
+        public void onLongClick(String text) {
+
+        }
+    }
 }

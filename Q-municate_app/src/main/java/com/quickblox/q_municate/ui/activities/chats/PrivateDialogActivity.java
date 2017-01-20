@@ -159,6 +159,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
         messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, dialog);
+        messagesAdapter.addMsgTextViewLinkClickListener(messagesTextViewLinkClickListener);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         findLastFriendsRequest();
