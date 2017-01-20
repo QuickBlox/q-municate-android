@@ -3,6 +3,8 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,7 +13,7 @@ import android.view.View;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
+import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
@@ -65,7 +67,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
+        messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList, dialog);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
@@ -107,17 +109,29 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
-            return;
-        }
-
-        try {
-            ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
-        } catch (QBResponseException e) {
-            ErrorUtils.showError(this, e);
-        }
+        sendGroupMessageWithAttach(dialogId, file, null);
     }
 
+    @Override
+    protected void onLocationLoaded(String location, String dialogId) {
+        Log.d("GroupDialogActivity", "location= " + location);
+        sendGroupMessageWithAttach(dialogId, null, location);
+    }
+
+    private void sendGroupMessageWithAttach(String dialogId, QBFile file, String location) {
+        if (!dialogId.equals(dialog.getDialogId())) {
+            return;
+        }
+        try {
+            if (file != null) {
+                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
+            } else if (!TextUtils.isEmpty(location)) {
+                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachLocation(dialog.getRoomJid(), location);
+            }
+        } catch (QBResponseException exc) {
+            ErrorUtils.showError(this, exc);
+        }
+    }
     @Override
     protected Bundle generateBundleToInitDialog() {
         return null;
@@ -125,11 +139,11 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        int oldMessagesCount = messagesAdapter.getAllItems().size();
+        int oldMessagesCount = messagesAdapter.getItemCount();
 
         this.combinationMessagesList = createCombinationMessagesList();
         processCombinationMessages();
-        messagesAdapter.setList(combinationMessagesList);
+        messagesAdapter.addList(combinationMessagesList);
 
         checkForScrolling(oldMessagesCount);
     }
@@ -169,7 +183,8 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     private void processCombinationMessages(){
         QBUser currentUser = AppSession.getSession().getUser();
-        for (CombinationMessage cm :combinationMessagesList){
+        for (Object cmb :combinationMessagesList){
+            CombinationMessage cm = (CombinationMessage)cmb;
             boolean ownMessage = !cm.isIncoming(currentUser.getId());
             if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
                 cm.setState(State.READ);

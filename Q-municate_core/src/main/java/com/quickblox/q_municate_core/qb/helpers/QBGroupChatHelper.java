@@ -106,7 +106,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void sendGroupMessage(String roomJidId, String message) throws Exception {
-        QBChatMessage chatMessage = getQBChatMessage(message, null);
+        QBChatMessage chatMessage = getQBChatMessage(message, null, null);
         sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 
@@ -136,7 +136,13 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throws QBResponseException {
         QBChatMessage chatMessage = getQBChatMessage(context.getString(R.string.dlg_attached_last_message),
-                file);
+                file, null);
+        sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
+    }
+
+    public void sendGroupMessageWithAttachLocation(String roomJidId, String location) throws QBResponseException {
+        QBChatMessage chatMessage = getQBChatMessage(context.getString(R.string.dlg_attached_last_message),
+                null, location);
         sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 

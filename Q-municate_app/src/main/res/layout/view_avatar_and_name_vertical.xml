@@ -10,7 +10,7 @@
     android:layout_marginTop="@dimen/action_bar_height">
 
     <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
-        style="@style/AvatarImageViewStyle"
+        style="@style/AvatarImageViewStyle.Common"
         android:id="@+id/avatar_imageview"
         android:layout_width="@dimen/call_opponent_avatar_diameter"
         android:layout_height="@dimen/call_opponent_avatar_diameter"

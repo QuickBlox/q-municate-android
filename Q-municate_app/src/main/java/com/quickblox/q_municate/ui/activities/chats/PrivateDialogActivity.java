@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +16,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
-import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
+import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
@@ -34,7 +35,6 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
@@ -125,12 +125,24 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
+        sendPrivateMessageWithAttach(dialogId, file, null);
+    }
+
+    @Override
+    protected void onLocationLoaded(String location, String dialogId) {
+        sendPrivateMessageWithAttach(dialogId, null, location);
+    }
+
+    private void sendPrivateMessageWithAttach(String dialogId, QBFile file, String location) {
+        if (!dialogId.equals(dialog.getDialogId())) {
             return;
         }
-
         try {
-            privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
+            if (file != null) {
+                privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
+            } else if (!TextUtils.isEmpty(location)) {
+                privateChatHelper.sendPrivateMessageWithAttachLocation(location, opponentUser.getUserId());
+            }
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
@@ -146,9 +158,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
+        messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, dialog);
         messagesRecyclerView.addItemDecoration(
-                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+                new StickyRecyclerHeadersDecoration(messagesAdapter));
         findLastFriendsRequest();
 
         messagesRecyclerView.setAdapter(messagesAdapter);
@@ -160,11 +172,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         initActualExtras();
         checkForCorrectChat();
 
-        int oldMessagesCount = messagesAdapter.getAllItems().size();
+        int oldMessagesCount = messagesAdapter.getItemCount();
 
         this.combinationMessagesList = createCombinationMessagesList();
-        Log.d(TAG, "combinationMessagesList = " + combinationMessagesList);
-        messagesAdapter.setList(combinationMessagesList);
+        Log.d(TAG, "updateMessagesList combinationMessagesList = " + combinationMessagesList);
+        messagesAdapter.addList(combinationMessagesList);
         findLastFriendsRequest();
 
         checkForScrolling(oldMessagesCount);
@@ -228,8 +240,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
         initActualExtras();
-//        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-//        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
         title = opponentUser.getFullName();
     }
@@ -243,7 +255,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void findLastFriendsRequest() {
-        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        ((PrivateChatMessageAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         messagesAdapter.notifyDataSetChanged();
     }
 
@@ -353,9 +365,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            messagesAdapter.notifyItemChanged(operationItemPosition);
-            startLoadDialogMessages();
+//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+//            messagesAdapter.notifyItemChanged(operationItemPosition);
+//            startLoadDialogMessages();
             hideProgress();
         }
     }
@@ -364,9 +376,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            messagesAdapter.notifyItemChanged(operationItemPosition);
-            startLoadDialogMessages();
+//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+//            messagesAdapter.notifyItemChanged(operationItemPosition);
+//            startLoadDialogMessages();
             hideProgress();
         }
     }

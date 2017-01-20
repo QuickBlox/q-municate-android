@@ -24,12 +24,11 @@
         <item name="android:textColorHint">@color/text_light_dark</item>
     </style>
 
-    <style name="AvatarImageViewStyle">
+    <style name="AvatarImageViewStyle.Common">
         <item name="android:layout_width">@dimen/image_view_big_avatar_layout_width</item>
         <item name="android:layout_height">@dimen/image_view_big_avatar_layout_height</item>
         <item name="android:layout_gravity">center|top</item>
         <item name="android:scaleType">centerCrop</item>
-        <item name="android:src">@drawable/placeholder_user</item>
     </style>
 
     <style name="SearchRadioButtonStyle">
@@ -127,5 +126,18 @@
         <item name="fabSize">normal</item>
     </style>
 
+    <style name="AvatarImageViewStyle.Right">
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="TextViewTextMsg.Left">
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:autoLink">none</item>
+    </style>
+
+    <style name="TextViewTextMsg.Right">
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:autoLink">none</item>
+    </style>
 
 </resources>
