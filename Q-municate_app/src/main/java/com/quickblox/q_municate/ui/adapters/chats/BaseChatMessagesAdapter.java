@@ -43,7 +43,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     protected FileUtils fileUtils;
 
     BaseChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
-        super(baseActivity.getApplicationContext(), chatMessages);
+        super(baseActivity.getBaseContext(), chatMessages);
         this.baseActivity = baseActivity;
         currentUser = AppSession.getSession().getUser();
         fileUtils = new FileUtils();
