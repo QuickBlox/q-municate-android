@@ -5,23 +5,23 @@ import android.text.Layout;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
+import com.quickblox.core.helper.Lo;
 
-public class TextViewClickMovement extends LinkMovementMethod {
 
-    private final String TAG = TextViewClickMovement.class.getSimpleName();
+public class QBTextViewClickMovement extends LinkMovementMethod {
 
-    private final OnTextViewClickMovementListener mListener;
-    private final GestureDetector mGestureDetector;
-    private TextView mWidget;
-    private Spannable mBuffer;
+    private final QBTextViewLinkClickListener clickListener;
+    private final GestureDetector gestureDetector;
+    private final boolean overrideOnLinkClick;
+    private TextView textView;
+    private Spannable buffer;
 
-    public enum LinkType {
+    public enum QBLinkType {
 
         /**
          * Indicates that phone link was clicked
@@ -48,16 +48,16 @@ public class TextViewClickMovement extends LinkMovementMethod {
      * Interface used to handle Long clicks on the {@link TextView} and taps
      * on the phone, web, mail links inside of {@link TextView}.
      */
-    public interface OnTextViewClickMovementListener {
+    public interface QBTextViewLinkClickListener {
 
         /**
          * This method will be invoked when user press and hold
          * finger on the {@link TextView}
          *
          * @param linkText Text which contains link on which user presses.
-         * @param linkType Type of the link can be one of {@link LinkType} enumeration
+         * @param linkType Type of the link can be one of {@link QBLinkType} enumeration
          */
-        void onLinkClicked(final String linkText, final LinkType linkType);
+        void onLinkClicked(final String linkText, final QBLinkType linkType);
 
         /**
          * @param text Whole text of {@link TextView}
@@ -66,19 +66,25 @@ public class TextViewClickMovement extends LinkMovementMethod {
     }
 
 
-    public TextViewClickMovement(final OnTextViewClickMovementListener listener, final Context context) {
-        mListener = listener;
-        mGestureDetector = new GestureDetector(context, new SimpleOnGestureListener());
+    public QBTextViewClickMovement(final QBTextViewLinkClickListener listener, boolean overrideOnClick, final Context context) {
+        this.clickListener = listener;
+        this.overrideOnLinkClick = overrideOnClick;
+        this.gestureDetector = new GestureDetector(context, new SimpleOnGestureListener());
     }
 
     @Override
     public boolean onTouchEvent(final TextView widget, final Spannable buffer, final MotionEvent event) {
+        this.textView = widget;
+        this.buffer = buffer;
+        gestureDetector.onTouchEvent(event);
 
-        mWidget = widget;
-        mBuffer = buffer;
-        mGestureDetector.onTouchEvent(event);
-
-        return false;
+        //Return super method for delegate logic sending intent from Linkify
+        //or return 'false' for yourself managing logic by link clicked
+        if (overrideOnLinkClick){
+            return false;
+        } else {
+            return super.onTouchEvent(widget, buffer, event);
+        }
     }
 
     /**
@@ -89,43 +95,43 @@ public class TextViewClickMovement extends LinkMovementMethod {
         @Override
         public boolean onDown(MotionEvent event) {
             // Notified when a tap occurs.
-            return true;
+            return false;
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
             // Notified when a long press occurs.
-            final String text = mBuffer.toString();
+            final String text = buffer.toString();
 
-            if (mListener != null) {
-                Log.d(TAG, "----> Long Click Occurs on TextView with ID: " + mWidget.getId() + "\n" +
-                        "Text: " + text + "\n<----");
+            if (clickListener != null) {
+                Lo.g("Long Click Occurs on TextView with ID: " + textView.getId() +
+                        "Text: " + text);
 
-                mListener.onLongClick(text);
+                clickListener.onLongClick(text);
             }
         }
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent event) {
             // Notified when tap occurs.
-            final String linkText = getLinkText(mWidget, mBuffer, event);
+            final String linkText = getLinkText(textView, buffer, event);
 
-            LinkType linkType = LinkType.NONE;
+            QBLinkType linkType = QBLinkType.NONE;
 
             if (Patterns.PHONE.matcher(linkText).matches()) {
-                linkType = LinkType.PHONE;
+                linkType = QBLinkType.PHONE;
             } else if (Patterns.WEB_URL.matcher(linkText).matches()) {
-                linkType = LinkType.WEB_URL;
+                linkType = QBLinkType.WEB_URL;
             } else if (Patterns.EMAIL_ADDRESS.matcher(linkText).matches()) {
-                linkType = LinkType.EMAIL_ADDRESS;
+                linkType = QBLinkType.EMAIL_ADDRESS;
             }
 
-            if (mListener != null) {
-                Log.d(TAG, "----> Tap Occurs on TextView with ID: " + mWidget.getId() + "\n" +
-                        "Link Text: " + linkText + "\n" +
-                        "Link Type: " + linkType + "\n<----");
+            if (clickListener != null) {
+                Lo.g("Tap Occurs on TextView with ID: " + textView.getId() +
+                        "Link Text: " + linkText +
+                        "Link Type: " + linkType);
 
-                mListener.onLinkClicked(linkText, linkType);
+                clickListener.onLinkClicked(linkText, linkType);
             }
 
             return false;

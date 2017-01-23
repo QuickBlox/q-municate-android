@@ -32,7 +32,7 @@ import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.TextViewClickMovement;
+import com.quickblox.q_municate.utils.QBTextViewClickMovement;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
@@ -205,6 +205,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        restoreDefaultCanPerformLogout();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -225,7 +231,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         removeActions();
         deleteObservers();
         unregisterBroadcastReceivers();
-        messagesAdapter.removeMsgTextViewLinkClickListener(messagesTextViewLinkClickListener);
+        removeMsgTextViewLinkClickListener();
     }
 
     @Override
@@ -281,6 +287,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         } else {
             setActionBarTitle(title);
             updateActionBar();
+        }
+    }
+
+    private void restoreDefaultCanPerformLogout() {
+        if (!canPerformLogout.get()){
+            canPerformLogout.set(true);
         }
     }
 
@@ -376,6 +388,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         dataManager.getDialogDataManager().deleteObserver(dialogObserver);
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
+    }
+
+    private void removeMsgTextViewLinkClickListener() {
+        if (messagesAdapter != null){
+            messagesAdapter.removeOnLinkClickListener();
+        }
     }
 
     protected void updateData() {
@@ -845,11 +863,15 @@ private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListe
         }
     }
 }
-    protected class MessagesTextViewLinkClickListener implements TextViewClickMovement.OnTextViewClickMovementListener{
+    protected class MessagesTextViewLinkClickListener implements QBTextViewClickMovement.QBTextViewLinkClickListener {
 
         @Override
-        public void onLinkClicked(String linkText, TextViewClickMovement.LinkType linkType) {
-            canPerformLogout.set(false);
+        public void onLinkClicked(String linkText, QBTextViewClickMovement.QBLinkType linkType) {
+            Log.i(TAG, "Link clicked. Text = " + linkText + " Type = " + linkType);
+
+            if (!QBTextViewClickMovement.QBLinkType.NONE.equals(linkType)) {
+                canPerformLogout.set(false);
+            }
         }
 
         @Override
