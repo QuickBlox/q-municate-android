@@ -185,7 +185,7 @@
     <!-- About -->
     <string name="about_title">About</string>
     <string name="about_version">Version %1$s</string>
-    <string name="about_vendor">&#169; 2016 QuickBlox</string>
+    <string name="about_vendor">&#169; 2017 QuickBlox</string>
     <string name="about_user_agreement">User Agreement</string>
 
 
