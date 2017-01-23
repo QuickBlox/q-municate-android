@@ -176,8 +176,8 @@ public abstract class QBBaseChatHelper extends BaseThreadPoolHelper {
     }
 
     public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
-                                                        Bundle returnedBundle, QBChatDialog qbDialog,
-                                                        long lastDateLoad) throws QBResponseException {
+                                                 Bundle returnedBundle, QBChatDialog qbDialog,
+                                                 long lastDateLoad) throws QBResponseException {
         List<QBChatMessage> qbMessagesList = QBRestChatService.getDialogMessages(qbDialog,
                 customObjectRequestBuilder).perform();
 
@@ -236,9 +236,7 @@ public abstract class QBBaseChatHelper extends BaseThreadPoolHelper {
     }
 
     private QBAttachment getAttachment(String location) {
-        String contentType = "image/jpeg";
         QBAttachment attachment = new QBAttachment(Attachment.Type.LOCATION.toString().toLowerCase());
-        attachment.setContentType(contentType);
         attachment.setData(location);
         attachment.setId(String.valueOf(location.hashCode()));
 
