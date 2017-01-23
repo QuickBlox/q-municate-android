@@ -107,7 +107,7 @@
 
     <!-- Dialog -->
     <string name="dialog_hint_message">Message</string>
-    <string name="dialog_no_chats">Oops…\nYou don\'t have any chats,\n tap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
+    <string name="dialog_no_chats">Oops…\nYou don\'t have any chats,\n tap \'Create\' button to create new group chat \nor go in private chat \nvia Friends Details page"</string>
     <string name="dialog_reply">Reply</string>
     <string name="dialog_user_is_not_friend">User is not your friend</string>
     <string name="dialog_confirm_sending_attach">Do you really want to send attachment?</string>
