@@ -28,10 +28,6 @@ public class StringObfuscator {
         return BuildConfig.DEBUG;
     }
 
-    public static String getPushRegistrationAppId(){
-        return BuildConfig.PUSH_REGISTRATION_APP_ID;
-    }
-
     public static String getTwitterConsumerKey(){
         return BuildConfig.TWITTER_KEY;
     }
