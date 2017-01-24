@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
@@ -285,8 +285,8 @@ public class UserProfileActivity extends BaseLoggableActivity {
         }
     }
 
-    private void startPrivateChat(QBChatDialog  QBChatDialog ) {
-        PrivateDialogActivity.start(UserProfileActivity.this, user, ChatUtils.createLocalDialog(QBChatDialog ));
+    private void startPrivateChat(QBChatDialog qbDialog) {
+        PrivateDialogActivity.start(UserProfileActivity.this, user, ChatUtils.createLocalDialog(qbDialog));
     }
 
     private boolean isUserFriendOrUserRequest() {
@@ -355,8 +355,8 @@ public class UserProfileActivity extends BaseLoggableActivity {
         @Override
         public void execute(Bundle bundle) throws Exception {
             hideProgress();
-            QBChatDialog  QBChatDialog  = (QBChatDialog ) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            startPrivateChat(QBChatDialog );
+            QBChatDialog qbDialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            startPrivateChat(qbDialog);
         }
     }
 }

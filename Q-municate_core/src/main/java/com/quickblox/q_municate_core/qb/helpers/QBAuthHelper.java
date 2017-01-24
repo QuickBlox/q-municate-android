@@ -39,9 +39,7 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
-        //QBAuth.createSession().perform();
         String password = inputUser.getPassword();
-        //qbUser = QBUsers.signIn(inputUser).perform();
         qbUser = QMAuthService.getInstance().loginSync(inputUser);
 
         if (!hasUserCustomData(qbUser)) {
@@ -67,8 +65,6 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser login(String socialProvider, String accessToken,
             String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
-        //QBSession session = QBAuth.createSession().perform();
-
         qbUser = QMAuthService.getInstance().loginSync(socialProvider, accessToken, accessTokenSecret);
 
         if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
@@ -106,7 +102,6 @@ public class QBAuthHelper extends BaseHelper {
         QBUser qbUser;
         UserCustomData userCustomData = new UserCustomData();
 
-        //QBAuth.createSession().perform();
         String password = inputUser.getPassword();
         inputUser.setOldPassword(password);
         inputUser.setCustomData(Utils.customDataToString(userCustomData));
@@ -114,8 +109,6 @@ public class QBAuthHelper extends BaseHelper {
         StringifyArrayList<String> stringifyArrayList = new StringifyArrayList<String>();
         stringifyArrayList.add(TAG_ANDROID);
         inputUser.setTags(stringifyArrayList);
-
-        //qbUser = QBUsers.signUpSignInTask(inputUser).perform();
 
         qbUser = QMAuthService.getInstance().signUpLoginSync(inputUser);
 
@@ -128,7 +121,7 @@ public class QBAuthHelper extends BaseHelper {
 
         qbUser.setCustomDataClass(UserCustomData.class);
         qbUser.setPassword(password);
-        String token = QBAuth.getBaseService().getToken();
+        String token = QBSessionManager.getInstance().getToken();
 
         saveOwnerUser(qbUser);
 
@@ -144,7 +137,6 @@ public class QBAuthHelper extends BaseHelper {
         }
 
         LoginManager.getInstance().logOut();
-        //QBAuth.deleteSession().perform();
         QMAuthService.getInstance().logoutSync();
     }
 
@@ -210,8 +202,6 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public void resetPassword(String email) throws QBResponseException {
-        //QBAuth.createSession().perform();
-        //QBUsers.resetPassword(email).perform();
         QMAuthService.getInstance().resetPasswordSync(email);
 
     }

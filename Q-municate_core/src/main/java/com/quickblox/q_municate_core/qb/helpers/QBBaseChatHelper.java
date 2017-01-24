@@ -56,13 +56,13 @@ import org.jivesoftware.smack.XMPPException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class QBBaseChatHelper extends BaseHelper {
+public abstract class QBBaseChatHelper extends BaseThreadPoolHelper {
 
     private static final String TAG = QBBaseChatHelper.class.getSimpleName();
 
     protected QBChatService chatService;
     protected QBUser chatCreator;
-    protected QBChatDialog  currentDialog;
+    protected QBChatDialog currentDialog;
     protected DataManager dataManager;
     protected QBPrivateChatManager privateChatManager;
     protected PrivateChatMessageListener privateChatMessageListener;
@@ -92,9 +92,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     /*
     Call this method when you want start chating by existing dialog
      */
-    public abstract QBChat createChatLocally(QBChatDialog  dialog, Bundle additional) throws QBResponseException;
+    public abstract QBChat createChatLocally(QBChatDialog dialog, Bundle additional) throws QBResponseException;
 
-    public abstract void closeChat(QBChatDialog  dialogId, Bundle additional);
+    public abstract void closeChat(QBChatDialog dialogId, Bundle additional);
 
     public void init(QBUser chatCreator) {
         this.chatService = QBChatService.getInstance();
@@ -160,28 +160,28 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         qbChatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
     }
 
-    public List<QBChatDialog > getDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
+    public List<QBChatDialog> getDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
         Log.d("Fix double message", "currentDialog = " + currentDialog);
-        List<QBChatDialog> qbChatDialogsList = QBRestChatService.getChatDialogs(null, qbRequestGetBuilder).perform();
+        List<QBChatDialog> qbDialogsList = QBRestChatService.getChatDialogs(null, qbRequestGetBuilder).perform();
 
-        if (qbChatDialogsList != null && !qbChatDialogsList.isEmpty()) {
-            FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbChatDialogsList);
+        if (qbDialogsList != null && !qbDialogsList.isEmpty()) {
+            FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbDialogsList);
             finderUnknownUsers.find();
-            DbUtils.saveDialogsToCache(dataManager, qbChatDialogsList, currentDialog);
-            DbUtils.updateDialogsOccupantsStatusesIfNeeded(dataManager, qbChatDialogsList);
+            DbUtils.saveDialogsToCache(dataManager, qbDialogsList, currentDialog);
+            DbUtils.updateDialogsOccupantsStatusesIfNeeded(dataManager, qbDialogsList);
         }
 
-        return qbChatDialogsList;
+        return qbDialogsList;
     }
 
     public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
-                                                        Bundle returnedBundle, QBChatDialog  QBChatDialog ,
+                                                        Bundle returnedBundle, QBChatDialog qbDialog,
                                                         long lastDateLoad) throws QBResponseException {
-        List<QBChatMessage> qbMessagesList = QBRestChatService.getDialogMessages(QBChatDialog ,
+        List<QBChatMessage> qbMessagesList = QBRestChatService.getDialogMessages(qbDialog,
                 customObjectRequestBuilder).perform();
 
         if (qbMessagesList != null && !qbMessagesList.isEmpty()) {
-            DbUtils.saveMessagesToCache(context, dataManager, qbMessagesList, QBChatDialog .getDialogId());
+            DbUtils.saveMessagesToCache(context, dataManager, qbMessagesList, qbDialog.getDialogId());
         }
 
         return qbMessagesList;
@@ -258,13 +258,13 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return privateChat;
     }
 
-    public QBChatDialog  createPrivateChatOnRest(int opponentId) throws QBResponseException {
-        QBChatDialog  dialog = DialogUtils.buildPrivateDialog(opponentId); //QBRestChatService.createChatDialog(null).perform();  //privateChatManager.createDialog(opponentId);
+    public QBChatDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
+        QBChatDialog dialog = QBRestChatService.createChatDialog(DialogUtils.buildPrivateDialog(opponentId)).perform();
         return dialog;
     }
 
-    public QBChatDialog  createPrivateDialogIfNotExist(int userId) throws QBResponseException {
-        QBChatDialog  existingPrivateDialog = ChatUtils.getExistPrivateDialog(dataManager, userId);
+    public QBChatDialog createPrivateDialogIfNotExist(int userId) throws QBResponseException {
+        QBChatDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(dataManager, userId);
         if (existingPrivateDialog == null) {
             existingPrivateDialog = createPrivateChatOnRest(userId);
             DbUtils.saveDialogToCache(dataManager, existingPrivateDialog);
@@ -370,18 +370,18 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     public void updateStatusMessageReadServer(String dialogId, CombinationMessage combinationMessage,
             boolean fromPrivate) throws Exception {
         if (fromPrivate) {
-            QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getId());
+            QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getUserId());
             if (privateChat != null) {
                 QBChatMessage qbChatMessage = new QBChatMessage();
                 qbChatMessage.setId(combinationMessage.getMessageId());
                 qbChatMessage.setDialogId(dialogId);
-                qbChatMessage.setSenderId(combinationMessage.getDialogOccupant().getUser().getId());
+                qbChatMessage.setSenderId(combinationMessage.getDialogOccupant().getUser().getUserId());
                 privateChat.readMessage(qbChatMessage);
             }
         } else {
             StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
             messagesIdsList.add(combinationMessage.getMessageId());
-            QBRestChatService.markMessagesAsRead(dialogId, messagesIdsList);
+            QBRestChatService.markMessagesAsRead(dialogId, messagesIdsList).perform();
         }
     }
 
@@ -399,8 +399,13 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     private class GroupChatMessageListener implements QBMessageListener<QBGroupChat> {
 
         @Override
-        public void processMessage(QBGroupChat groupChat, QBChatMessage chatMessage) {
-            onGroupMessageReceived(groupChat, chatMessage);
+        public void processMessage(final QBGroupChat groupChat, final QBChatMessage chatMessage) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    onGroupMessageReceived(groupChat, chatMessage);
+                }
+            });
         }
 
         @Override
@@ -412,15 +417,20 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
 
         @Override
-        public void processMessage(QBPrivateChat privateChat, final QBChatMessage chatMessage) {
-            if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
-                for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
-                    notificationChatListener.onReceivedNotification((String) chatMessage.getProperty(
-                            ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
+        public void processMessage(final QBPrivateChat privateChat, final QBChatMessage chatMessage) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
+                        for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
+                            notificationChatListener.onReceivedNotification((String) chatMessage.getProperty(
+                                    ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
+                        }
+                    } else {
+                        onPrivateMessageReceived(privateChat, chatMessage);
+                    }
                 }
-            } else {
-                onPrivateMessageReceived(privateChat, chatMessage);
-            }
+            });
         }
 
         @Override

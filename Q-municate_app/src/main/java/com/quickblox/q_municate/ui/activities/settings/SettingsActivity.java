@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.auth.session.QBSettings;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.changepassword.ChangePasswordActivity;
@@ -97,7 +98,7 @@ public class SettingsActivity extends BaseLoggableActivity {
 
     @OnCheckedChanged(R.id.push_notification_switch)
     void enablePushNotification(boolean enable) {
-        appSharedHelper.saveEnablePushNotifications(enable);
+        QBSettings.getInstance().setEnablePushNotification(enable);
     }
 
     @OnClick(R.id.invite_friends_button)
@@ -129,7 +130,6 @@ public class SettingsActivity extends BaseLoggableActivity {
                                     facebookHelper.logout();
                                     twitterDigitsHelper.logout();
                                     AppSession.getSession().closeAndClear();
-                                    DataManager.getInstance().clearAllTables();
                                     QBLogoutCompositeCommand.start(SettingsActivity.this);
                                 }
                             });
@@ -149,7 +149,7 @@ public class SettingsActivity extends BaseLoggableActivity {
     }
 
     private void fillUI() {
-        pushNotificationSwitch.setChecked(appSharedHelper.isEnablePushNotifications());
+        pushNotificationSwitch.setChecked(QBSettings.getInstance().isEnablePushNotification());
         changePasswordView.setVisibility(
                 LoginType.EMAIL.equals(AppSession.getSession().getLoginType()) ? View.VISIBLE : View.GONE);
         fullNameTextView.setText(user.getFullName());

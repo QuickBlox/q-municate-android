@@ -24,7 +24,6 @@ public class QBRestHelper extends BaseHelper {
         QMUser resultUser;
 
         try {
-            //QBUser user = QBUsers. getUser(userId).perform();
             QMUser user = QMUserService.getInstance().getUserSync(userId, true);
             resultUser = user;
         } catch (QBResponseException e) {
@@ -39,7 +38,6 @@ public class QBRestHelper extends BaseHelper {
         QMUser resultUser = null;
 
         try {
-            //QBUser user = QBUsers.getUser(userId).perform();
             QMUser user = QMUserService.getInstance().getUserSync(userId, true);
             resultUser = user;
         } catch (QBResponseException e) {
@@ -56,7 +54,6 @@ public class QBRestHelper extends BaseHelper {
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
         requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
-        //Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle()).perform();
         Collection<QMUser> usersList = QMUserService.getInstance().getUsersByIDsSync(usersIdsList, requestBuilder);
         return usersList;
     }

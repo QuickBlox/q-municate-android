@@ -11,7 +11,7 @@ import com.quickblox.chat.QBRoster;
 import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.chat.listeners.QBSubscriptionListener;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
@@ -44,7 +44,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class QBFriendListHelper extends BaseHelper implements Serializable {
+public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializable {
 
     private static final int LOADING_DELAY = 500;
 
@@ -141,9 +141,9 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private synchronized void sendNotificationToFriend(QBChatMessage qbChatMessage, int userId) throws QBResponseException {
-        QBChatDialog  QBChatDialog  = privateChatHelper.createPrivateDialogIfNotExist(userId);
-        if (QBChatDialog  != null) {
-            privateChatHelper.sendPrivateMessage(qbChatMessage, userId, QBChatDialog .getDialogId());
+        QBChatDialog qbDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
+        if (qbDialog != null) {
+            privateChatHelper.sendPrivateMessage(qbChatMessage, userId, qbDialog.getDialogId());
         }
     }
 
@@ -421,7 +421,6 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
                     }
                 }
             });
-
         }
 
         @Override

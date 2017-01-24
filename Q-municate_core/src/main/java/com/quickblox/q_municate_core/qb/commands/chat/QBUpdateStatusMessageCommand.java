@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
@@ -24,7 +24,7 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
         this.baseChatHelper = baseChatHelper;
     }
 
-    public static void start(Context context, QBChatDialog  dialog, CombinationMessage combinationMessage, boolean forPrivate) {
+    public static void start(Context context, QBChatDialog dialog, CombinationMessage combinationMessage, boolean forPrivate) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, combinationMessage);
@@ -34,7 +34,7 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBChatDialog  dialog = (QBChatDialog ) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        QBChatDialog dialog = (QBChatDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         CombinationMessage combinationMessage = (CombinationMessage) extras.getSerializable(QBServiceConsts.EXTRA_MESSAGE);
         boolean forPrivate = extras.getBoolean(QBServiceConsts.EXTRA_IS_FOR_PRIVATE);
 

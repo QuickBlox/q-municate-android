@@ -42,6 +42,8 @@ public class CoreSharedHelper {
         public static final String CALL_STARTBITRATE_VALUE = "call_startbitrate_value";
         public static final String CALL_VIDEO_CODEC = "call_video_codec";
         public static final String CALL_AUDIO_CODEC = "call_audio_codec";
+
+        public static final String PERMISSIONS_SAVE_FILE_WAS_REQUESTED = "permission_save_file_was_requested";
     }
 
     protected final SharedPreferences sharedPreferences;
@@ -216,6 +218,14 @@ public class CoreSharedHelper {
         return getPref(USER_TD_ID);
     }
 
+    public boolean isPermissionsSaveFileWasRequested(){
+        return getPref(Constants.PERMISSIONS_SAVE_FILE_WAS_REQUESTED, false);
+    }
+
+    public void savePermissionsSaveFileWasRequested(boolean requested){
+        savePref(Constants.PERMISSIONS_SAVE_FILE_WAS_REQUESTED, requested);
+    }
+
     public void clearUserData() {
         saveUserId(0);
         saveUserEmail(null);
@@ -248,22 +258,6 @@ public class CoreSharedHelper {
 
     public void savePushUserId(int userId) {
         savePref(Constants.PUSH_USER_ID, userId);
-    }
-
-    public String getPushRegistrationId() {
-        return getPref(Constants.PUSH_REGISTRATION_ID, null);
-    }
-
-    public void savePushRegistrationId(String registrationId) {
-        savePref(Constants.PUSH_REGISTRATION_ID, registrationId);
-    }
-
-    public int getPushAppVersion() {
-        return getPref(Constants.PUSH_APP_VERSION, 0);
-    }
-
-    public void savePushAppVersion(int appVersion) {
-        savePref(Constants.PUSH_APP_VERSION, appVersion);
     }
 
     public boolean getCallHwCodec(boolean defValue) {

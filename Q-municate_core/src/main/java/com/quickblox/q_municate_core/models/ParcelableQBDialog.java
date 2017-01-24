@@ -3,31 +3,31 @@ package com.quickblox.q_municate_core.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
 
 //TODO VF maybe move this logic to Dialog class
-public class ParcelableQBDialog  implements Parcelable {
+public class ParcelableQBDialog implements Parcelable {
 
-    public static final Parcelable.Creator<ParcelableQBDialog > CREATOR = new Parcelable.Creator<ParcelableQBDialog >() {
-        public ParcelableQBDialog  createFromParcel(Parcel in) {
-            return new ParcelableQBDialog (in);
+    public static final Parcelable.Creator<ParcelableQBDialog> CREATOR = new Parcelable.Creator<ParcelableQBDialog>() {
+        public ParcelableQBDialog createFromParcel(Parcel in) {
+            return new ParcelableQBDialog(in);
         }
 
-        public ParcelableQBDialog [] newArray(int size) {
-            return new ParcelableQBDialog [size];
+        public ParcelableQBDialog[] newArray(int size) {
+            return new ParcelableQBDialog[size];
         }
     };
-    private QBChatDialog  dialog;
+    private QBChatDialog dialog;
 
-    public ParcelableQBDialog (QBChatDialog  dialog) {
+    public ParcelableQBDialog(QBChatDialog dialog) {
         this.dialog = dialog;
     }
 
-    public ParcelableQBDialog (Parcel inputParcel) {
-        dialog = new QBChatDialog (inputParcel.readString());
+    public ParcelableQBDialog(Parcel inputParcel) {
+        dialog = new QBChatDialog(inputParcel.readString());
         dialog.setName(inputParcel.readString());
         dialog.setType(QBDialogType.parseByCode(inputParcel.readInt()));
         dialog.setRoomJid(inputParcel.readString());
@@ -38,7 +38,7 @@ public class ParcelableQBDialog  implements Parcelable {
         dialog.setOccupantsIds(Utils.toArrayList(occupantArray));
     }
 
-    public QBChatDialog  getDialog() {
+    public QBChatDialog getDialog() {
         return dialog;
     }
 

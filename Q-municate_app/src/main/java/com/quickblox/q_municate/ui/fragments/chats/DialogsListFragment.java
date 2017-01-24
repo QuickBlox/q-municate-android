@@ -327,12 +327,24 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void deleteDialog(Dialog dialog) {
-        baseActivity.showProgress();
+        if(dialog == null || dialog.getDialogId() == null){
+            return;
+        }
         if (Dialog.Type.GROUP.equals(dialog.getType())) {
             if (groupChatHelper != null) {
                 try {
-                    QBChatDialog  localDialog = ChatUtils.createQBChatDialogFromLocalDialogWithoutLeaved(dataManager,
-                                dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId()));
+                    Dialog storeDialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
+                    if (storeDialog == null || storeDialog.getDialogId() == null){
+                        return;
+                    }
+
+                    QBChatDialog localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,storeDialog);
+
+                    if(!groupChatHelper.isDialogJoined(localDialog)){
+                        ToastUtils.shortToast(R.string.error_cant_delete_chat);
+                        return;
+                    }
+
                     List<Integer> occupantsIdsList = new ArrayList<>();
                     occupantsIdsList.add(qbUser.getId());
                     groupChatHelper.sendGroupMessageToFriends(
@@ -344,6 +356,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                 }
             }
         }
+        baseActivity.showProgress();
         QBDeleteChatCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
     }
 

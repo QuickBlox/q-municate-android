@@ -64,15 +64,13 @@ public class AppSession implements Serializable {
     }
 
     public static boolean isSessionExistOrNotExpired(long expirationTime) {
-            //BaseService baseService = QBAuth.getBaseService();
-            //String token = baseService.getToken();
-            String token = QBSessionManager.getInstance().getToken();
+            QBSessionManager qbSessionManager = QBSessionManager.getInstance();
+            String token = qbSessionManager.getToken();
             if (token == null) {
                 Log.d("AppSession", "token == null");
                 return false;
             }
-            //Date tokenExpirationDate = baseService.getTokenExpirationDate();
-            Date tokenExpirationDate = QBSessionManager.getInstance().getTokenExpirationDate();
+            Date tokenExpirationDate = qbSessionManager.getTokenExpirationDate();
             long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
             return tokenLiveOffset > expirationTime;
     }

@@ -24,7 +24,7 @@ import android.widget.ImageButton;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -180,7 +180,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
+            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        } else {
+            showPermissionSettingsDialog();
+        }
     }
 
     @Override
@@ -282,8 +286,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         if (groupChatHelper != null) {
-            QBChatDialog  QBChatDialog  = ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog);
-            groupChatHelper.tryJoinRoomChat(QBChatDialog );
+            QBChatDialog qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
+            groupChatHelper.tryJoinRoomChat(qbDialog);
         }
 
         startLoadDialogMessages();
@@ -422,40 +426,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void checkPermissionSaveFiles() {
-        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile()){
+        boolean permissionSaveFileWasRequested = appSharedHelper.isPermissionsSaveFileWasRequested();
+        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested){
             systemPermissionHelper.requestPermissionsForSaveFile();
+            appSharedHelper.savePermissionsSaveFileWasRequested(true);
         }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST: {
-                if (grantResults.length > 0) {
-                    if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile()){
-                        showPermissionSettingsDialog();
-                    }
-                }
-            }
-        }
-    }
-
-    private void showPermissionSettingsDialog() {
-        DialogsUtils.showOpenAppSettingsDialog(
-                getSupportFragmentManager(),
-                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
-                new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                    }
-
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-                        super.onNegative(dialog);
-                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
-                    }
-                });
     }
 
     protected void loadActionBarLogo(String logoUrl) {
@@ -675,6 +650,24 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messageEditText.setEnabled(enable);
         smilePanelImageButton.setEnabled(enable);
         attachButton.setEnabled(enable);
+    }
+
+    private void showPermissionSettingsDialog() {
+        DialogsUtils.showOpenAppSettingsDialog(
+                getSupportFragmentManager(),
+                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
+                    }
+                });
     }
 
     protected abstract void updateActionBar();

@@ -185,20 +185,20 @@ public class ChatUtils {
         return new QMUser();
     }
 
-    public static Dialog createLocalDialog(QBChatDialog  QBChatDialog ) {
+    public static Dialog createLocalDialog(QBChatDialog qbDialog) {
         Dialog dialog = new Dialog();
-        dialog.setDialogId(QBChatDialog .getDialogId());
-        dialog.setRoomJid(QBChatDialog .getRoomJid());
-        dialog.setTitle(QBChatDialog .getName());
-        dialog.setPhoto(QBChatDialog .getPhoto());
-        if (QBChatDialog .getUpdatedAt() != null) {
-            dialog.setUpdatedAt(DateUtilsCore.getTime(QBChatDialog .getUpdatedAt()));
+        dialog.setDialogId(qbDialog.getDialogId());
+        dialog.setRoomJid(qbDialog.getRoomJid());
+        dialog.setTitle(qbDialog.getName());
+        dialog.setPhoto(qbDialog.getPhoto());
+        if (qbDialog.getUpdatedAt() != null) {
+            dialog.setUpdatedAt(DateUtilsCore.getTime(qbDialog.getUpdatedAt()));
         }
-        dialog.setModifiedDateLocal(QBChatDialog .getLastMessageDateSent());
+        dialog.setModifiedDateLocal(qbDialog.getLastMessageDateSent());
 
-        if (QBDialogType.PRIVATE.equals(QBChatDialog .getType())) {
+        if (QBDialogType.PRIVATE.equals(qbDialog.getType())) {
             dialog.setType(Dialog.Type.PRIVATE);
-        } else if (QBDialogType.GROUP.equals(QBChatDialog .getType())){
+        } else if (QBDialogType.GROUP.equals(qbDialog.getType())){
             dialog.setType(Dialog.Type.GROUP);
         }
 
@@ -225,36 +225,36 @@ public class ChatUtils {
     }
 
     public static List<Message> createTempLocalMessagesList(DataManager dataManager,
-            List<QBChatDialog > qbChatDialogsList, QBChatDialog  currentDialog) {
+            List<QBChatDialog> qbDialogsList, QBChatDialog currentDialog) {
         List<Message> messagesList = new ArrayList<>();
 
-        for (QBChatDialog  QBChatDialog  : qbChatDialogsList) {
+        for (QBChatDialog qbDialog : qbDialogsList) {
             // dialog is opened
             Log.d("Fix double message", "currentDialog = " + currentDialog);
-            if (currentDialog != null && QBChatDialog .getDialogId().equals(currentDialog.getDialogId())) {
+            if (currentDialog != null && qbDialog.getDialogId().equals(currentDialog.getDialogId())) {
                 Log.d("Fix double message", "currentDialog = " + currentDialog + " currentDialogID = " + currentDialog.getDialogId());
                 continue;
             }
 
-            int randomUserId = getRandomUserFromOccupantsList(QBChatDialog .getOccupants());
+            int randomUserId = getRandomUserFromOccupantsList(qbDialog.getOccupants());
             DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager()
-                    .getDialogOccupant(QBChatDialog .getDialogId(), randomUserId);
+                    .getDialogOccupant(qbDialog.getDialogId(), randomUserId);
 
-            boolean onlyMeInDialog = QBChatDialog .getOccupants().size() == 1;
+            boolean onlyMeInDialog = qbDialog.getOccupants().size() == 1;
 
             if (dialogOccupant == null && onlyMeInDialog) {
-                QMUser user =  QMUserService.getInstance().getUserCache().get((long)AppSession.getSession().getUser().getId());
+                User user = dataManager.getUserDataManager().get(AppSession.getSession().getUser().getId());
                 DbUtils.saveDialogOccupant(dataManager,
-                        createDialogOccupant(dataManager, QBChatDialog .getDialogId(), user));
-                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(QBChatDialog .getDialogId(), AppSession.getSession().getUser().getId());
+                        createDialogOccupant(dataManager, qbDialog.getDialogId(), user));
+                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), AppSession.getSession().getUser().getId());
             }
 
-            long tempMessageId = QBChatDialog .getDialogId().hashCode();
-            Message message = createTempLocalMessage(tempMessageId, dialogOccupant, QBChatDialog .getLastMessage(), QBChatDialog .getLastMessageDateSent(), State.TEMP_LOCAL);
+            long tempMessageId = qbDialog.getDialogId().hashCode();
+            Message message = createTempLocalMessage(tempMessageId, dialogOccupant, qbDialog.getLastMessage(), qbDialog.getLastMessageDateSent(), State.TEMP_LOCAL);
             messagesList.add(message);
 
-            if (QBChatDialog .getUnreadMessageCount() != null && QBChatDialog .getUnreadMessageCount() > 0) {
-                for (int i = 0; i < QBChatDialog .getUnreadMessageCount(); i++) {
+            if (qbDialog.getUnreadMessageCount() != null && qbDialog.getUnreadMessageCount() > 0) {
+                for (int i = 0; i < qbDialog.getUnreadMessageCount(); i++) {
                     messagesList.add(createTempLocalMessage(--tempMessageId, dialogOccupant, null, State.TEMP_LOCAL_UNREAD));
                 }
             }
@@ -298,8 +298,8 @@ public class ChatUtils {
         return qbChatDialogsList;
     }
 
-    public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBChatDialog  QBChatDialog , boolean onlyNewOccupant) {
-        List<DialogOccupant> dialogOccupantsList = new ArrayList<>(QBChatDialog .getOccupants().size());
+    public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBChatDialog qbDialog, boolean onlyNewOccupant) {
+        List<DialogOccupant> dialogOccupantsList = new ArrayList<>(qbDialog.getOccupants().size());
 
         for (Integer userId : QBChatDialog .getOccupants()) {
             DialogOccupant dialogOccupant;
@@ -347,31 +347,31 @@ public class ChatUtils {
         return idsList;
     }
 
-    public static QBChatDialog  createQBChatDialogFromLocalDialog(DataManager dataManager, Dialog dialog) {
+    public static QBChatDialog createQBDialogFromLocalDialog(DataManager dataManager, Dialog dialog) {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        QBChatDialog  QBChatDialog  = createQBChatDialogFromLocalDialog(dialog, dialogOccupantsList);
-        return QBChatDialog ;
+        QBChatDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
+        return qbDialog;
     }
 
-    public static QBChatDialog  createQBChatDialogFromLocalDialogWithoutLeaved(DataManager dataManager, Dialog dialog) {
+    public static QBChatDialog createQBDialogFromLocalDialogWithoutLeaved(DataManager dataManager, Dialog dialog) {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getActualDialogOccupantsByDialog(dialog.getDialogId());
-        QBChatDialog  QBChatDialog  = createQBChatDialogFromLocalDialog(dialog, dialogOccupantsList);
-        return QBChatDialog ;
+        QBChatDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
+        return qbDialog;
     }
 
-    private static QBChatDialog  createQBChatDialogFromLocalDialog(Dialog dialog, List<DialogOccupant> dialogOccupantsList) {
-        QBChatDialog  QBChatDialog  = new QBChatDialog ();
-        QBChatDialog .setDialogId(dialog.getDialogId());
-        QBChatDialog .setRoomJid(dialog.getRoomJid());
-        QBChatDialog .setPhoto(dialog.getPhoto());
-        QBChatDialog .setName(dialog.getTitle());
-        QBChatDialog .setOccupantsIds(createOccupantsIdsFromDialogOccupantsList(dialogOccupantsList));
-        QBChatDialog .setType(
+    private static QBChatDialog createQBDialogFromLocalDialog(Dialog dialog, List<DialogOccupant> dialogOccupantsList) {
+        QBChatDialog qbDialog = new QBChatDialog();
+        qbDialog.setDialogId(dialog.getDialogId());
+        qbDialog.setRoomJid(dialog.getRoomJid());
+        qbDialog.setPhoto(dialog.getPhoto());
+        qbDialog.setName(dialog.getTitle());
+        qbDialog.setOccupantsIds(createOccupantsIdsFromDialogOccupantsList(dialogOccupantsList));
+        qbDialog.setType(
                 Dialog.Type.PRIVATE.equals(dialog.getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
-        QBChatDialog .setUpdatedAt(new Date(dialog.getUpdatedAt()));
-        return QBChatDialog ;
+        qbDialog.setUpdatedAt(new Date(dialog.getUpdatedAt()));
+        return qbDialog;
     }
 
     public static ArrayList<Integer> createOccupantsIdsFromDialogOccupantsList(
@@ -651,9 +651,9 @@ public class ChatUtils {
         return dialogOccupant;
     }
 
-    public static void addOccupantsToQBChatDialog (QBChatDialog  QBChatDialog , QBChatMessage qbChatMessage) {
-        QBChatDialog .setOccupantsIds(new ArrayList<Integer>(2));
-        QBChatDialog .getOccupants().add(qbChatMessage.getSenderId());
-        QBChatDialog .getOccupants().add(qbChatMessage.getRecipientId());
+    public static void addOccupantsToQBDialog(QBChatDialog qbDialog, QBChatMessage qbChatMessage) {
+        qbDialog.setOccupantsIds(new ArrayList<Integer>(2));
+        qbDialog.getOccupants().add(qbChatMessage.getSenderId());
+        qbDialog.getOccupants().add(qbChatMessage.getRecipientId());
     }
 }

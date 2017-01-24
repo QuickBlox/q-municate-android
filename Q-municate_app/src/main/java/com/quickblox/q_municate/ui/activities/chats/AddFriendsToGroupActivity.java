@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
@@ -31,12 +31,12 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     public static final int RESULT_ADDED_FRIENDS = 9123;
 
-    private QBChatDialog  QBChatDialog ;
+    private QBChatDialog qbDialog;
     private List<Integer> friendIdsList;
 
-    public static void start(Activity activity, QBChatDialog  QBChatDialog ) {
+    public static void start(Activity activity, QBChatDialog qbDialog) {
         Intent intent = new Intent(activity, AddFriendsToGroupActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, QBChatDialog );
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, qbDialog);
         activity.startActivityForResult(intent, RESULT_ADDED_FRIENDS);
     }
 
@@ -67,12 +67,12 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     @Override
     protected List<QMUser> getFriendsList() {
-        QBChatDialog  = (QBChatDialog ) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        List<Friend> friendsList = dataManager.getFriendDataManager().getAllForGroupDetails(QBChatDialog .getOccupants());
+        qbDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        List<Friend> friendsList = dataManager.getFriendDataManager().getAllForGroupDetails(qbDialog.getOccupants());
         if (!friendsList.isEmpty()) {
             List<Integer> actualFriendIdsList = UserFriendUtils.getFriendIdsListFromList(friendsList);
             List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
-                    .getActualDialogOccupantsByIds(QBChatDialog .getDialogId(), actualFriendIdsList);
+                    .getActualDialogOccupantsByIds(qbDialog.getDialogId(), actualFriendIdsList);
             if (!dialogOccupantsList.isEmpty()) {
                 friendsList.removeAll(UserFriendUtils.getFriendsListFromDialogOccupantsList(dialogOccupantsList));
             }
@@ -92,11 +92,11 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     protected void performDone() {
         List<QMUser> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
         if (!selectedFriendsList.isEmpty()) {
-            boolean joined = groupChatHelper != null && groupChatHelper.isDialogJoined(QBChatDialog );
+            boolean joined = groupChatHelper != null && groupChatHelper.isDialogJoined(qbDialog);
             if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError() && joined) {
                 showProgress();
                 friendIdsList = UserFriendUtils.getFriendIds(selectedFriendsList);
-                QBAddFriendsToGroupCommand.start(this, QBChatDialog .getDialogId(),
+                QBAddFriendsToGroupCommand.start(this, qbDialog.getDialogId(),
                         (ArrayList<Integer>) friendIdsList);
             } else {
                 ToastUtils.longToast(R.string.chat_service_is_initializing);

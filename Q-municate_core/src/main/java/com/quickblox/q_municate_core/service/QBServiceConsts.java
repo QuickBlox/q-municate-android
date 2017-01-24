@@ -210,8 +210,6 @@ public class QBServiceConsts {
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
     public static final String EXTRA_PAGE = "load_elements";
     public static final String EXTRA_USER_STATUS = "user_status";
-    public static final String EXTRA_REGISTRATION_ID = "registration_id";
-    public static final String EXTRA_IS_PUSH_SUBSCRIBED_ON_SERVER = "is_push_subscribed_on_server";
     public static final String EXTRA_OPPONENTS = "opponents";
     public static final String EXTRA_WIFI_DISABLED = "wifi_disabled";
     public static final String EXTRA_CONFERENCE_TYPE = "conference_type";

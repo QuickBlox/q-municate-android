@@ -210,8 +210,8 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            QBChatDialog  QBChatDialog  = (QBChatDialog ) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            startPrivateChat(ChatUtils.createLocalDialog(QBChatDialog ));
+            QBChatDialog qbDialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            startPrivateChat(ChatUtils.createLocalDialog(qbDialog));
         }
     }
 }
