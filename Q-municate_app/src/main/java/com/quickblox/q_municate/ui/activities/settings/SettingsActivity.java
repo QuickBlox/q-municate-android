@@ -29,7 +29,9 @@ import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLogoutCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_user_service.model.QMUser;
+//import com.quickblox.q_municate_db.models.User;
 
 import butterknife.Bind;
 import butterknife.OnCheckedChanged;
@@ -49,7 +51,7 @@ public class SettingsActivity extends BaseLoggableActivity {
     @Bind(R.id.change_password_view)
     RelativeLayout changePasswordView;
 
-    private User user;
+    private QMUser user;
     private FacebookHelper facebookHelper;
     private TwitterDigitsHelper twitterDigitsHelper;
 

@@ -21,8 +21,9 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 
 public class GroupDialogActivity extends BaseDialogActivity {
 
-    public static void start(Context context, ArrayList<User> friends) {
+    public static void start(Context context, ArrayList<QMUser> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
         context.startActivity(intent);
@@ -173,7 +174,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
             boolean ownMessage = !cm.isIncoming(currentUser.getId());
             if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
                 cm.setState(State.READ);
-                QBUpdateStatusMessageCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), cm, false);
+                QBUpdateStatusMessageCommand.start(this, ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog), cm, false);
             } else if (ownMessage) {
                 cm.setState(State.READ);
                 dataManager.getMessageDataManager().update(cm.toMessage(), false);

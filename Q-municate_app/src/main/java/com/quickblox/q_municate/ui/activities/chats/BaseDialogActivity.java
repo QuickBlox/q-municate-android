@@ -60,8 +60,9 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
@@ -109,7 +110,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
     protected BaseRecyclerViewAdapter messagesAdapter;
-    protected User opponentUser;
+    protected QMUser opponentUser;
     protected QBBaseChatHelper baseChatHelper;
     protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
@@ -462,7 +463,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
                 lastDateLoad, loadMore);
     }
 
@@ -493,7 +494,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void sendTypingStatus() {
-        baseChatHelper.sendTypingStatusToServer(opponentUser.getUserId(), isTypingNow);
+        baseChatHelper.sendTypingStatusToServer(opponentUser.getId(), isTypingNow);
     }
 
     private void setSmilePanelIcon(int resourceId) {
@@ -530,7 +531,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         try {
             if (privateMessage) {
                 ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(
-                        messageEditText.getText().toString(), opponentUser.getUserId());
+                        messageEditText.getText().toString(), opponentUser.getId());
             } else {
                 ((QBGroupChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
                         messageEditText.getText().toString());
@@ -602,7 +603,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 Log.d("Fix double message", "baseChatHelper = " + baseChatHelper + "\n dialog = " + dialog);
                 if (baseChatHelper != null && dialog != null) {
                     try {
-                        baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+                        baseChatHelper.createChatLocally(ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
                                 generateBundleToInitDialog());
                     } catch (QBResponseException e) {
                         ErrorUtils.showError(this, e.getMessage());
@@ -617,7 +618,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void closeChatLocally() {
         if (baseChatHelper != null && dialog != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+            baseChatHelper.closeChat(ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
                     generateBundleToInitDialog());
         }
         dialog = null;
@@ -794,7 +795,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             Bundle extras = intent.getExtras();
             int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
             // TODO: now it is possible only for Private chats
-            if (dialog != null && opponentUser != null && userId == opponentUser.getUserId()) {
+            if (dialog != null && opponentUser != null && userId == opponentUser.getId()) {
                 if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
                     boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
                     if (isTyping) {

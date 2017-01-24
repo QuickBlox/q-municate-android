@@ -17,7 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
@@ -46,12 +46,15 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogOccupantDataManager;
 import com.quickblox.q_municate_db.managers.MessageDataManager;
-import com.quickblox.q_municate_db.managers.UserDataManager;
+//import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -252,7 +255,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
         dialogsListAdapter.setNewData(dialogsList);
-        dialogsListAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
     }
 
@@ -272,7 +274,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void addObservers() {
         dataManager.getDialogDataManager().addObserver(commonObserver);
         dataManager.getMessageDataManager().addObserver(commonObserver);
-        dataManager.getUserDataManager().addObserver(commonObserver);
+        ((Observable)QMUserService.getInstance().getUserCache()).addObserver(commonObserver);
         dataManager.getDialogOccupantDataManager().addObserver(commonObserver);
     }
 
@@ -280,7 +282,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if (dataManager != null) {
             dataManager.getDialogDataManager().deleteObserver(commonObserver);
             dataManager.getMessageDataManager().deleteObserver(commonObserver);
-            dataManager.getUserDataManager().deleteObserver(commonObserver);
+            ((Observable)QMUserService.getInstance().getUserCache()).deleteObserver(commonObserver);
             dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
         }
     }
@@ -309,7 +311,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void startPrivateChatActivity(Dialog dialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        User opponent = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
+        QMUser opponent = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
 
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             PrivateDialogActivity.start(baseActivity, opponent, dialog);
@@ -410,7 +412,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         public void update(Observable observable, Object data) {
             if (data != null) {
                 if (data.equals(DialogDataManager.OBSERVE_KEY) || data.equals(MessageDataManager.OBSERVE_KEY)
-                        || data.equals(UserDataManager.OBSERVE_KEY) || data.equals(DialogOccupantDataManager.OBSERVE_KEY)) {
+                        || data.equals(QMUserCacheImpl.OBSERVE_KEY) || data.equals(DialogOccupantDataManager.OBSERVE_KEY)) {
                     updateDialogsList();
                 }
             }

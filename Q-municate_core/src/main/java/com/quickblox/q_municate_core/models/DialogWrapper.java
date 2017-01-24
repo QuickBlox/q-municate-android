@@ -1,18 +1,17 @@
 package com.quickblox.q_municate_core.models;
 
 import android.content.Context;
-import android.view.View;
 
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.io.Serializable;
@@ -21,7 +20,7 @@ import java.util.List;
 public class DialogWrapper implements Serializable {
 
     private Dialog dialog;
-    private User opponentUser;
+    private QMUser opponentUser;
     private long totalCount;
     private String lastMessage;
 
@@ -69,7 +68,7 @@ public class DialogWrapper implements Serializable {
         return dialog;
     }
 
-    public User getOpponentUser() {
+    public QMUser getOpponentUser() {
         return opponentUser;
     }
 

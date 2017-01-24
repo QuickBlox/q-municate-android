@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.auth.session.BaseService;
+import com.quickblox.auth.session.QBSession;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.auth.QBAuth;

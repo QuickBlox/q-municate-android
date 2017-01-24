@@ -13,7 +13,11 @@ import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
+import com.quickblox.q_municate_auth_service.QMAuthService;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.cache.QMUserCache;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 
@@ -58,6 +62,7 @@ public class App extends MultiDexApplication {
         initQb();
         initDb();
         initImageLoader(this);
+        initServices();
     }
 
     private void initQb() {
@@ -78,9 +83,16 @@ public class App extends MultiDexApplication {
         ImageLoader.getInstance().init(ImageLoaderUtils.getImageLoaderConfiguration(context));
     }
 
+    private void initServices(){
+        QMAuthService.init();
+        QMUserCache userCache = new QMUserCacheImpl(this);
+        QMUserService.init(userCache);
+    }
+
     public synchronized SharedHelper getAppSharedHelper() {
         return appSharedHelper == null
                 ? appSharedHelper = new SharedHelper(this)
                 : appSharedHelper;
     }
+
 }

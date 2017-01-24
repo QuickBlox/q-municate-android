@@ -2,6 +2,8 @@ package com.quickblox.q_municate_db.models;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.io.Serializable;
 
@@ -22,13 +24,13 @@ public class Friend implements Serializable {
             foreignAutoRefresh = true,
             unique = true,
             canBeNull = false,
-            columnName = User.Column.ID)
-    private User user;
+            columnName = QMUserColumns.ID)
+    private QMUser user;
 
     public Friend() {
     }
 
-    public Friend(User user) {
+    public Friend(QMUser user) {
         this.user = user;
     }
 
@@ -40,11 +42,11 @@ public class Friend implements Serializable {
         this.friendId = friendId;
     }
 
-    public User getUser() {
+    public QMUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(QMUser user) {
         this.user = user;
     }
 
@@ -59,7 +61,7 @@ public class Friend implements Serializable {
 
         Friend friend = (Friend) object;
 
-        return user.getUserId() == friend.getUser().getUserId();
+        return user.getId() == friend.getUser().getId();
     }
 
     @Override

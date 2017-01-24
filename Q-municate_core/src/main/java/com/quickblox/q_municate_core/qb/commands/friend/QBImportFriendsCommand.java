@@ -10,7 +10,8 @@ import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.users.QBUsers;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -49,12 +50,21 @@ public class QBImportFriendsCommand extends ServiceCommand {
         List<QBUser> realFriendsContactsList = null;
 
         if (!friendsFacebookList.isEmpty()) {
-            realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder,
-                    params).perform();
+            //realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder, params).perform();
+            List<QMUser> realQMFriendsFacebookList=  QMUserService.getInstance().getUsersByFacebookIdSync(friendsFacebookList, requestBuilder, true);
+            realFriendsFacebookList = new ArrayList<>(realQMFriendsFacebookList.size());
+            for (QMUser user : realQMFriendsFacebookList){
+                realFriendsFacebookList.add(user);
+            }
         }
 
         if (!friendsContactsList.isEmpty()) {
-            realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params).perform();
+            //realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params).perform();
+            List<QMUser> realQMFriendsContactsList = QMUserService.getInstance().getUsersByEmailsSync(friendsFacebookList, requestBuilder, true);
+            realFriendsContactsList = new ArrayList<>(realQMFriendsContactsList.size());
+            for (QMUser user : realQMFriendsContactsList){
+                realFriendsContactsList.add(user);
+            }
         }
 
         List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList,

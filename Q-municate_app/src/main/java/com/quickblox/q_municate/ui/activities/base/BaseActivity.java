@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
@@ -39,7 +38,6 @@ import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
-import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
 import com.quickblox.q_municate.utils.bridges.ConnectionBridge;
@@ -67,18 +65,18 @@ import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.User;
+//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
@@ -634,7 +632,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private void checkOpeningDialog() {
         if (appSharedHelper.needToOpenDialog() && isChatInitializedAndUserLoggedIn()) {
             Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
-            User user = DataManager.getInstance().getUserDataManager().get(appSharedHelper.getPushUserId());
+            QMUser user = QMUserService.getInstance().getUserCache().get((long)appSharedHelper.getPushUserId());
 
             if (dialog != null && user != null) {
                 if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
@@ -660,7 +658,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return isAppInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
-    public void startPrivateChatActivity(User user, Dialog dialog) {
+    public void startPrivateChatActivity(QMUser user, Dialog dialog) {
         PrivateDialogActivity.start(this, user, dialog);
     }
 

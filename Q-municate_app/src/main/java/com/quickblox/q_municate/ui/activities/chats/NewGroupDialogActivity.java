@@ -14,7 +14,8 @@ import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoratio
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
 import com.quickblox.q_municate.utils.listeners.simple.SimpleOnRecycleItemClickListener;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
+//import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
 
     @Override
     protected void performDone() {
-        List<User> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
+        List<QMUser> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
         if (!selectedFriendsList.isEmpty()) {
             CreateGroupDialogActivity.start(this, selectedFriendsList);
         } else {
@@ -80,10 +81,10 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
     }
 
     private void initCustomListeners() {
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QMUser>() {
 
             @Override
-            public void onItemClicked(View view, User entity, int position) {
+            public void onItemClicked(View view, QMUser entity, int position) {
                 ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
             }
         });

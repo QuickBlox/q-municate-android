@@ -109,7 +109,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!State.READ.equals(combinationMessage.getState()) && !ownMessage && baseActivity.isNetworkAvailable()) {
             combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
+            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
         }
 
         // check if last messageCombination is request messageCombination
@@ -123,7 +123,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             lastRequestPosition = EMPTY_POSITION;
         } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == position)) { // set visible friends actions
             setVisibilityFriendsActions(viewHolder, View.VISIBLE);
-            initListeners(viewHolder, position, combinationMessage.getDialogOccupant().getUser().getUserId());
+            initListeners(viewHolder, position, combinationMessage.getDialogOccupant().getUser().getId());
         }
     }
 
@@ -180,7 +180,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
             if (friendsRequestMessage && !ownMessage) {
                 isFriend = dataManager.getFriendDataManager().
-                        getByUserId(combinationMessage.getDialogOccupant().getUser().getUserId()) != null;
+                        getByUserId(combinationMessage.getDialogOccupant().getUser().getId()) != null;
                 if (!isFriend) {
                     lastRequestPosition = position;
                 }
