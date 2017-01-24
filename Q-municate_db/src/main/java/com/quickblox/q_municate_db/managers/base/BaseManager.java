@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 
 public abstract class BaseManager<T> extends Observable implements Manager {
 
-    public static String OBSERVE_KEY;
+    public String OBSERVE_KEY;
 
     private static final String TAG = BaseManager.class.getSimpleName();
 
@@ -198,5 +198,9 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         }
 
         return false;
+    }
+
+    public String getObserverKey(){
+        return OBSERVE_KEY;
     }
 }

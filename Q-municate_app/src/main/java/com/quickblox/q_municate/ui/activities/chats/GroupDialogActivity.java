@@ -80,7 +80,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
         updateData();
 
         if (isNetworkAvailable()) {
-            startLoadDialogMessages();
+            startLoadDialogMessages(false);
         }
 
         checkMessageSendingPossibility();

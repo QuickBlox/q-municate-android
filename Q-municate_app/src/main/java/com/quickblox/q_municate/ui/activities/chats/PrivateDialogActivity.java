@@ -99,7 +99,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         checkForCorrectChat();
 
         if (isNetworkAvailable()) {
-            startLoadDialogMessages();
+            startLoadDialogMessages(false);
         }
 
         checkMessageSendingPossibility();
@@ -378,7 +378,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         public void execute(Bundle bundle) {
             ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
             messagesAdapter.notifyItemChanged(operationItemPosition);
-            startLoadDialogMessages();
+            startLoadDialogMessages(false);
             hideProgress();
         }
     }
@@ -389,7 +389,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         public void execute(Bundle bundle) {
             ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
             messagesAdapter.notifyItemChanged(operationItemPosition);
-            startLoadDialogMessages();
+            startLoadDialogMessages(false);
             hideProgress();
         }
     }
@@ -398,7 +398,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(FriendDataManager.OBSERVE_KEY)) {
+            if (data != null && data.equals(dataManager.getFriendDataManager().getObserverKey())) {
                 checkForCorrectChat();
                 checkMessageSendingPossibility();
             }

@@ -61,9 +61,7 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends BaseClickListenerVie
     }
 
     public void addAllInBegin(List <T> collection) {
-        for (int i = 0; i < collection.size(); i++){
-            objectsList.add(i, collection.get(i));
-        }
+        objectsList.addAll(0, collection);
 
         notifyItemRangeInserted(0, collection.size());
     }

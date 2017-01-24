@@ -195,6 +195,7 @@ public class QBServiceConsts {
     public static final String EXTRA_OPPONENT = "opponent_friend";
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";
     public static final String EXTRA_LAST_DATE_LOAD_MESSAGES = "last_date_load_messages";
+    public static final String EXTRA_IS_LOAD_NEW_MESSAGES = "is_load_new_messages";
     public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";
     public static final String EXTRA_GROUP_NAME = "group_name";
     public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
