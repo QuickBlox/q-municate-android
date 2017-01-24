@@ -26,12 +26,6 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     @SuppressLint("LongLogTag")
     public void onActivityStarted(Activity activity) {
         Log.d("ActivityLifecycleHandler", "onActivityStarted " + activity.getClass().getSimpleName());
-    }
-
-    @SuppressLint("LongLogTag")
-    public void onActivityResumed(Activity activity) {
-        Log.d("ActivityLifecycleHandler", "onActivityResumed " + activity.getClass().getSimpleName() + " count of activities = " +  numberOfActivitiesInForeground);
-        //Count only our app logeable activity
         boolean activityLogeable = isActivityLogeable(activity);
         chatDestroyed = chatDestroyed && !isLoggedIn();
         if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
@@ -41,8 +35,27 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             }
         }
         if (activityLogeable) {
+            Log.d("ActivityLifecycle", "++numberOfActivitiesInForeground");
             ++numberOfActivitiesInForeground;
         }
+    }
+
+    @SuppressLint("LongLogTag")
+    public void onActivityResumed(Activity activity) {
+        Log.d("ActivityLifecycleHandler", "onActivityResumed " + activity.getClass().getSimpleName() + " count of activities = " +  numberOfActivitiesInForeground);
+        //Count only our app logeable activity
+//        boolean activityLogeable = isActivityLogeable(activity);
+//        chatDestroyed = chatDestroyed && !isLoggedIn();
+//        if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
+//            boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
+//            if (canLogin && ((BaseActivity) activity).isNetworkAvailable()) {
+//                QBLoginChatCompositeCommand.start(activity);
+//            }
+//        }
+//        if (activityLogeable) {
+//            Log.d("ActivityLifecycle", "++numberOfActivitiesInForeground");
+//            ++numberOfActivitiesInForeground;
+//        }
     }
 
     public boolean isActivityLogeable(Activity activity) {
@@ -55,6 +68,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     public void onActivityStopped(Activity activity) {
         //Count only our app logeable activity
         if (activity instanceof Loggable) {
+            Log.d("ActivityLifecycle", "--numberOfActivitiesInForeground");
             --numberOfActivitiesInForeground;
         }
         Lo.g("onActivityStopped" + numberOfActivitiesInForeground);
