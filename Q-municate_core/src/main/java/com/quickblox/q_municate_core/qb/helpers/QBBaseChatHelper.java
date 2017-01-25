@@ -26,6 +26,7 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.CollectionUtils;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.R;
@@ -310,8 +311,10 @@ public abstract class QBBaseChatHelper extends BaseThreadPoolHelper {
         String messageBody = chatMessage.getBody();
         String extraChatMessage;
 
-        if (chatMessage.getAttachments() != null && !chatMessage.getAttachments().isEmpty()) {
-            extraChatMessage = context.getResources().getString(R.string.file_was_attached);
+        if (!CollectionUtils.isEmpty(chatMessage.getAttachments())) {
+            String attachType = chatMessage.getAttachments().iterator().next().getType();
+            extraChatMessage = context.getResources().getString(attachType.equalsIgnoreCase(Attachment.Type.LOCATION.toString()) ?
+                    R.string.location_was_attached : R.string.file_was_attached);
         } else {
             extraChatMessage = messageBody;
         }

@@ -33,6 +33,7 @@
 
     <string name="url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=large</string>
     <string name="file_was_attached">file was attached</string>
+    <string name="location_was_attached">@string/dlg_location_last_message</string>
     <string name="user_created_room">%1$s created group chat</string>
 
     <string-array name="friends_relation_statuses_array">
