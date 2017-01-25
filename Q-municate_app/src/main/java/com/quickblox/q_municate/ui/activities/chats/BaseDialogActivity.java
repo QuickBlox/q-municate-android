@@ -62,7 +62,7 @@ import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
-import com.quickblox.ui.kit.chatmessage.adapter.utils.QBChatMessageClickMovement;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
@@ -393,7 +393,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void removeMsgTextViewLinkClickListener() {
         if (messagesAdapter != null){
-            messagesAdapter.removeTextViewLinkClickListener();
+            messagesAdapter.removeMessageTextViewLinkClickListener();
         }
     }
 
@@ -867,10 +867,10 @@ private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListe
     protected class MessagesTextViewLinkClickListener implements QBChatMessageLinkClickListener {
 
         @Override
-        public void onLinkClicked(String linkText, QBChatMessageClickMovement.QBLinkType qbLinkType, int position) {
+        public void onLinkClicked(String linkText, QBMessageTextClickMovement.QBLinkType qbLinkType, int position) {
             Log.i(TAG, "Link clicked. Text = " + linkText + " Type = " + qbLinkType + " Position: " + position);
 
-            if (!QBChatMessageClickMovement.QBLinkType.NONE.equals(qbLinkType)) {
+            if (!QBMessageTextClickMovement.QBLinkType.NONE.equals(qbLinkType)) {
                 canPerformLogout.set(false);
             }
         }
