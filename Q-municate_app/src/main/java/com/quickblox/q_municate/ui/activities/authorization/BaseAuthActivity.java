@@ -43,7 +43,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -242,63 +241,14 @@ public abstract class BaseAuthActivity extends BaseActivity {
         appSharedHelper.saveSavedRememberMe(true);
         appSharedHelper.saveUsersImportInitialized(true);
         QBUser user = new QBUser(null, userPassword, userEmail);
-        //AppSession.getSession().closeAndClear();
-
 
         ServiceManager serviceManager = new ServiceManager(this);
         serviceManager.login(user);
 
 
-        //QBLoginCompositeCommand.start(this, user);
-//        authService.login(user).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
-//            @Override
-//            public void onCompleted() {
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                    Log.d(TAG, "onError" + e.getMessage());
-//            }
-//
-//            @Override
-//            public void onNext(QBUser qbUser) {
-//
-//                //String password = qbUser.getPassword();
-//                String password = userPassword;
-//
-//                if (!hasUserCustomData(qbUser)) {
-//                    qbUser.setOldPassword(password);
-//                    try {
-//                        updateUser(qbUser);
-//                    } catch (QBResponseException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                String token = QBSessionManager.getInstance().getToken();
-//                qbUser.setPassword(password);
-//
-//                saveOwnerUser(qbUser);
-//
-//                AppSession.startSession(LoginType.EMAIL, qbUser, token);
-//
-//                startMainActivity(qbUser);
-//
-//                // send analytics data
-//                GoogleAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this, qbUser, "User Sign In");
-//                FlurryAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this);
-//            }
-//        });
     }
 
     protected void performLoginSuccessAction(Bundle bundle) {
-//        QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-//        startMainActivity(user);
-//
-//        // send analytics data
-//        GoogleAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
-//        FlurryAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this);
     }
 
     protected void performLoginSuccessAction(QBUser user) {
@@ -425,10 +375,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         @Override
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
-                showProgress();
-
-            //QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
-
+            showProgress();
             authService.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(),null).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
                 @Override
@@ -444,7 +391,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
                 @Override
                 public void onNext(QBUser qbUser) {
                     QBUpdateUserCommand.start(BaseAuthActivity.this, qbUser, null);
-
                     performLoginSuccessAction(qbUser);
 
                 }
@@ -479,10 +425,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
             DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
-            //            QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.TWITTER_DIGITS,
-//                    authHeaders.get(TwitterDigitsHelper.PROVIDER),
-//                    authHeaders.get(TwitterDigitsHelper.CREDENTIALS));
-
             authService.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS)).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
                 @Override
@@ -503,9 +445,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
                 }
             });
-
-
-
         }
 
         @Override

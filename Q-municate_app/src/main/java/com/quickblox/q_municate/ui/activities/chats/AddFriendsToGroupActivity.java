@@ -19,7 +19,6 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_user_service.model.QMUser;
-//import com.quickblox.q_municate_db.models.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;

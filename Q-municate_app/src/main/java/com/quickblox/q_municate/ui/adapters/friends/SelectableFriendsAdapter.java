@@ -10,7 +10,6 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.ArrayList;

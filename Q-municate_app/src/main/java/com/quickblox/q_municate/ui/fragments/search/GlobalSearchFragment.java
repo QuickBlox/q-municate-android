@@ -41,7 +41,6 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.managers.UserRequestDataManager;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
@@ -123,8 +122,6 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     @Override
     public void prepareSearch() {
         clearOldData();
-
-//в
     }
 
     @Override
@@ -267,8 +264,6 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     private void searchUsers() {
         if (!TextUtils.isEmpty(searchQuery) && checkSearchDataWithError(searchQuery)) {
 
-            //QBFindUsersCommand.start(baseActivity, AppSession.getSession().getUser(), searchQuery, page);
-
             QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
             requestBuilder.setPage(page);
             requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
@@ -288,13 +283,6 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 
                 @Override
                 public void onNext(List<QMUser> qbUsers) {
-
-//                    List<User> usersList = new ArrayList<User>(qbUsers.size());
-//                    User user = null;
-//                    for (QBUser qbUser : qbUsers){
-//                        user = UserFriendUtils.createLocalUser(qbUser);
-//                        usersList.add(user);
-//                    }
 
                     if (qbUsers != null && !qbUsers.isEmpty()) {
                         checkForExcludeMe(qbUsers);
@@ -337,25 +325,6 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     }
 
     private void parseResult(Bundle bundle) {
-//        String searchQuery = bundle.getString(QBServiceConsts.EXTRA_CONSTRAINT);
-//        totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-//
-//        if (excludedMe) {
-//            totalEntries--;
-//        }
-//
-//        if (GlobalSearchFragment.this.searchQuery.equals(searchQuery)) {
-//            Collection<User> newUsersCollection = (Collection<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
-//            if (newUsersCollection != null && !newUsersCollection.isEmpty()) {
-//                checkForExcludeMe(newUsersCollection);
-//
-//                usersList.addAll(newUsersCollection);
-//
-//                updateContactsList(usersList);
-//            }
-//        } else {
-//            search(GlobalSearchFragment.this.searchQuery);
-//        }
     }
 
     private void checkForExcludeMe(Collection<QMUser> usersCollection) {

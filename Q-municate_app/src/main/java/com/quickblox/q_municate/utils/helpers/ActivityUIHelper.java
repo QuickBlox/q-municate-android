@@ -14,7 +14,6 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
-//import com.quickblox.q_municate_db.models.User;
 
 public class ActivityUIHelper {
 

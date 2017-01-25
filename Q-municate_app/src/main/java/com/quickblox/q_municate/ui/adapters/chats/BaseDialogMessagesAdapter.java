@@ -136,12 +136,6 @@ public abstract class BaseDialogMessagesAdapter
         setViewVisibility(viewHolder.textMessageView, View.GONE);
     }
 
-    //    @Override
-    //    public void onAbsolutePathExtFileReceived(String absolutePath) {
-    //        chatUIHelperListener.onScreenResetPossibilityPerformLogout(false);
-    //        imageUtils.showFullImage((android.app.Activity) context, absolutePath);
-    //    }
-
     protected void setViewVisibility(View view, int visibility) {
         if (view != null) {
             view.setVisibility(visibility);

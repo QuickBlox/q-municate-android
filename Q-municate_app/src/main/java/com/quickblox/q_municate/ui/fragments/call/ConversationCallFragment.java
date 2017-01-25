@@ -33,7 +33,6 @@ import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.AppRTCAudioManager;

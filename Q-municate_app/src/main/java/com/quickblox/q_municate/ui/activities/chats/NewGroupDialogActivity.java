@@ -15,7 +15,6 @@ import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
 import com.quickblox.q_municate.utils.listeners.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_user_service.model.QMUser;
-//import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
 

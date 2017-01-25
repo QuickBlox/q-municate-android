@@ -60,7 +60,6 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
@@ -463,7 +462,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
+        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
                 lastDateLoad, loadMore);
     }
 
@@ -603,7 +602,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 Log.d("Fix double message", "baseChatHelper = " + baseChatHelper + "\n dialog = " + dialog);
                 if (baseChatHelper != null && dialog != null) {
                     try {
-                        baseChatHelper.createChatLocally(ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
+                        baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
                                 generateBundleToInitDialog());
                     } catch (QBResponseException e) {
                         ErrorUtils.showError(this, e.getMessage());
@@ -618,7 +617,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void closeChatLocally() {
         if (baseChatHelper != null && dialog != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dialog),
+            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
                     generateBundleToInitDialog());
         }
         dialog = null;

@@ -52,7 +52,6 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -275,9 +274,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateDialog() {
-        QBChatDialog  = ChatUtils.createQBChatDialogFromLocalDialog(dataManager,
+        QBChatDialog  qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(dialogId));
-        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
+        occupantsList = getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
         qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
         groupDialogOccupantsAdapter.setNewData(occupantsList);
     }
@@ -413,9 +412,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateCurrentData() {
-        QBChatDialog  = ChatUtils.createQBChatDialogFromLocalDialog(dataManager,
-                dataManager.getDialogDataManager().getByDialogId(QBChatDialog .getDialogId()));
-        occupantsList = QMUserService.getInstance().getUserCache().getUsersByIDs(QBChatDialog .getOccupants());
+        QBChatDialog  qbChatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
+                dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
+        occupantsList = QMUserService.getInstance().getUserCache().getUsersByIDs(qbChatDialog.getOccupants());
         groupNameCurrent = groupNameEditText.getText().toString();
     }
 

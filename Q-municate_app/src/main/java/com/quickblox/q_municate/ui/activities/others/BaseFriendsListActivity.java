@@ -12,7 +12,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
