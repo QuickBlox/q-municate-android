@@ -709,7 +709,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void update(Observable observable, Object data) {
             Log.e("Fix double message", "MessageObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            Log.e("Fix double message", "OBSERVE_KEY =  " + data);
+            Log.e("Fix double message", "observeKey =  " + data);
             if (data != null && data.equals(dataManager.getMessageDataManager().getObserverKey())) {
                 updateMessagesList();
             }

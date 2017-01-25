@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 
 public abstract class BaseManager<T> extends Observable implements Manager {
 
-    public String OBSERVE_KEY;
+    private String observeKey;
 
     private static final String TAG = BaseManager.class.getSimpleName();
 
@@ -26,7 +26,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
     private Handler handler;
 
     public BaseManager(Dao<T, Long> dao, String observeKey) {
-        OBSERVE_KEY = observeKey;
+        this.observeKey = observeKey;
         handler = new Handler(Looper.getMainLooper());
         this.dao = dao;
     }
@@ -47,7 +47,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         try {
             dao.create((T) object);
 
-            notifyObservers(OBSERVE_KEY);
+            notifyObservers(getObserverKey());
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "create() - " + e.getMessage());
         }
@@ -64,7 +64,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
             dao.createOrUpdate((T) object);
 
             if (notify) {
-                notifyObservers(OBSERVE_KEY);
+                notifyObservers(getObserverKey());
             }
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdateAll(Object) - " + e.getMessage());
@@ -81,7 +81,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
                         createOrUpdate(object, false);
                     }
 
-                    notifyObservers(OBSERVE_KEY);
+                    notifyObservers(getObserverKey());
 
                     return null;
                 }
@@ -140,7 +140,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
             dao.update((T) object);
 
             if (notify) {
-                notifyObservers(OBSERVE_KEY);
+                notifyObservers(getObserverKey());
             }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
@@ -157,7 +157,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
                         update(object, false);
                     }
 
-                    notifyObservers(OBSERVE_KEY);
+                    notifyObservers(getObserverKey());
 
                     return null;
                 }
@@ -172,7 +172,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         try {
             dao.delete((T) object);
 
-            notifyObservers(OBSERVE_KEY);
+            notifyObservers(getObserverKey());
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
@@ -183,7 +183,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         try {
             dao.deleteById(id);
 
-            notifyObservers(OBSERVE_KEY);
+            notifyObservers(getObserverKey());
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
@@ -201,6 +201,6 @@ public abstract class BaseManager<T> extends Observable implements Manager {
     }
 
     public String getObserverKey(){
-        return OBSERVE_KEY;
+        return observeKey;
     }
 }

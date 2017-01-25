@@ -206,7 +206,7 @@ public class MessageDataManager extends BaseManager<Message> {
             ErrorUtils.logError(e);
         }
 
-        notifyObservers(OBSERVE_KEY);
+        notifyObservers(getObserverKey());
     }
 
     public List<Message> getTempMessagesByDialogId(String dialogId){

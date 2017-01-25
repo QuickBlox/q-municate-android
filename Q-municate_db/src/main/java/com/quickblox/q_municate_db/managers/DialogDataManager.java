@@ -58,7 +58,7 @@ public class DialogDataManager extends BaseManager<Dialog> {
             ErrorUtils.logError(e);
         }
 
-        notifyObservers(OBSERVE_KEY);
+        notifyObservers(getObserverKey());
     }
 
     public List<Dialog> getAllSorted() {
