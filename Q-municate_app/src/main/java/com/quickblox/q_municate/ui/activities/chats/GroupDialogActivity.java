@@ -12,6 +12,7 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
+import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
@@ -79,7 +80,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
         updateData();
 
         if (isNetworkAvailable()) {
-            startLoadDialogMessages();
+            startLoadDialogMessages(false);
         }
 
         checkMessageSendingPossibility();
@@ -125,13 +126,32 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        int oldMessagesCount = messagesAdapter.getAllItems().size();
+        final int oldMessagesCount = messagesAdapter.getAllItems().size();
+        (new BaseAsyncTask<Void, Void, Boolean>() {
+            @Override
+            public Boolean performInBackground(Void... params) throws Exception {
+                combinationMessagesList = createCombinationMessagesList();
+                processCombinationMessages();
+                return true;
+            }
 
-        this.combinationMessagesList = createCombinationMessagesList();
+            @Override
+            public void onResult(Boolean aBoolean) {
+                messagesAdapter.setList(combinationMessagesList);
+                checkForScrolling(oldMessagesCount);
+            }
+
+            @Override
+            public void onException(Exception e) {
+                ErrorUtils.showError(GroupDialogActivity.this, e);
+            }
+
+        }).execute();
+    }
+
+    @Override
+    protected void additionalActionsAfterLoadMessages() {
         processCombinationMessages();
-        messagesAdapter.setList(combinationMessagesList);
-
-        checkForScrolling(oldMessagesCount);
     }
 
     @Override
