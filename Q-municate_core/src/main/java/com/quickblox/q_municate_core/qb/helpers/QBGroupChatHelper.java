@@ -34,7 +34,6 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -116,7 +115,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         QBGroupChat groupChat = groupChatManager.getGroupChat(roomJId);
         QBChatDialog existingDialog = null;
         if (groupChat == null) {
-            existingDialog = ChatUtils.createQBChatDialogFromLocalDialog(dataManager, dataManager.getDialogDataManager().getByDialogId(dialogId));
+            existingDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dataManager.getDialogDataManager().getByDialogId(dialogId));
             groupChat = (QBGroupChat) createChatLocally(existingDialog, null);
         }
         String error = null;
@@ -162,7 +161,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
 
         if (dialogsList != null) {
-            List<QBChatDialog> qbDialogsList = ChatUtils.createQBDialogsListFromDialogsList(dataManager, dialogsList);
+            List<QBChatDialog> qbDialogsList = ChatUtils.createQBChatDialogsListFromDialogsList(dataManager, dialogsList);
             tryJoinRoomChats(qbDialogsList);
         }
     }

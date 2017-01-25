@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.quickblox.q_municate_base_cache.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUserCustomData;
 
 /**
@@ -26,7 +27,7 @@ public class Utils {
         try {
             userCustomData = gson.fromJson(userCustomDataString, QMUserCustomData.class);
         } catch (JsonSyntaxException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
 
         return userCustomData;

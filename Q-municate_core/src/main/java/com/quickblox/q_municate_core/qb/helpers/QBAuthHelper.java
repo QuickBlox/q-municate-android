@@ -21,7 +21,6 @@ import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.QBUsers;
@@ -68,11 +67,9 @@ public class QBAuthHelper extends BaseHelper {
         qbUser = QMAuthService.getInstance().loginSync(socialProvider, accessToken, accessTokenSecret);
 
         if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
-            //qbUser = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret).perform();
             CoreSharedHelper.getInstance().saveTDServiceProvider(accessToken);
             CoreSharedHelper.getInstance().saveTDCredentials(accessTokenSecret);
         } else {
-            //qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret).perform();
             CoreSharedHelper.getInstance().saveFBToken(accessToken);
         }
 

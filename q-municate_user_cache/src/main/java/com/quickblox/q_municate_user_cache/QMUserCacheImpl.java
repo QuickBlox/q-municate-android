@@ -26,17 +26,9 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QMUser, Long> implement
 
     private static final String TAG = QMUserCacheImpl.class.getSimpleName();
 
-    private QMUserDataHelper dataHelper;
-
     public QMUserCacheImpl(Context context) {
         OBSERVE_KEY = QMUserCacheImpl.class.getSimpleName();
-        //dataHelper = new QMUserDataHelper(context);
-        //dao = dataHelper.getDaoByClass(QMUser.class);
         dao = DataManager.getInstance().getDataHelper().getDaoByClass(QMUser.class);
-    }
-
-    private QMUserDataHelper getDataHelper() {
-        return dataHelper;
     }
 
     @Override
@@ -52,8 +44,6 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QMUser, Long> implement
         }
     }
 
-
-
     public List<QMUser> getUsersByIDs(Collection<Integer> idsList) {
         List<QMUser> usersList  = Collections.emptyList();
 
@@ -68,8 +58,6 @@ public class QMUserCacheImpl extends QMAbstractBaseCache<QMUser, Long> implement
 
         return usersList;
     }
-
-
 
     @Override
     public List<QMUser> getUsersByFilter(Collection<?> filterValue, String filter) {

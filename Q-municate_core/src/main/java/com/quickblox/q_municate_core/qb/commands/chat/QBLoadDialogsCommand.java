@@ -71,7 +71,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         qbRequestGetBuilder.setLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         qbRequestGetBuilder.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
 
-        parcelableQBDialog.addAll(ChatUtils.qbDialogsToParcelableQBDialogs(
+        parcelableQBDialog.addAll(ChatUtils.qBDialogsToParcelableQBDialogs(
                 loadAllDialogs(returnedBundle, qbRequestGetBuilder)));
 
         Bundle bundle = new Bundle();

@@ -35,6 +35,8 @@ ext {
 //    QuickBlox SDK version
     qbSdkVersion = '3.3.0'
 
+    testRunnerVersion = "0.4.1"
+
     // Dependencies versions
     multiDexVersion = '1.0.1'
     supportVersion = '23.4.0'

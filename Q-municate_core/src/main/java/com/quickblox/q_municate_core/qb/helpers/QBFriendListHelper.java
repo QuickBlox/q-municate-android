@@ -24,7 +24,6 @@ import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -63,7 +62,6 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     private List<Integer> userLoadingIdsList;
 
     //ThreadPoolExecutor
-    //
     private static final int THREAD_POOL_SIZE = 3;
     private static final int KEEP_ALIVE_TIME = 1;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
@@ -211,11 +209,6 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
-        //List<User> usersList = (List<User>) restHelper.loadUsers(friendIdsList);
-        //saveUsersAndFriends(usersList);
-
-        Log.d("TAG", "updateFriends  - begin");
-
         List<QMUser> qmUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, new QBPagedRequestBuilder());
         List<QMUser> usersList = new ArrayList<QMUser>(qmUsers.size());
         QMUser user = null;
@@ -224,8 +217,6 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
             usersList.add(user);
         }
         saveUsersAndFriends(usersList);
-
-        Log.d("TAG", "updateFriends  - end");
     }
 
     private void updateUsersAndFriends(Collection<Integer> idsList) throws QBResponseException {

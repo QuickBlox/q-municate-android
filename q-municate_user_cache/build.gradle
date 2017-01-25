@@ -29,7 +29,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
     compile project(path: ':q-municate_base_cache')
-    //compile 'com.quickblox:quickblox-android-sdk-core:3.0'
     compile project(":quickblox-android-sdk-core" )
     compile 'com.j256.ormlite:ormlite-core:5.0'
     compile project(path: ':Q-municate_db')

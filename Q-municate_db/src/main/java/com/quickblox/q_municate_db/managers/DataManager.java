@@ -10,7 +10,6 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.Social;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
@@ -50,15 +49,6 @@ public class DataManager {
     public void clearAllTables() {
         dataHelper.clearTables();
     }
-
-//    public UserDataManager getUserDataManager() {
-//        if (userDataManager == null) {
-//            userDataManager = new UserDataManager(
-//                    getDataHelper().getDaoByClass(User.class),
-//                    getDataHelper().getDaoByClass(DialogOccupant.class));
-//        }
-//        return userDataManager;
-//    }
 
     public FriendDataManager getFriendDataManager() {
         if (friendDataManager == null) {

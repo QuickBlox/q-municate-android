@@ -10,7 +10,6 @@ import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_user_service.model.QMUser;
-//import com.quickblox.q_municate_db.models.User;
 
 public class QBCreatePrivateChatCommand extends ServiceCommand {
 

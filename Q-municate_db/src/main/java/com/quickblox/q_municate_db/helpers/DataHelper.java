@@ -14,7 +14,6 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.Social;
-//import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.DbHelperUtils;
 import com.quickblox.q_municate_db.utils.ErrorUtils;

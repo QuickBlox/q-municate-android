@@ -7,7 +7,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
-import com.quickblox.users.model.QBUser;
+import com.quickblox.q_municate_base_cache.utils.ErrorUtils;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -46,7 +46,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
             dao.create(object);
             notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
-            //ErrorUtils.logError(TAG, "create() - " + e.getMessage());
+            ErrorUtils.logError(TAG, "create() - " + e.getMessage());
         }
     }
 
@@ -57,7 +57,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
             dao.createOrUpdate((T) object);
             notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
-            //ErrorUtils.logError(TAG, "createOrUpdateAll(Object) - " + e.getMessage());
+            ErrorUtils.logError(TAG, "createOrUpdateAll(Object) - " + e.getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
                 }
             });
         } catch (Exception e) {
-            //ErrorUtils.logError(TAG, "createOrUpdateAll(Collection) - " + e.getMessage());
+            ErrorUtils.logError(TAG, "createOrUpdateAll(Collection) - " + e.getMessage());
         }
     }
 
@@ -84,7 +84,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
         try {
             return dao.queryForId(id);
         } catch (SQLException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
 
         return null;
@@ -95,7 +95,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
         try {
             return dao.queryForAll();
         } catch (SQLException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
 
         return Collections.emptyList();
@@ -111,7 +111,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
             PreparedQuery<T> preparedQuery = queryBuilder.prepare();
             objectsList = dao.query(preparedQuery);
         } catch (SQLException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
 
         return objectsList;
@@ -155,7 +155,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
         try {
             dao.update((T) object);
        } catch (SQLException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
     }
 
@@ -173,7 +173,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
                 }
             });
         } catch (Exception e) {
-            //ErrorUtils.logError(TAG, "updateAll(Collection) - " + e.getMessage());
+            ErrorUtils.logError(TAG, "updateAll(Collection) - " + e.getMessage());
         }
     }
 
@@ -183,7 +183,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
             dao.delete((T) object);
             notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
     }
 
@@ -193,7 +193,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
             dao.deleteById(id);
             notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
     }
 
@@ -202,7 +202,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
         try {
             return dao.idExists(id);
         } catch (SQLException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
 
         return false;
@@ -214,7 +214,7 @@ public abstract class QMAbstractBaseCache<T, ID>  extends Observable implements 
         try {
             deleteBuilder.delete();
         } catch (SQLException e) {
-            //ErrorUtils.logError(e);
+            ErrorUtils.logError(e);
         }
     }
 }

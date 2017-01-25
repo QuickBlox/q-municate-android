@@ -24,11 +24,8 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
-//import com.quickblox.q_municate_db.models.User;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -107,25 +104,13 @@ public class ChatUtils {
 
         if (dialogOccupant != null) {
             Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogOccupant.getDialog().getDialogId());
-            return createQBChatDialogFromLocalDialog(dataManager, dialog);
+            return  createQBDialogFromLocalDialog(dataManager, dialog);
         } else {
             return null;
         }
     }
 
     public static String getFullNameById(DataManager dataManager, int userId) {
-//        QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
-//
-//        if (user == null) {
-//            try {
-//                QBUser qbUser = QBUsers.getUser(userId).perform();
-//                user = UserFriendUtils.createLocalUser(qbUser);
-//                dataManager.getUserDataManager().createOrUpdate(user);
-//            } catch (QBResponseException e) {
-//                ErrorUtils.logError(e);
-//            }
-//        }
-
         QMUser user = null;
         try {
             user = QMUserService.getInstance().getUserSync(userId, true);
@@ -243,7 +228,7 @@ public class ChatUtils {
             boolean onlyMeInDialog = qbDialog.getOccupants().size() == 1;
 
             if (dialogOccupant == null && onlyMeInDialog) {
-                User user = dataManager.getUserDataManager().get(AppSession.getSession().getUser().getId());
+                QMUser user = QMUserService.getInstance().getUserCache().get((long)AppSession.getSession().getUser().getId());
                 DbUtils.saveDialogOccupant(dataManager,
                         createDialogOccupant(dataManager, qbDialog.getDialogId(), user));
                 dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), AppSession.getSession().getUser().getId());
@@ -292,7 +277,7 @@ public class ChatUtils {
         List<QBChatDialog > qbChatDialogsList = new ArrayList<>(dialogsList.size());
 
         for (Dialog dialog : dialogsList) {
-            qbChatDialogsList.add(createQBChatDialogFromLocalDialog(dataManager, dialog));
+            qbChatDialogsList.add(createQBDialogFromLocalDialog(dataManager, dialog));
         }
 
         return qbChatDialogsList;
@@ -301,24 +286,24 @@ public class ChatUtils {
     public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBChatDialog qbDialog, boolean onlyNewOccupant) {
         List<DialogOccupant> dialogOccupantsList = new ArrayList<>(qbDialog.getOccupants().size());
 
-        for (Integer userId : QBChatDialog .getOccupants()) {
+        for (Integer userId : qbDialog.getOccupants()) {
             DialogOccupant dialogOccupant;
             if (onlyNewOccupant) {
-                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(QBChatDialog .getDialogId(), userId);
+                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), userId);
                 if (dialogOccupant == null) {
-                    dialogOccupant = createDialogOccupant(dataManager, QBChatDialog .getDialogId(),QMUserService.getInstance().getUserCache().get((long)userId));
+                    dialogOccupant = createDialogOccupant(dataManager, qbDialog.getDialogId(),QMUserService.getInstance().getUserCache().get((long)userId));
                 } else {
                     dialogOccupant.setStatus(DialogOccupant.Status.ACTUAL);
                 }
                 dialogOccupantsList.add(dialogOccupant);
             } else {
-                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(QBChatDialog .getDialogId(), userId);
+                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), userId);
                 if (dialogOccupant == null) {
                     QMUser user =  QMUserService.getInstance().getUserCache().get((long)userId);
                     if (user == null) {
                         user = QBRestHelper.loadAndSaveUser(userId);
                     }
-                    dialogOccupant = createDialogOccupant(dataManager, QBChatDialog .getDialogId(), user);
+                    dialogOccupant = createDialogOccupant(dataManager, qbDialog.getDialogId(), user);
                     dialogOccupantsList.add(dialogOccupant);
                 }
             }

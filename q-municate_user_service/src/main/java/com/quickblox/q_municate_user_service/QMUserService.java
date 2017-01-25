@@ -205,10 +205,6 @@ public class QMUserService extends QMBaseService {
         return getUsersByIDsSync(usersIds,requestBuilder, true);
     }
 
-//    public Performer<ArrayList<QBUser>> getUsersByIDsPerformer(final Collection<Integer> usersIds, final QBPagedRequestBuilder requestBuilder){
-//        return getUsersByIDsPerformer(usersIds,requestBuilder, true);
-//    }
-
     public Observable<List<QMUser>> getUsersByIDs(final Collection<Integer> usersIds, final QBPagedRequestBuilder requestBuilder, boolean forceLoad){
         Observable<List<QMUser>> result = null;
 
@@ -545,7 +541,6 @@ public class QMUserService extends QMBaseService {
         Performer<ArrayList<QBUser>> result = null;
         switch (column){
             case QMUserColumns.ID:
-                //result = QBUsers.getUsersByIDs(value, new QBPagedRequestBuilder());
                 result = null;
                 break;
             case QMUserColumns.FULL_NAME:
@@ -601,7 +596,6 @@ public class QMUserService extends QMBaseService {
         Performer<ArrayList<QBUser>> result = null;
         switch (column){
             case QMUserColumns.ID:
-                //result = QBUsers.getUsersByIDs(values, new QBPagedRequestBuilder());
                 result = null;
                 break;
             case QMUserColumns.FULL_NAME:

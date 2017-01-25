@@ -50,7 +50,6 @@ public class QBImportFriendsCommand extends ServiceCommand {
         List<QBUser> realFriendsContactsList = null;
 
         if (!friendsFacebookList.isEmpty()) {
-            //realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder, params).perform();
             List<QMUser> realQMFriendsFacebookList=  QMUserService.getInstance().getUsersByFacebookIdSync(friendsFacebookList, requestBuilder, true);
             realFriendsFacebookList = new ArrayList<>(realQMFriendsFacebookList.size());
             for (QMUser user : realQMFriendsFacebookList){
@@ -59,7 +58,6 @@ public class QBImportFriendsCommand extends ServiceCommand {
         }
 
         if (!friendsContactsList.isEmpty()) {
-            //realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params).perform();
             List<QMUser> realQMFriendsContactsList = QMUserService.getInstance().getUsersByEmailsSync(friendsFacebookList, requestBuilder, true);
             realFriendsContactsList = new ArrayList<>(realQMFriendsContactsList.size());
             for (QMUser user : realQMFriendsContactsList){
