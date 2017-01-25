@@ -141,7 +141,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void sendGroupMessageWithAttachLocation(String roomJidId, String location) throws QBResponseException {
-        QBChatMessage chatMessage = getQBChatMessage(context.getString(R.string.dlg_attached_last_message),
+        QBChatMessage chatMessage = getQBChatMessage(context.getString(R.string.dlg_location_last_message),
                 null, location);
         sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }

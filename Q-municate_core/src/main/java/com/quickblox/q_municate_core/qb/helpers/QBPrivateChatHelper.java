@@ -69,7 +69,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     public void sendPrivateMessageWithAttachLocation(String location, int userId) throws QBResponseException {
-        sendPrivateMessage(null, context.getString(R.string.dlg_attached_last_message), userId, location);
+        sendPrivateMessage(null, context.getString(R.string.dlg_location_last_message), userId, location);
     }
 
     private void sendPrivateMessage(QBFile file, String message, int userId, String location) throws QBResponseException {

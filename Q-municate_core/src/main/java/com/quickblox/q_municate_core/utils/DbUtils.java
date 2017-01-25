@@ -138,7 +138,6 @@ public class DbUtils {
                         qbChatMessage.getAttachments());
                 Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0), context);
                 message.setAttachment(attachment);
-                Log.d("DbUtilsZZ", "saveMessageOrNotificationToCache Attachment= " + attachment);
                 dataManager.getAttachmentDataManager().createOrUpdate(attachment, notify);
             }
 
