@@ -20,7 +20,6 @@ import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
-import com.quickblox.q_municate.utils.QBTextViewClickMovement;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -28,11 +27,7 @@ import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -45,9 +40,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     protected QBUser currentUser;
     protected final BaseActivity baseActivity;
     protected FileUtils fileUtils;
-
-    private QBTextViewClickMovement.QBTextViewLinkClickListener onLinkClickListener;
-    private boolean overrideOnLinkClick;
 
     BaseChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
         super(baseActivity.getBaseContext(), chatMessages);
@@ -76,22 +68,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         TextView headerTextView = (TextView) view.findViewById(R.id.header_date_textview);
         CombinationMessage combinationMessage = getItem(position);
         headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
-    }
-
-    @Override
-    protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
-        super.onBindViewMsgLeftHolder(holder, chatMessage, position);
-        if (onLinkClickListener != null) {
-            holder.messageTextView.setMovementMethod(new QBTextViewClickMovement(onLinkClickListener, overrideOnLinkClick, context));
-        }
-    }
-
-    @Override
-    protected void onBindViewMsgRightHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
-        super.onBindViewMsgRightHolder(holder, chatMessage, position);
-        if (onLinkClickListener != null) {
-            holder.messageTextView.setMovementMethod(new QBTextViewClickMovement(onLinkClickListener, overrideOnLinkClick, context));
-        }
     }
 
     @Override
@@ -142,20 +118,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     @Override
     protected boolean isIncoming(CombinationMessage chatMessage) {
         return chatMessage.isIncoming(currentUser.getId());
-    }
-
-    public QBTextViewClickMovement.QBTextViewLinkClickListener getOnLinkClickListener() {
-        return onLinkClickListener;
-    }
-
-    public void setOnLinkClickListener(QBTextViewClickMovement.QBTextViewLinkClickListener onLinkClickListener, boolean overrideOnLinkClick) {
-        this.onLinkClickListener = onLinkClickListener;
-        this.overrideOnLinkClick = overrideOnLinkClick;
-    }
-
-    public void removeOnLinkClickListener() {
-        this.onLinkClickListener = null;
-        this.overrideOnLinkClick = false;
     }
 
     public class ImageRequestListener implements RequestListener<String, GlideBitmapDrawable> {

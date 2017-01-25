@@ -32,7 +32,6 @@ import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.QBTextViewClickMovement;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
@@ -62,6 +61,8 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.QBChatMessageClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
@@ -392,7 +393,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void removeMsgTextViewLinkClickListener() {
         if (messagesAdapter != null){
-            messagesAdapter.removeOnLinkClickListener();
+            messagesAdapter.removeTextViewLinkClickListener();
         }
     }
 
@@ -863,13 +864,13 @@ private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListe
         }
     }
 }
-    protected class MessagesTextViewLinkClickListener implements QBTextViewClickMovement.QBTextViewLinkClickListener {
+    protected class MessagesTextViewLinkClickListener implements QBChatMessageLinkClickListener {
 
         @Override
-        public void onLinkClicked(String linkText, QBTextViewClickMovement.QBLinkType linkType) {
-            Log.i(TAG, "Link clicked. Text = " + linkText + " Type = " + linkType);
+        public void onLinkClicked(String linkText, QBChatMessageClickMovement.QBLinkType qbLinkType, int position) {
+            Log.i(TAG, "Link clicked. Text = " + linkText + " Type = " + qbLinkType + " Position: " + position);
 
-            if (!QBTextViewClickMovement.QBLinkType.NONE.equals(linkType)) {
+            if (!QBChatMessageClickMovement.QBLinkType.NONE.equals(qbLinkType)) {
                 canPerformLogout.set(false);
             }
         }
