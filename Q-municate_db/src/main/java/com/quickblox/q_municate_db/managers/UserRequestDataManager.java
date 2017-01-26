@@ -43,7 +43,7 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
             ErrorUtils.logError(e);
         }
 
-        notifyObservers(OBSERVE_KEY);
+        notifyObservers(getObserverKey());
     }
 
     public boolean existsByUserId(int userId) {

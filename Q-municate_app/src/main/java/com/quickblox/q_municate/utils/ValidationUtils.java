@@ -132,18 +132,25 @@ public class ValidationUtils {
     public boolean isFullNameValid(TextInputLayout fullNameTextInputLayout, String oldFullName,
             String newFullName) {
         boolean fullNameEntered = !TextUtils.isEmpty(newFullName.trim());
+        boolean valid = true;
 
         if (fullNameEntered) {
             if (newFullName.equals(oldFullName)) {
+                valid = false;
                 fullNameTextInputLayout.setError(context.getString(R.string.profile_full_name_not_changed));
-            } else {
-                return true;
+            } else if (newFullName.length() < FULL_NAME_MIN_LENGTH) {
+                valid = false;
+                fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_field_is_too_short));
+            } else if (newFullName.length() > FULL_NAME_MAX_LENGTH) {
+                valid = false;
+                fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_field_is_too_long));
             }
         } else {
+            valid = false;
             fullNameTextInputLayout.setError(context.getString(R.string.profile_full_name_not_entered));
         }
 
-        return false;
+        return valid;
     }
 
     public boolean isForgotPasswordDataValid(TextInputLayout emailTextInputLayout, String email) {

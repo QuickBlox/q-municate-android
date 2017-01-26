@@ -204,6 +204,10 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         }
     }
 
+    public void clearLastRequestMessagePosition() {
+        lastRequestPosition = EMPTY_POSITION;
+    }
+
     private void findLastFriendsRequest(int position, CombinationMessage combinationMessage) {
         boolean ownMessage;
         boolean friendsRequestMessage;

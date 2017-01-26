@@ -14,10 +14,8 @@ public class CoreSharedHelper {
 
         public static final String NAME = "Q-municate";
 
-        public static final String LOGIN_TYPE = "login_type";
         public static final String IMPORT_INITIALIZED = "import_initialized";
         public static final String FIRST_AUTH = "first_auth";
-        public static final String QB_TOKEN = "qb_token";
         public static final String FB_TOKEN = "fb_token";
         public static final String TD_SERVICE_PROVIDER = "x_auth_service_provider";
         public static final String TD_CREDENTIALS = "x_verify_credentials_authorization";
@@ -105,14 +103,6 @@ public class CoreSharedHelper {
         sharedPreferencesEditor.clear();
     }
 
-    public String getLoginType() {
-        return getPref(Constants.LOGIN_TYPE, LoginType.EMAIL.toString());
-    }
-
-    public void saveLoginType(String loginType) {
-        savePref(Constants.LOGIN_TYPE, loginType);
-    }
-
     public boolean isUsersImportInitialized() {
         return getPref(Constants.IMPORT_INITIALIZED, false);
     }
@@ -127,14 +117,6 @@ public class CoreSharedHelper {
 
     public void saveFirstAuth(boolean firstAuth) {
         savePref(Constants.FIRST_AUTH, firstAuth);
-    }
-
-    public String getQBToken() {
-        return getPref(Constants.QB_TOKEN, null);
-    }
-
-    public void saveQBToken(String token) {
-        savePref(Constants.QB_TOKEN, token);
     }
 
     public String getFBToken() {

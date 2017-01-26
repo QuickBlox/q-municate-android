@@ -39,7 +39,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     protected Dialog dialog;
     protected QBUser currentUser;
     protected final BaseActivity baseActivity;
-
     protected FileUtils fileUtils;
 
     BaseChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
@@ -119,6 +118,11 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     @Override
     protected boolean isIncoming(CombinationMessage chatMessage) {
         return chatMessage.isIncoming(currentUser.getId());
+    }
+
+    public void addAllInBegin(List<CombinationMessage> collection) {
+        chatMessages.addAll(0, collection);
+        notifyItemRangeInserted(0, collection.size());
     }
 
     public class ImageRequestListener implements RequestListener<String, GlideBitmapDrawable> {

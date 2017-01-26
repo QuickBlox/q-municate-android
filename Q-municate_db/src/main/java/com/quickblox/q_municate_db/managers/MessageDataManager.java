@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.util.Log;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -152,6 +154,38 @@ public class MessageDataManager extends BaseManager<Message> {
         return messagesList;
     }
 
+    public List<Message> getMessagesByDialogIdAndDate(String dialogId, long createdDate, boolean moreDate){
+        List<Message> messagesList = new ArrayList<>();
+
+        try {
+            QueryBuilder<Message, Long> messageQueryBuilder = dao.queryBuilder();
+            if (moreDate){
+                messageQueryBuilder.where().gt(Message.Column.CREATED_DATE, createdDate);
+            } else {
+                messageQueryBuilder.where().lt(Message.Column.CREATED_DATE, createdDate);
+            }
+
+            Where<Message, Long> where = messageQueryBuilder.where();
+            where.and(where.ne(Message.Column.STATE, State.TEMP_LOCAL),
+                    where.ne(Message.Column.STATE, State.TEMP_LOCAL_UNREAD));
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
+            messagesList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return messagesList;
+    }
+
     public void deleteTempMessages(List<Long> dialogOccupantsIdsList) {
         try {
             DeleteBuilder<Message, Long> deleteBuilder = dao.deleteBuilder();
@@ -165,12 +199,14 @@ public class MessageDataManager extends BaseManager<Message> {
                     )
             );
 
+            Log.e(TAG, "Deleted " + deleteBuilder.delete() + " items");
+
             deleteBuilder.delete();
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
 
-        notifyObservers(OBSERVE_KEY);
+        notifyObservers(getObserverKey());
     }
 
     public List<Message> getTempMessagesByDialogId(String dialogId){

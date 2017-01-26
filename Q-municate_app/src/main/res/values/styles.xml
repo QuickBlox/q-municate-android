@@ -132,12 +132,12 @@
 
     <style name="TextViewTextMsg.Left">
         <item name="android:textColor">@color/dark_gray</item>
-        <item name="android:autoLink">none</item>
+        <item name="android:autoLink">web|phone|email</item>
     </style>
 
     <style name="TextViewTextMsg.Right">
         <item name="android:textColor">@color/dark_gray</item>
-        <item name="android:autoLink">none</item>
+        <item name="android:autoLink">web|phone|email</item>
     </style>
 
 </resources>

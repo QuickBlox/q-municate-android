@@ -13,7 +13,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven { url "file://Users/roman/QuickBlox/StudioProjects/SDK-REPO/quickblox-android-sdk-releases" }
+        maven { url "file://Users/tereha/StudioProjects/quickblox-android-sdk-releases" }
         maven { url 'https://maven.fabric.io/public' }
     }
 }
@@ -43,7 +43,7 @@ ext {
     ormliteAndroidVersion = '4.48'
     ormliteCoreVersion = '4.48'
     butterknifeVersion = '7.0.1'
-    materialDialogsVersion = '0.7.8.1'
+    materialDialogsVersion = '0.9.0.1'
     swipyRecyclerviewVersion = '1.2.0'
     stickylistheadersRecyclerViewVersion = '0.4.2'
     emojiconVersion = '1.3.1'
