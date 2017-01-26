@@ -3,8 +3,10 @@ package com.quickblox.q_municate_core.models;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.BaseService;
 import com.quickblox.auth.session.QBSessionManager;
+import com.quickblox.auth.session.QBSessionParameters;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
@@ -19,20 +21,18 @@ public class AppSession implements Serializable {
     private static AppSession activeSession;
 
     private CoreSharedHelper coreSharedHelper;
-    private final LoginType loginType;
+    private LoginType loginType;
     private QBUser qbUser;
-    private String qbToken;
 
-    private AppSession(LoginType loginType, QBUser qbUser, String qbToken) {
+    private AppSession(QBUser qbUser) {
         coreSharedHelper = CoreSharedHelper.getInstance();
-        this.loginType = loginType;
         this.qbUser = qbUser;
-        this.qbToken = qbToken;
+        this.loginType = getLoginTypeBySessionParameters(QBSessionManager.getInstance().getSessionParameters());
         save();
     }
 
-    public static void startSession(LoginType loginType, QBUser user, String qbToken) {
-        activeSession = new AppSession(loginType, user, qbToken);
+    public static void startSession(QBUser user) {
+        activeSession = new AppSession(user);
     }
 
     private static AppSession getActiveSession() {
@@ -42,8 +42,6 @@ public class AppSession implements Serializable {
     }
 
     public static AppSession load() {
-        String loginTypeRaw = CoreSharedHelper.getInstance().getLoginType();
-        String qbToken = CoreSharedHelper.getInstance().getQBToken();
 
         int userId = CoreSharedHelper.getInstance().getUserId();
         String userFullName = CoreSharedHelper.getInstance().getUserFullName();
@@ -57,9 +55,8 @@ public class AppSession implements Serializable {
         qbUser.setTwitterId(CoreSharedHelper.getInstance().getTwitterId());
         qbUser.setTwitterDigitsId(CoreSharedHelper.getInstance().getTwitterDigitsId());
 
-        LoginType loginType = LoginType.valueOf(loginTypeRaw);
 
-        return new AppSession(loginType, qbUser, qbToken);
+        return new AppSession(qbUser);
     }
 
     public static boolean isSessionExistOrNotExpired(long expirationTime) {
@@ -83,9 +80,6 @@ public class AppSession implements Serializable {
     }
 
     public void closeAndClear() {
-        coreSharedHelper.saveQBToken(null);
-        coreSharedHelper.saveLoginType(null);
-
         coreSharedHelper.clearUserData();
 
         activeSession = null;
@@ -96,9 +90,6 @@ public class AppSession implements Serializable {
     }
 
     public void save() {
-        coreSharedHelper.saveQBToken(qbToken);
-        coreSharedHelper.saveLoginType(loginType.toString());
-
         saveUser(qbUser);
     }
 
@@ -118,14 +109,32 @@ public class AppSession implements Serializable {
     }
 
     public boolean isLoggedIn() {
-        return qbUser != null && !TextUtils.isEmpty(qbToken);
+        return qbUser != null && !TextUtils.isEmpty(QBSessionManager.getInstance().getToken());
     }
 
     public boolean isSessionExist() {
-        return loginType != null && !TextUtils.isEmpty(qbToken);
+        return !TextUtils.isEmpty(QBSessionManager.getInstance().getToken());
     }
 
     public LoginType getLoginType() {
         return loginType;
     }
+
+    private LoginType getLoginTypeBySessionParameters(QBSessionParameters sessionParameters){
+        LoginType result = null;
+        if(sessionParameters == null){
+            return null;
+        }
+        String socialProvider = sessionParameters.getSocialProvider();
+        if(socialProvider == null){
+            loginType = LoginType.EMAIL;
+        } else if (socialProvider.equals(QBProvider.FACEBOOK)){
+            loginType = LoginType.FACEBOOK;
+        } else if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
+            loginType = LoginType.TWITTER_DIGITS;
+        }
+        return result;
+    }
+
+
 }

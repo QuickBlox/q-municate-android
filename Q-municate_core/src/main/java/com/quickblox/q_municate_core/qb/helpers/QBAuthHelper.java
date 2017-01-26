@@ -49,7 +49,7 @@ public class QBAuthHelper extends BaseHelper {
 
         saveOwnerUser(qbUser);
 
-        AppSession.startSession(LoginType.EMAIL, qbUser, token);
+        AppSession.startSession(qbUser);
 
         return qbUser;
     }
@@ -84,10 +84,7 @@ public class QBAuthHelper extends BaseHelper {
 
         saveOwnerUser(qbUser);
 
-        AppSession.startSession(socialProvider.equals(QBProvider.FACEBOOK)
-                ? LoginType.FACEBOOK
-                : LoginType.TWITTER_DIGITS,
-                qbUser, qbToken);
+        AppSession.startSession(qbUser);
 
         return qbUser;
     }
@@ -115,11 +112,10 @@ public class QBAuthHelper extends BaseHelper {
 
         qbUser.setCustomDataClass(UserCustomData.class);
         qbUser.setPassword(password);
-        String token = QBSessionManager.getInstance().getToken();
 
         saveOwnerUser(qbUser);
 
-        AppSession.startSession(LoginType.EMAIL, qbUser, token);
+        AppSession.startSession(qbUser);
 
         return qbUser;
     }
