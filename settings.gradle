@@ -1,3 +1,4 @@
-include ':Q-municate_app'
+include ':Q-municate_app', ':q-municate_auth_service', ':q-municate_chat_service', ':q-municate_user_service', ':q-municate_contact_list_service', ':q-municate_chat_cache', ':q-municate_user_cache', ':q-municate_contact_list_cache', ':q-municate_base_service', ':q-municate_base_cache', ':q-municate_services_manager'
 include ':Q-municate_core'
 include ':Q-municate_db'
+apply from: "sdk-settings.gradle"

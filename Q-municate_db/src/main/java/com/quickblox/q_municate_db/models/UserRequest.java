@@ -2,6 +2,8 @@ package com.quickblox.q_municate_db.models;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.io.Serializable;
 
@@ -25,8 +27,8 @@ public class UserRequest implements Serializable {
             foreignAutoRefresh = true,
             unique = true,
             canBeNull = false,
-            columnName = User.Column.ID)
-    private User user;
+            columnName = QMUserColumns.ID)
+    private QMUser user;
 
     @DatabaseField(
             columnName = REQUEST_STATUS)
@@ -43,7 +45,7 @@ public class UserRequest implements Serializable {
     public UserRequest() {
     }
 
-    public UserRequest(long updatedDate, String textStatus, RequestStatus requestStatus, User user) {
+    public UserRequest(long updatedDate, String textStatus, RequestStatus requestStatus, QMUser user) {
         this.updatedDate = updatedDate;
         this.textStatus = textStatus;
         this.requestStatus = requestStatus;
@@ -66,11 +68,11 @@ public class UserRequest implements Serializable {
         this.updatedDate = updatedDate;
     }
 
-    public User getUser() {
+    public QMUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(QMUser user) {
         this.user = user;
     }
 
@@ -90,8 +92,8 @@ public class UserRequest implements Serializable {
         this.requestStatus = requestStatus;
     }
 
-    public boolean isIncoming() {
-        return user.getRole() != User.Role.OWNER;
+    public boolean isIncoming(String ownerLogin) {
+        return !user.getLogin().equals(ownerLogin);
     }
 
     @Override

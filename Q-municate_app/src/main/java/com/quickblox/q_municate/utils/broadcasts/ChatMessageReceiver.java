@@ -9,7 +9,7 @@ import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.utils.SystemUtils;
 import com.quickblox.q_municate.utils.helpers.notification.ChatNotificationHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 public class ChatMessageReceiver extends BroadcastReceiver {
 
@@ -26,10 +26,10 @@ public class ChatMessageReceiver extends BroadcastReceiver {
             ChatNotificationHelper chatNotificationHelper = new ChatNotificationHelper(context);
 
             String message = intent.getStringExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-            User user = (User) intent.getSerializableExtra(QBServiceConsts.EXTRA_USER);
+            QMUser user = (QMUser) intent.getSerializableExtra(QBServiceConsts.EXTRA_USER);
             String dialogId = intent.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID);
 
-            chatNotificationHelper.saveOpeningDialogData(user.getUserId(), dialogId);
+            chatNotificationHelper.saveOpeningDialogData(user.getId(), dialogId);
             chatNotificationHelper.saveOpeningDialog(true);
             chatNotificationHelper.sendNotification(message);
         }

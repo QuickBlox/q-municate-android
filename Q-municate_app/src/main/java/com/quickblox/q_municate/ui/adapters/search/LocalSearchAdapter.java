@@ -26,7 +26,7 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
 
@@ -63,8 +63,8 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
         String label;
 
         if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-            User currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
-            User opponentUser = ChatUtils.getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
+            QMUser currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+            QMUser opponentUser = ChatUtils.getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
             setOnlineStatus(viewHolder, opponentUser);
             displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
         } else {
@@ -94,16 +94,16 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
         notifyDataSetChanged();
     }
 
-    private void setOnlineStatus(ViewHolder viewHolder, User user) {
-        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getUserId());
+    private void setOnlineStatus(ViewHolder viewHolder, QMUser user) {
+        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getId());
 
         if (online) {
             viewHolder.labelTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
             viewHolder.labelTextView.setTextColor(resources.getColor(R.color.green));
         } else {
             viewHolder.labelTextView.setText(resources.getString(R.string.last_seen,
-                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
-                    DateUtils.formatDateSimpleTime(user.getLastLogin())));
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
+                    DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime())));
             viewHolder.labelTextView.setTextColor(resources.getColor(R.color.dark_gray));
         }
     }

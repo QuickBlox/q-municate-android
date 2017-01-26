@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.BaseService;
+import com.quickblox.auth.session.QBSession;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.auth.session.QBSessionParameters;
 import com.quickblox.core.exception.BaseServiceException;

@@ -12,8 +12,8 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ public class MessageDataManager extends BaseManager<Message> {
             queryBuilder.setCountOf(true);
 
             QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
-            dialogOccupantQueryBuilder.where().ne(User.Column.ID, currentUserId);
+            dialogOccupantQueryBuilder.where().ne(QMUserColumns.ID, currentUserId);
 
             queryBuilder.join(dialogOccupantQueryBuilder);
 

@@ -16,54 +16,59 @@ import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.helpers.TextViewHelper;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
+import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 
 import butterknife.Bind;
 
-public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListenerViewHolder<User>> {
+public class GlobalSearchAdapter extends BaseFilterAdapter<QBUser, BaseClickListenerViewHolder<QBUser>> {
 
     private DataManager dataManager;
     private UserOperationListener userOperationListener;
     private QBFriendListHelper friendListHelper;
 
-    public GlobalSearchAdapter(BaseActivity baseActivity, List<User> list) {
+    public GlobalSearchAdapter(BaseActivity baseActivity, List<QBUser> list) {
         super(baseActivity, list);
         dataManager = DataManager.getInstance();
     }
 
     @Override
-    protected boolean isMatch(User item, String query) {
+    protected boolean isMatch(QBUser item, String query) {
         return item.getFullName() != null && item.getFullName().toLowerCase().contains(query);
     }
 
     @Override
-    public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseClickListenerViewHolder<QBUser> onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(this, layoutInflater.inflate(R.layout.item_user, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(BaseClickListenerViewHolder<User> baseClickListenerViewHolder, int position) {
-        User user = getItem(position);
+    public void onBindViewHolder(BaseClickListenerViewHolder<QBUser> baseClickListenerViewHolder, int position) {
+        QBUser user = getItem(position);
         ViewHolder holder = (ViewHolder) baseClickListenerViewHolder;
 
         if (user.getFullName() != null) {
             holder.fullNameTextView.setText(user.getFullName());
         } else {
-            holder.fullNameTextView.setText(user.getUserId());
+            holder.fullNameTextView.setText(user.getId());
         }
 
-        String avatarUrl = user.getAvatar();
+        final UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
+        String avatarUrl = userCustomData.getAvatarUrl();
         displayAvatarImage(avatarUrl, holder.avatarImageView);
 
         checkVisibilityItems(holder, user);
 
-        initListeners(holder, user.getUserId());
+        initListeners(holder, user.getId());
 
         if (!TextUtils.isEmpty(query)) {
             TextViewHelper.changeTextColorView(baseActivity, holder.fullNameTextView, query);
@@ -88,7 +93,7 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
         notifyDataSetChanged();
     }
 
-    private void checkVisibilityItems(ViewHolder viewHolder, User user) {
+    private void checkVisibilityItems(ViewHolder viewHolder, QBUser user) {
         if (isFriendOrPending(user)) {
             checkVisibilityItemsMyContacts(viewHolder, user);
         } else {
@@ -96,15 +101,15 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
         }
     }
 
-    private void checkVisibilityItemsAllUsers(ViewHolder viewHolder, User user) {
-        boolean me = AppSession.getSession().getUser().getId() == user.getUserId();
+    private void checkVisibilityItemsAllUsers(ViewHolder viewHolder, QBUser user) {
+        boolean me = AppSession.getSession().getUser().getId() == user.getId();
         viewHolder.addFriendImageView.setVisibility(me ? View.GONE : View.VISIBLE);
         viewHolder.statusTextView.setVisibility(View.GONE);
     }
 
-    private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, User user) {
+    private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, QBUser user) {
         String status;
-        User pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getUserId());
+        QMUser pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getId());
 
         if (pendingUser != null) {
             status = resources.getString(R.string.search_pending_request_status);
@@ -118,27 +123,27 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListen
         viewHolder.addFriendImageView.setVisibility(View.GONE);
     }
 
-    private boolean isFriendOrPending(User user) {
-        Friend friend = dataManager.getFriendDataManager().getByUserId(user.getUserId());
-        User pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getUserId());
+    private boolean isFriendOrPending(QBUser user) {
+        Friend friend = dataManager.getFriendDataManager().getByUserId(user.getId());
+        QMUser pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getId());
         return friend != null || pendingUser != null;
     }
 
-    private void setOnlineStatus(ViewHolder viewHolder, User user) {
-        boolean online = friendListHelper != null && friendListHelper.isUserOnline(user.getUserId());
+    private void setOnlineStatus(ViewHolder viewHolder, QBUser user) {
+        boolean online = friendListHelper != null && friendListHelper.isUserOnline(user.getId());
 
         if (online) {
             viewHolder.statusTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
             viewHolder.statusTextView.setTextColor(resources.getColor(R.color.green));
         } else {
             viewHolder.statusTextView.setText(resources.getString(R.string.last_seen,
-                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
-                    DateUtils.formatDateSimpleTime(user.getLastLogin())));
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(DateUtilsCore.getTime(user.getLastRequestAt())),
+                    DateUtils.formatDateSimpleTime(DateUtilsCore.getTime(user.getLastRequestAt()))));
             viewHolder.statusTextView.setTextColor(resources.getColor(R.color.dark_gray));
         }
     }
 
-    protected static class ViewHolder extends BaseViewHolder<User> {
+    protected static class ViewHolder extends BaseViewHolder<QBUser> {
 
         @Bind(R.id.avatar_imageview)
         RoundedImageView avatarImageView;
