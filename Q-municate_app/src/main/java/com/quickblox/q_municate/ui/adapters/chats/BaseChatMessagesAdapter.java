@@ -121,8 +121,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     }
 
     public void addAllInBegin(List<CombinationMessage> collection) {
-        chatMessages.addAll(collection);
-
+        chatMessages.addAll(0, collection);
         notifyItemRangeInserted(0, collection.size());
     }
 
