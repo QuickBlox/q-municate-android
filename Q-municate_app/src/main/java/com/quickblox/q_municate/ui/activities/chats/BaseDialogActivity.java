@@ -28,7 +28,6 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
-import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
@@ -42,7 +41,6 @@ import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -254,7 +252,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onImagePicked(int requestCode, File file, String location) {
         canPerformLogout.set(true);
-            startLoadAttachFile(file, location, dialog.getDialogId());
+        startLoadAttachFile(file, location, dialog.getDialogId());
     }
 
     @Override
@@ -292,7 +290,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void restoreDefaultCanPerformLogout() {
-        if (!canPerformLogout.get()){
+        if (!canPerformLogout.get()) {
             canPerformLogout.set(true);
         }
     }
@@ -392,7 +390,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void removeMsgTextViewLinkClickListener() {
-        if (messagesAdapter != null){
+        if (messagesAdapter != null) {
             messagesAdapter.removeMessageTextViewLinkClickListener();
         }
     }
@@ -538,7 +536,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void scrollMessagesToBottom() {
-            scrollMessagesWithDelay();
+        scrollMessagesWithDelay();
     }
 
     private void scrollMessagesWithDelay() {
@@ -654,7 +652,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         return combinationMessages;
     }
 
-    protected List <CombinationMessage> buildCombinationMessagesListByDate(long createDate, boolean moreDate){
+    protected List<CombinationMessage> buildCombinationMessagesListByDate(long createDate, boolean moreDate) {
         if (dialog == null) {
             Log.d("BaseDialogActivity", "dialog = " + dialog);
             return null;
@@ -719,27 +717,27 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
 
-    private String dialogId;
+        private String dialogId;
 
-    public CombinationMessageLoader(Context context, DataManager dataManager, String dialogId) {
-        super(context, dataManager);
-        this.dialogId = dialogId;
+        public CombinationMessageLoader(Context context, DataManager dataManager, String dialogId) {
+            super(context, dataManager);
+            this.dialogId = dialogId;
+        }
+
+        @Override
+        protected List<CombinationMessage> getItems() {
+            return createCombinationMessagesList();
+        }
+
+        private List<CombinationMessage> createCombinationMessagesList() {
+            List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
+            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                    .getDialogNotificationsByDialogId(dialogId);
+            return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+        }
     }
 
-    @Override
-    protected List<CombinationMessage> getItems() {
-        return createCombinationMessagesList();
-    }
-
-    private List<CombinationMessage> createCombinationMessagesList() {
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
-        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogId(dialogId);
-        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-    }
-}
-
-private class MessageObserver implements Observer {
+    private class MessageObserver implements Observer {
 
         @Override
         public void update(Observable observable, Object data) {
@@ -751,7 +749,7 @@ private class MessageObserver implements Observer {
         }
     }
 
-private class DialogNotificationObserver implements Observer {
+    private class DialogNotificationObserver implements Observer {
 
         @Override
         public void update(Observable observable, Object data) {
@@ -762,7 +760,7 @@ private class DialogNotificationObserver implements Observer {
         }
     }
 
-private class DialogObserver implements Observer {
+    private class DialogObserver implements Observer {
 
         @Override
         public void update(Observable observable, Object data) {
@@ -774,31 +772,31 @@ private class DialogObserver implements Observer {
         }
     }
 
-private class TypingTimerTask extends TimerTask {
+    private class TypingTimerTask extends TimerTask {
 
-    @Override
-    public void run() {
-        isTypingNow = false;
-        sendTypingStatus();
+        @Override
+        public void run() {
+            isTypingNow = false;
+            sendTypingStatus();
+        }
     }
-}
 
-public class LoadAttachFileSuccessAction implements Command {
+    public class LoadAttachFileSuccessAction implements Command {
 
-    @Override
-    public void execute(Bundle bundle) {
-        QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-        String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        onFileLoaded(file, dialogId);
-        hideProgress();
+        @Override
+        public void execute(Bundle bundle) {
+            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
+            String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
+            onFileLoaded(file, dialogId);
+            hideProgress();
+        }
     }
-}
 
-public class LoadDialogMessagesSuccessAction implements Command {
+    public class LoadDialogMessagesSuccessAction implements Command {
 
-    @Override
-    public void execute(Bundle bundle) {
-        messageSwipeRefreshLayout.setRefreshing(false);
+        @Override
+        public void execute(Bundle bundle) {
+            messageSwipeRefreshLayout.setRefreshing(false);
             final int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES,
                     ConstsCore.ZERO_INT_VALUE);
             final long lastMessageDate = bundle.getLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES,
@@ -818,9 +816,9 @@ public class LoadDialogMessagesSuccessAction implements Command {
                     @Override
                     public Boolean performInBackground(Void... params) throws Exception {
                         boolean isFirstLoadingMessages = lastMessageDate == ConstsCore.ZERO_INT_VALUE;
-                        if (isFirstLoadingMessages){
+                        if (isFirstLoadingMessages) {
                             combinationMessagesList = createCombinationMessagesList();
-                        } else if (isLoadedOldMessages){
+                        } else if (isLoadedOldMessages) {
                             combinationMessagesList.addAll(0, sortedLoadedCombinationMessagesList);
                         } else {
                             combinationMessagesList.addAll(sortedLoadedCombinationMessagesList);
@@ -832,11 +830,10 @@ public class LoadDialogMessagesSuccessAction implements Command {
 
                     @Override
                     public void onResult(Boolean aBoolean) {
-                        if (isLoadedOldMessages){
+                        if (isLoadedOldMessages) {
                             messagesAdapter.addAllInBegin(sortedLoadedCombinationMessagesList);
                         } else {
-//                            messagesAdapter.addAll(sortedLoadedCombinationMessagesList);
-                            messagesAdapter.setList(combinationMessagesList);
+                            messagesAdapter.addList(combinationMessagesList);
                             scrollMessagesToBottom();
                         }
 
@@ -861,66 +858,64 @@ public class LoadDialogMessagesSuccessAction implements Command {
         }
     }
 
-public class LoadDialogMessagesFailAction implements Command {
+    public class LoadDialogMessagesFailAction implements Command {
 
-    @Override
-    public void execute(Bundle bundle) {
-        messageSwipeRefreshLayout.setRefreshing(false);
+        @Override
+        public void execute(Bundle bundle) {
+            messageSwipeRefreshLayout.setRefreshing(false);
 
             isLoadingMessages = false;
 
-        hideActionBarProgress();
+            hideActionBarProgress();
+        }
     }
-}
 
-private class TypingStatusBroadcastReceiver extends BroadcastReceiver {
+    private class TypingStatusBroadcastReceiver extends BroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Bundle extras = intent.getExtras();
-        int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-        // TODO: now it is possible only for Private chats
-        if (dialog != null && opponentUser != null && userId == opponentUser.getUserId()) {
-            if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-                boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
-                if (isTyping) {
-                    showTypingStatus();
-                } else {
-                    hideTypingStatus();
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
+            // TODO: now it is possible only for Private chats
+            if (dialog != null && opponentUser != null && userId == opponentUser.getUserId()) {
+                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+                    boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+                    if (isTyping) {
+                        showTypingStatus();
+                    } else {
+                        hideTypingStatus();
+                    }
                 }
             }
         }
     }
-}
 
-private class UpdatingDialogBroadcastReceiver extends BroadcastReceiver {
+    private class UpdatingDialogBroadcastReceiver extends BroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
-            updateData();
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
+                updateData();
+            }
         }
     }
-}
 
-private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListener {
+    private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListener {
 
-    @Override
-    public void onRefresh() {
-        if (!isNetworkAvailable()) {
-            messageSwipeRefreshLayout.setRefreshing(false);
-            return;
-        }
-        if (!isLoadingMessages) {
-            isLoadingMessages = true;
-            startLoadDialogMessages(true);
+        @Override
+        public void onRefresh() {
+            if (!isNetworkAvailable()) {
+                messageSwipeRefreshLayout.setRefreshing(false);
+                return;
+            }
 
             if (!isLoadingMessages) {
                 isLoadingMessages = true;
                 startLoadDialogMessages(true);
-
+            }
+        }
     }
-}
+
     protected class MessagesTextViewLinkClickListener implements QBChatMessageLinkClickListener {
 
         @Override

@@ -120,6 +120,12 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         return chatMessage.isIncoming(currentUser.getId());
     }
 
+    public void addAllInBegin(List<CombinationMessage> collection) {
+        chatMessages.addAll(collection);
+
+        notifyItemRangeInserted(0, collection.size());
+    }
+
     public class ImageRequestListener implements RequestListener<String, GlideBitmapDrawable> {
         private ImageAttachHolder viewHolder;
         private Bitmap loadedImageBitmap;
