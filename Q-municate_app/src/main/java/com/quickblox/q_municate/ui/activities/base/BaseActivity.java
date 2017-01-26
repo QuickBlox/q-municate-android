@@ -436,7 +436,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL);
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
-        globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
         globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
         IntentFilter networkIntentFilter = new IntentFilter(NetworkChangeReceiver.ACTION_LOCAL_CONNECTIVITY);
         IntentFilter userStatusIntentFilter = new IntentFilter(QBServiceConsts.USER_STATUS_CHANGED_ACTION);
@@ -807,7 +806,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                     } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
                         //                        onReceiveForceReloginAction(intent.getExtras());
                     } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
-                        onReceiveRefreshSessionAction(intent.getExtras());
+                        //onReceiveRefreshSessionAction(intent.getExtras());
                     }
                 }
             });

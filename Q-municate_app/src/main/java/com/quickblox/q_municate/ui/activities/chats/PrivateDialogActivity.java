@@ -22,6 +22,7 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
@@ -98,7 +99,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         checkForCorrectChat();
 
         if (isNetworkAvailable()) {
-            startLoadDialogMessages();
+            startLoadDialogMessages(false);
         }
 
         checkMessageSendingPossibility();
@@ -162,7 +163,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
-        findLastFriendsRequest();
+        findLastFriendsRequest(true);
 
         messagesRecyclerView.setAdapter(messagesAdapter);
         scrollMessagesToBottom();
@@ -173,14 +174,34 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         initActualExtras();
         checkForCorrectChat();
 
-        int oldMessagesCount = messagesAdapter.getItemCount();
+        final int oldMessagesCount = messagesAdapter.getItemCount();
 
-        this.combinationMessagesList = createCombinationMessagesList();
-        Log.d(TAG, "updateMessagesList combinationMessagesList = " + combinationMessagesList);
-        messagesAdapter.addList(combinationMessagesList);
-        findLastFriendsRequest();
+        (new BaseAsyncTask<Void, Void, Boolean>() {
+            @Override
+            public Boolean performInBackground(Void... params) throws Exception {
+                combinationMessagesList = createCombinationMessagesList();
+                return true;
+            }
 
-        checkForScrolling(oldMessagesCount);
+            @Override
+            public void onResult(Boolean aBoolean) {
+                messagesAdapter.addList(combinationMessagesList);
+                findLastFriendsRequest(true);
+
+                checkForScrolling(oldMessagesCount);
+        }
+
+            @Override
+            public void onException(Exception e) {
+                ErrorUtils.showError(PrivateDialogActivity.this, e);
+            }
+
+        }).execute();
+    }
+
+    @Override
+    protected void additionalActionsAfterLoadMessages() {
+        findLastFriendsRequest(false);
     }
 
     private void initActualExtras() {
@@ -241,8 +262,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
         initActualExtras();
-        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+//        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+//        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
         title = opponentUser.getFullName();
     }
@@ -255,9 +276,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         dataManager.getFriendDataManager().deleteObserver(friendObserver);
     }
 
-    private void findLastFriendsRequest() {
+    private void findLastFriendsRequest(boolean needNotifyAdapter) {
         ((PrivateChatMessageAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
-        messagesAdapter.notifyDataSetChanged();
+        if (needNotifyAdapter) {
+            messagesAdapter.notifyDataSetChanged();
+        }
     }
 
     private void setOnlineStatus(User user) {
@@ -366,9 +389,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void execute(Bundle bundle) {
-//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-//            messagesAdapter.notifyItemChanged(operationItemPosition);
-//            startLoadDialogMessages();
+            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            messagesAdapter.notifyItemChanged(operationItemPosition);
+            startLoadDialogMessages(false);
             hideProgress();
         }
     }
@@ -377,9 +400,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void execute(Bundle bundle) {
-//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-//            messagesAdapter.notifyItemChanged(operationItemPosition);
-//            startLoadDialogMessages();
+            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            messagesAdapter.notifyItemChanged(operationItemPosition);
+            startLoadDialogMessages(false);
             hideProgress();
         }
     }
@@ -388,7 +411,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(FriendDataManager.OBSERVE_KEY)) {
+            if (data != null && data.equals(dataManager.getFriendDataManager().getObserverKey())) {
                 checkForCorrectChat();
                 checkMessageSendingPossibility();
             }

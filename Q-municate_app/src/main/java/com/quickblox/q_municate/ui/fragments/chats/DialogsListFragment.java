@@ -409,8 +409,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         @Override
         public void update(Observable observable, Object data) {
             if (data != null) {
-                if (data.equals(DialogDataManager.OBSERVE_KEY) || data.equals(MessageDataManager.OBSERVE_KEY)
-                        || data.equals(UserDataManager.OBSERVE_KEY) || data.equals(DialogOccupantDataManager.OBSERVE_KEY)) {
+                if (data.equals(dataManager.getDialogDataManager().getObserverKey()) || data.equals(dataManager.getMessageDataManager().getObserverKey())
+                        || data.equals(dataManager.getUserDataManager().getObserverKey()) || data.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
                     updateDialogsList();
                 }
             }

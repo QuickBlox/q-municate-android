@@ -28,6 +28,9 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
+import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
+import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
+import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DialogsUtils;
@@ -52,9 +55,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.managers.DialogDataManager;
-import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
-import com.quickblox.q_municate_db.managers.MessageDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -130,8 +130,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private Observer dialogNotificationObserver;
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private BroadcastReceiver updatingDialogBroadcastReceiver;
-    private boolean loadMore;
     private SystemPermissionHelper systemPermissionHelper;
+    private boolean isLoadingMessages;
 
     @Override
     protected int getContentResId() {
@@ -305,7 +305,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             groupChatHelper.tryJoinRoomChat(qbDialog);
         }
 
-        startLoadDialogMessages();
+        startLoadDialogMessages(false);
     }
 
     private void initFields() {
@@ -488,9 +488,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 });
     }
 
-    protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
+    protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad, boolean isLoadOldMessages) {
         QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
-                lastDateLoad, loadMore);
+                lastDateLoad, isLoadOldMessages);
     }
 
     private void setActionButtonVisibility(CharSequence charSequence) {
@@ -538,9 +538,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void scrollMessagesToBottom() {
-        if (!loadMore) {
             scrollMessagesWithDelay();
-        }
     }
 
     private void scrollMessagesWithDelay() {
@@ -580,7 +578,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
-    protected void startLoadDialogMessages() {
+    protected void startLoadDialogMessages(boolean isLoadOldMessages) {
         if (dialog == null) {
             return;
         }
@@ -593,20 +591,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         Message message;
         DialogNotification dialogNotification;
 
-        long messageDateSent = 0;
+        message = dataManager.getMessageDataManager().getMessageByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+        dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+        long messageDateSent = ChatUtils.getDialogMessageCreatedDate(!isLoadOldMessages, message, dialogNotification);
 
-        if (loadMore) {
-            message = dataManager.getMessageDataManager().getMessageByDialogId(true, dialogOccupantsIdsList);
-            dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(true, dialogOccupantsIdsList);
-            messageDateSent = ChatUtils.getDialogMessageCreatedDate(false, message, dialogNotification);
-        } else {
-            message = dataManager.getMessageDataManager().getMessageByDialogId(false, dialogOccupantsIdsList);
-            dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(
-                    false, dialogOccupantsIdsList);
-            messageDateSent = ChatUtils.getDialogMessageCreatedDate(true, message, dialogNotification);
-        }
-
-        startLoadDialogMessages(dialog, messageDateSent);
+        startLoadDialogMessages(dialog, messageDateSent, isLoadOldMessages);
     }
 
     private void readAllMessages() {
@@ -652,7 +641,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected List<CombinationMessage> createCombinationMessagesList() {
         if (dialog == null) {
-            Log.d("PrivateDialogActivity", "dialog = " + dialog);
+            Log.d("BaseDialogActivity", "dialog = " + dialog);
             return null;
         }
 
@@ -663,6 +652,19 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
         Log.d(TAG, "combinationMessages= " + combinationMessages);
         return combinationMessages;
+    }
+
+    protected List <CombinationMessage> buildCombinationMessagesListByDate(long createDate, boolean moreDate){
+        if (dialog == null) {
+            Log.d("BaseDialogActivity", "dialog = " + dialog);
+            return null;
+        }
+
+        List<Message> messagesList = dataManager.getMessageDataManager()
+                .getMessagesByDialogIdAndDate(dialog.getDialogId(), createDate, moreDate);
+        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                .getDialogNotificationsByDialogIdAndDate(dialog.getDialogId(), createDate, moreDate);
+        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
     }
 
     private void visibleOrHideSmilePanel() {
@@ -713,7 +715,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void checkMessageSendingPossibility();
 
-public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
+    protected abstract void additionalActionsAfterLoadMessages();
+
+    public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
 
     private String dialogId;
 
@@ -737,37 +741,38 @@ public static class CombinationMessageLoader extends BaseLoader<List<Combination
 
 private class MessageObserver implements Observer {
 
-    @Override
-    public void update(Observable observable, Object data) {
-        Log.d("Fix double message", "MessageObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-        if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
-            updateMessagesList();
+        @Override
+        public void update(Observable observable, Object data) {
+            Log.e("Fix double message", "MessageObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
+            Log.e("Fix double message", "observeKey =  " + data);
+            if (data != null && data.equals(dataManager.getMessageDataManager().getObserverKey())) {
+                updateMessagesList();
+            }
         }
     }
-}
 
 private class DialogNotificationObserver implements Observer {
 
-    @Override
-    public void update(Observable observable, Object data) {
-        Log.d("Fix double message", "DialogNotificationObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-        if (data != null && data.equals(DialogNotificationDataManager.OBSERVE_KEY)) {
-            updateMessagesList();
+        @Override
+        public void update(Observable observable, Object data) {
+            Log.d("Fix double message", "DialogNotificationObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
+            if (data != null && data.equals(dataManager.getDialogNotificationDataManager().getObserverKey())) {
+                updateMessagesList();
+            }
         }
     }
-}
 
 private class DialogObserver implements Observer {
 
-    @Override
-    public void update(Observable observable, Object data) {
-        Log.d("Fix double message", "DialogObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-        if (data != null && data.equals(DialogDataManager.OBSERVE_KEY) && dialog != null) {
-            dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
-            updateActionBar();
+        @Override
+        public void update(Observable observable, Object data) {
+            Log.d("Fix double message", "DialogObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
+            if (data != null && data.equals(dataManager.getDialogDataManager().getObserverKey()) && dialog != null) {
+                dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
+                updateActionBar();
+            }
         }
     }
-}
 
 private class TypingTimerTask extends TimerTask {
 
@@ -794,18 +799,67 @@ public class LoadDialogMessagesSuccessAction implements Command {
     @Override
     public void execute(Bundle bundle) {
         messageSwipeRefreshLayout.setRefreshing(false);
-        int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
+            final int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES,
+                    ConstsCore.ZERO_INT_VALUE);
+            final long lastMessageDate = bundle.getLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES,
+                    ConstsCore.ZERO_INT_VALUE);
+            final boolean isLoadedOldMessages = bundle.getBoolean(QBServiceConsts.EXTRA_IS_LOAD_NEW_MESSAGES);
 
+            Log.e("BaseDialogActivity", "Laoding messages finished" + " totalEntries = " + totalEntries
+                    + " lastMessageDate = " + lastMessageDate
+                    + " isLoadedOldMessages = " + isLoadedOldMessages);
 
-        if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
-            scrollMessagesToBottom();
+            final List<CombinationMessage> sortedLoadedCombinationMessagesList =
+                    buildCombinationMessagesListByDate(lastMessageDate, !isLoadedOldMessages);
+
+            if (messagesAdapter != null && totalEntries != ConstsCore.ZERO_INT_VALUE) {
+
+                (new BaseAsyncTask<Void, Void, Boolean>() {
+                    @Override
+                    public Boolean performInBackground(Void... params) throws Exception {
+                        boolean isFirstLoadingMessages = lastMessageDate == ConstsCore.ZERO_INT_VALUE;
+                        if (isFirstLoadingMessages){
+                            combinationMessagesList = createCombinationMessagesList();
+                        } else if (isLoadedOldMessages){
+                            combinationMessagesList.addAll(0, sortedLoadedCombinationMessagesList);
+                        } else {
+                            combinationMessagesList.addAll(sortedLoadedCombinationMessagesList);
+                        }
+
+                        additionalActionsAfterLoadMessages();
+                        return isFirstLoadingMessages;
+                    }
+
+                    @Override
+                    public void onResult(Boolean aBoolean) {
+                        if (isLoadedOldMessages){
+                            messagesAdapter.addAllInBegin(sortedLoadedCombinationMessagesList);
+                        } else {
+//                            messagesAdapter.addAll(sortedLoadedCombinationMessagesList);
+                            messagesAdapter.setList(combinationMessagesList);
+                            scrollMessagesToBottom();
+                        }
+
+                        messageSwipeRefreshLayout.setRefreshing(false);
+                        hideActionBarProgress();
+                        isLoadingMessages = false;
+                    }
+
+                    @Override
+                    public void onException(Exception e) {
+                        ErrorUtils.showError(BaseDialogActivity.this, e);
+                        isLoadingMessages = false;
+                    }
+
+                }).execute();
+
+            } else {
+                messageSwipeRefreshLayout.setRefreshing(false);
+                hideActionBarProgress();
+                isLoadingMessages = false;
+            }
         }
-
-        loadMore = false;
-
-        hideActionBarProgress();
     }
-}
 
 public class LoadDialogMessagesFailAction implements Command {
 
@@ -813,7 +867,7 @@ public class LoadDialogMessagesFailAction implements Command {
     public void execute(Bundle bundle) {
         messageSwipeRefreshLayout.setRefreshing(false);
 
-        loadMore = false;
+            isLoadingMessages = false;
 
         hideActionBarProgress();
     }
@@ -857,11 +911,14 @@ private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListe
             messageSwipeRefreshLayout.setRefreshing(false);
             return;
         }
+        if (!isLoadingMessages) {
+            isLoadingMessages = true;
+            startLoadDialogMessages(true);
 
-        if (!loadMore) {
-            loadMore = true;
-            startLoadDialogMessages();
-        }
+            if (!isLoadingMessages) {
+                isLoadingMessages = true;
+                startLoadDialogMessages(true);
+
     }
 }
     protected class MessagesTextViewLinkClickListener implements QBChatMessageLinkClickListener {

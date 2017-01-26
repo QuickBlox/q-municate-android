@@ -7,6 +7,7 @@ import com.facebook.login.LoginManager;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSession;
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
@@ -35,7 +36,6 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
-        QBAuth.createSession();
         String password = inputUser.getPassword();
         qbUser = QBUsers.signIn(inputUser).perform();
 
@@ -44,12 +44,12 @@ public class QBAuthHelper extends BaseHelper {
             updateUser(qbUser);
         }
 
-        String token = QBAuth.getBaseService().getToken();
+        String token = QBSessionManager.getInstance().getToken();
         qbUser.setPassword(password);
 
         saveOwnerUser(qbUser);
 
-        AppSession.startSession(LoginType.EMAIL, qbUser, token);
+        AppSession.startSession(qbUser);
 
         return qbUser;
     }
@@ -62,7 +62,6 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser login(String socialProvider, String accessToken,
             String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
-        QBSession session = QBAuth.createSession().perform();
 
         if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
             qbUser = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret).perform();
@@ -73,22 +72,19 @@ public class QBAuthHelper extends BaseHelper {
             CoreSharedHelper.getInstance().saveFBToken(accessToken);
         }
 
-        qbUser.setPassword(session.getToken());
+        qbUser.setPassword(QBSessionManager.getInstance().getToken());
 
         if (!hasUserCustomData(qbUser)) {
-            qbUser.setOldPassword(session.getToken());
+            qbUser.setOldPassword(QBSessionManager.getInstance().getToken());
             qbUser = updateUser(qbUser);
         }
 
-        qbUser.setPassword(session.getToken());
-        String qbToken = QBAuth.getBaseService().getToken();
+        qbUser.setPassword(QBSessionManager.getInstance().getToken());
+        String qbToken = QBSessionManager.getInstance().getToken();
 
         saveOwnerUser(qbUser);
 
-        AppSession.startSession(socialProvider.equals(QBProvider.FACEBOOK)
-                ? LoginType.FACEBOOK
-                : LoginType.TWITTER_DIGITS,
-                qbUser, qbToken);
+        AppSession.startSession(qbUser);
 
         return qbUser;
     }
@@ -97,7 +93,6 @@ public class QBAuthHelper extends BaseHelper {
         QBUser qbUser;
         UserCustomData userCustomData = new UserCustomData();
 
-        QBAuth.createSession();
         String password = inputUser.getPassword();
         inputUser.setOldPassword(password);
         inputUser.setCustomData(Utils.customDataToString(userCustomData));
@@ -117,11 +112,10 @@ public class QBAuthHelper extends BaseHelper {
 
         qbUser.setCustomDataClass(UserCustomData.class);
         qbUser.setPassword(password);
-        String token = QBAuth.getBaseService().getToken();
 
         saveOwnerUser(qbUser);
 
-        AppSession.startSession(LoginType.EMAIL, qbUser, token);
+        AppSession.startSession(qbUser);
 
         return qbUser;
     }

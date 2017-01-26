@@ -63,7 +63,7 @@ public class FriendDataManager extends BaseManager<Friend> {
             ErrorUtils.logError(e);
         }
 
-        notifyObservers(OBSERVE_KEY);
+        notifyObservers(getObserverKey());
     }
 
     public boolean existsByUserId(int userId) {

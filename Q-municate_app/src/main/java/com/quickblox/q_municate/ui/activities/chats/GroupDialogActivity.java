@@ -13,6 +13,8 @@ import android.view.View;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
+import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -82,7 +84,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
         updateData();
 
         if (isNetworkAvailable()) {
-            startLoadDialogMessages();
+            startLoadDialogMessages(false);
         }
 
         checkMessageSendingPossibility();
@@ -140,13 +142,32 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        int oldMessagesCount = messagesAdapter.getItemCount();
+        final int oldMessagesCount = messagesAdapter.getItemCount();
+        (new BaseAsyncTask<Void, Void, Boolean>() {
+            @Override
+            public Boolean performInBackground(Void... params) throws Exception {
+                combinationMessagesList = createCombinationMessagesList();
+                processCombinationMessages();
+                return true;
+            }
 
-        this.combinationMessagesList = createCombinationMessagesList();
+            @Override
+            public void onResult(Boolean aBoolean) {
+                messagesAdapter.addList(combinationMessagesList);
+                checkForScrolling(oldMessagesCount);
+            }
+
+            @Override
+            public void onException(Exception e) {
+                ErrorUtils.showError(GroupDialogActivity.this, e);
+            }
+
+        }).execute();
+    }
+
+    @Override
+    protected void additionalActionsAfterLoadMessages() {
         processCombinationMessages();
-        messagesAdapter.addList(combinationMessagesList);
-
-        checkForScrolling(oldMessagesCount);
     }
 
     @Override
@@ -184,8 +205,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     private void processCombinationMessages(){
         QBUser currentUser = AppSession.getSession().getUser();
-        for (Object cmb :combinationMessagesList){
-            CombinationMessage cm = (CombinationMessage)cmb;
+        for (CombinationMessage cm :combinationMessagesList){
             boolean ownMessage = !cm.isIncoming(currentUser.getId());
             if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
                 cm.setState(State.READ);

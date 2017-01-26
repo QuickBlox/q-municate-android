@@ -367,7 +367,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         @Override
         public void update(Observable observable, Object data) {
             if (data != null) {
-                if (data.equals(UserRequestDataManager.OBSERVE_KEY) || data.equals(FriendDataManager.OBSERVE_KEY)) {
+                if (data.equals(dataManager.getUserRequestDataManager().getObserverKey()) || data.equals(dataManager.getFriendDataManager().getObserverKey())) {
                     updateList();
                 }
             }

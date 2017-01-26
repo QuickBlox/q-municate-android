@@ -249,7 +249,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     }
 
     private void saveChanges() {
-        if (isFullNameNotEmpty()) {
+        if (new ValidationUtils(this).isFullNameValid(fullNameTextInputLayout, oldFullName, currentFullName)) {
             showProgress();
 
             if (isNeedUpdateImage && imageUri != null) {
@@ -259,8 +259,6 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
                 QBUser newUser = createUserForUpdating();
                 QBUpdateUserCommand.start(this, newUser, null);
             }
-        } else {
-            new ValidationUtils(this).isFullNameValid(fullNameTextInputLayout, oldFullName, currentFullName);
         }
     }
 

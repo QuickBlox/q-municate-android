@@ -318,7 +318,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(UserDataManager.OBSERVE_KEY)) {
+            if (data != null && data.equals(dataManager.getUserDataManager().getObserverKey())) {
                 user = DataManager.getInstance().getUserDataManager().get(userId);
                 initUIWithUsersData();
             }
