@@ -47,7 +47,6 @@ public class ServiceManager {
     }
 
     public void login(QBUser user) {
-        AppSession.getSession().closeAndClear();
         final String userPassword = user.getPassword();
         authService.login(user).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -5,14 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.listeners.ExistingQbSessionListener;
 import com.quickblox.q_municate.utils.helpers.LoginHelper;
+import com.quickblox.q_municate_core.models.AppSession;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SplashActivity extends BaseAuthActivity implements ExistingQbSessionListener {
+public class SplashActivity extends BaseAuthActivity  {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
     private static final int DELAY_FOR_OPENING_LANDING_ACTIVITY = 1000;
@@ -32,40 +34,13 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
 
-        if (isNetworkAvailable()) {
-            Log.d(TAG, "onCreate checkStartExistSession()");
-            LoginHelper loginHelper = new LoginHelper(this, this);
-            loginHelper.checkStartExistSession();
-        } else if (LoginHelper.isCorrectOldAppSession()) {
-            Log.d(TAG, "onCreate startMainActivity()");
+        AppSession.load();
+
+        if (QBSessionManager.getInstance().getSessionParameters() != null && appSharedHelper.isSavedRememberMe()) {
             startMainActivity();
         } else {
             startLandingActivity();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (isLoggedInToServer()) {
-            startMainActivity(true);
-        }
-    }
-
-    @Override
-    public void onStartSessionSuccess() {
-        appSharedHelper.saveSavedRememberMe(true);
-        startMainActivity(true);
-    }
-
-    @Override
-    public void onStartSessionFail() {
-        startLandingActivity();
-    }
-
-    @Override
-    public void checkShowingConnectionError() {
-        // nothing. Toolbar is missing.
     }
 
     private void startLandingActivity() {

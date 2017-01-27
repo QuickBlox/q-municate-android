@@ -3,7 +3,9 @@ package com.quickblox.q_municate_core.utils.helpers;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.users.model.QBUser;
 
 import static com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper.Constants.*;
 
@@ -27,6 +29,7 @@ public class CoreSharedHelper {
         public static final String USER_FB_ID = "facebook_id";
         public static final String USER_TWITTER_ID = "twitter_id";
         public static final String USER_TD_ID = "twitter_digits_id";
+        public static final String USER_CUSTOM_DATA = "user_custom_data";
 
         public static final String PUSH_NEED_TO_OPEN_DIALOG = "push_need_to_open_dialog";
         public static final String PUSH_DIALOG_ID = "push_dialog_id";
@@ -192,6 +195,14 @@ public class CoreSharedHelper {
         return getPref(USER_TWITTER_ID);
     }
 
+    public void saveUserCustomData(String customData){
+        savePref(USER_CUSTOM_DATA, customData);
+    }
+
+    public String getUserCustomData(){
+        return getPref(USER_CUSTOM_DATA);
+    }
+
     public void saveTwitterDigitsId(String twitterDigitsId){
         savePref(USER_TD_ID, twitterDigitsId);
     }
@@ -216,6 +227,8 @@ public class CoreSharedHelper {
         saveFBId(null);
         saveTwitterId(null);
         saveTwitterDigitsId(null);
+        saveUserCustomData(null);
+
     }
 
     public boolean needToOpenDialog() {
@@ -284,9 +297,5 @@ public class CoreSharedHelper {
 
     public String getCallAudioCodec(String defValue) {
         return getPref(Constants.CALL_AUDIO_CODEC, defValue);
-    }
-
-    public void saveCallAudioCodec(String value) {
-        savePref(Constants.CALL_AUDIO_CODEC, value);
     }
 }

@@ -10,6 +10,7 @@ import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.auth.session.QBSessionParameters;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.auth.QBAuth;
+import com.quickblox.q_municate_base_service.QMServiceManagerListener;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
 
@@ -55,6 +56,7 @@ public class AppSession implements Serializable {
         qbUser.setFacebookId(CoreSharedHelper.getInstance().getFBId());
         qbUser.setTwitterId(CoreSharedHelper.getInstance().getTwitterId());
         qbUser.setTwitterDigitsId(CoreSharedHelper.getInstance().getTwitterDigitsId());
+        qbUser.setCustomData(CoreSharedHelper.getInstance().getUserCustomData());
 
 
         return new AppSession(qbUser);
@@ -107,10 +109,11 @@ public class AppSession implements Serializable {
         coreSharedHelper.saveFBId(user.getFacebookId());
         coreSharedHelper.saveTwitterId(user.getTwitterId());
         coreSharedHelper.saveTwitterDigitsId(user.getTwitterDigitsId());
+        coreSharedHelper.saveUserCustomData(user.getCustomData());
     }
 
     public boolean isLoggedIn() {
-        return qbUser != null && !TextUtils.isEmpty(QBSessionManager.getInstance().getToken());
+        return QBSessionManager.getInstance().getSessionParameters() != null;
     }
 
     public boolean isSessionExist() {
