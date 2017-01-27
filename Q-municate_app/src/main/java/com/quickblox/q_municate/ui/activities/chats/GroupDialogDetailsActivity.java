@@ -20,8 +20,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
@@ -47,15 +50,22 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
@@ -93,7 +103,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private ArrayList<Integer> newFriendIdsList;
     private UserOperationAction friendOperationAction;
     private BroadcastReceiver updatingDialogDetailsBroadcastReceiver;
-    private List<User> occupantsList;
+    private List<QMUser> occupantsList;
     private int countOnlineFriends;
     private DataManager dataManager;
     private String dialogId;
@@ -213,7 +223,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
     @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-        User selectedFriend = groupDialogOccupantsAdapter.getItem(position);
+        QMUser selectedFriend = groupDialogOccupantsAdapter.getItem(position);
         if (selectedFriend != null) {
             startFriendProfile(selectedFriend);
         }
@@ -264,9 +274,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateDialog() {
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
+        QBChatDialog  qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(dialogId));
-        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
+        occupantsList = getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
         qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
         groupDialogOccupantsAdapter.setNewData(occupantsList);
     }
@@ -402,9 +412,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateCurrentData() {
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
+        QBChatDialog  qbChatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
-        occupantsList = dataManager.getUserDataManager().getAllByIds(qbDialog.getOccupants());
+        occupantsList = QMUserService.getInstance().getUserCache().getUsersByIDs(qbChatDialog.getOccupants());
         groupNameCurrent = groupNameEditText.getText().toString();
     }
 
@@ -468,12 +478,12 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         photoUrlOld = qbDialog.getPhoto();
     }
 
-    private void startFriendProfile(User selectedFriend) {
+    private void startFriendProfile(QMUser selectedFriend) {
         QBUser currentUser = AppSession.getSession().getUser();
-        if (currentUser.getId() == selectedFriend.getUserId()) {
+        if (currentUser.getId() == selectedFriend.getId()) {
             MyProfileActivity.start(GroupDialogDetailsActivity.this);
         } else {
-            UserProfileActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getUserId());
+            UserProfileActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getId());
         }
     }
 
@@ -497,7 +507,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     public void updateUserStatus(int userId, boolean status) {
-        User user = findUserById(userId);
+        QMUser user = findUserById(userId);
         if (user != null) {
             groupDialogOccupantsAdapter.notifyDataSetChanged();
 
@@ -511,13 +521,33 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         }
     }
 
-    public User findUserById(int userId) {
-        for (User user : occupantsList) {
-            if (userId == user.getUserId()) {
+    public QMUser findUserById(int userId) {
+        for (QMUser user : occupantsList) {
+            if (userId == user.getId()) {
                 return user;
             }
         }
         return null;
+    }
+
+
+    public List<QMUser> getUsersForGroupChat(String dialogId, List<Integer> idsList) {
+        List<QMUser> usersList  = Collections.emptyList();
+
+        List<QMUser> qmUsers =QMUserService.getInstance().getUserCache().getUsersByIDs(idsList);
+
+        List<DialogOccupant> dialogOccupants = dataManager.getDialogOccupantDataManager().getActualDialogOccupantsByDialog(dialogId);
+        Set<Integer> dialogOccupantIdsSet = new HashSet<>();
+        for(DialogOccupant dialogOccupant : dialogOccupants){
+            dialogOccupantIdsSet.add(dialogOccupant.getUser().getId());
+        }
+
+        for(QMUser qmUser: qmUsers){
+            if( dialogOccupantIdsSet.contains(qmUser.getId())) {
+                usersList.add(qmUser);
+            }
+        }
+        return usersList;
     }
 
     @Override

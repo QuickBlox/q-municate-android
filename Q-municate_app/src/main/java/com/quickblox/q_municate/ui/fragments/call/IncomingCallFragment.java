@@ -14,16 +14,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
@@ -116,7 +114,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
     }
 
     private void setOpponentAvatarAndName(){
-        User opponent = ((CallActivity) getActivity()).getOpponentAsUserFromDB(sessionDescription.getCallerID());
+        QMUser opponent = ((CallActivity) getActivity()).getOpponentAsUserFromDB(sessionDescription.getCallerID());
         ImageLoader.getInstance().displayImage(opponent.getAvatar(), avatarImageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         callerName.setText(opponent.getFullName());
     }

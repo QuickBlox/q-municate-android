@@ -12,12 +12,13 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 public class ActivityUIHelper {
 
     private BaseActivity baseActivity;
-    private User senderUser;
+    private QMUser senderUser;
     private Dialog messagesDialog;
     private String message;
     private boolean isPrivateMessage;
@@ -27,7 +28,7 @@ public class ActivityUIHelper {
     }
 
     public void showChatMessageNotification(Bundle extras) {
-        senderUser = (User) extras.getSerializable(QBServiceConsts.EXTRA_USER);
+        senderUser = (QMUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
@@ -46,7 +47,7 @@ public class ActivityUIHelper {
 
     public void showContactRequestNotification(Bundle extras) {
         int senderUserId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-        senderUser = DataManager.getInstance().getUserDataManager().get(senderUserId);
+        senderUser = QMUserService.getInstance().getUserCache().get((long)senderUserId);
         message = extras.getString(QBServiceConsts.EXTRA_MESSAGE);
         DialogOccupant dialogOccupant = DataManager.getInstance().getDialogOccupantDataManager().getDialogOccupantForPrivateChat(senderUserId);
 

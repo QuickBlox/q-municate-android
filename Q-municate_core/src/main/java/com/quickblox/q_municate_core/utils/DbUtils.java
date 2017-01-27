@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -15,7 +15,8 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class DbUtils {
             String dialogId, int userId, DialogOccupant.Status status) {
         QBRestHelper.loadAndSaveUser(userId);
 
-        User user = DataManager.getInstance().getUserDataManager().get(userId);
+        QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
         DialogOccupant dialogOccupant = ChatUtils.createDialogOccupant(dataManager, dialogId, user);
         dialogOccupant.setStatus(status);
 
@@ -44,19 +45,19 @@ public class DbUtils {
         }
     }
 
-    public static void saveDialogsToCache(DataManager dataManager, List<QBChatDialog> qbDialogsList,
-            QBChatDialog currentDialog) {
-        dataManager.getDialogDataManager().createOrUpdateAll(ChatUtils.createLocalDialogsList(qbDialogsList));
+    public static void saveDialogsToCache(DataManager dataManager, List<QBChatDialog > qbChatDialogsList,
+            QBChatDialog  currentDialog) {
+        dataManager.getDialogDataManager().createOrUpdateAll(ChatUtils.createLocalDialogsList(qbChatDialogsList));
 
-        saveDialogsOccupants(dataManager, qbDialogsList);
+        saveDialogsOccupants(dataManager, qbChatDialogsList);
 
-        saveTempMessages(dataManager, qbDialogsList, currentDialog);
+        saveTempMessages(dataManager, qbChatDialogsList, currentDialog);
     }
 
-    public static void saveTempMessages(DataManager dataManager, List<QBChatDialog> qbDialogsList,
-            QBChatDialog currentDialog) {
+    public static void saveTempMessages(DataManager dataManager, List<QBChatDialog > qbChatDialogsList,
+            QBChatDialog  currentDialog) {
         dataManager.getMessageDataManager()
-                .createOrUpdateAll(ChatUtils.createTempLocalMessagesList(dataManager, qbDialogsList, currentDialog));
+                .createOrUpdateAll(ChatUtils.createTempLocalMessagesList(dataManager, qbChatDialogsList, currentDialog));
     }
 
     public static void saveTempMessage(DataManager dataManager, Message message) {

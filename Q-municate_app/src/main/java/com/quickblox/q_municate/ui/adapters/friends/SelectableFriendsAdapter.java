@@ -10,7 +10,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,25 +21,25 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
 
     private SelectUsersListener selectUsersListener;
     private int counterFriends;
-    private List<User> selectedFriendsList;
+    private List<QMUser> selectedFriendsList;
     private SparseBooleanArray sparseArrayCheckBoxes;
 
-    public SelectableFriendsAdapter(BaseActivity baseActivity, List<User> userList, boolean withFirstLetter) {
+    public SelectableFriendsAdapter(BaseActivity baseActivity, List<QMUser> userList, boolean withFirstLetter) {
         super(baseActivity, userList, withFirstLetter);
-        selectedFriendsList = new ArrayList<User>();
+        selectedFriendsList = new ArrayList<QMUser>();
         sparseArrayCheckBoxes = new SparseBooleanArray(userList.size());
     }
 
     @Override
-    public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseClickListenerViewHolder<QMUser> onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(this, layoutInflater.inflate(R.layout.item_friend_selectable, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(BaseClickListenerViewHolder<User> baseClickListenerViewHolder, final int position) {
+    public void onBindViewHolder(BaseClickListenerViewHolder<QMUser> baseClickListenerViewHolder, final int position) {
         super.onBindViewHolder(baseClickListenerViewHolder, position);
 
-        final User user = getItem(position);
+        final QMUser user = getItem(position);
         final ViewHolder viewHolder = (ViewHolder) baseClickListenerViewHolder;
 
         viewHolder.selectFriendCheckBox.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +69,7 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
         notifyItemChanged(position);
     }
 
-    private void addOrRemoveSelectedFriend(boolean checked, User user) {
+    private void addOrRemoveSelectedFriend(boolean checked, QMUser user) {
         if (checked) {
             selectedFriendsList.add(user);
         } else if (selectedFriendsList.contains(user)) {
@@ -100,7 +100,7 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
         notifyDataSetChanged();
     }
 
-    public List<User> getSelectedFriendsList() {
+    public List<QMUser> getSelectedFriendsList() {
         return selectedFriendsList;
     }
 

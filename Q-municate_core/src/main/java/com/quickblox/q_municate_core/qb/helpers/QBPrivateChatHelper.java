@@ -23,7 +23,8 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.io.File;
@@ -84,7 +85,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     public void onPrivateMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         if (qbChatMessage.getId() != null && dialogId != null) {
-            User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
+            QMUser user = QMUserService.getInstance().getUserCache().get((long)qbChatMessage.getSenderId());
             Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
             if (dialog == null) {
                 QBChatDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
@@ -114,7 +115,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         Message message = parseReceivedMessage(qbChatMessage);
 
-        if (!dataManager.getUserDataManager().exists(qbChatMessage.getSenderId())) {
+        if (!QMUserService.getInstance().getUserCache().exists((long)qbChatMessage.getSenderId())) {
             QBRestHelper.loadAndSaveUser(qbChatMessage.getSenderId());
         }
 
