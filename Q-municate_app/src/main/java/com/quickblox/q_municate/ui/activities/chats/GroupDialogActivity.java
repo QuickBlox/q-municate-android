@@ -3,6 +3,8 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,8 +13,8 @@ import android.view.View;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
+import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
@@ -25,7 +27,6 @@ import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
@@ -66,9 +67,10 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
+        messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList, dialog);
+        messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesRecyclerView.addItemDecoration(
-                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+                new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
 
         scrollMessagesToBottom();
@@ -108,17 +110,29 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
-            return;
-        }
-
-        try {
-            ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
-        } catch (QBResponseException e) {
-            ErrorUtils.showError(this, e);
-        }
+        sendGroupMessageWithAttach(dialogId, file, null);
     }
 
+    @Override
+    protected void onLocationLoaded(String location, String dialogId) {
+        Log.d("GroupDialogActivity", "location= " + location);
+        sendGroupMessageWithAttach(dialogId, null, location);
+    }
+
+    private void sendGroupMessageWithAttach(String dialogId, QBFile file, String location) {
+        if (!dialogId.equals(dialog.getDialogId())) {
+            return;
+        }
+        try {
+            if (file != null) {
+                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
+            } else if (!TextUtils.isEmpty(location)) {
+                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachLocation(dialog.getRoomJid(), location);
+            }
+        } catch (QBResponseException exc) {
+            ErrorUtils.showError(this, exc);
+        }
+    }
     @Override
     protected Bundle generateBundleToInitDialog() {
         return null;
@@ -126,7 +140,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        final int oldMessagesCount = messagesAdapter.getAllItems().size();
+        final int oldMessagesCount = messagesAdapter.getItemCount();
         (new BaseAsyncTask<Void, Void, Boolean>() {
             @Override
             public Boolean performInBackground(Void... params) throws Exception {
@@ -137,7 +151,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
             @Override
             public void onResult(Boolean aBoolean) {
-                messagesAdapter.setList(combinationMessagesList);
+                messagesAdapter.addList(combinationMessagesList);
                 checkForScrolling(oldMessagesCount);
             }
 

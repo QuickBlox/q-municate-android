@@ -4,12 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,18 +27,19 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.DialogsUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
-import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
-import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
+import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
+import com.quickblox.q_municate.utils.DialogsUtils;
+import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -51,7 +52,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
@@ -59,6 +59,8 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
@@ -79,6 +81,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener,
         ChatUIHelperListener, OnImagePickedListener {
 
+    private static final String TAG = BaseDialogActivity.class.getSimpleName();
     private static final int TYPING_DELAY = 1000;
     private static final int DELAY_SCROLLING_LIST = 300;
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
@@ -105,12 +108,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected Resources resources;
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
-    protected BaseRecyclerViewAdapter messagesAdapter;
+    protected BaseChatMessagesAdapter messagesAdapter;
     protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
     protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
     protected ImagePickHelper imagePickHelper;
+    protected MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
 
     private Handler mainThreadHandler;
     private View emojiconsFragment;
@@ -177,7 +181,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
         if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
-            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_LOCATION_REQUEST_CODE);
         } else {
             showPermissionSettingsDialog();
         }
@@ -197,6 +201,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onStart();
         createChatLocally();
         checkPermissionSaveFiles();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        restoreDefaultCanPerformLogout();
     }
 
     @Override
@@ -220,6 +230,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         removeActions();
         deleteObservers();
         unregisterBroadcastReceivers();
+        removeMsgTextViewLinkClickListener();
     }
 
     @Override
@@ -239,9 +250,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
+    public void onImagePicked(int requestCode, File file, String location) {
         canPerformLogout.set(true);
-        startLoadAttachFile(file, dialog.getDialogId());
+        startLoadAttachFile(file, location, dialog.getDialogId());
     }
 
     @Override
@@ -278,6 +289,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
+    private void restoreDefaultCanPerformLogout() {
+        if (!canPerformLogout.get()) {
+            canPerformLogout.set(true);
+        }
+    }
+
     @Override
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
@@ -306,6 +323,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         appSharedHelper.saveNeedToOpenDialog(false);
         imagePickHelper = new ImagePickHelper();
         systemPermissionHelper = new SystemPermissionHelper(this);
+        messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
     }
 
     private void initCustomUI() {
@@ -371,6 +389,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
     }
 
+    private void removeMsgTextViewLinkClickListener() {
+        if (messagesAdapter != null) {
+            messagesAdapter.removeMessageTextViewLinkClickListener();
+        }
+    }
+
     protected void updateData() {
         dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
         if (dialog != null) {
@@ -423,7 +447,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void checkPermissionSaveFiles() {
         boolean permissionSaveFileWasRequested = appSharedHelper.isPermissionsSaveFileWasRequested();
-        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested){
+        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested) {
             systemPermissionHelper.requestPermissionsForSaveFile();
             appSharedHelper.savePermissionsSaveFileWasRequested(true);
         }
@@ -446,14 +470,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
-    protected void startLoadAttachFile(final File file, final String dialogId) {
+    protected void startLoadAttachFile(final File file, final String location, final String dialogId) {
         TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        showProgress();
-                        QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
+                        if (location != null) {
+                            onLocationLoaded(location, dialogId);
+                        } else {
+                            showProgress();
+                            QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
+                        }
                     }
                 });
     }
@@ -502,13 +530,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void checkForScrolling(int oldMessagesCount) {
-        if (oldMessagesCount != messagesAdapter.getAllItems().size()) {
+        if (oldMessagesCount != messagesAdapter.getItemCount()) {
             scrollMessagesToBottom();
         }
     }
 
     protected void scrollMessagesToBottom() {
-            scrollMessagesWithDelay();
+        scrollMessagesWithDelay();
     }
 
     private void scrollMessagesWithDelay() {
@@ -618,10 +646,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
-        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+
+        List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+        Log.d(TAG, "combinationMessages= " + combinationMessages);
+        return combinationMessages;
     }
 
-    protected List <CombinationMessage> buildCombinationMessagesListByDate(long createDate, boolean moreDate){
+    protected List<CombinationMessage> buildCombinationMessagesListByDate(long createDate, boolean moreDate) {
         if (dialog == null) {
             Log.d("BaseDialogActivity", "dialog = " + dialog);
             return null;
@@ -677,6 +708,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected abstract void updateMessagesList();
 
     protected abstract void onFileLoaded(QBFile file, String dialogId);
+
+    protected abstract void onLocationLoaded(String location, String dialogId);
 
     protected abstract void checkMessageSendingPossibility();
 
@@ -767,40 +800,29 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     ConstsCore.ZERO_INT_VALUE);
             final long lastMessageDate = bundle.getLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES,
                     ConstsCore.ZERO_INT_VALUE);
-            final boolean isLoadedOldMessages = bundle.getBoolean(QBServiceConsts.EXTRA_IS_LOAD_NEW_MESSAGES);
+            final boolean isLoadedOldMessages = bundle.getBoolean(QBServiceConsts.EXTRA_IS_LOAD_OLD_MESSAGES);
 
-            Log.e("BaseDialogActivity", "Laoding messages finished" + " totalEntries = " + totalEntries
+            Log.d("BaseDialogActivity", "Laoding messages finished" + " totalEntries = " + totalEntries
                     + " lastMessageDate = " + lastMessageDate
                     + " isLoadedOldMessages = " + isLoadedOldMessages);
-
-            final List<CombinationMessage> sortedLoadedCombinationMessagesList =
-                    buildCombinationMessagesListByDate(lastMessageDate, !isLoadedOldMessages);
 
             if (messagesAdapter != null && totalEntries != ConstsCore.ZERO_INT_VALUE) {
 
                 (new BaseAsyncTask<Void, Void, Boolean>() {
                     @Override
                     public Boolean performInBackground(Void... params) throws Exception {
-                        boolean isFirstLoadingMessages = lastMessageDate == ConstsCore.ZERO_INT_VALUE;
-                        if (isFirstLoadingMessages){
-                            combinationMessagesList = createCombinationMessagesList();
-                        } else if (isLoadedOldMessages){
-                            combinationMessagesList.addAll(0, sortedLoadedCombinationMessagesList);
-                        } else {
-                            combinationMessagesList.addAll(sortedLoadedCombinationMessagesList);
-                        }
-
+                        combinationMessagesList = createCombinationMessagesList();
                         additionalActionsAfterLoadMessages();
-                        return isFirstLoadingMessages;
+                        return true;
                     }
 
                     @Override
                     public void onResult(Boolean aBoolean) {
-                        if (isLoadedOldMessages){
-                            messagesAdapter.addAllInBegin(sortedLoadedCombinationMessagesList);
+                        if (isLoadedOldMessages) {
+                            messagesAdapter.setList(combinationMessagesList, false);
+                            messagesAdapter.notifyItemRangeInserted(0, totalEntries);
                         } else {
-//                            messagesAdapter.addAll(sortedLoadedCombinationMessagesList);
-                            messagesAdapter.setList(combinationMessagesList);
+                            messagesAdapter.setList(combinationMessagesList, true);
                             scrollMessagesToBottom();
                         }
 
@@ -880,6 +902,23 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 isLoadingMessages = true;
                 startLoadDialogMessages(true);
             }
+        }
+    }
+
+    protected class MessagesTextViewLinkClickListener implements QBChatMessageLinkClickListener {
+
+        @Override
+        public void onLinkClicked(String linkText, QBMessageTextClickMovement.QBLinkType qbLinkType, int position) {
+            Log.i(TAG, "Link clicked. Text = " + linkText + " Type = " + qbLinkType + " Position: " + position);
+
+            if (!QBMessageTextClickMovement.QBLinkType.NONE.equals(qbLinkType)) {
+                canPerformLogout.set(false);
+            }
+        }
+
+        @Override
+        public void onLongClick(String text) {
+
         }
     }
 }

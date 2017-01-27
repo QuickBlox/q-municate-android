@@ -71,19 +71,19 @@ public class QBCallChatHelper extends BaseHelper {
     }
 
     public void initCurrentSession(QBRTCSession qbRtcSession, QBRTCSignalingCallback qbRtcSignalingCallback,
-            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+                                   QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         this.currentQbRtcSession = qbRtcSession;
         initCurrentSession(qbRtcSignalingCallback, qbRtcSessionConnectionCallbacks);
     }
 
     public void initCurrentSession(QBRTCSignalingCallback qbRtcSignalingCallback,
-            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+                                   QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         this.currentQbRtcSession.addSignalingCallback(qbRtcSignalingCallback);
         this.currentQbRtcSession.addSessionCallbacksListener(qbRtcSessionConnectionCallbacks);
     }
 
     public void releaseCurrentSession(QBRTCSignalingCallback qbRtcSignalingCallback,
-            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+                                      QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         if (currentQbRtcSession != null) {
             currentQbRtcSession.removeSignalingCallback(qbRtcSignalingCallback);
             currentQbRtcSession.removeSessionCallbacksListener(qbRtcSessionConnectionCallbacks);

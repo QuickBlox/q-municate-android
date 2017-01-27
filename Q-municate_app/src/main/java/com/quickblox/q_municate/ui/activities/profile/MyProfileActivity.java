@@ -127,7 +127,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
+    public void onImagePicked(int requestCode, File file, String url) {
         canPerformLogout.set(true);
         startCropActivity(Uri.fromFile(file));
     }
