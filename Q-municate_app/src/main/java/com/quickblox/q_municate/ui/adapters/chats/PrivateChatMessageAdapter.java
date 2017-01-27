@@ -91,7 +91,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
             lastRequestPosition = EMPTY_POSITION;
         } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == position)) { // set visible friends actions
             setVisibilityFriendsActions((FriendsViewHolder) holder, View.VISIBLE);
-            initListeners((FriendsViewHolder) holder, position, chatMessage.getDialogOccupant().getUser().getUserId());
+            initListeners((FriendsViewHolder) holder, position, chatMessage.getDialogOccupant().getUser().getId());
         }
     }
 
@@ -220,7 +220,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
             if (friendsRequestMessage && !ownMessage) {
                 isFriend = dataManager.getFriendDataManager().
-                        getByUserId(combinationMessage.getDialogOccupant().getUser().getUserId()) != null;
+                        getByUserId(combinationMessage.getDialogOccupant().getUser().getId()) != null;
                 if (!isFriend) {
                     lastRequestPosition = position;
                 }

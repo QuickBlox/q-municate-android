@@ -50,7 +50,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         senderName = chatMessage.getDialogOccupant().getUser().getFullName();
         TextView textView = (TextView) holder.itemView.findViewById(R.id.custom_text_view);
 
-        textView.setTextColor(colorUtils.getRandomTextColorById(chatMessage.getDialogOccupant().getUser().getUserId()));
+        textView.setTextColor(colorUtils.getRandomTextColorById(chatMessage.getDialogOccupant().getUser().getId()));
         textView.setText(senderName);
 
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);

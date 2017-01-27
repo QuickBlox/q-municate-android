@@ -244,12 +244,17 @@ public class QBCallChatHelper extends BaseHelper {
         }
 
         @Override
+        public void onCameraDisconnected() {
+
+        }
+
+        @Override
         public void onCameraFreezed(String s) {
             Log.e(TAG, "Camera is frozen " + s);
         }
 
         @Override
-        public void onCameraOpening(int i) {
+        public void onCameraOpening(String i) {
             Log.e(TAG, "Camera opening = " + i);
         }
 

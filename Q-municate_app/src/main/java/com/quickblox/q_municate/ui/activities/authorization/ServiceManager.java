@@ -87,7 +87,7 @@ public class ServiceManager {
 
                 saveOwnerUser(qbUser);
 
-                AppSession.startSession(LoginType.EMAIL, qbUser, token);
+                AppSession.startSession(qbUser);
 
 
                 authActivity.startMainActivity(qbUser);

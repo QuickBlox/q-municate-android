@@ -6,9 +6,8 @@ import android.util.Log;
 
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBChatDialog ;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -26,10 +25,7 @@ import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.q_municate_db.models.User;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
-import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
