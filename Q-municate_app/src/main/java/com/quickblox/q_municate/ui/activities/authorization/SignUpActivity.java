@@ -238,7 +238,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     };
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
+    public void onImagePicked(int requestCode, File file, String url) {
         startCropActivity(Uri.fromFile(file));
     }
 

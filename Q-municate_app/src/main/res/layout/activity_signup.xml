@@ -72,7 +72,7 @@
             android:orientation="horizontal">
 
             <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
-                style="@style/AvatarImageViewStyle"
+                style="@style/AvatarImageViewStyle.Common"
                 android:id="@+id/avatar_imageview"
                 app:border_color="@color/dark_gray"
                 app:border_width="@dimen/avatar_border_width"

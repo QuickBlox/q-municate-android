@@ -29,7 +29,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
     compile project(path: ':q-municate_base_cache')
-    compile project(":quickblox-android-sdk-core" )
-    compile project(":quickblox-android-sdk-extensions" )
+    compile "com.quickblox:quickblox-android-sdk-core:${rootProject.qbSdkVersion}"
+    compile "com.quickblox:quickblox-android-sdk-extensions:${rootProject.qbSdkVersion}"
     compile 'io.reactivex:rxandroid:1.2.1'
 }

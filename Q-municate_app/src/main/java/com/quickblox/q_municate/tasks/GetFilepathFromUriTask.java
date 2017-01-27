@@ -85,7 +85,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         hideProgress();
         Log.w(GetFilepathFromUriTask.class.getSimpleName(), "onResult listener = " + listener);
         if (listener != null) {
-            listener.onImagePicked(requestCode, file);
+            listener.onImagePicked(requestCode, file, null);
         }
     }
 

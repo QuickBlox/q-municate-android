@@ -28,7 +28,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
-    compile project(path: ':quickblox-android-sdk-chat')
+    compile "com.quickblox:quickblox-android-sdk-chat:${rootProject.qbSdkVersion}"
     compile project(path: ':q-municate_base_cache')
     compile project(path: ':q-municate_base_service')
     compile project(path: ':Q-municate_core')
