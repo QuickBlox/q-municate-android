@@ -125,6 +125,15 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         notifyItemRangeInserted(0, collection.size());
     }
 
+    public void setList(List <CombinationMessage> collection, boolean notifyDataChanged){
+        if (notifyDataChanged) {
+            addList(collection);
+        } else {
+            chatMessages.clear();
+            chatMessages.addAll(collection);
+        }
+    }
+
     public class ImageRequestListener implements RequestListener<String, GlideBitmapDrawable> {
         private ImageAttachHolder viewHolder;
         private Bitmap loadedImageBitmap;

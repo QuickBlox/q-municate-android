@@ -796,44 +796,33 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            messageSwipeRefreshLayout.setRefreshing(false);
             final int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES,
                     ConstsCore.ZERO_INT_VALUE);
             final long lastMessageDate = bundle.getLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES,
                     ConstsCore.ZERO_INT_VALUE);
-            final boolean isLoadedOldMessages = bundle.getBoolean(QBServiceConsts.EXTRA_IS_LOAD_NEW_MESSAGES);
+            final boolean isLoadedOldMessages = bundle.getBoolean(QBServiceConsts.EXTRA_IS_LOAD_OLD_MESSAGES);
 
-            Log.e("BaseDialogActivity", "Laoding messages finished" + " totalEntries = " + totalEntries
+            Log.d("BaseDialogActivity", "Laoding messages finished" + " totalEntries = " + totalEntries
                     + " lastMessageDate = " + lastMessageDate
                     + " isLoadedOldMessages = " + isLoadedOldMessages);
-
-            final List<CombinationMessage> sortedLoadedCombinationMessagesList =
-                    buildCombinationMessagesListByDate(lastMessageDate, !isLoadedOldMessages);
 
             if (messagesAdapter != null && totalEntries != ConstsCore.ZERO_INT_VALUE) {
 
                 (new BaseAsyncTask<Void, Void, Boolean>() {
                     @Override
                     public Boolean performInBackground(Void... params) throws Exception {
-                        boolean isFirstLoadingMessages = lastMessageDate == ConstsCore.ZERO_INT_VALUE;
-                        if (isFirstLoadingMessages) {
-                            combinationMessagesList = createCombinationMessagesList();
-                        } else if (isLoadedOldMessages) {
-                            combinationMessagesList.addAll(0, sortedLoadedCombinationMessagesList);
-                        } else {
-                            combinationMessagesList.addAll(sortedLoadedCombinationMessagesList);
-                        }
-
+                        combinationMessagesList = createCombinationMessagesList();
                         additionalActionsAfterLoadMessages();
-                        return isFirstLoadingMessages;
+                        return true;
                     }
 
                     @Override
                     public void onResult(Boolean aBoolean) {
                         if (isLoadedOldMessages) {
-                            messagesAdapter.addAllInBegin(sortedLoadedCombinationMessagesList);
+                            messagesAdapter.setList(combinationMessagesList, false);
+                            messagesAdapter.notifyItemRangeInserted(0, totalEntries);
                         } else {
-                            messagesAdapter.addList(combinationMessagesList);
+                            messagesAdapter.setList(combinationMessagesList, true);
                             scrollMessagesToBottom();
                         }
 
