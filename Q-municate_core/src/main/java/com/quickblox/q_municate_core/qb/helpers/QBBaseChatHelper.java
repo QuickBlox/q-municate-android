@@ -13,6 +13,7 @@ import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.QBSystemMessagesManager;
 import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.chat.listeners.QBChatDialogMessageListener;
 import com.quickblox.chat.listeners.QBChatDialogTypingListener;
 import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBMessageStatusListener;
@@ -395,12 +396,15 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     public void updateStatusMessageReadServer(String dialogId, CombinationMessage combinationMessage,
             boolean fromPrivate) throws Exception {
         if (fromPrivate) {
-            QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getUserId());
+            QBChatDialog privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getUserId());
             if (privateChat != null) {
                 QBChatMessage qbChatMessage = new QBChatMessage();
                 qbChatMessage.setId(combinationMessage.getMessageId());
                 qbChatMessage.setDialogId(dialogId);
                 qbChatMessage.setSenderId(combinationMessage.getDialogOccupant().getUser().getUserId());
+
+                privateChat.initForChat(chatService);
+
                 privateChat.readMessage(qbChatMessage);
             }
         } else {
@@ -410,10 +414,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
     }
 
-    public void onGroupMessageReceived(QBChat groupChat, final QBChatMessage chatMessage) {
+    public void onGroupMessageReceived(String groupChat, final QBChatMessage chatMessage) {
     }
 
-    public void onPrivateMessageReceived(QBChat privateChat, final QBChatMessage chatMessage) {
+    public void onPrivateMessageReceived(String privateChat, final QBChatMessage chatMessage) {
     }
 
     public interface QBNotificationChatListener {
@@ -421,36 +425,42 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
     }
 
-    private class GroupChatMessageListener implements QBMessageListener<QBGroupChat> {
+    private class GroupChatMessageListener implements QBChatDialogMessageListener {
 
         @Override
-        public void processMessage(QBGroupChat groupChat, QBChatMessage chatMessage) {
-            onGroupMessageReceived(groupChat, chatMessage);
+        public void processMessage(String dialogId, QBChatMessage chatMessage, Integer senderId) {
+            onGroupMessageReceived(dialogId, chatMessage);
         }
 
         @Override
-        public void processError(QBGroupChat groupChat, QBChatException error, QBChatMessage originMessage) {
+        public void processError(String s, QBChatException e, QBChatMessage qbChatMessage, Integer integer) {
 
         }
     }
 
-    private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
+    private class PrivateChatMessageListener implements QBChatDialogMessageListener {
 
         @Override
         public void processMessage(QBPrivateChat privateChat, final QBChatMessage chatMessage) {
+
+        }
+
+        @Override
+        public void processMessage(String dialogId, QBChatMessage chatMessage, Integer senderId) {
             if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
                 for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
                     notificationChatListener.onReceivedNotification((String) chatMessage.getProperty(
                             ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
                 }
             } else {
-                onPrivateMessageReceived(privateChat, chatMessage);
+                onPrivateMessageReceived(dialogId, chatMessage);
             }
+
         }
 
         @Override
-        public void processError(QBPrivateChat privateChat, QBChatException error, QBChatMessage originMessage) {
-            // TODO: need to be implemented
+        public void processError(String s, QBChatException e, QBChatMessage qbChatMessage, Integer integer) {
+
         }
     }
 

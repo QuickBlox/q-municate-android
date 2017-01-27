@@ -3,7 +3,6 @@ package com.quickblox.q_municate_core.qb.helpers;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.quickblox.chat.QBChat;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -16,6 +15,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DbUtils;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -55,7 +55,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public void onPrivateMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
+    public void onPrivateMessageReceived(String chat, QBChatMessage qbChatMessage) {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         if (qbChatMessage.getId() != null && dialogId != null) {
             User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());

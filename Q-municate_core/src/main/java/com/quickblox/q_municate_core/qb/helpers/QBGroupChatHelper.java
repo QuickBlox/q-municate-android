@@ -7,7 +7,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.quickblox.chat.JIDHelper;
-import com.quickblox.chat.QBChat;
 //import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.exception.QBChatException;
@@ -84,7 +83,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public void onGroupMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
+    public void onGroupMessageReceived(String chat, QBChatMessage qbChatMessage) {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         User user = DataManager.getInstance().getUserDataManager().get(qbChatMessage.getSenderId());
         Message message = parseReceivedMessage(qbChatMessage);
