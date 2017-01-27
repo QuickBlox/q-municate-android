@@ -29,6 +29,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
     //compile 'com.quickblox:quickblox-android-sdk-core:3.0'
-    compile project(':quickblox-android-sdk-core')
+    compile "com.quickblox:quickblox-android-sdk-core:${rootProject.qbSdkVersion}"
     compile project(path: ':q-municate_base_service')
 }

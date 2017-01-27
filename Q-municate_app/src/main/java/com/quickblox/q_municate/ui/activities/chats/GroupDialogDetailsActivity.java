@@ -230,7 +230,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
+    public void onImagePicked(int requestCode, File file, String url) {
         startCropActivity(Uri.fromFile(file));
     }
 

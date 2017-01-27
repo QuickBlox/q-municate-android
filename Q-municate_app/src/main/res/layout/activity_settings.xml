@@ -28,7 +28,7 @@
                 android:layout_margin="@dimen/padding_large">
 
                 <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
-                    style="@style/AvatarImageViewStyle"
+                    style="@style/AvatarImageViewStyle.Common"
                     android:id="@+id/avatar_imageview"
                     android:layout_alignParentLeft="true"
                     app:border_color="@color/dark_gray"

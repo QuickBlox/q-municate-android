@@ -6,9 +6,8 @@ import android.util.Log;
 
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBChatDialog ;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -26,6 +25,7 @@ import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ public class ChatUtils {
     }
 
     public static String getFullNamesFromOpponentId(DataManager dataManager, Integer userId,
-            String occupantsIdsString) {
+                                                    String occupantsIdsString) {
         List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
         occupantsIdsList.remove(userId);
         return getFullNamesFromOpponentIdsList(dataManager, occupantsIdsList);
@@ -183,7 +183,7 @@ public class ChatUtils {
 
         if (QBDialogType.PRIVATE.equals(qbDialog.getType())) {
             dialog.setType(Dialog.Type.PRIVATE);
-        } else if (QBDialogType.GROUP.equals(qbDialog.getType())){
+        } else if (QBDialogType.GROUP.equals(qbDialog.getType())) {
             dialog.setType(Dialog.Type.GROUP);
         }
 
@@ -388,7 +388,7 @@ public class ChatUtils {
         return message;
     }
 
-    private static boolean messageIsRead(QBChatMessage qbChatMessage){
+    private static boolean messageIsRead(QBChatMessage qbChatMessage) {
         return qbChatMessage.getReadIds() != null
                 && qbChatMessage.getReadIds().contains(qbChatMessage.getRecipientId());
     }
@@ -412,10 +412,19 @@ public class ChatUtils {
                 .concat(QBSettings.getInstance().getChatEndpoint());
     }
 
-    public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
+    public static Attachment createLocalAttachment(QBAttachment qbAttachment, Context context) {
         Attachment attachment = new Attachment();
+        String remoteUrl = qbAttachment.getUrl();
+        if (qbAttachment.getType().equalsIgnoreCase(Attachment.Type.LOCATION.toString())) {
+            attachment.setType(Attachment.Type.LOCATION);
+            attachment.setAdditionalInfo(qbAttachment.getData());
+            remoteUrl = LocationUtils.getRemoteUri(qbAttachment.getData(), context);
+        }
+        if(qbAttachment.getId() == null){
+            qbAttachment.setId(String.valueOf(qbAttachment.getData().hashCode()));
+        }
         attachment.setAttachmentId(qbAttachment.getId());
-        attachment.setRemoteUrl(qbAttachment.getUrl());
+        attachment.setRemoteUrl(remoteUrl);
         attachment.setName(qbAttachment.getName());
         attachment.setSize(qbAttachment.getSize());
         return attachment;
@@ -521,7 +530,7 @@ public class ChatUtils {
     }
 
     public static List<CombinationMessage> createCombinationMessagesList(List<Message> messagesList,
-            List<DialogNotification> dialogNotificationsList) {
+                                                                         List<DialogNotification> dialogNotificationsList) {
         List<CombinationMessage> combinationMessagesList = new ArrayList<>();
         combinationMessagesList.addAll(getCombinationMessagesListFromMessagesList(messagesList));
         combinationMessagesList.addAll(getCombinationMessagesListFromDialogNotificationsList(
@@ -564,7 +573,7 @@ public class ChatUtils {
     }
 
     public static List<Dialog> fillTitleForPrivateDialogsList(String titleForDeletedUser, DataManager dataManager,
-            List<Dialog> inputDialogsList) {
+                                                              List<Dialog> inputDialogsList) {
         List<Dialog> dialogsList = new ArrayList<>(inputDialogsList.size());
 
         for (Dialog dialog : inputDialogsList) {
@@ -621,7 +630,7 @@ public class ChatUtils {
     }
 
     public static DialogOccupant getUpdatedDialogOccupant(DataManager dataManager, String dialogId,
-            DialogOccupant.Status status, Integer userId) {
+                                                          DialogOccupant.Status status, Integer userId) {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, userId);
         if (dialogOccupant != null) {
             dialogOccupant.setStatus(status);

@@ -3,7 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,7 +15,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
-import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
+import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
@@ -29,14 +29,12 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
@@ -127,12 +125,24 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
+        sendPrivateMessageWithAttach(dialogId, file, null);
+    }
+
+    @Override
+    protected void onLocationLoaded(String location, String dialogId) {
+        sendPrivateMessageWithAttach(dialogId, null, location);
+    }
+
+    private void sendPrivateMessageWithAttach(String dialogId, QBFile file, String location) {
+        if (!dialogId.equals(dialog.getDialogId())) {
             return;
         }
-
         try {
-            privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getId());
+            if (file != null) {
+                privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getId());
+            } else if (!TextUtils.isEmpty(location)) {
+                privateChatHelper.sendPrivateMessageWithAttachLocation(location, opponentUser.getId());
+            }
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
@@ -148,9 +158,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
+        messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, dialog);
+        messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesRecyclerView.addItemDecoration(
-                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+                new StickyRecyclerHeadersDecoration(messagesAdapter));
         findLastFriendsRequest(true);
 
         messagesRecyclerView.setAdapter(messagesAdapter);
@@ -162,7 +173,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         initActualExtras();
         checkForCorrectChat();
 
-        final int oldMessagesCount = messagesAdapter.getAllItems().size();
+        final int oldMessagesCount = messagesAdapter.getItemCount();
 
         (new BaseAsyncTask<Void, Void, Boolean>() {
             @Override
@@ -173,7 +184,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
             @Override
             public void onResult(Boolean aBoolean) {
-                messagesAdapter.setList(combinationMessagesList);
+                messagesAdapter.addList(combinationMessagesList);
                 findLastFriendsRequest(true);
 
                 checkForScrolling(oldMessagesCount);
@@ -263,7 +274,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void findLastFriendsRequest(boolean needNotifyAdapter) {
-        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        ((PrivateChatMessageAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         if (needNotifyAdapter) {
             messagesAdapter.notifyDataSetChanged();
         }
@@ -375,7 +386,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            ((PrivateChatMessageAdapter) messagesAdapter).clearLastRequestMessagePosition();
             messagesAdapter.notifyItemChanged(operationItemPosition);
             startLoadDialogMessages(false);
             hideProgress();
@@ -386,7 +397,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            ((PrivateChatMessageAdapter) messagesAdapter).clearLastRequestMessagePosition();
             messagesAdapter.notifyItemChanged(operationItemPosition);
             startLoadDialogMessages(false);
             hideProgress();

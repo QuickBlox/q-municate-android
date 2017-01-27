@@ -128,7 +128,8 @@ public class Attachment implements Serializable {
         VIDEO(1),
         PICTURE(2),
         DOC(3),
-        OTHER(4);
+        LOCATION(4),
+        OTHER(5);
 
         private int code;
 

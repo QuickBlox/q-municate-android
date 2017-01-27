@@ -7,11 +7,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.util.Pair;
 
 import com.quickblox.q_municate.tasks.GetFilepathFromUriTask;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
+
 
 public class ImagePickHelperFragment extends Fragment {
 
@@ -61,15 +65,26 @@ public class ImagePickHelperFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (isResultFromImagePick(requestCode, resultCode, data)) {
-            if (requestCode == ImageUtils.CAMERA_REQUEST_CODE && (data == null || data.getData() == null)) {
-                // Hacky way to get EXTRA_OUTPUT param to work.
-                // When setting EXTRA_OUTPUT param in the camera intent there is a chance that data will return as null
-                // So we just pass temporary camera file as a data, because RESULT_OK means that photo was written in the file.
-                data = new Intent();
-                data.setData(Uri.fromFile(ImageUtils.getLastUsedCameraFile()));
+            if (requestCode == ImageUtils.IMAGE_LOCATION_REQUEST_CODE) {
+                if (data != null) {
+                    Bundle bundle = data.getExtras();
+                    double latitude = bundle.getDouble(ConstsCore.EXTRA_LOCATION_LATITUDE);
+                    double longitude = bundle.getDouble(ConstsCore.EXTRA_LOCATION_LONGITUDE);
+                    String location = LocationUtils.generateLocationJson(new Pair<>(ConstsCore.LATITUDE_PARAM, latitude),
+                            new Pair<>(ConstsCore.LONGITUDE_PARAM, longitude));
+                    listener.onImagePicked(requestCode, null, location);
+                }
+            } else {
+                if (requestCode == ImageUtils.CAMERA_REQUEST_CODE && (data == null || data.getData() == null)) {
+                    // Hacky way to get EXTRA_OUTPUT param to work.
+                    // When setting EXTRA_OUTPUT param in the camera intent there is a chance that data will return as null
+                    // So we just pass temporary camera file as a data, because RESULT_OK means that photo was written in the file.
+                    data = new Intent();
+                    data.setData(Uri.fromFile(ImageUtils.getLastUsedCameraFile()));
+                }
+                new GetFilepathFromUriTask(getChildFragmentManager(), listener,
+                        getArguments().getInt(ARG_REQUEST_CODE)).execute(data);
             }
-            new GetFilepathFromUriTask(getChildFragmentManager(), listener,
-                    getArguments().getInt(ARG_REQUEST_CODE)).execute(data);
         } else {
             stop(getChildFragmentManager());
             if (listener != null) {
@@ -110,6 +125,7 @@ public class ImagePickHelperFragment extends Fragment {
     }
 
     private boolean isResultFromImagePick(int requestCode, int resultCode, Intent data) {
-        return resultCode == Activity.RESULT_OK && ((requestCode == ImageUtils.CAMERA_REQUEST_CODE) || (requestCode == ImageUtils.GALLERY_REQUEST_CODE && data != null));
+        return resultCode == Activity.RESULT_OK && ((requestCode == ImageUtils.CAMERA_REQUEST_CODE) || (requestCode == ImageUtils.GALLERY_REQUEST_CODE && data != null)
+                || (requestCode == ImageUtils.IMAGE_LOCATION_REQUEST_CODE && data != null));
     }
 }
