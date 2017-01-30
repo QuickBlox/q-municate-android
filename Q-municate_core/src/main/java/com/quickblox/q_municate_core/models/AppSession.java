@@ -58,8 +58,9 @@ public class AppSession implements Serializable {
         qbUser.setTwitterDigitsId(CoreSharedHelper.getInstance().getTwitterDigitsId());
         qbUser.setCustomData(CoreSharedHelper.getInstance().getUserCustomData());
 
+        activeSession = new AppSession(qbUser);
 
-        return new AppSession(qbUser);
+        return activeSession;
     }
 
     public static boolean isSessionExistOrNotExpired(long expirationTime) {
