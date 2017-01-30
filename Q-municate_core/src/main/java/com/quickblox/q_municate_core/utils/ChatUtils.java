@@ -163,7 +163,7 @@ public class ChatUtils {
     public static QMUser getOpponentFromPrivateDialog(QMUser currentUser, List<DialogOccupant> occupantsList) {
         for (DialogOccupant dialogOccupant : occupantsList) {
             if (dialogOccupant != null && dialogOccupant.getUser() != null
-                    && currentUser.getId() != dialogOccupant.getUser().getId()) {
+                    && currentUser.getId().intValue() != dialogOccupant.getUser().getId().intValue()) {
                 return dialogOccupant.getUser();
             }
         }
