@@ -122,7 +122,7 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
     }
 
     public boolean isIncoming(int currentUserId) {
-        return dialogOccupant != null && dialogOccupant.getUser() != null && currentUserId != dialogOccupant.getUser().getId();
+        return dialogOccupant != null && dialogOccupant.getUser() != null && currentUserId != dialogOccupant.getUser().getId().intValue();
     }
 
     @Override

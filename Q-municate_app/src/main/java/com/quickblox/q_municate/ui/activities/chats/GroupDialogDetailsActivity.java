@@ -480,7 +480,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
     private void startFriendProfile(QMUser selectedFriend) {
         QBUser currentUser = AppSession.getSession().getUser();
-        if (currentUser.getId() == selectedFriend.getId()) {
+        if (currentUser.getId().intValue() == selectedFriend.getId().intValue()) {
             MyProfileActivity.start(GroupDialogDetailsActivity.this);
         } else {
             UserProfileActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getId());

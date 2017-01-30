@@ -118,7 +118,7 @@ public class FriendsAdapter extends BaseFilterAdapter<QMUser, BaseClickListenerV
 
     private boolean isMe(QMUser inputUser) {
         QBUser currentUser = AppSession.getSession().getUser();
-        return currentUser.getId() == inputUser.getId();
+        return currentUser.getId().intValue() == inputUser.getId().intValue();
     }
 
     protected static class ViewHolder extends BaseViewHolder<QMUser> {

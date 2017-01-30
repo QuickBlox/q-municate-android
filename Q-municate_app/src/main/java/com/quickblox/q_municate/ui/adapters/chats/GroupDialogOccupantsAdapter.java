@@ -115,7 +115,7 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<QMUser> {
 
     private boolean isMe(QMUser inputUser) {
         QBUser currentUser = AppSession.getSession().getUser();
-        return currentUser.getId() == inputUser.getId();
+        return currentUser.getId().intValue() == inputUser.getId().intValue();
     }
 
     private static class ViewHolder {

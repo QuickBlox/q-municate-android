@@ -83,7 +83,7 @@ public class FinderUnknownUsers {
         List<Integer> occupantsList = dialog.getOccupants();
         for (int occupantId : occupantsList) {
             boolean isUserInBase = QMUserService.getInstance().getUserCache().exists((long)occupantId);
-            if (!isUserInBase && currentUser.getId() != occupantId) {
+            if (!isUserInBase && currentUser.getId().intValue() != occupantId) {
                 loadIdsSet.add(occupantId);
             }
         }
