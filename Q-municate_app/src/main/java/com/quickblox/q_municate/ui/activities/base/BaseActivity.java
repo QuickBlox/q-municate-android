@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
@@ -39,7 +38,6 @@ import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
-import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
 import com.quickblox.q_municate.utils.bridges.ConnectionBridge;
@@ -61,13 +59,11 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
@@ -78,7 +74,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
@@ -91,8 +86,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected FailAction failAction;
     protected SuccessAction successAction;
     protected QBFriendListHelper friendListHelper;
-    protected QBPrivateChatHelper privateChatHelper;
-    protected QBGroupChatHelper groupChatHelper;
+    protected QBChatHelper chatHelper;
     protected QBService service;
     protected LocalBroadcastManager localBroadcastManager;
     protected String title;
@@ -406,12 +400,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
         }
 
-        if (privateChatHelper == null) {
-            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
-        }
-
-        if (groupChatHelper == null) {
-            groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+        if (chatHelper == null){
+            chatHelper = (QBChatHelper) service.getHelper(QBService.CHAT_HELPER);
         }
 
         notifyConnectedToService();
@@ -619,12 +609,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return friendListHelper;
     }
 
-    public QBPrivateChatHelper getPrivateChatHelper() {
-        return privateChatHelper;
-    }
-
-    public QBGroupChatHelper getGroupChatHelper() {
-        return groupChatHelper;
+    public QBChatHelper getChatHelper(){
+        return chatHelper;
     }
 
     public FailAction getFailAction() {

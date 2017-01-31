@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
@@ -16,12 +16,12 @@ import java.util.ArrayList;
 
 public class QBCreateGroupDialogCommand extends ServiceCommand {
 
-    private QBGroupChatHelper multiChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBCreateGroupDialogCommand(Context context, QBGroupChatHelper multiChatHelper,
+    public QBCreateGroupDialogCommand(Context context, QBChatHelper chatHelper,
             String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.multiChatHelper = multiChatHelper;
+        this.chatHelper = chatHelper;
     }
 
     public static void start(Context context, String roomName, ArrayList<User> friendList, String photoUrl) {
@@ -38,7 +38,7 @@ public class QBCreateGroupDialogCommand extends ServiceCommand {
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
         String photoUrl = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_PHOTO_URL);
 
-        QBChatDialog dialog = multiChatHelper.createGroupChat(roomName, UserFriendUtils.getFriendIdsFromUsersList(friendList), photoUrl);
+        QBChatDialog dialog = chatHelper.createGroupChat(roomName, UserFriendUtils.getFriendIdsFromUsersList(friendList), photoUrl);
         extras.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
         return extras;
     }

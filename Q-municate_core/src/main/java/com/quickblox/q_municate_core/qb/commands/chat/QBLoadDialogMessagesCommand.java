@@ -9,7 +9,7 @@ import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -18,12 +18,12 @@ import java.util.List;
 
 public class QBLoadDialogMessagesCommand extends ServiceCommand {
 
-    private QBBaseChatHelper baseChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBLoadDialogMessagesCommand(Context context, QBBaseChatHelper baseChatHelper, String successAction,
-            String failAction) {
+    public QBLoadDialogMessagesCommand(Context context, QBChatHelper chatHelper, String successAction,
+                                       String failAction) {
         super(context, successAction, failAction);
-        this.baseChatHelper = baseChatHelper;
+        this.chatHelper = chatHelper;
     }
 
     public static void start(Context context, QBChatDialog dialog, long lastDateLoad, boolean loadMore) {
@@ -57,7 +57,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
             }
         }
 
-        List<QBChatMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,
+        List<QBChatMessage> dialogMessagesList = chatHelper.getDialogMessages(customObjectRequestBuilder,
                 returnedBundle, dialog, lastDateLoad);
 
         Bundle bundleResult = new Bundle();

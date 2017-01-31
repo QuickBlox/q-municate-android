@@ -8,21 +8,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.content.model.QBFile;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
@@ -105,19 +101,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-//    @Override
-//    protected void onFileLoaded(QBFile file, String dialogId) {
-//        if(!dialogId.equals(dialog.getDialogId())){
-//            return;
-//        }
-//
-//        try {
-//            ((QBGroupChatHelper) chatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
-//        } catch (QBResponseException e) {
-//            ErrorUtils.showError(this, e);
-//        }
-//    }
-
     @Override
     protected Bundle generateBundleToInitDialog() {
         return null;
@@ -160,7 +143,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     private void initFields() {
-        chatHelperIdentifier = QBService.GROUP_CHAT_HELPER;
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
         if (dialog != null)

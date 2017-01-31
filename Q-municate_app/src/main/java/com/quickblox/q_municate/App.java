@@ -61,13 +61,17 @@ public class App extends MultiDexApplication {
     }
 
     private void initQb() {
-        QBChatService.setDebugEnabled(StringObfuscator.getDebugEnabled());
-
         QBSettings.getInstance().init(getApplicationContext(),
                 StringObfuscator.getApplicationId(),
                 StringObfuscator.getAuthKey(),
                 StringObfuscator.getAuthSecret());
         QBSettings.getInstance().setAccountKey(StringObfuscator.getAccountKey());
+
+        QBChatService.ConfigurationBuilder configurationBuilder = new QBChatService.ConfigurationBuilder();
+        configurationBuilder.setAutojoinEnabled(true);
+
+        QBChatService.setConfigurationBuilder(configurationBuilder);
+        QBChatService.setDebugEnabled(StringObfuscator.getDebugEnabled());
     }
 
     private void initDb() {

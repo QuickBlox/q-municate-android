@@ -10,8 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.quickblox.content.model.QBFile;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
@@ -31,7 +29,6 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
@@ -123,19 +120,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         setOnlineStatus(opponentUser);
     }
 
-//    @Override
-//    protected void onFileLoaded(QBFile file, String dialogId) {
-//        if(!dialogId.equals(dialog.getDialogId())){
-//            return;
-//        }
-//
-//        try {
-//            privateChatHelper.sendMessageWithAttachImage(file, opponentUser.getUserId());
-//        } catch (QBResponseException exc) {
-//            ErrorUtils.showError(this, exc);
-//        }
-//    }
-
     @Override
     protected Bundle generateBundleToInitDialog() {
         Bundle bundle = new Bundle();
@@ -224,7 +208,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void initFields() {
-        chatHelperIdentifier = QBService.PRIVATE_CHAT_HELPER;
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
         initActualExtras();

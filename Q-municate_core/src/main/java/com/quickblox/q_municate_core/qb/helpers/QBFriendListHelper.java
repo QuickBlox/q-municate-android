@@ -49,7 +49,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
     private QBRestHelper restHelper;
     private QBRoster roster;
-    private QBPrivateChatHelper privateChatHelper;
+    private QBChatHelper chatHelper;
     private DataManager dataManager;
     private Timer userLoadingTimer;
     private List<Integer> userLoadingIdsList;
@@ -58,8 +58,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         super(context);
     }
 
-    public void init(QBPrivateChatHelper privateChatHelper) {
-        this.privateChatHelper = privateChatHelper;
+    public void init(QBChatHelper chatHelper) {
+        this.chatHelper = chatHelper;
         restHelper = new QBRestHelper(context);
         dataManager = DataManager.getInstance();
         roster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual,
@@ -119,9 +119,9 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private synchronized void sendNotificationToFriend(QBChatMessage qbChatMessage, int userId) throws QBResponseException {
-        QBChatDialog qbDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
+        QBChatDialog qbDialog = chatHelper.createPrivateDialogIfNotExist(userId);
         if (qbDialog != null) {
-            privateChatHelper.sendChatMessage(qbChatMessage, userId, qbDialog.getDialogId());
+            chatHelper.sendChatMessage(qbChatMessage, qbDialog);
         }
     }
 

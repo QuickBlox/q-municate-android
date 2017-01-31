@@ -6,17 +6,17 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.models.User;
 
 public class QBCreatePrivateChatCommand extends ServiceCommand {
 
-    private QBPrivateChatHelper chatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBCreatePrivateChatCommand(Context context, QBPrivateChatHelper chatHelper, String successAction,
-            String failAction) {
+    public QBCreatePrivateChatCommand(Context context, QBChatHelper chatHelper, String successAction,
+                                      String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = chatHelper;
     }
