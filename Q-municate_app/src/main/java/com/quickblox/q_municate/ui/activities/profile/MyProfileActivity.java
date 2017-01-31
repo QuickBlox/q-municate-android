@@ -249,7 +249,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     }
 
     private void saveChanges() {
-        if (new ValidationUtils(this).isFullNameValid(fullNameTextInputLayout, oldFullName, currentFullName)) {
+        if (new ValidationUtils(this).isFullNameValid(fullNameTextInputLayout, oldFullName.trim(), currentFullName.trim())) {
             showProgress();
 
             if (isNeedUpdateImage && imageUri != null) {
