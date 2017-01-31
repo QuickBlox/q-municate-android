@@ -6,6 +6,7 @@ import android.util.Log;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.authorization.BaseAuthActivity;
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
@@ -14,6 +15,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.cache.QMUserCache;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -66,6 +68,8 @@ public class ServiceManager {
             @Override
             public void onError(Throwable e) {
                 Log.d(TAG, "onError" + e.getMessage());
+                authActivity.hideProgress();
+                parseExceptionMessage(e.getMessage());
             }
 
             @Override
@@ -145,6 +149,23 @@ public class ServiceManager {
             return userCustomData;
         } else {
             return new UserCustomData();
+        }
+    }
+
+    private void parseExceptionMessage(String errorMessage) {
+        if (errorMessage != null) {
+            if (errorMessage.equals(authActivity.getString(R.string.error_bad_timestamp))) {
+                errorMessage = authActivity.getString(R.string.error_bad_timestamp_from_app);
+            } else if (errorMessage.equals(authActivity.getString(R.string.error_login_or_email_required))) {
+                errorMessage = authActivity.getString(R.string.error_login_or_email_required_from_app);
+            } else if (errorMessage.equals(authActivity.getString(R.string.error_email_already_taken))
+                    && AppSession.getSession().getLoginType().equals(LoginType.FACEBOOK)) {
+                errorMessage = authActivity.getString(R.string.error_email_already_taken_from_app);
+            } else if (errorMessage.equals(authActivity.getString(R.string.error_unauthorized))) {
+                errorMessage = authActivity.getString(R.string.error_unauthorized_from_app);
+            }
+
+            ErrorUtils.showError(authActivity, errorMessage);
         }
     }
 
