@@ -274,7 +274,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateDialog() {
-        QBChatDialog  qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
+        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(dialogId));
         occupantsList = getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
         qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
@@ -532,7 +532,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
 
     public List<QMUser> getUsersForGroupChat(String dialogId, List<Integer> idsList) {
-        List<QMUser> usersList  = Collections.emptyList();
+        List<QMUser> usersList  = new ArrayList<>();
 
         List<QMUser> qmUsers =QMUserService.getInstance().getUserCache().getUsersByIDs(idsList);
 
