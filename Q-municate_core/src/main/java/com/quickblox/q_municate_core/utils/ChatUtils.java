@@ -13,7 +13,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.models.NotificationType;
-import com.quickblox.q_municate_core.models.ParcelableQBChatDialog;
+import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -146,19 +146,19 @@ public class ChatUtils {
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
     }
 
-    public static List<ParcelableQBChatDialog> qbDialogsToParcelableQBDialogs(List<QBChatDialog> dialogList){
-        List<ParcelableQBChatDialog> parcelableDialogList = new ArrayList<>(dialogList.size());
+    public static List<ParcelableQBDialog> qbDialogsToParcelableQBDialogs(List<QBChatDialog> dialogList){
+        List<ParcelableQBDialog> parcelableDialogList = new ArrayList<ParcelableQBDialog>(dialogList.size());
         for (QBChatDialog dialog : dialogList) {
-            ParcelableQBChatDialog parcelableQBDialog = new ParcelableQBChatDialog(dialog);
+            ParcelableQBDialog parcelableQBDialog = new ParcelableQBDialog(dialog);
             parcelableDialogList.add(parcelableQBDialog);
         }
         return parcelableDialogList;
     }
 
 
-    public static List<QBChatDialog> parcelableQBDialogsToQBDialogs(List<ParcelableQBChatDialog> parcelableQBDialogsList){
+    public static List<QBChatDialog> parcelableQBDialogsToQBDialogs(List<ParcelableQBDialog> parcelableQBDialogsList){
         List<QBChatDialog> qbDialogsList = new ArrayList<QBChatDialog>(parcelableQBDialogsList.size());
-        for (ParcelableQBChatDialog parcelableQBDialog : parcelableQBDialogsList) {
+        for (ParcelableQBDialog parcelableQBDialog : parcelableQBDialogsList) {
             QBChatDialog qbDialog = parcelableQBDialog.getDialog();
             qbDialogsList.add(qbDialog);
         }

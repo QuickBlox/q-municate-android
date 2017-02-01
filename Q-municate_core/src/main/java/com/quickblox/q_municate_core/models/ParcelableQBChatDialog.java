@@ -9,24 +9,24 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
 
 //TODO VF maybe move this logic to Dialog class
-public class ParcelableQBChatDialog implements Parcelable {
+public class ParcelableQBDialog implements Parcelable {
 
-    public static final Parcelable.Creator<ParcelableQBChatDialog> CREATOR = new Parcelable.Creator<ParcelableQBChatDialog>() {
-        public ParcelableQBChatDialog createFromParcel(Parcel in) {
-            return new ParcelableQBChatDialog(in);
+    public static final Parcelable.Creator<ParcelableQBDialog> CREATOR = new Parcelable.Creator<ParcelableQBDialog>() {
+        public ParcelableQBDialog createFromParcel(Parcel in) {
+            return new ParcelableQBDialog(in);
         }
 
-        public ParcelableQBChatDialog[] newArray(int size) {
-            return new ParcelableQBChatDialog[size];
+        public ParcelableQBDialog[] newArray(int size) {
+            return new ParcelableQBDialog[size];
         }
     };
     private QBChatDialog dialog;
 
-    public ParcelableQBChatDialog(QBChatDialog dialog) {
+    public ParcelableQBDialog(QBChatDialog dialog) {
         this.dialog = dialog;
     }
 
-    public ParcelableQBChatDialog(Parcel inputParcel) {
+    public ParcelableQBDialog(Parcel inputParcel) {
         dialog = new QBChatDialog(inputParcel.readString());
         dialog.setName(inputParcel.readString());
         dialog.setType(QBDialogType.parseByCode(inputParcel.readInt()));

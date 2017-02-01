@@ -10,7 +10,7 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.ParcelableQBChatDialog;
+import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -60,7 +60,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        final ArrayList<ParcelableQBChatDialog> parcelableQBDialog = new ArrayList<>();
+        final ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
 
         final Bundle returnedBundle = new Bundle();
         final QBRequestGetBuilder qbRequestGetBuilder = new QBRequestGetBuilder();

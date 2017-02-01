@@ -197,8 +197,7 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public void resetPassword(String email) throws QBResponseException {
-        QBAuth.createSession();
-        QBUsers.resetPassword(email);
+        QBUsers.resetPassword(email).perform();
     }
 
     public QBUser changePasswordUser(QBUser inputUser) throws QBResponseException {
