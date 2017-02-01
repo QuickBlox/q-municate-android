@@ -236,7 +236,9 @@
     <string name="dlg_done">Done</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
-    <string name="dlg_need_permission_write_storage">%s needs access to your External Storage so that you can send and save files</string>
+    <string name="dlg_need_permission">%1$s needs access to your %2$s so that you can finish this action</string>
+    <string name="dlg_permission_storage">External Storage</string>
+    <string name="dlg_permission_camera">Camera</string>
     <string name="dlg_need_permission_read_contacts">To invite friends via email %s needs to have an access to Contacts</string>
     <string name="dlg_password_changed">Password changed</string>
     <string name="dlg_success_request_facebook">Request sent</string>
