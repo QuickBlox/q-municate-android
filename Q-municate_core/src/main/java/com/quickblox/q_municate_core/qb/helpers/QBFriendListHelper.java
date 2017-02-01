@@ -15,6 +15,7 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.NotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -23,9 +24,11 @@ import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
@@ -35,6 +38,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializable {
 
@@ -54,12 +61,19 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     private Timer userLoadingTimer;
     private List<Integer> userLoadingIdsList;
 
+    //ThreadPoolExecutor
+    private static final int THREAD_POOL_SIZE = 3;
+    private static final int KEEP_ALIVE_TIME = 1;
+    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
+    private ThreadPoolExecutor threadPoolExecutor;
+
     public QBFriendListHelper(Context context) {
         super(context);
     }
 
     public void init(QBChatHelper chatHelper) {
         this.chatHelper = chatHelper;
+        initThreads();
         restHelper = new QBRestHelper(context);
         dataManager = DataManager.getInstance();
         roster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual,
@@ -67,6 +81,12 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
         userLoadingTimer = new Timer();
+    }
+
+    private void initThreads() {
+        BlockingQueue<Runnable> threadQueue = new LinkedBlockingQueue<>();
+        threadPoolExecutor = new ThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, threadQueue);
+        threadPoolExecutor.allowCoreThreadTimeOut(true);
     }
 
     public void inviteFriend(int userId) throws Exception {
@@ -189,8 +209,13 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
-        List<User> usersList = (List<User>) restHelper.loadUsers(friendIdsList);
-
+        List<QMUser> qmUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, new QBPagedRequestBuilder());
+        List<QMUser> usersList = new ArrayList<QMUser>(qmUsers.size());
+        QMUser user = null;
+        for (QBUser qbUser : qmUsers){
+            user = QMUser.convert(qbUser);
+            usersList.add(user);
+        }
         saveUsersAndFriends(usersList);
     }
 
@@ -203,7 +228,7 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     private void updateFriend(int userId) throws QBResponseException {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
-        User newUser = loadAndSaveUser(userId);
+        QMUser newUser = loadAndSaveUser(userId);
 
         if (newUser == null) {
             return;
@@ -218,11 +243,11 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
             createUserRequest(newUser, UserRequest.RequestStatus.OUTGOING);
         } else {
             saveFriend(newUser);
-            deleteUserRequestByUser(newUser.getUserId());
+            deleteUserRequestByUser(newUser.getId());
         }
     }
 
-    private void createUserRequest(User user, UserRequest.RequestStatus requestStatus) {
+    private void createUserRequest(QMUser user, UserRequest.RequestStatus requestStatus) {
         long currentTime = DateUtilsCore.getCurrentTime();
         UserRequest userRequest = new UserRequest(currentTime, null, requestStatus, user);
         dataManager.getUserRequestDataManager().createOrUpdate(userRequest);
@@ -248,18 +273,18 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         dataManager.getUserRequestDataManager().deleteByUserId(userId);
     }
 
-    private void saveUser(User user) {
-        dataManager.getUserDataManager().createOrUpdate(user);
+    private void saveUser(QMUser user) {
+        QMUserService.getInstance().getUserCache().createOrUpdate(user);
     }
 
-    private void saveUsersAndFriends(Collection<User> usersCollection) {
-        for (User user : usersCollection) {
+    private void saveUsersAndFriends(Collection<QMUser> usersCollection) {
+        for (QMUser user : usersCollection) {
             saveUser(user);
             saveFriend(user);
         }
     }
 
-    private void saveFriend(User user) {
+    private void saveFriend(QMUser user) {
         dataManager.getFriendDataManager().createOrUpdate(new Friend(user));
     }
 
@@ -285,8 +310,8 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     @Nullable
-    private User loadAndSaveUser(int userId) {
-        User user = QBRestHelper.loadUser(userId);
+    private QMUser loadAndSaveUser(int userId) {
+        QMUser user = QBRestHelper.loadUser(userId);
 
         if (user == null) {
             return null;
@@ -334,8 +359,8 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
 
     private void loadAndSaveUsers(Collection<Integer> userList, UserRequest.RequestStatus status) throws QBResponseException {
         if (!userList.isEmpty()) {
-            List<User> loadedUserList = (List<User>) restHelper.loadUsers(userList);
-            for (User user : loadedUserList) {
+            List<QMUser> loadedUserList = (List<QMUser>) restHelper.loadUsers(userList);
+            for (QMUser user : loadedUserList) {
                 saveUser(user);
                 createUserRequest(user, status);
             }
@@ -391,11 +416,11 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
 
         @Override
         public void presenceChanged(QBPresence presence) {
-            User user = dataManager.getUserDataManager().get(presence.getUserId());
+            QMUser user =  QMUserService.getInstance().getUserCache().get((long)presence.getUserId());
             if (user == null) {
                 ErrorUtils.logError(TAG, PRESENCE_CHANGE_ERROR + presence.getUserId());
             } else {
-                notifyUserStatusChanged(user.getUserId());
+                notifyUserStatusChanged(user.getId());
             }
         }
     }

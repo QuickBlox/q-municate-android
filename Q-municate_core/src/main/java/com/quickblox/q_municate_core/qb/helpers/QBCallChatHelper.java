@@ -12,8 +12,8 @@ import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
 import com.quickblox.videochat.webrtc.QBRTCConfig;
@@ -71,19 +71,19 @@ public class QBCallChatHelper extends BaseHelper {
     }
 
     public void initCurrentSession(QBRTCSession qbRtcSession, QBRTCSignalingCallback qbRtcSignalingCallback,
-            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+                                   QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         this.currentQbRtcSession = qbRtcSession;
         initCurrentSession(qbRtcSignalingCallback, qbRtcSessionConnectionCallbacks);
     }
 
     public void initCurrentSession(QBRTCSignalingCallback qbRtcSignalingCallback,
-            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+                                   QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         this.currentQbRtcSession.addSignalingCallback(qbRtcSignalingCallback);
         this.currentQbRtcSession.addSessionCallbacksListener(qbRtcSessionConnectionCallbacks);
     }
 
     public void releaseCurrentSession(QBRTCSignalingCallback qbRtcSignalingCallback,
-            QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
+                                      QBRTCSessionConnectionCallbacks qbRtcSessionConnectionCallbacks) {
         if (currentQbRtcSession != null) {
             currentQbRtcSession.removeSignalingCallback(qbRtcSignalingCallback);
             currentQbRtcSession.removeSessionCallbacksListener(qbRtcSessionConnectionCallbacks);
@@ -105,8 +105,7 @@ public class QBCallChatHelper extends BaseHelper {
     }
 
     private void startCallActivity(QBRTCSession qbRtcSession) {
-        User user = DataManager.getInstance().getUserDataManager()
-                .get(qbRtcSession.getSessionDescription().getCallerID());
+        QMUser user = QMUserService.getInstance().getUserCache().get((long)qbRtcSession.getSessionDescription().getCallerID());
 
         if (user != null) {
             Log.d(TAG, "startCallActivity(), user = " + user);
@@ -246,7 +245,7 @@ public class QBCallChatHelper extends BaseHelper {
 
         @Override
         public void onCameraDisconnected() {
-            Log.e(TAG, "Camera disconnected");
+
         }
 
         @Override
@@ -255,8 +254,8 @@ public class QBCallChatHelper extends BaseHelper {
         }
 
         @Override
-        public void onCameraOpening(String s) {
-            Log.e(TAG, "Camera opening = " + s);
+        public void onCameraOpening(String i) {
+            Log.e(TAG, "Camera opening = " + i);
         }
 
         @Override

@@ -21,6 +21,7 @@ import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.users.model.QBUser;
 
 import java.util.concurrent.TimeUnit;
@@ -52,12 +53,6 @@ public class LoginHelper {
     }
 
     public void checkStartExistSession() {
-        if (needToClearAllData()) {
-            if (existingQbSessionListener != null) {
-                existingQbSessionListener.onStartSessionFail();
-            }
-            return;
-        }
 
         if (appSharedHelper.isSavedRememberMe()) {
             startExistSession();
@@ -121,14 +116,12 @@ public class LoginHelper {
 
     public void loginFB() {
         String fbToken = appSharedHelper.getFBToken();
-        AppSession.getSession().closeAndClear();
         QBSocialLoginCommand.start(context, QBProvider.FACEBOOK, fbToken, null);
     }
 
     private void loginTD() {
         String tdServiceProvider = appSharedHelper.getTDServiceProvider();
         String tdCredentials = appSharedHelper.getTDCredentials();
-        AppSession.getSession().closeAndClear();
         QBSocialLoginCommand.start(context, QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials);
     }
 
@@ -138,16 +131,6 @@ public class LoginHelper {
 
     private void loadDialogs() {
         QBLoadDialogsCommand.start(context);
-    }
-
-    private boolean needToClearAllData() {
-        if (DataManager.getInstance().getUserDataManager().getAll().isEmpty()) {
-            App.getInstance().getAppSharedHelper().clearAll();
-            AppSession.getSession().closeAndClear();
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public void makeGeneralLogin(GlobalLoginListener globalLoginListener) {

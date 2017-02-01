@@ -66,7 +66,6 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         } else if (SchemeType.SCHEME_FILE.equalsIgnoreCase(uriScheme)) {
             Log.d("test_rotation", "performInBackground(). 2");
             imageFilePath = uri.getPath();
-            //                ImageUtils.checkForRotation(imageFilePath);
         } else {
             Log.d("test_rotation", "performInBackground(). 3");
             imageFilePath = ImageUtils.saveUriToFile(uri);
@@ -86,7 +85,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         hideProgress();
         Log.w(GetFilepathFromUriTask.class.getSimpleName(), "onResult listener = " + listener);
         if (listener != null) {
-            listener.onImagePicked(requestCode, file);
+            listener.onImagePicked(requestCode, file, null);
         }
     }
 

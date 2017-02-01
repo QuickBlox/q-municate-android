@@ -60,6 +60,12 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends BaseClickListenerVie
         notifyItemRangeChanged(objectsList.size() - collection.size(), collection.size());
     }
 
+    public void addAllInBegin(List <T> collection) {
+        objectsList.addAll(0, collection);
+
+        notifyItemRangeInserted(0, collection.size());
+    }
+
     public void removeItem(int position) {
         objectsList.remove(position);
         notifyItemRemoved(position);

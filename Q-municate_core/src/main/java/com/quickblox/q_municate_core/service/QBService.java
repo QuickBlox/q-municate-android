@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
@@ -595,9 +596,7 @@ public class QBService extends Service {
                     command.execute(intent.getExtras());
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);
-                    if (Utils.isExactError(e, ConstsCore.SESSION_DOES_NOT_EXIST)) {
-                        refreshSession();
-                    } else if (Utils.isTokenDestroyedError(e)) {
+                    if (Utils.isTokenDestroyedError(e)) {
                         forceReLogin();
                     }
                 } catch (Exception e) {
@@ -609,11 +608,6 @@ public class QBService extends Service {
 
     private void forceReLogin() {
         Intent intent = new Intent(QBServiceConsts.FORCE_RELOGIN);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    public void refreshSession() {
-        Intent intent = new Intent(QBServiceConsts.REFRESH_SESSION);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

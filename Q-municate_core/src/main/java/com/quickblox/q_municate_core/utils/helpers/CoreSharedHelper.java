@@ -3,7 +3,9 @@ package com.quickblox.q_municate_core.utils.helpers;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.users.model.QBUser;
 
 import static com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper.Constants.*;
 
@@ -14,10 +16,8 @@ public class CoreSharedHelper {
 
         public static final String NAME = "Q-municate";
 
-        public static final String LOGIN_TYPE = "login_type";
         public static final String IMPORT_INITIALIZED = "import_initialized";
         public static final String FIRST_AUTH = "first_auth";
-        public static final String QB_TOKEN = "qb_token";
         public static final String FB_TOKEN = "fb_token";
         public static final String TD_SERVICE_PROVIDER = "x_auth_service_provider";
         public static final String TD_CREDENTIALS = "x_verify_credentials_authorization";
@@ -29,6 +29,7 @@ public class CoreSharedHelper {
         public static final String USER_FB_ID = "facebook_id";
         public static final String USER_TWITTER_ID = "twitter_id";
         public static final String USER_TD_ID = "twitter_digits_id";
+        public static final String USER_CUSTOM_DATA = "user_custom_data";
 
         public static final String PUSH_NEED_TO_OPEN_DIALOG = "push_need_to_open_dialog";
         public static final String PUSH_DIALOG_ID = "push_dialog_id";
@@ -105,14 +106,6 @@ public class CoreSharedHelper {
         sharedPreferencesEditor.clear();
     }
 
-    public String getLoginType() {
-        return getPref(Constants.LOGIN_TYPE, LoginType.EMAIL.toString());
-    }
-
-    public void saveLoginType(String loginType) {
-        savePref(Constants.LOGIN_TYPE, loginType);
-    }
-
     public boolean isUsersImportInitialized() {
         return getPref(Constants.IMPORT_INITIALIZED, false);
     }
@@ -127,14 +120,6 @@ public class CoreSharedHelper {
 
     public void saveFirstAuth(boolean firstAuth) {
         savePref(Constants.FIRST_AUTH, firstAuth);
-    }
-
-    public String getQBToken() {
-        return getPref(Constants.QB_TOKEN, null);
-    }
-
-    public void saveQBToken(String token) {
-        savePref(Constants.QB_TOKEN, token);
     }
 
     public String getFBToken() {
@@ -210,6 +195,14 @@ public class CoreSharedHelper {
         return getPref(USER_TWITTER_ID);
     }
 
+    public void saveUserCustomData(String customData){
+        savePref(USER_CUSTOM_DATA, customData);
+    }
+
+    public String getUserCustomData(){
+        return getPref(USER_CUSTOM_DATA);
+    }
+
     public void saveTwitterDigitsId(String twitterDigitsId){
         savePref(USER_TD_ID, twitterDigitsId);
     }
@@ -234,6 +227,8 @@ public class CoreSharedHelper {
         saveFBId(null);
         saveTwitterId(null);
         saveTwitterDigitsId(null);
+        saveUserCustomData(null);
+
     }
 
     public boolean needToOpenDialog() {
@@ -258,22 +253,6 @@ public class CoreSharedHelper {
 
     public void savePushUserId(int userId) {
         savePref(Constants.PUSH_USER_ID, userId);
-    }
-
-    public String getPushRegistrationId() {
-        return getPref(Constants.PUSH_REGISTRATION_ID, null);
-    }
-
-    public void savePushRegistrationId(String registrationId) {
-        savePref(Constants.PUSH_REGISTRATION_ID, registrationId);
-    }
-
-    public int getPushAppVersion() {
-        return getPref(Constants.PUSH_APP_VERSION, 0);
-    }
-
-    public void savePushAppVersion(int appVersion) {
-        savePref(Constants.PUSH_APP_VERSION, appVersion);
     }
 
     public boolean getCallHwCodec(boolean defValue) {
@@ -318,9 +297,5 @@ public class CoreSharedHelper {
 
     public String getCallAudioCodec(String defValue) {
         return getPref(Constants.CALL_AUDIO_CODEC, defValue);
-    }
-
-    public void saveCallAudioCodec(String value) {
-        savePref(Constants.CALL_AUDIO_CODEC, value);
     }
 }

@@ -4,7 +4,7 @@ import java.io.File;
 
 public interface OnImagePickedListener {
 
-    void onImagePicked(int requestCode, File file);
+    void onImagePicked(int requestCode, File file, String location);
 
     void onImagePickError(int requestCode, Exception e);
 

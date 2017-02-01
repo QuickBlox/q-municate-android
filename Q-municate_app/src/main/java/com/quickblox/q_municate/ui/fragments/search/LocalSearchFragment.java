@@ -30,7 +30,7 @@ import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.managers.UserRequestDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.Collections;
 import java.util.List;
@@ -170,7 +170,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     private void startPrivateChatActivity(Dialog dialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        User occupant = ChatUtils.getOpponentFromPrivateDialog(
+        QMUser occupant = ChatUtils.getOpponentFromPrivateDialog(
                 UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             PrivateDialogActivity.start(baseActivity, occupant, dialog);
@@ -223,7 +223,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         @Override
         public void update(Observable observable, Object data) {
             if (data != null) {
-                if (data.equals(UserRequestDataManager.OBSERVE_KEY) || data.equals(FriendDataManager.OBSERVE_KEY)) {
+                if (data.equals(dataManager.getUserRequestDataManager().getObserverKey()) || data.equals(dataManager.getFriendDataManager().getObserverKey())) {
                     updateList();
                 }
             }

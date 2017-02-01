@@ -5,9 +5,10 @@ import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.sql.SQLException;
 
@@ -19,12 +20,12 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
         super(userRequestDao, UserRequestDataManager.class.getSimpleName());
     }
 
-    public User getUserRequestById(int userId) {
+    public QMUser getUserRequestById(int userId) {
         UserRequest userRequest = null;
 
         try {
             QueryBuilder<UserRequest, Long> queryBuilder = dao.queryBuilder();
-            queryBuilder.where().eq(User.Column.ID, userId);
+            queryBuilder.where().eq(QMUserColumns.ID, userId);
             PreparedQuery<UserRequest> preparedQuery = queryBuilder.prepare();
             userRequest = dao.queryForFirst(preparedQuery);
         } catch (SQLException e) {
@@ -37,13 +38,13 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
     public void deleteByUserId(int userId) {
         try {
             DeleteBuilder<UserRequest, Long> deleteBuilder = dao.deleteBuilder();
-            deleteBuilder.where().eq(User.Column.ID, userId);
+            deleteBuilder.where().eq(QMUserColumns.ID, userId);
             deleteBuilder.delete();
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
 
-        notifyObservers(OBSERVE_KEY);
+        notifyObservers(getObserverKey());
     }
 
     public boolean existsByUserId(int userId) {

@@ -194,6 +194,8 @@ public class QBServiceConsts {
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";
+    public static final String EXTRA_LAST_DATE_LOAD_MESSAGES = "last_date_load_messages";
+    public static final String EXTRA_IS_LOAD_OLD_MESSAGES = "is_load_new_messages";
     public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";
     public static final String EXTRA_GROUP_NAME = "group_name";
     public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
@@ -210,8 +212,6 @@ public class QBServiceConsts {
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
     public static final String EXTRA_PAGE = "load_elements";
     public static final String EXTRA_USER_STATUS = "user_status";
-    public static final String EXTRA_REGISTRATION_ID = "registration_id";
-    public static final String EXTRA_IS_PUSH_SUBSCRIBED_ON_SERVER = "is_push_subscribed_on_server";
     public static final String EXTRA_OPPONENTS = "opponents";
     public static final String EXTRA_WIFI_DISABLED = "wifi_disabled";
     public static final String EXTRA_CONFERENCE_TYPE = "conference_type";

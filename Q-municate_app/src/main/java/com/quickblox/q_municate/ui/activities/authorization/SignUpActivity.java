@@ -207,7 +207,6 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
 
     private void startSignUp(File imageFile) {
         DataManager.getInstance().clearAllTables();
-        AppSession.getSession().closeAndClear();
         QBSignUpCommand.start(SignUpActivity.this, qbUser, imageFile);
     }
 
@@ -239,7 +238,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     };
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
+    public void onImagePicked(int requestCode, File file, String url) {
         startCropActivity(Uri.fromFile(file));
     }
 

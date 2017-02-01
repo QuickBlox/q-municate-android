@@ -24,6 +24,7 @@ import android.util.TypedValue;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.utils.MimeType;
 import com.quickblox.q_municate.utils.StorageUtil;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -47,6 +48,7 @@ public class ImageUtils {
     public static final int GALLERY_REQUEST_CODE = 111;
     public static final int CAMERA_REQUEST_CODE = 222;
     public static final int IMAGE_REQUEST_CODE = 333;
+    public static final int IMAGE_LOCATION_REQUEST_CODE = 444;
 
     private static final String TAG = ImageUtils.class.getSimpleName();
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
@@ -96,6 +98,16 @@ public class ImageUtils {
         File photoFile = getTemporaryCameraFile();
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
         fragment.startActivityForResult(intent, CAMERA_REQUEST_CODE);
+    }
+
+    public static void startMapForResult(Activity activity){
+        Intent intent = new Intent(activity, MapsActivity.class);
+        activity.startActivityForResult(intent, IMAGE_LOCATION_REQUEST_CODE);
+    }
+
+    public static void startMapForResult(Fragment fragment){
+        Intent intent = new Intent(fragment.getContext(), MapsActivity.class);
+        fragment.startActivityForResult(intent, IMAGE_LOCATION_REQUEST_CODE);
     }
 
     public static File getTemporaryCameraFile() {

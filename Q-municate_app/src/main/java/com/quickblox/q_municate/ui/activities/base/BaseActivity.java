@@ -66,8 +66,9 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -426,7 +427,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL);
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
-        globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
         globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
         IntentFilter networkIntentFilter = new IntentFilter(NetworkChangeReceiver.ACTION_LOCAL_CONNECTIVITY);
         IntentFilter userStatusIntentFilter = new IntentFilter(QBServiceConsts.USER_STATUS_CHANGED_ACTION);
@@ -620,7 +620,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private void checkOpeningDialog() {
         if (appSharedHelper.needToOpenDialog() && isChatInitializedAndUserLoggedIn()) {
             Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
-            User user = DataManager.getInstance().getUserDataManager().get(appSharedHelper.getPushUserId());
+            QMUser user = QMUserService.getInstance().getUserCache().get((long)appSharedHelper.getPushUserId());
 
             if (dialog != null && user != null) {
                 if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
@@ -646,7 +646,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return isAppInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
-    public void startPrivateChatActivity(User user, Dialog dialog) {
+    public void startPrivateChatActivity(QMUser user, Dialog dialog) {
         PrivateDialogActivity.start(this, user, dialog);
     }
 
@@ -793,7 +793,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                     } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
                         //                        onReceiveForceReloginAction(intent.getExtras());
                     } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
-                        onReceiveRefreshSessionAction(intent.getExtras());
+                        //onReceiveRefreshSessionAction(intent.getExtras());
                     }
                 }
             });

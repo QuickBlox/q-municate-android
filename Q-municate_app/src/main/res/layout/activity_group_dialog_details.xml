@@ -21,7 +21,7 @@
             android:padding="10dp">
 
             <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
-                style="@style/AvatarImageViewStyle"
+                style="@style/AvatarImageViewStyle.Common"
                 android:id="@+id/avatar_imageview"
                 android:onClick="changeAvatarOnClick"
                 android:src="@drawable/placeholder_group"

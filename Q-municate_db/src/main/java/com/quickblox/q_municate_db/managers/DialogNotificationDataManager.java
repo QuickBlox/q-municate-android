@@ -9,8 +9,8 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,6 +36,41 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         try {
             QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao
                     .queryBuilder();
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
+                    .queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
+    }
+
+    public List<DialogNotification> getDialogNotificationsByDialogIdAndDate(String dialogId, long createdDate, boolean moreDate) {
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>();
+
+        try {
+            QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao
+                    .queryBuilder();
+
+            if (moreDate){
+                messageQueryBuilder.where().gt(DialogNotification.Column.CREATED_DATE, createdDate);
+            } else {
+                messageQueryBuilder.where().lt(DialogNotification.Column.CREATED_DATE, createdDate);
+            }
+
+            Where<DialogNotification, Long> where = messageQueryBuilder.where();
+            where.and(where.ne(DialogNotification.Column.STATE, State.TEMP_LOCAL),
+                    where.ne(DialogNotification.Column.STATE, State.TEMP_LOCAL_UNREAD));
 
             QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
                     .queryBuilder();
@@ -100,7 +135,7 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
             queryBuilder.setCountOf(true);
 
             QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
-            dialogOccupantQueryBuilder.where().ne(User.Column.ID, currentUserId);
+            dialogOccupantQueryBuilder.where().ne(QMUserColumns.ID, currentUserId);
 
             queryBuilder.join(dialogOccupantQueryBuilder);
 

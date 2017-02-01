@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_core.models;
 
+import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -10,7 +12,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 // Combination DialogNotification and Message (for chats)
-public class CombinationMessage implements Serializable {
+public class CombinationMessage extends QBChatMessage implements Serializable {
 
     private String messageId;
     private DialogOccupant dialogOccupant;
@@ -18,6 +20,7 @@ public class CombinationMessage implements Serializable {
     private State state;
     private String body;
     private long createdDate;
+    private QBAttachment qbAttachment;
     private DialogNotification.Type notificationType;
 
     public CombinationMessage(DialogNotification dialogNotification) {
@@ -36,6 +39,8 @@ public class CombinationMessage implements Serializable {
         this.state = message.getState();
         this.body = message.getBody();
         this.createdDate = message.getCreatedDate();
+        this.setDateSent(createdDate);
+        addQBAttachment(attachment);
     }
 
     public Message toMessage() {
@@ -117,7 +122,7 @@ public class CombinationMessage implements Serializable {
     }
 
     public boolean isIncoming(int currentUserId) {
-        return dialogOccupant != null && dialogOccupant.getUser() != null && currentUserId != dialogOccupant.getUser().getUserId();
+        return dialogOccupant != null && dialogOccupant.getUser() != null && currentUserId != dialogOccupant.getUser().getId().intValue();
     }
 
     @Override
@@ -140,6 +145,25 @@ public class CombinationMessage implements Serializable {
         } else {
             return false;
         }
+    }
+
+    private void addQBAttachment(Attachment attachment) {
+        String attachType;
+        if(attachment == null ){
+            return;
+        }
+        if(attachment.getType() == null){
+            attachType = QBAttachment.PHOTO_TYPE;
+        } else {
+            attachType = attachment.getType().name();
+        }
+        qbAttachment = new QBAttachment(attachType);
+        qbAttachment.setId(attachment.getAttachmentId());
+        qbAttachment.setUrl(attachment.getRemoteUrl());
+        qbAttachment.setName(attachment.getName());
+        qbAttachment.setSize(attachment.getSize());
+        qbAttachment.setData(attachment.getAdditionalInfo());
+        this.addAttachment(qbAttachment);
     }
 
     public static class DateComparator implements Comparator<CombinationMessage> {

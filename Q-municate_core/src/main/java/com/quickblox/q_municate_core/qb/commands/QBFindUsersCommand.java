@@ -10,7 +10,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -42,8 +42,7 @@ public class QBFindUsersCommand extends ServiceCommand {
 
         Bundle requestParams = new Bundle();
         Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams).perform();
-        Collection<User> userCollection = UserFriendUtils.createUsersList(userList);
-//        userCollection.remove(UserFriendUtils.createLocalUser(currentUser));
+        Collection<QMUser> userCollection = UserFriendUtils.createUsersList(userList);
 
         Bundle params = new Bundle();
         params.putString(QBServiceConsts.EXTRA_CONSTRAINT, constraint);

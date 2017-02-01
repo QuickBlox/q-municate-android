@@ -9,7 +9,7 @@ import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 public class QBCreatePrivateChatCommand extends ServiceCommand {
 
@@ -21,10 +21,10 @@ public class QBCreatePrivateChatCommand extends ServiceCommand {
         this.chatHelper = chatHelper;
     }
 
-    public static void start(Context context, User friend) {
+    public static void start(Context context, QMUser friend) {
         Intent intent = new Intent(QBServiceConsts.CREATE_PRIVATE_CHAT_ACTION, null, context,
                 QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend.getUserId());
+        intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend.getId());
         context.startService(intent);
     }
 

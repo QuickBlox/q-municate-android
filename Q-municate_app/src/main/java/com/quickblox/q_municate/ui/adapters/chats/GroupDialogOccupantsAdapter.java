@@ -10,7 +10,7 @@ import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -20,12 +20,12 @@ import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 
 import java.util.List;
 
-public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
+public class GroupDialogOccupantsAdapter extends BaseListAdapter<QMUser> {
 
     private UserOperationListener userOperationListener;
     private QBFriendListHelper qbFriendListHelper;
 
-    public GroupDialogOccupantsAdapter(BaseActivity baseActivity, UserOperationListener userOperationListener, List<User> objectsList) {
+    public GroupDialogOccupantsAdapter(BaseActivity baseActivity, UserOperationListener userOperationListener, List<QMUser> objectsList) {
         super(baseActivity, objectsList);
         this.userOperationListener = userOperationListener;
     }
@@ -33,7 +33,7 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        User user = getItem(position);
+        QMUser user = getItem(position);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_dialog_friend, null);
@@ -53,14 +53,14 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         if (isFriendValid(user)) {
             fullName = user.getFullName();
         } else {
-            fullName = String.valueOf(user.getUserId());
+            fullName = String.valueOf(user.getId());
         }
         viewHolder.nameTextView.setText(fullName);
 
         setStatus(viewHolder, user);
         viewHolder.addFriendImageView.setVisibility(isFriend(user) ? View.GONE : View.VISIBLE);
 
-        initListeners(viewHolder, user.getUserId());
+        initListeners(viewHolder, user.getId());
 
         displayAvatarImage(user.getAvatar(), viewHolder.avatarImageView);
 
@@ -76,8 +76,8 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         });
     }
 
-    private void setStatus(ViewHolder viewHolder, User user) {
-        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getUserId());
+    private void setStatus(ViewHolder viewHolder, QMUser user) {
+        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getId());
 
         if (isMe(user)) {
             online = true;
@@ -88,8 +88,8 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
             viewHolder.onlineStatusTextView.setTextColor(context.getResources().getColor(R.color.green));
         } else {
             viewHolder.onlineStatusTextView.setText(context.getString(R.string.last_seen,
-                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
-                    DateUtils.formatDateSimpleTime(user.getLastLogin())));
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
+                    DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime())));
             viewHolder.onlineStatusTextView.setTextColor(context.getResources().getColor(R.color.dark_gray));
         }
     }
@@ -99,23 +99,23 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         notifyDataSetChanged();
     }
 
-    private boolean isFriendValid(User user) {
+    private boolean isFriendValid(QMUser user) {
         return user.getFullName() != null;
     }
 
-    private boolean isFriend(User user) {
+    private boolean isFriend(QMUser user) {
         if (isMe(user)) {
             return true;
         } else {
-            boolean outgoingUserRequest = DataManager.getInstance().getUserRequestDataManager().existsByUserId(user.getUserId());
-            boolean friend = DataManager.getInstance().getFriendDataManager().getByUserId(user.getUserId()) != null;
+            boolean outgoingUserRequest = DataManager.getInstance().getUserRequestDataManager().existsByUserId(user.getId());
+            boolean friend = DataManager.getInstance().getFriendDataManager().getByUserId(user.getId()) != null;
             return friend || outgoingUserRequest;
         }
     }
 
-    private boolean isMe(User inputUser) {
+    private boolean isMe(QMUser inputUser) {
         QBUser currentUser = AppSession.getSession().getUser();
-        return currentUser.getId() == inputUser.getUserId();
+        return currentUser.getId().intValue() == inputUser.getId().intValue();
     }
 
     private static class ViewHolder {

@@ -2,6 +2,8 @@ package com.quickblox.q_municate_db.models;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.io.Serializable;
 
@@ -21,8 +23,8 @@ public class Social implements Serializable {
             foreign = true,
             foreignAutoRefresh = true,
             canBeNull = false,
-            columnName = User.Column.ID)
-    private User user;
+            columnName = QMUserColumns.ID)
+    private QMUser user;
 
     @DatabaseField(
             columnName = TYPE)
@@ -31,7 +33,7 @@ public class Social implements Serializable {
     public Social() {
     }
 
-    public Social(String socialId, User user, Type type) {
+    public Social(String socialId, QMUser user, Type type) {
         this.socialId = socialId;
         this.user = user;
         this.type = type;
@@ -53,11 +55,11 @@ public class Social implements Serializable {
         this.type = type;
     }
 
-    public User getUser() {
+    public QMUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(QMUser user) {
         this.user = user;
     }
 

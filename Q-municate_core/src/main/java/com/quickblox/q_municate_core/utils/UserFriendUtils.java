@@ -4,8 +4,8 @@ import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
@@ -18,16 +18,16 @@ import java.util.Map;
 
 public class UserFriendUtils {
 
-    public static List<User> getUsersFromFriends(List<Friend> friendList) {
-        List<User> userList = new ArrayList<>(friendList.size());
+    public static List<QMUser> getUsersFromFriends(List<Friend> friendList) {
+        List<QMUser> userList = new ArrayList<>(friendList.size());
         for (Friend friend : friendList) {
             userList.add(friend.getUser());
         }
         return userList;
     }
 
-    public static List<User> getUsersFromUserRequest(List<UserRequest> userRequestList) {
-        List<User> userList = new ArrayList<>(userRequestList.size());
+    public static List<QMUser> getUsersFromUserRequest(List<UserRequest> userRequestList) {
+        List<QMUser> userList = new ArrayList<>(userRequestList.size());
         for (UserRequest userRequest : userRequestList) {
             if (userRequest.getRequestStatus() == UserRequest.RequestStatus.OUTGOING) {
                 userList.add(userRequest.getUser());
@@ -36,19 +36,18 @@ public class UserFriendUtils {
         return userList;
     }
 
-    public static User createLocalUser(QBUser qbUser, User.Role role) {
-        User user = new User();
-        user.setUserId(qbUser.getId());
+    public static QMUser createLocalUser(QBUser qbUser) {
+        QMUser user = new QMUser();
+        user.setId(qbUser.getId());
         user.setFullName(qbUser.getFullName());
         user.setEmail(qbUser.getEmail());
         user.setPhone(qbUser.getPhone());
         user.setLogin(qbUser.getLogin());
 
         if (qbUser.getLastRequestAt() != null) {
-            user.setLastLogin(DateUtilsCore.getTime(qbUser.getLastRequestAt()));
+            user.setLastRequestAt(qbUser.getLastRequestAt());
         }
 
-        user.setRole(role);
 
         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
 
@@ -60,13 +59,10 @@ public class UserFriendUtils {
         return user;
     }
 
-    public static User createLocalUser(QBUser qbUser) {
-        return createLocalUser(qbUser, User.Role.SIMPLE_ROLE);
-    }
 
-    public static QBUser createQbUser(User user) {
+    public static QBUser createQbUser(QMUser user) {
         QBUser qbUser = new QBUser();
-        qbUser.setId(user.getUserId());
+        qbUser.setId(user.getId());
         qbUser.setLogin(user.getLogin());
         qbUser.setFullName(user.getFullName());
         return qbUser;
@@ -84,16 +80,24 @@ public class UserFriendUtils {
         return rosterEntry.getStatus() == null;
     }
 
-    public static List<User> createUsersList(Collection<QBUser> usersList) {
-        List<User> users = new ArrayList<User>();
+    public static List<QMUser> createUsersList(Collection<QBUser> usersList) {
+        List<QMUser> users = new ArrayList<QMUser>();
         for (QBUser user : usersList) {
             users.add(createLocalUser(user));
         }
         return users;
     }
 
-    public static Map<Integer, User> createUserMap(List<QBUser> userList) {
-        Map<Integer, User> userHashMap = new HashMap<Integer, User>();
+    public static List<QMUser> createUsers(Collection<QMUser> usersList) {
+        List<QMUser> users = new ArrayList<QMUser>();
+        for (QBUser user : usersList) {
+            users.add(createLocalUser(user));
+        }
+        return users;
+    }
+
+    public static Map<Integer, QMUser> createUserMap(List<QBUser> userList) {
+        Map<Integer, QMUser> userHashMap = new HashMap<Integer, QMUser>();
         for (QBUser user : userList) {
             userHashMap.put(user.getId(), createLocalUser(user));
         }
@@ -108,18 +112,18 @@ public class UserFriendUtils {
         return friendIdsList;
     }
 
-    public static ArrayList<Integer> getFriendIds(List<User> friendList) {
+    public static ArrayList<Integer> getFriendIds(List<QMUser> friendList) {
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
-        for (User friend : friendList) {
-            friendIdsList.add(friend.getUserId());
+        for (QMUser friend : friendList) {
+            friendIdsList.add(friend.getId());
         }
         return friendIdsList;
     }
 
-    public static ArrayList<Integer> getFriendIdsFromUsersList(List<User> friendList) {
+    public static ArrayList<Integer> getFriendIdsFromUsersList(List<QMUser> friendList) {
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
-        for (User friend : friendList) {
-            friendIdsList.add(friend.getUserId());
+        for (QMUser friend : friendList) {
+            friendIdsList.add(friend.getId());
         }
         return friendIdsList;
     }
@@ -127,7 +131,7 @@ public class UserFriendUtils {
     public static List<Integer> getFriendIdsListFromList(List<Friend> friendsList) {
         List<Integer> friendIdsList = new ArrayList<Integer>();
         for (Friend friend : friendsList) {
-            friendIdsList.add(friend.getUser().getUserId());
+            friendIdsList.add(friend.getUser().getId());
         }
         return friendIdsList;
     }
@@ -161,9 +165,9 @@ public class UserFriendUtils {
         return result;
     }
 
-    public static User createDeletedUser(int userId) {
-        User user = new User();
-        user.setUserId(userId);
+    public static QMUser createDeletedUser(int userId) {
+        QMUser user = new QMUser();
+        user.setId(userId);
         user.setFullName(String.valueOf(userId));
         return user;
     }
