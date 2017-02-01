@@ -87,12 +87,10 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected LoginType loginType = LoginType.EMAIL;
     protected Resources resources;
 
-    protected LoginSuccessAction loginSuccessAction;
-    protected SocialLoginSuccessAction socialLoginSuccessAction;
-    protected FailAction failAction;
     private TwitterDigitsAuthCallback twitterDigitsAuthCallback;
     private QMAuthService authService;
     private QMUserService userService;
+    private ServiceManager serviceManager;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, BaseAuthActivity.class);
@@ -111,17 +109,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
         facebookHelper.onActivityStart();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        addActions();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        removeActions();
-    }
 
     @Override
     public void onStop() {
@@ -161,11 +148,10 @@ public abstract class BaseAuthActivity extends BaseActivity {
         facebookHelper = new FacebookHelper(this);
         twitterDigitsHelper = new TwitterDigitsHelper();
         twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
-        loginSuccessAction = new LoginSuccessAction();
-        socialLoginSuccessAction = new SocialLoginSuccessAction();
         failAction = new FailAction();
         authService = QMAuthService.getInstance();
         userService = QMUserService.getInstance();
+        serviceManager = new ServiceManager(this);
     }
 
     protected void startSocialLogin() {
@@ -209,18 +195,55 @@ public abstract class BaseAuthActivity extends BaseActivity {
         finish();
     }
 
-    protected void parseExceptionMessage(Exception exception) {
-        hideProgress();
+    protected void login(String userEmail, final String userPassword) {
+        appSharedHelper.saveFirstAuth(true);
+        appSharedHelper.saveSavedRememberMe(true);
+        appSharedHelper.saveUsersImportInitialized(true);
+        QBUser user = new QBUser(null, userPassword, userEmail);
 
-        String errorMessage = exception.getMessage();
+        ServiceManager serviceManager = new ServiceManager(this);
+        serviceManager.login(user, new Observer<QBUser>() {
+            @Override
+            public void onCompleted() {
 
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG, "onError" + e.getMessage());
+                hideProgress();
+                parseExceptionMessage(e.getMessage());
+            }
+
+            @Override
+            public void onNext(QBUser qbUser) {
+                performLoginSuccessAction(qbUser);
+            }
+        });
+    }
+
+    protected void startLandingScreen() {
+        LandingActivity.start(this);
+        finish();
+    }
+
+    private void performLoginSuccessAction(QBUser user) {
+        startMainActivity(user);
+
+        // send analytics data
+        GoogleAnalyticsHelper.pushAnalyticsData(this, user, "User Sign In");
+        FlurryAnalyticsHelper.pushAnalyticsData(this);
+    }
+
+
+    private void parseExceptionMessage(String errorMessage) {
         if (errorMessage != null) {
             if (errorMessage.equals(getString(R.string.error_bad_timestamp))) {
                 errorMessage = getString(R.string.error_bad_timestamp_from_app);
             } else if (errorMessage.equals(getString(R.string.error_login_or_email_required))) {
                 errorMessage = getString(R.string.error_login_or_email_required_from_app);
             } else if (errorMessage.equals(getString(R.string.error_email_already_taken))
-                    && loginType.equals(LoginType.FACEBOOK)) {
+                    && AppSession.getSession().getLoginType().equals(LoginType.FACEBOOK)) {
                 errorMessage = getString(R.string.error_email_already_taken_from_app);
             } else if (errorMessage.equals(getString(R.string.error_unauthorized))) {
                 errorMessage = getString(R.string.error_unauthorized_from_app);
@@ -230,154 +253,13 @@ public abstract class BaseAuthActivity extends BaseActivity {
         }
     }
 
-    protected void parseFailException(Bundle bundle) {
-        Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-        int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
-        parseExceptionMessage(exception);
-    }
-
-    protected void login(String userEmail, final String userPassword) {
-        appSharedHelper.saveFirstAuth(true);
-        appSharedHelper.saveSavedRememberMe(true);
-        appSharedHelper.saveUsersImportInitialized(true);
-        QBUser user = new QBUser(null, userPassword, userEmail);
-
-        ServiceManager serviceManager = new ServiceManager(this);
-        serviceManager.login(user);
-
-
-    }
-
-    protected void performLoginSuccessAction(Bundle bundle) {
-    }
-
-    protected void performLoginSuccessAction(QBUser user) {
-        startMainActivity(user);
-
-        // send analytics data
-        GoogleAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
-        FlurryAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this);
-    }
-
-
-    protected boolean isLoggedInToServer() {
-        return AppSession.getSession().isLoggedIn();
-    }
-
-
-    private void addActions() {
-        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, loginSuccessAction);
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
-
-        addAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION, socialLoginSuccessAction);
-        addAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION, failAction);
-
-        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, failAction);
-
-        updateBroadcastActionList();
-    }
-
-    private void removeActions() {
-        removeAction(QBServiceConsts.LOGIN_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOGIN_FAIL_ACTION);
-
-        removeAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION);
-
-        removeAction(QBServiceConsts.SIGNUP_FAIL_ACTION);
-
-        updateBroadcastActionList();
-    }
-
-    protected void startLandingScreen() {
-        LandingActivity.start(this);
-        finish();
-    }
-
-    private boolean hasUserCustomData(QBUser user) {
-        if (TextUtils.isEmpty(user.getCustomData())) {
-            return false;
-        }
-        UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
-        return userCustomData != null;
-    }
-
-    private QBUser updateUser(QBUser inputUser) throws QBResponseException {
-        QBUser user;
-
-        String password = inputUser.getPassword();
-
-        UserCustomData userCustomDataNew = getUserCustomData(inputUser);
-        inputUser.setCustomData(Utils.customDataToString(userCustomDataNew));
-
-        inputUser.setPassword(null);
-        inputUser.setOldPassword(null);
-
-        user = QBUsers.updateUser(inputUser).perform();
-
-        if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
-            user.setPassword(password);
-        } else {
-            user.setPassword(QBAuth.getSession().perform().getToken());
-        }
-
-        return user;
-    }
-
-    private void saveOwnerUser(QBUser qbUser) {
-        QMUser user = QMUser.convert(qbUser);
-        QMUserService.getInstance().getUserCache().createOrUpdate(user);
-    }
-    private UserCustomData getUserCustomData(QBUser user) {
-        if (TextUtils.isEmpty(user.getCustomData())) {
-            return new UserCustomData();
-        }
-
-        UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
-
-        if (userCustomData != null) {
-            return userCustomData;
-        } else {
-            return new UserCustomData();
-        }
-    }
-
-
-    private class LoginSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            performLoginSuccessAction(bundle);
-        }
-    }
-
-    private class SocialLoginSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            QBUpdateUserCommand.start(BaseAuthActivity.this, user, null);
-
-            performLoginSuccessAction(bundle);
-        }
-    }
-
-    private class FailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            parseFailException(bundle);
-        }
-    }
-
     private class FacebookLoginCallback implements FacebookCallback<LoginResult> {
 
         @Override
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
             showProgress();
-            authService.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(),null).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
+            serviceManager.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null, new Observer<QBUser>() {
                 @Override
                 public void onCompleted() {
 
@@ -385,18 +267,16 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
                 @Override
                 public void onError(Throwable e) {
-                    Log.d(TAG, "onError" + e.getMessage());
+                    Log.d(TAG, "onError " + e.getMessage());
+                    hideProgress();
+                    parseExceptionMessage(e.getMessage());
                 }
 
                 @Override
                 public void onNext(QBUser qbUser) {
-                    QBUpdateUserCommand.start(BaseAuthActivity.this, qbUser, null);
                     performLoginSuccessAction(qbUser);
-
                 }
             });
-
-
         }
 
         @Override
@@ -425,26 +305,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
             DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
-            authService.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS)).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
-                @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.d(TAG, "onError" + e.getMessage());
-                }
-
-                @Override
-                public void onNext(QBUser qbUser) {
-                    QBUpdateUserCommand.start(BaseAuthActivity.this, qbUser, null);
-
-                    performLoginSuccessAction(qbUser);
-
-                }
-            });
+            authService.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS));
         }
 
         @Override
