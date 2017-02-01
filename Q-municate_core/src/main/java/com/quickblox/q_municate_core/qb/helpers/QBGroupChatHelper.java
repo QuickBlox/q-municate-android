@@ -247,7 +247,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
         }
         QBGroupChat groupChat = groupChatManager.getGroupChat(dialog.getRoomJid());
-        if (groupChat == null && dialog.getRoomJid() != null) {
+        if (groupChat == null && dialog.getRoomJid() != null && !dialog.getRoomJid().equals("null")) {
             groupChat = groupChatManager.createGroupChat(dialog.getRoomJid());
         }
 
