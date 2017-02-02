@@ -88,8 +88,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected Resources resources;
 
     private TwitterDigitsAuthCallback twitterDigitsAuthCallback;
-    private QMAuthService authService;
-    private QMUserService userService;
     private ServiceManager serviceManager;
 
     public static void start(Context context) {
@@ -149,8 +147,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
         twitterDigitsHelper = new TwitterDigitsHelper();
         twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
         failAction = new FailAction();
-        authService = QMAuthService.getInstance();
-        userService = QMUserService.getInstance();
         serviceManager = new ServiceManager(this);
     }
 
@@ -182,11 +178,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
     protected void startMainActivity(QBUser user) {
         AppSession.getSession().updateUser(user);
-        startMainActivity();
-    }
-
-    protected void startMainActivity(boolean importInitialized) {
-        appSharedHelper.saveUsersImportInitialized(importInitialized);
         startMainActivity();
     }
 
@@ -253,30 +244,32 @@ public abstract class BaseAuthActivity extends BaseActivity {
         }
     }
 
+    private Observer<QBUser> socialLoginObserver = new Observer<QBUser>() {
+        @Override
+        public void onCompleted() {
+
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.d(TAG, "onError " + e.getMessage());
+            hideProgress();
+            parseExceptionMessage(e.getMessage());
+        }
+
+        @Override
+        public void onNext(QBUser qbUser) {
+            performLoginSuccessAction(qbUser);
+        }
+    };
+
     private class FacebookLoginCallback implements FacebookCallback<LoginResult> {
 
         @Override
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
             showProgress();
-            serviceManager.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null, new Observer<QBUser>() {
-                @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.d(TAG, "onError " + e.getMessage());
-                    hideProgress();
-                    parseExceptionMessage(e.getMessage());
-                }
-
-                @Override
-                public void onNext(QBUser qbUser) {
-                    performLoginSuccessAction(qbUser);
-                }
-            });
+            serviceManager.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null, socialLoginObserver);
         }
 
         @Override
@@ -305,7 +298,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
             DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
-            authService.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS));
+            serviceManager.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS), socialLoginObserver);
         }
 
         @Override
@@ -314,4 +307,5 @@ public abstract class BaseAuthActivity extends BaseActivity {
             hideProgress();
         }
     }
+
 }

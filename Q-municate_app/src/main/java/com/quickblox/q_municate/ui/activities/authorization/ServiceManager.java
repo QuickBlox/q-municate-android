@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.activities.authorization;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -17,13 +18,17 @@ import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.cache.QMUserCache;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.twitter.sdk.android.core.identity.AuthHandler;
+import com.twitter.sdk.android.core.internal.TwitterCollection;
 
 import rx.Observable;
 import rx.Observer;
@@ -39,19 +44,19 @@ public class ServiceManager {
 
     public static final String TAG = "ServiceManager";
 
-    private BaseAuthActivity authActivity;
+    private Context context;
 
     private QMAuthService authService;
     private QMUserService userService;
     private QMUserCache userCache;
     private QBAuthHelper authHelper;
 
-    public ServiceManager(BaseAuthActivity authActivity){
-        this.authActivity = authActivity;
+    public ServiceManager(Context context){
+        this.context = context;
         authService = QMAuthService.getInstance();
         userService = QMUserService.getInstance();
         userCache = userService.getUserCache();
-        authHelper = new QBAuthHelper(authActivity);
+        authHelper = new QBAuthHelper(context);
     }
 
     public void login(QBUser user, Observer<QBUser> observer) {
@@ -61,6 +66,7 @@ public class ServiceManager {
         .map(new Func1<QBUser,QMUser>() {
             @Override
             public QMUser call(QBUser qbUser) {
+                CoreSharedHelper.getInstance().saveUsersImportInitialized(true);
                 QMUser result = QMUser.convert(qbUser);
                 userCache.createOrUpdate(result);
 
@@ -87,12 +93,22 @@ public class ServiceManager {
         .subscribe(observer);
     }
 
-    public void  login(String socialProvider, final String accessToken, final String accessTokenSecret, Observer<QBUser> observer) {
+    public void  login(final String socialProvider, final String accessToken, final String accessTokenSecret, Observer<QBUser> observer) {
         authService.login(QBProvider.FACEBOOK, accessToken, accessTokenSecret).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<QBUser, QBUser>() {
                     @Override
                     public QBUser call(QBUser qbUser) {
+                        UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
+                        if (QBProvider.FACEBOOK.equals(socialProvider) && TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
+                            //Actions for first login via Facebook
+                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                            getFBUserWithAvatar(qbUser);
+                        } else if (QBProvider.TWITTER_DIGITS.equals(socialProvider) && TextUtils.isEmpty(qbUser.getFullName())) {
+                            //Actions for first login via Twitter Digits
+                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                            getTDUserWithFullName(qbUser);
+                        }
                         try {
                             authHelper.updateUser(qbUser);
                         } catch (QBResponseException e) {
@@ -152,6 +168,23 @@ public class ServiceManager {
         } else {
             return new UserCustomData();
         }
+    }
+
+    private QBUser getFBUserWithAvatar(QBUser user) {
+        String avatarUrl = context.getString(com.quickblox.q_municate_core.R.string.url_to_facebook_avatar, user.getFacebookId());
+        user.setCustomData(Utils.customDataToString(getUserCustomData(avatarUrl)));
+        return user;
+    }
+
+    private QBUser getTDUserWithFullName(QBUser user){
+        user.setFullName(user.getPhone());
+        user.setCustomData(Utils.customDataToString(getUserCustomData(ConstsCore.EMPTY_STRING)));
+        return user;
+    }
+
+    private UserCustomData getUserCustomData(String avatarUrl) {
+        String isImport = "1"; // TODO: temp, first FB or TD login (for correct work need use crossplatform)
+        return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
 
 }
