@@ -147,7 +147,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         twitterDigitsHelper = new TwitterDigitsHelper();
         twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
         failAction = new FailAction();
-        serviceManager = new ServiceManager(this);
+        serviceManager = new ServiceManager();
     }
 
     protected void startSocialLogin() {
@@ -192,8 +192,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         appSharedHelper.saveUsersImportInitialized(true);
         QBUser user = new QBUser(null, userPassword, userEmail);
 
-        ServiceManager serviceManager = new ServiceManager(this);
-        serviceManager.login(user, new Observer<QBUser>() {
+        serviceManager.login(user).subscribe(new Observer<QBUser>() {
             @Override
             public void onCompleted() {
 
@@ -269,7 +268,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
             showProgress();
-            serviceManager.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null, socialLoginObserver);
+            serviceManager.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null)
+                          .subscribe(socialLoginObserver);
         }
 
         @Override
@@ -298,7 +298,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
             DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
-            serviceManager.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS), socialLoginObserver);
+            serviceManager.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS))
+                          .subscribe(socialLoginObserver);
         }
 
         @Override

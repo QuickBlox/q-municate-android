@@ -8,6 +8,7 @@ import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.authorization.BaseAuthActivity;
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
@@ -48,27 +49,22 @@ public class ServiceManager {
 
     private QMAuthService authService;
     private QMUserService userService;
-    private QMUserCache userCache;
-    private QBAuthHelper authHelper;
 
-    public ServiceManager(Context context){
-        this.context = context;
+    public ServiceManager(){
+        this.context = App.getInstance();
         authService = QMAuthService.getInstance();
         userService = QMUserService.getInstance();
-        userCache = userService.getUserCache();
-        authHelper = new QBAuthHelper(context);
     }
 
-    public void login(QBUser user, Observer<QBUser> observer) {
+    public Observable<QBUser> login(QBUser user) {
         final String userPassword = user.getPassword();
-        authService.login(user).subscribeOn(Schedulers.io())
+
+        Observable<QBUser> result = authService.login(user).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-        .map(new Func1<QBUser,QMUser>() {
+        .map(new Func1<QBUser,QBUser>() {
             @Override
-            public QMUser call(QBUser qbUser) {
+            public QBUser call(QBUser qbUser) {
                 CoreSharedHelper.getInstance().saveUsersImportInitialized(true);
-                QMUser result = QMUser.convert(qbUser);
-                userCache.createOrUpdate(result);
 
                 String password = userPassword;
 
@@ -77,7 +73,7 @@ public class ServiceManager {
                     try {
                         updateUser(qbUser);
                     } catch (QBResponseException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, "updateUser " + e.getMessage());
                     }
                 }
 
@@ -87,14 +83,15 @@ public class ServiceManager {
 
                 AppSession.startSession(qbUser);
 
-                return result;
+                return qbUser;
             }
-        })
-        .subscribe(observer);
+        });
+
+        return result;
     }
 
-    public void  login(final String socialProvider, final String accessToken, final String accessTokenSecret, Observer<QBUser> observer) {
-        authService.login(QBProvider.FACEBOOK, accessToken, accessTokenSecret).subscribeOn(Schedulers.io())
+    public  Observable<QBUser>  login(final String socialProvider, final String accessToken, final String accessTokenSecret) {
+        Observable<QBUser> result = authService.login(QBProvider.FACEBOOK, accessToken, accessTokenSecret).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<QBUser, QBUser>() {
                     @Override
@@ -110,13 +107,15 @@ public class ServiceManager {
                             getTDUserWithFullName(qbUser);
                         }
                         try {
-                            authHelper.updateUser(qbUser);
+                            updateUser(qbUser);
                         } catch (QBResponseException e) {
                             Log.d(TAG, "updateUser " + e.getMessage());
                         }
                         return qbUser;
                     }
-                }).subscribe(observer);
+                });
+
+        return result;
     }
 
 
@@ -137,7 +136,7 @@ public class ServiceManager {
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             user.setPassword(password);
         } else {
-            user.setPassword(QBAuth.getSession().perform().getToken());
+            user.setPassword(QBSessionManager.getInstance().getToken());
         }
 
         return user;
