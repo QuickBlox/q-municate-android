@@ -309,6 +309,15 @@ public abstract class BaseAuthActivity extends BaseActivity {
         return userCustomData != null;
     }
 
+    private Observable<QBUser> updateUserObservable(final QBUser user) {
+        return Observable.fromCallable(new Callable<QBUser>() {
+            @Override
+            public QBUser call() throws Exception {
+                return updateUser(user);
+            }
+        });
+    }
+
     private QBUser updateUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
 
@@ -404,12 +413,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
                     .flatMap(new Func1<QBUser, Observable<QBUser>>() {
                         @Override
                         public Observable<QBUser> call(final QBUser user) {
-                            return Observable.fromCallable(new Callable<QBUser>() {
-                                @Override
-                                public QBUser call() throws Exception {
-                                    return updateUser(user);
-                                }
-                            });
+                            return updateUserObservable(user);
                         }
                     })
                     .subscribeOn(Schedulers.io())
@@ -461,30 +465,33 @@ public abstract class BaseAuthActivity extends BaseActivity {
             DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
-            authService.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER), authHeaders.get(TwitterDigitsHelper.CREDENTIALS)).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
-                @Override
-                public void onCompleted() {
+            authService.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER), authHeaders.get(TwitterDigitsHelper.CREDENTIALS))
+                    .flatMap(new Func1<QBUser, Observable<QBUser>>() {
+                        @Override
+                        public Observable<QBUser> call(final QBUser user) {
+                            return updateUserObservable(user);
+                        }
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<QBUser>() {
+                        @Override
+                        public void onCompleted() {
 
-                }
+                        }
 
-                @Override
-                public void onError(Throwable e) {
-                    Log.d(TAG, "onError" + e.getMessage());
-                }
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.d(TAG, "onError" + e.getMessage());
+                        }
 
-                @Override
-                public void onNext(QBUser qbUser) {
-                    UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
-                    CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
-                    getTDUserWithFullName(qbUser);
-
-                    QBUpdateUserCommand.start(BaseAuthActivity.this, qbUser, null);
-
-                    performLoginSuccessAction(qbUser);
-
-                }
-            });
+                        @Override
+                        public void onNext(QBUser qbUser) {
+                            UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
+                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                            getTDUserWithFullName(qbUser);
+                            performLoginSuccessAction(qbUser);
+                        }
+                    });
         }
 
         @Override
