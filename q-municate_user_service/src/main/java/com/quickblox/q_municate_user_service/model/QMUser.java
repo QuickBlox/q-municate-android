@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_user_service.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.table.DatabaseTable;
 import com.quickblox.q_municate_user_service.utils.Utils;
 import com.quickblox.users.model.QBUser;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * Created by pelipets on 1/10/17.
  */
 
+@DatabaseTable(tableName = QMUserColumns.TABLE_NAME)
 public class QMUser extends QBUser {
 
     private String avatar;

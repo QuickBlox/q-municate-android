@@ -40,8 +40,10 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -249,6 +251,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
     }
 
     protected void performLoginSuccessAction(Bundle bundle) {
+        QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+        performLoginSuccessAction(user);
     }
 
     protected void performLoginSuccessAction(QBUser user) {
@@ -342,6 +346,22 @@ public abstract class BaseAuthActivity extends BaseActivity {
         }
     }
 
+    private QBUser getFBUserWithAvatar(QBUser user) {
+        String avatarUrl = getString(com.quickblox.q_municate_core.R.string.url_to_facebook_avatar, user.getFacebookId());
+        user.setCustomData(Utils.customDataToString(getUserCustomData(avatarUrl)));
+        return user;
+    }
+
+    private QBUser getTDUserWithFullName(QBUser user){
+        user.setFullName(user.getPhone());
+        user.setCustomData(Utils.customDataToString(getUserCustomData(ConstsCore.EMPTY_STRING)));
+        return user;
+    }
+
+    private UserCustomData getUserCustomData(String avatarUrl) {
+        String isImport = "1"; // TODO: temp, first FB or TD login (for correct work need use crossplatform)
+        return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
+    }
 
     private class LoginSuccessAction implements Command {
 
@@ -390,9 +410,10 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
                 @Override
                 public void onNext(QBUser qbUser) {
+                    CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                    getFBUserWithAvatar(qbUser);
                     QBUpdateUserCommand.start(BaseAuthActivity.this, qbUser, null);
                     performLoginSuccessAction(qbUser);
-
                 }
             });
 
@@ -439,6 +460,10 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
                 @Override
                 public void onNext(QBUser qbUser) {
+                    UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
+                    CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                    getTDUserWithFullName(qbUser);
+
                     QBUpdateUserCommand.start(BaseAuthActivity.this, qbUser, null);
 
                     performLoginSuccessAction(qbUser);
@@ -453,4 +478,5 @@ public abstract class BaseAuthActivity extends BaseActivity {
             hideProgress();
         }
     }
+
 }
