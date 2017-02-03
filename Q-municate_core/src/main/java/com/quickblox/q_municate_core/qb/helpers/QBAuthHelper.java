@@ -62,7 +62,7 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public QBUser login(String socialProvider, String accessToken,
-            String accessTokenSecret) throws QBResponseException, BaseServiceException {
+                        String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
         qbUser = QMAuthService.getInstance().loginSync(socialProvider, accessToken, accessTokenSecret);
 

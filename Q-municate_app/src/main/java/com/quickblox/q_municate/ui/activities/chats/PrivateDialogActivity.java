@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -47,7 +46,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
     private int operationItemPosition;
-    private final String TAG = "PrivateDialogActivity";
+    private final String TAG = PrivateDialogActivity.class.getSimpleName();
 
     public static void start(Context context, QMUser opponent, Dialog dialog) {
         Intent intent = new Intent(context, PrivateDialogActivity.class);
@@ -119,31 +118,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     protected void onConnectServiceLocally(QBService service) {
         onConnectServiceLocally();
         setOnlineStatus(opponentUser);
-    }
-
-    @Override
-    protected void onFileLoaded(QBFile file, String dialogId) {
-        sendPrivateMessageWithAttach(dialogId, file, null);
-    }
-
-    @Override
-    protected void onLocationLoaded(String location, String dialogId) {
-        sendPrivateMessageWithAttach(dialogId, null, location);
-    }
-
-    private void sendPrivateMessageWithAttach(String dialogId, QBFile file, String location) {
-        if (!dialogId.equals(dialog.getDialogId())) {
-            return;
-        }
-        try {
-            if (file != null) {
-                privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getId());
-            } else if (!TextUtils.isEmpty(location)) {
-                privateChatHelper.sendPrivateMessageWithAttachLocation(location, opponentUser.getId());
-            }
-        } catch (QBResponseException exc) {
-            ErrorUtils.showError(this, exc);
-        }
     }
 
     @Override
@@ -289,7 +263,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     public void sendMessage(View view) {
-        sendMessage(true);
+        sendMessage();
     }
 
     private void callToUser(QMUser user, QBRTCTypes.QBConferenceType qbConferenceType) {

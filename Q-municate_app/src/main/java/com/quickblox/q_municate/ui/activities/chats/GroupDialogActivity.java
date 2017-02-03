@@ -106,31 +106,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void onFileLoaded(QBFile file, String dialogId) {
-        sendGroupMessageWithAttach(dialogId, file, null);
-    }
-
-    @Override
-    protected void onLocationLoaded(String location, String dialogId) {
-        Log.d("GroupDialogActivity", "location= " + location);
-        sendGroupMessageWithAttach(dialogId, null, location);
-    }
-
-    private void sendGroupMessageWithAttach(String dialogId, QBFile file, String location) {
-        if (!dialogId.equals(dialog.getDialogId())) {
-            return;
-        }
-        try {
-            if (file != null) {
-                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
-            } else if (!TextUtils.isEmpty(location)) {
-                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachLocation(dialog.getRoomJid(), location);
-            }
-        } catch (QBResponseException exc) {
-            ErrorUtils.showError(this, exc);
-        }
-    }
-    @Override
     protected Bundle generateBundleToInitDialog() {
         return null;
     }
@@ -212,6 +187,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     public void sendMessage(View view) {
-        sendMessage(false);
+        sendMessage();
     }
 }

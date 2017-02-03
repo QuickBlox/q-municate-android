@@ -110,7 +110,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected ImageUtils imageUtils;
     protected BaseChatMessagesAdapter messagesAdapter;
     protected QMUser opponentUser;
-    protected QBChatHelper baseChatHelper;
     protected List<CombinationMessage> combinationMessagesList;
     protected ImagePickHelper imagePickHelper;
     protected MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
@@ -477,7 +476,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
                         if (location != null) {
-                            onLocationLoaded(location, dialogId);
+                            sendMessageWithAttachment(dialogId, null, location);
                         } else {
                             showProgress();
                             QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
@@ -548,7 +547,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }, DELAY_SCROLLING_LIST);
     }
 
-    protected void sendMessage(boolean privateMessage) {
+    protected void sendMessage() {
         boolean error = false;
         try {
             chatHelper.sendChatMessage(messageEditText.getText().toString(), ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog));
@@ -701,19 +700,20 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void updateMessagesList();
 
-    protected void onFileLoaded(QBFile file, String dialogId){
-        if(!dialogId.equals(dialog.getDialogId())){
+    protected void sendMessageWithAttachment(String dialogId, QBFile file, String location){
+        if (!dialogId.equals(dialog.getDialogId())) {
             return;
         }
-
         try {
-            chatHelper.sendMessageWithAttachImage(file, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog));
+            if (file != null) {
+                chatHelper.sendMessageWithAttachImage(file, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog));
+            } else if (!TextUtils.isEmpty(location)) {
+                chatHelper.sendMessageWithAttachLocation(location, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog));
+            }
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
     }
-
-    protected abstract void onLocationLoaded(String location, String dialogId);
 
     protected abstract void checkMessageSendingPossibility();
 
@@ -791,7 +791,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-            onFileLoaded(file, dialogId);
+            sendMessageWithAttachment(dialogId, file, null);
             hideProgress();
         }
     }

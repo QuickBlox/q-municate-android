@@ -28,8 +28,6 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -281,7 +279,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
             finish();
         } else {
             String dialogId = dialogOccupant.getDialog().getDialogId();
-            QBDeleteChatCommand.start(this, dialogId, Dialog.Type.PRIVATE);
+            QBDeleteChatCommand.start(this, dialogId);
         }
     }
 
