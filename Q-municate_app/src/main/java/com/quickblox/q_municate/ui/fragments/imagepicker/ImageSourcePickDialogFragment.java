@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,7 @@ import java.util.Arrays;
 
 public class ImageSourcePickDialogFragment extends DialogFragment {
     private static final String TAG = ImageSourcePickDialogFragment.class.getSimpleName();
+    private static final long POP_BACKSTECK_DELAY = 300;
 
     private static final int POSITION_GALLERY = 0;
     private static final int POSITION_CAMERA = 1;
@@ -48,7 +50,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         fragmentManager.popBackStack();
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.addToBackStack(tag);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.add(this, tag);
         fragmentTransaction.commit();
     }
@@ -133,26 +135,34 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case (SystemPermissionHelper.PERMISSIONS_FOR_TAKE_PHOTO_REQUEST):
-                if (systemPermissionHelper.isCameraPermissionGranted()) {
-                    onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
-                } else {
-                    showPermissionSettingsDialog(R.string.dlg_permission_camera);
-                }
-                break;
-            case (SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST):
-                if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
-                    onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
-                } else {
-                    showPermissionSettingsDialog(R.string.dlg_permission_storage);
-                }
-                break;
-        }
-
-        getFragmentManager().popBackStack();
+    public void onRequestPermissionsResult(final int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        //postDelayed() is temp fix before fixing this bug https://code.google.com/p/android/issues/detail?id=190966
+        //on Android 7+ can use without delay
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                switch(requestCode) {
+                    case (SystemPermissionHelper.PERMISSIONS_FOR_TAKE_PHOTO_REQUEST):
+                        if (systemPermissionHelper.isCameraPermissionGranted()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                        } else {
+                            showPermissionSettingsDialog(R.string.dlg_permission_camera);
+                        }
+                        break;
+                    case (SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST):
+                        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                        } else {
+                            showPermissionSettingsDialog(R.string.dlg_permission_storage);
+                        }
+                        break;
+                }
+
+                getFragmentManager().popBackStack();
+            }
+        }, POP_BACKSTECK_DELAY);
     }
 
     public interface OnImageSourcePickedListener {
