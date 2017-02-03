@@ -111,7 +111,9 @@
     <string name="dialog_no_chats">Oops…\nYou don\'t have any chats,\n tap \'Create\' button to create new group chat \nor go in private chat \nvia Friends Details page"</string>
     <string name="dialog_reply">Reply</string>
     <string name="dialog_user_is_not_friend">User is not your friend</string>
-    <string name="dialog_confirm_sending_attach">Do you really want to send attachment?</string>
+    <string name="dialog_confirm_sending_attach">Do you really want to send %1$s?</string>
+    <string name="dialog_attach">attachment</string>
+    <string name="dialog_location">location</string>
     <string name="dialog_now_typing">Typing…</string>
     <string name="dialog_message_reject_friend">Do you really want to reject contact request from %1$s?</string>
     <string name="dialog_ctx_menu_reply">Reply</string>
