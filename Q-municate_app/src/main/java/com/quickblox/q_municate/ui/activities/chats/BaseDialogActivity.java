@@ -66,6 +66,7 @@ import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -470,7 +471,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadAttachFile(final File file, final String location, final String dialogId) {
-        TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(), getString(R.string.dialog_confirm_sending_attach,
+                getString(location == null ? R.string.dialog_attach : R.string.dialog_location)), false,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
@@ -633,7 +635,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected List<CombinationMessage> createCombinationMessagesList() {
         if (dialog == null) {
             Log.d("BaseDialogActivity", "dialog = " + dialog);
-            return null;
+            return new ArrayList<>();
         }
 
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
@@ -648,7 +650,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected List<CombinationMessage> buildCombinationMessagesListByDate(long createDate, boolean moreDate) {
         if (dialog == null) {
             Log.d("BaseDialogActivity", "dialog = " + dialog);
-            return null;
+            return new ArrayList<>();
         }
 
         List<Message> messagesList = dataManager.getMessageDataManager()
@@ -921,8 +923,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
 
         @Override
-        public void onLongClick(String text) {
+        public void onLongClick(String text, int positionInAdapter) {
 
         }
+
     }
 }

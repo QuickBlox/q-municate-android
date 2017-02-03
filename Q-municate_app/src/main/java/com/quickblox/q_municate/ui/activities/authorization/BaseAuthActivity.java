@@ -40,8 +40,10 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -53,11 +55,14 @@ import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.twitter.sdk.android.core.TwitterCore;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
+import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public abstract class BaseAuthActivity extends BaseActivity {
@@ -172,13 +177,13 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (!appSharedHelper.isShownUserAgreement()) {
             UserAgreementDialogFragment
                     .show(getSupportFragmentManager(), new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    super.onPositive(dialog);
-                                    appSharedHelper.saveShownUserAgreement(true);
-                                    loginWithSocial();
-                                }
-                            });
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            appSharedHelper.saveShownUserAgreement(true);
+                            loginWithSocial();
+                        }
+                    });
         } else {
             loginWithSocial();
         }
@@ -187,9 +192,9 @@ public abstract class BaseAuthActivity extends BaseActivity {
     private void loginWithSocial() {
         appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
-        if (loginType.equals(LoginType.FACEBOOK)){
+        if (loginType.equals(LoginType.FACEBOOK)) {
             facebookHelper.login(new FacebookLoginCallback());
-        } else if (loginType.equals(LoginType.TWITTER_DIGITS)){
+        } else if (loginType.equals(LoginType.TWITTER_DIGITS)) {
             twitterDigitsHelper.login(twitterDigitsAuthCallback);
         }
     }
@@ -209,7 +214,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         finish();
     }
 
-    protected void parseExceptionMessage(Exception exception) {
+    protected void parseExceptionMessage(Throwable exception) {
         hideProgress();
 
         String errorMessage = exception.getMessage();
@@ -249,6 +254,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
     }
 
     protected void performLoginSuccessAction(Bundle bundle) {
+        QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+        performLoginSuccessAction(user);
     }
 
     protected void performLoginSuccessAction(QBUser user) {
@@ -302,6 +309,15 @@ public abstract class BaseAuthActivity extends BaseActivity {
         return userCustomData != null;
     }
 
+    private Observable<QBUser> updateUserObservable(final QBUser user) {
+        return Observable.fromCallable(new Callable<QBUser>() {
+            @Override
+            public QBUser call() throws Exception {
+                return updateUser(user);
+            }
+        });
+    }
+
     private QBUser updateUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
 
@@ -328,6 +344,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         QMUser user = QMUser.convert(qbUser);
         QMUserService.getInstance().getUserCache().createOrUpdate(user);
     }
+
     private UserCustomData getUserCustomData(QBUser user) {
         if (TextUtils.isEmpty(user.getCustomData())) {
             return new UserCustomData();
@@ -342,6 +359,22 @@ public abstract class BaseAuthActivity extends BaseActivity {
         }
     }
 
+    private QBUser getFBUserWithAvatar(QBUser user) {
+        String avatarUrl = getString(com.quickblox.q_municate_core.R.string.url_to_facebook_avatar, user.getFacebookId());
+        user.setCustomData(Utils.customDataToString(getUserCustomData(avatarUrl)));
+        return user;
+    }
+
+    private QBUser getTDUserWithFullName(QBUser user) {
+        user.setFullName(user.getPhone());
+        user.setCustomData(Utils.customDataToString(getUserCustomData(ConstsCore.EMPTY_STRING)));
+        return user;
+    }
+
+    private UserCustomData getUserCustomData(String avatarUrl) {
+        String isImport = "1"; // TODO: temp, first FB or TD login (for correct work need use crossplatform)
+        return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
+    }
 
     private class LoginSuccessAction implements Command {
 
@@ -376,25 +409,33 @@ public abstract class BaseAuthActivity extends BaseActivity {
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
             showProgress();
-            authService.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(),null).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
-                @Override
-                public void onCompleted() {
+            authService.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null)
+                    .flatMap(new Func1<QBUser, Observable<QBUser>>() {
+                        @Override
+                        public Observable<QBUser> call(final QBUser user) {
+                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                            getFBUserWithAvatar(user);
+                            return updateUserObservable(user);
+                        }
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<QBUser>() {
+                        @Override
+                        public void onCompleted() {
 
-                }
+                        }
 
-                @Override
-                public void onError(Throwable e) {
-                    Log.d(TAG, "onError" + e.getMessage());
-                }
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.d(TAG, "onError " + e.getMessage());
+                            parseExceptionMessage(e);
+                        }
 
-                @Override
-                public void onNext(QBUser qbUser) {
-                    QBUpdateUserCommand.start(BaseAuthActivity.this, qbUser, null);
-                    performLoginSuccessAction(qbUser);
-
-                }
-            });
+                        @Override
+                        public void onNext(QBUser qbUser) {
+                            performLoginSuccessAction(qbUser);
+                        }
+                    });
 
 
         }
@@ -425,26 +466,34 @@ public abstract class BaseAuthActivity extends BaseActivity {
             DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
-            authService.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS)).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<QBUser>() {
-                @Override
-                public void onCompleted() {
+            authService.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER), authHeaders.get(TwitterDigitsHelper.CREDENTIALS))
+                    .flatMap(new Func1<QBUser, Observable<QBUser>>() {
+                        @Override
+                        public Observable<QBUser> call(final QBUser user) {
+                            UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
+                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                            getTDUserWithFullName(user);
+                            return updateUserObservable(user);
+                        }
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<QBUser>() {
+                        @Override
+                        public void onCompleted() {
 
-                }
+                        }
 
-                @Override
-                public void onError(Throwable e) {
-                    Log.d(TAG, "onError" + e.getMessage());
-                }
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.d(TAG, "onError" + e.getMessage());
+                            parseExceptionMessage(e);
+                        }
 
-                @Override
-                public void onNext(QBUser qbUser) {
-                    QBUpdateUserCommand.start(BaseAuthActivity.this, qbUser, null);
-
-                    performLoginSuccessAction(qbUser);
-
-                }
-            });
+                        @Override
+                        public void onNext(QBUser qbUser) {
+                            performLoginSuccessAction(qbUser);
+                        }
+                    });
         }
 
         @Override
@@ -453,4 +502,5 @@ public abstract class BaseAuthActivity extends BaseActivity {
             hideProgress();
         }
     }
+
 }

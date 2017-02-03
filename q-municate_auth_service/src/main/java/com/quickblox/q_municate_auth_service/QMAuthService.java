@@ -128,7 +128,7 @@ public class QMAuthService extends QMBaseService {
         result = observable.flatMap(new Func1<Void, Observable<Void>>() {
             @Override
             public Observable<Void> call(Void qbVoid) {
-                authorized = true;
+                authorized = false;
                 notifyLogout(QMAuthService.this);
                 return observable;
             }

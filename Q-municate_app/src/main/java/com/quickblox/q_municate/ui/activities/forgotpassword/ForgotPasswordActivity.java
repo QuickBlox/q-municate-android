@@ -9,6 +9,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.result.HttpStatus;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
@@ -120,9 +122,10 @@ public class ForgotPasswordActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            QBResponseException exception = (QBResponseException) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             if (exception != null) {
-                emailEditText.setError(exception.getMessage());
+                String errorMesasge = exception.getHttpStatusCode() == HttpStatus.SC_NOT_FOUND ? getString(R.string.forgot_password_email_not_found_error) : exception.getMessage();
+                emailEditText.setError(errorMesasge);
             }
 
             hideProgress();

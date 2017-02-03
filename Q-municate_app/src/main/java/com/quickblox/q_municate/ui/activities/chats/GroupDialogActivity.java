@@ -173,6 +173,9 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     private void processCombinationMessages(){
+        if(combinationMessagesList == null){
+            return;
+        }
         QBUser currentUser = AppSession.getSession().getUser();
         for (CombinationMessage cm :combinationMessagesList){
             boolean ownMessage = !cm.isIncoming(currentUser.getId());
