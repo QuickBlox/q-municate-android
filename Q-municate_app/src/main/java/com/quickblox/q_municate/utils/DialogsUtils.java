@@ -32,7 +32,7 @@ public class DialogsUtils {
                 fm,
                 App.getInstance().getString(R.string.app_name),
                 dialogMessage,
-                App.getInstance().getString(R.string.dlg_ok),
+                App.getInstance().getString(R.string.dlg_cancel),
                 App.getInstance().getString(R.string.dlg_open_app_settings),
                 callback,
                 OPEN_APP_SETTINGS_DIALOG_DELAY);

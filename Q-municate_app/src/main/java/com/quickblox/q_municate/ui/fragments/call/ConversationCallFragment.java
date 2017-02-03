@@ -164,7 +164,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
 
     private void correctButtonsVisibilityByGrantedPermissions (){
         if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)){
-            if(!systemPermissionHelper.isMicriphonePermissionGranted()){
+            if(!systemPermissionHelper.isMicrophonePermissionGranted()){
                 micToggleVideoCall.setChecked(false);
                 micToggleVideoCall.setEnabled(false);
             }

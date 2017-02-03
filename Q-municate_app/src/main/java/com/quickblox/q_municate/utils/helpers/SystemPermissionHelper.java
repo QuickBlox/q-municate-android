@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -28,22 +29,35 @@ public class SystemPermissionHelper {
     public static final int PERMISSIONS_FOR_CALL_REQUEST = 15;
     public static final int PERMISSIONS_FOR_IMPORT_FRIENDS_REQUEST = 16;
     public static final int PERMISSIONS_FOR_SAVE_FILE_REQUEST = 17;
+    public static final int PERMISSIONS_FOR_TAKE_PHOTO_REQUEST = 18;
 
-    private final Activity activity;
+    private Activity activity;
+    private Fragment fragment;
 
     public SystemPermissionHelper(Activity activity) {
         this.activity = activity;
     }
 
+    public SystemPermissionHelper(Fragment fragment) {
+        this.fragment = fragment;
+    }
 
     public void requestPermission(int requestCode, String permission) {
-        ActivityCompat.requestPermissions(activity, new String[]{permission},
-                requestCode);
+        if (fragment != null){
+            fragment.requestPermissions(new String[]{permission}, requestCode);
+        } else {
+            ActivityCompat.requestPermissions(activity, new String[]{permission}, requestCode);
+        }
     }
 
     public void requestPermissions(int requestCode, String... permissions) {
-        ActivityCompat.requestPermissions(activity, permissions,
-                requestCode);
+        if (fragment != null){
+            Log.v("Permissions", "request Permissions for Fragment");
+            fragment.requestPermissions(permissions, requestCode);
+        } else {
+            Log.v("Permissions", "request Permissions for Activity");
+            ActivityCompat.requestPermissions(activity, permissions, requestCode);
+        }
     }
 
     public static void requestPermission(AppCompatActivity activity, int requestId,
@@ -71,7 +85,11 @@ public class SystemPermissionHelper {
     }
 
     public boolean isPermissionGranted(String permission) {
-        return ContextCompat.checkSelfPermission(activity.getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED;
+        if (fragment != null){
+            return ContextCompat.checkSelfPermission(fragment.getContext(), permission) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return ContextCompat.checkSelfPermission(activity.getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED;
+        }
     }
 
     public boolean isAllPermissionGranted(String... permissions) {
@@ -113,7 +131,7 @@ public class SystemPermissionHelper {
         return isPermissionGranted(Manifest.permission.CAMERA);
     }
 
-    public boolean isMicriphonePermissionGranted() {
+    public boolean isMicrophonePermissionGranted() {
         return isPermissionGranted(Manifest.permission.RECORD_AUDIO);
     }
 
@@ -123,6 +141,10 @@ public class SystemPermissionHelper {
         } else {
             checkAndRequestPermissions(PERMISSIONS_FOR_CALL_REQUEST, Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA);
         }
+    }
+
+    public void requestPermissionsTakePhoto() {
+            checkAndRequestPermissions(PERMISSIONS_FOR_TAKE_PHOTO_REQUEST, Manifest.permission.CAMERA);
     }
 
     public boolean isAllPermissionsGrantedForImportFriends() {

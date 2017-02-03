@@ -34,7 +34,6 @@ import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
-import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
@@ -179,11 +178,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
-            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_LOCATION_REQUEST_CODE);
-        } else {
-            showPermissionSettingsDialog();
-        }
+        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_LOCATION_REQUEST_CODE);
     }
 
     @Override
@@ -674,24 +669,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messageEditText.setEnabled(enable);
         smilePanelImageButton.setEnabled(enable);
         attachButton.setEnabled(enable);
-    }
-
-    private void showPermissionSettingsDialog() {
-        DialogsUtils.showOpenAppSettingsDialog(
-                getSupportFragmentManager(),
-                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
-                new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                    }
-
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-                        super.onNegative(dialog);
-                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
-                    }
-                });
     }
 
     protected abstract void updateActionBar();
