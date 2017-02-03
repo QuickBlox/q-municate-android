@@ -59,9 +59,8 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
@@ -88,8 +87,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected FailAction failAction;
     protected SuccessAction successAction;
     protected QBFriendListHelper friendListHelper;
-    protected QBPrivateChatHelper privateChatHelper;
-    protected QBGroupChatHelper groupChatHelper;
+    protected QBChatHelper chatHelper;
     protected QBService service;
     protected LocalBroadcastManager localBroadcastManager;
     protected String title;
@@ -403,12 +401,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
         }
 
-        if (privateChatHelper == null) {
-            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
-        }
-
-        if (groupChatHelper == null) {
-            groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+        if (chatHelper == null){
+            chatHelper = (QBChatHelper) service.getHelper(QBService.CHAT_HELPER);
         }
 
         notifyConnectedToService();
@@ -615,12 +609,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return friendListHelper;
     }
 
-    public QBPrivateChatHelper getPrivateChatHelper() {
-        return privateChatHelper;
-    }
-
-    public QBGroupChatHelper getGroupChatHelper() {
-        return groupChatHelper;
+    public QBChatHelper getChatHelper(){
+        return chatHelper;
     }
 
     public FailAction getFailAction() {

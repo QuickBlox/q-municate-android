@@ -168,7 +168,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                 startAddFriendsActivity();
                 break;
             case R.id.action_leave:
-                boolean joined = groupChatHelper != null && groupChatHelper.isDialogJoined(qbDialog);
+                boolean joined = chatHelper != null && chatHelper.isDialogJoined(qbDialog);
                 if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError() && joined) {
                     showLeaveGroupDialog();
                 } else {
@@ -374,7 +374,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
             updateOccupantsList();
 
             try {
-                groupChatHelper.sendSystemMessageAboutCreatingGroupChat(qbDialog, newFriendIdsList);
+                chatHelper.sendSystemMessageAboutCreatingGroupChat(qbDialog, newFriendIdsList);
             } catch (Exception e) {
                 ErrorUtils.logError(e);
             }
@@ -459,7 +459,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                     localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,
                             dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
                 }
-                groupChatHelper.sendGroupMessageToFriends(localDialog, messagesNotificationType,
+                chatHelper.sendGroupMessageToFriends(localDialog, messagesNotificationType,
                         newFriendIdsList, leavedFromDialog);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
@@ -553,8 +553,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     @Override
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
-        if (groupChatHelper != null) {
-            groupChatHelper.tryJoinRoomChat(qbDialog);
+        if (chatHelper != null) {
+            chatHelper.tryJoinRoomChat(qbDialog);
         }
     }
 
