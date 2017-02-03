@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 public class ImageSourcePickDialogFragment extends DialogFragment {
     private static final String TAG = ImageSourcePickDialogFragment.class.getSimpleName();
-    private static final long POP_BACKSTECK_DELAY = 300;
+    private static final long DELAY_PERMISSIONS_RESULT_ACTIONS = 300;
 
     private static final int POSITION_GALLERY = 0;
     private static final int POSITION_CAMERA = 1;
@@ -33,6 +33,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     private static SystemPermissionHelper systemPermissionHelper;
 
     private OnImageSourcePickedListener onImageSourcePickedListener;
+    protected Handler handler = new Handler();
 
     public ImageSourcePickDialogFragment() {
         systemPermissionHelper = new SystemPermissionHelper(this);
@@ -140,7 +141,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
         //postDelayed() is temp fix before fixing this bug https://code.google.com/p/android/issues/detail?id=190966
         //on Android 7+ can use without delay
-        new Handler().postDelayed(new Runnable() {
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 switch(requestCode) {
@@ -162,7 +163,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
                 getFragmentManager().popBackStack();
             }
-        }, POP_BACKSTECK_DELAY);
+        }, DELAY_PERMISSIONS_RESULT_ACTIONS);
     }
 
     public interface OnImageSourcePickedListener {
