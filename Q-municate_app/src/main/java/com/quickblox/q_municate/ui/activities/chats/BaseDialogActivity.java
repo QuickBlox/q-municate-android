@@ -918,8 +918,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
 
         @Override
-        public void onLongClick(String text) {
+        public void onLongClick(String text, int positionInAdapter) {
 
         }
+
     }
 }

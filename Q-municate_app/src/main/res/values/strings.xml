@@ -63,6 +63,7 @@
     <string name="forgot_password_email_field_is_incorrect">Please enter a valid email</string>
     <string name="forgot_password_label">Enter your email and we\'ll send a link to reset your password</string>
     <string name="forgot_password_massage_email_was_sent">Mail was sent to %1$s</string>
+    <string name="forgot_password_email_not_found_error">User with this email wasn\'t found</string>
 
 
     <!-- User profile -->
