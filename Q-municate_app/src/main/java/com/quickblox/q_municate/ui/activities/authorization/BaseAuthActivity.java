@@ -214,7 +214,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         finish();
     }
 
-    protected void parseExceptionMessage(Exception exception) {
+    protected void parseExceptionMessage(Throwable exception) {
         hideProgress();
 
         String errorMessage = exception.getMessage();
@@ -428,6 +428,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
                         @Override
                         public void onError(Throwable e) {
                             Log.d(TAG, "onError " + e.getMessage());
+                            parseExceptionMessage(e);
                         }
 
                         @Override
@@ -485,6 +486,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
                         @Override
                         public void onError(Throwable e) {
                             Log.d(TAG, "onError" + e.getMessage());
+                            parseExceptionMessage(e);
                         }
 
                         @Override
