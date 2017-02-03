@@ -471,7 +471,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadAttachFile(final File file, final String location, final String dialogId) {
-        TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(), getString(R.string.dialog_confirm_sending_attach,
+                getString(location == null ? R.string.dialog_attach : R.string.dialog_location)),
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
