@@ -413,6 +413,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
                     .flatMap(new Func1<QBUser, Observable<QBUser>>() {
                         @Override
                         public Observable<QBUser> call(final QBUser user) {
+                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                            getFBUserWithAvatar(user);
                             return updateUserObservable(user);
                         }
                     })
@@ -430,8 +432,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
                         @Override
                         public void onNext(QBUser qbUser) {
-                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
-                            getFBUserWithAvatar(qbUser);
                             performLoginSuccessAction(qbUser);
                         }
                     });
@@ -469,6 +469,9 @@ public abstract class BaseAuthActivity extends BaseActivity {
                     .flatMap(new Func1<QBUser, Observable<QBUser>>() {
                         @Override
                         public Observable<QBUser> call(final QBUser user) {
+                            UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
+                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                            getTDUserWithFullName(user);
                             return updateUserObservable(user);
                         }
                     })
@@ -486,9 +489,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
                         @Override
                         public void onNext(QBUser qbUser) {
-                            UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
-                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
-                            getTDUserWithFullName(qbUser);
                             performLoginSuccessAction(qbUser);
                         }
                     });
