@@ -418,7 +418,7 @@ public class ChatUtils {
         if (qbAttachment.getType().equalsIgnoreCase(Attachment.Type.LOCATION.toString())) {
             attachment.setType(Attachment.Type.LOCATION);
             attachment.setAdditionalInfo(qbAttachment.getData());
-            remoteUrl = LocationUtils.getRemoteUri(qbAttachment.getData(), context);
+            remoteUrl = LocationUtils.getRemoteUri(qbAttachment.getData(), LocationUtils.defaultUrlLocationParams(context));
         }
         if(qbAttachment.getId() == null){
             qbAttachment.setId(String.valueOf(qbAttachment.getData().hashCode()));
