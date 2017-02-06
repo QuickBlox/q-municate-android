@@ -27,8 +27,10 @@ android {
         versionCode rootProject.versionCode
         versionName rootProject.versionName
         multiDexEnabled = true
-        ext.betaDistrubutionGroupAliases="crazy testers"
-        ext.betaDistributionEmails="kate.suchkova@injoit.com, vadim.fite@quickblox.com, injoittest@gmail.com"
+
+        //have to remove before merge to master branch
+        ext.betaDistrubutionGroupAliases=property('testers_group_name')
+        ext.betaDistributionEmails=property('testers_notification_e-mails')
     }
 
     signingConfigs {
