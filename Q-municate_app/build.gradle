@@ -27,6 +27,8 @@ android {
         versionCode rootProject.versionCode
         versionName rootProject.versionName
         multiDexEnabled = true
+        ext.betaDistrubutionGroupAliases="crazy testers"
+        ext.betaDistributionEmails="kate.suchkova@injoit.com, vadim.fite@quickblox.com, injoittest@gmail.com"
     }
 
     signingConfigs {
