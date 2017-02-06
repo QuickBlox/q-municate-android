@@ -413,8 +413,11 @@ public abstract class BaseAuthActivity extends BaseActivity {
                     .flatMap(new Func1<QBUser, Observable<QBUser>>() {
                         @Override
                         public Observable<QBUser> call(final QBUser user) {
-                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
-                            getFBUserWithAvatar(user);
+                            UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
+                            if(TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
+                                CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                                getFBUserWithAvatar(user);
+                            }
                             return updateUserObservable(user);
                         }
                     })
@@ -470,9 +473,10 @@ public abstract class BaseAuthActivity extends BaseActivity {
                     .flatMap(new Func1<QBUser, Observable<QBUser>>() {
                         @Override
                         public Observable<QBUser> call(final QBUser user) {
-                            UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
-                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
-                            getTDUserWithFullName(user);
+                            if  (TextUtils.isEmpty(user.getFullName())) {
+                                CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
+                                getTDUserWithFullName(user);
+                            }
                             return updateUserObservable(user);
                         }
                     })
