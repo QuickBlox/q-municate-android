@@ -273,7 +273,7 @@ public class ChatUtils {
         return message;
     }
 
-    public static List<QBChatDialog > createQBChatDialogsListFromDialogsList(DataManager dataManager, List<Dialog> dialogsList) {
+    public static List<QBChatDialog > createQBDialogsListFromDialogsList(DataManager dataManager, List<Dialog> dialogsList) {
         List<QBChatDialog > qbChatDialogsList = new ArrayList<>(dialogsList.size());
 
         for (Dialog dialog : dialogsList) {

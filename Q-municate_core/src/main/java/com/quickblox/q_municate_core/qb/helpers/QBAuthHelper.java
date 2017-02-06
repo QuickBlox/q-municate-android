@@ -62,7 +62,7 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public QBUser login(String socialProvider, String accessToken,
-            String accessTokenSecret) throws QBResponseException, BaseServiceException {
+                        String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser qbUser;
         qbUser = QMAuthService.getInstance().loginSync(socialProvider, accessToken, accessTokenSecret);
 
@@ -159,7 +159,7 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
         QBUser newUser = new QBUser();
 
-        QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null).perform();
+        QBFile qbFile = QBContent.uploadFileTask(file, true, null).perform();
         newUser.setId(user.getId());
         newUser.setPassword(user.getPassword());
         newUser.setFileId(qbFile.getId());

@@ -10,15 +10,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.content.model.QBFile;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -109,31 +106,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void onFileLoaded(QBFile file, String dialogId) {
-        sendGroupMessageWithAttach(dialogId, file, null);
-    }
-
-    @Override
-    protected void onLocationLoaded(String location, String dialogId) {
-        Log.d("GroupDialogActivity", "location= " + location);
-        sendGroupMessageWithAttach(dialogId, null, location);
-    }
-
-    private void sendGroupMessageWithAttach(String dialogId, QBFile file, String location) {
-        if (!dialogId.equals(dialog.getDialogId())) {
-            return;
-        }
-        try {
-            if (file != null) {
-                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
-            } else if (!TextUtils.isEmpty(location)) {
-                ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachLocation(dialog.getRoomJid(), location);
-            }
-        } catch (QBResponseException exc) {
-            ErrorUtils.showError(this, exc);
-        }
-    }
-    @Override
     protected Bundle generateBundleToInitDialog() {
         return null;
     }
@@ -194,7 +166,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     private void initFields() {
-        chatHelperIdentifier = QBService.GROUP_CHAT_HELPER;
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = createCombinationMessagesList();
         if (dialog != null)
@@ -219,6 +190,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     public void sendMessage(View view) {
-        sendMessage(false);
+        sendMessage();
     }
 }

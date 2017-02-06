@@ -17,9 +17,8 @@ import com.quickblox.q_municate.utils.bridges.SnackbarBridge;
 import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 
 import butterknife.ButterKnife;
@@ -35,8 +34,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     protected SnackbarBridge snackbarBridge;
 
     protected QBFriendListHelper friendListHelper;
-    protected QBPrivateChatHelper privateChatHelper;
-    protected QBGroupChatHelper groupChatHelper;
+    protected QBChatHelper chatHelper;
 
     protected QBService service;
 
@@ -50,8 +48,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
             baseActivity = (BaseActivity) activity;
             service = baseActivity.getService();
             friendListHelper = baseActivity.getFriendListHelper();
-            privateChatHelper = baseActivity.getPrivateChatHelper();
-            groupChatHelper = baseActivity.getGroupChatHelper();
+            chatHelper = baseActivity.getChatHelper();
         }
 
         if (activity instanceof ConnectionBridge) {

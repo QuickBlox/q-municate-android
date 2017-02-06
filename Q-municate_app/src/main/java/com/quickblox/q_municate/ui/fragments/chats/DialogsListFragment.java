@@ -36,7 +36,7 @@ import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -238,9 +238,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @Override
     public void onConnectedToService(QBService service) {
-        if (groupChatHelper == null) {
+        if (chatHelper == null) {
             if (service != null) {
-                groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+                chatHelper = (QBChatHelper) service.getHelper(QBService.CHAT_HELPER);
             }
         }
     }
@@ -329,7 +329,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             return;
         }
         if (Dialog.Type.GROUP.equals(dialog.getType())) {
-            if (groupChatHelper != null) {
+            if (chatHelper != null) {
                 try {
                     Dialog storeDialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
                     if (storeDialog == null || storeDialog.getDialogId() == null){
@@ -338,14 +338,14 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
                     QBChatDialog localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,storeDialog);
 
-                    if(!groupChatHelper.isDialogJoined(localDialog)){
+                    if(!chatHelper.isDialogJoined(localDialog)){
                         ToastUtils.shortToast(R.string.error_cant_delete_chat);
                         return;
                     }
 
                     List<Integer> occupantsIdsList = new ArrayList<>();
                     occupantsIdsList.add(qbUser.getId());
-                    groupChatHelper.sendGroupMessageToFriends(
+                    chatHelper.sendGroupMessageToFriends(
                             localDialog,
                             DialogNotification.Type.OCCUPANTS_DIALOG, occupantsIdsList, true);
                     DbUtils.deleteDialogLocal(dataManager, dialog.getDialogId());
@@ -355,7 +355,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             }
         }
         baseActivity.showProgress();
-        QBDeleteChatCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
+        QBDeleteChatCommand.start(baseActivity, dialog.getDialogId());
     }
 
     private void checkEmptyList(int listSize) {
