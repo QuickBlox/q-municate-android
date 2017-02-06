@@ -13,7 +13,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven { url "file://Users/tereha/StudioProjects/quickblox-android-sdk-releases" }
+        maven { url "file:///Users/pelipets/AndroidStudioProjects/quickblox-android-sdk-releases" }
         maven { url 'https://maven.fabric.io/public' }
     }
 }
@@ -23,7 +23,7 @@ ext {
     buildToolsVersion = '23.0.2'
     minSdkVersion = 15
     targetSdkVersion = 23
-    versionName = '2.1.4'
+    versionName = '2.1.7'
     versionCode = 220
 
     sourceCompatibility = JavaVersion.VERSION_1_7
