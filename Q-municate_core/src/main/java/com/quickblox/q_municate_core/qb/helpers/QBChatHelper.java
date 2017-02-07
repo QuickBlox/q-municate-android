@@ -94,6 +94,7 @@ public class QBChatHelper extends BaseHelper {
         currentDialog = dialog;
         currentDialog.initForChat(chatService);
         if (QBDialogType.GROUP.equals(dialog.getType())) {
+            tryJoinRoomChat(currentDialog);
             currentDialog.addParticipantListener(participantListener);
         } else {
             currentDialog.addIsTypingListener(typingListener);
