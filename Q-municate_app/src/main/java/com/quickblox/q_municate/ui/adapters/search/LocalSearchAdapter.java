@@ -95,7 +95,7 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
     }
 
     private void setOnlineStatus(ViewHolder viewHolder, QMUser user) {
-        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getId());
+        boolean online = qbFriendListHelper != null && user.getId()!= null && qbFriendListHelper.isUserOnline(user.getId());
 
         if (online) {
             viewHolder.labelTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
