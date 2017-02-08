@@ -193,7 +193,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        createChatLocally();
         checkPermissionSaveFiles();
     }
 
@@ -268,7 +267,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void loadDialogs() {
         super.loadDialogs();
-        createChatLocally();
         checkMessageSendingPossibility();
     }
 
@@ -292,11 +290,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
-        if (chatHelper != null) {
-            QBChatDialog qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
-            qbDialog.initForChat(QBChatService.getInstance());
-            chatHelper.tryJoinRoomChat(qbDialog);
-        }
+
+        createChatLocally();
 
         startLoadDialogMessages(false);
     }
@@ -399,7 +394,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void onConnectServiceLocally() {
-        createChatLocally();
     }
 
     private void showTypingStatus() {
