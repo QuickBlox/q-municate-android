@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -337,6 +338,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                     }
 
                     QBChatDialog localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,storeDialog);
+                    localDialog.initForChat(QBChatService.getInstance());
 
                     if(!chatHelper.isDialogJoined(localDialog)){
                         ToastUtils.shortToast(R.string.error_cant_delete_chat);

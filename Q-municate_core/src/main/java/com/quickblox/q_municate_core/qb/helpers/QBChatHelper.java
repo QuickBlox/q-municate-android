@@ -158,6 +158,10 @@ public class QBChatHelper extends BaseHelper {
         message.setMarkable(true);
         chatDialog.initForChat(chatService);
 
+        if (QBDialogType.GROUP.equals(chatDialog.getType())){
+            tryJoinRoomChat(chatDialog);
+        }
+
         String error = null;
         try {
             chatDialog.sendMessage(message);
@@ -487,6 +491,7 @@ public class QBChatHelper extends BaseHelper {
     }
 
     public void joinRoomChat(QBChatDialog dialog) throws Exception {
+        dialog.initForChat(chatService);
         if (!dialog.isJoined()) {
             DiscussionHistory history = new DiscussionHistory();
             history.setMaxStanzas(0); // without getting messages
