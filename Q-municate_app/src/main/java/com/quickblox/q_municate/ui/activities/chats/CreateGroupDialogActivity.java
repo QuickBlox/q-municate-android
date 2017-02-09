@@ -226,7 +226,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
             QBChatDialog  dialog = (QBChatDialog ) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
             if (dialog != null) {
-                GroupDialogActivity.start(CreateGroupDialogActivity.this, ChatUtils.createLocalDialog(dialog));
+                GroupDialogActivity.start(CreateGroupDialogActivity.this, dialog);
                 finish();
             } else {
                 ErrorUtils.showError(CreateGroupDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));

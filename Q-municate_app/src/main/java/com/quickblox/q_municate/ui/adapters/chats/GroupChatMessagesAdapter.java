@@ -18,9 +18,8 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     private static final String TAG = GroupChatMessagesAdapter.class.getSimpleName();
     private ColorUtils colorUtils;
 
-    public GroupChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages, Dialog dialog) {
+    public GroupChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
         super(baseActivity, chatMessages);
-        this.dialog = dialog;
         colorUtils = new ColorUtils();
     }
 
