@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
 
@@ -18,35 +17,19 @@ import com.digits.sdk.android.DigitsSession;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
-import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
-import com.quickblox.auth.session.QBSessionManager;
-import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
+import com.quickblox.q_municate.utils.AuthUtils;
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
-import com.quickblox.q_municate_auth_service.QMAuthService;
-import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_core.utils.Utils;
-import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
-import com.quickblox.q_municate_user_service.QMUserService;
-import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.users.QBUsers;
+import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.users.model.QBUser;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterAuthToken;
@@ -57,8 +40,6 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.OnTextChanged;
 import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public abstract class BaseAuthActivity extends BaseActivity {
 
@@ -147,7 +128,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         twitterDigitsHelper = new TwitterDigitsHelper();
         twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
         failAction = new FailAction();
-        serviceManager = new ServiceManager();
+        serviceManager = ServiceManager.getInstance();
     }
 
     protected void startSocialLogin() {
@@ -202,7 +183,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
             public void onError(Throwable e) {
                 Log.d(TAG, "onError" + e.getMessage());
                 hideProgress();
-                parseExceptionMessage(e.getMessage());
+                AuthUtils.parseExceptionMessage(BaseAuthActivity.this, e.getMessage());
             }
 
             @Override
@@ -226,23 +207,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
     }
 
 
-    private void parseExceptionMessage(String errorMessage) {
-        if (errorMessage != null) {
-            if (errorMessage.equals(getString(R.string.error_bad_timestamp))) {
-                errorMessage = getString(R.string.error_bad_timestamp_from_app);
-            } else if (errorMessage.equals(getString(R.string.error_login_or_email_required))) {
-                errorMessage = getString(R.string.error_login_or_email_required_from_app);
-            } else if (errorMessage.equals(getString(R.string.error_email_already_taken))
-                    && AppSession.getSession().getLoginType().equals(LoginType.FACEBOOK)) {
-                errorMessage = getString(R.string.error_email_already_taken_from_app);
-            } else if (errorMessage.equals(getString(R.string.error_unauthorized))) {
-                errorMessage = getString(R.string.error_unauthorized_from_app);
-            }
-
-            ErrorUtils.showError(this, errorMessage);
-        }
-    }
-
     private Observer<QBUser> socialLoginObserver = new Observer<QBUser>() {
         @Override
         public void onCompleted() {
@@ -253,7 +217,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         public void onError(Throwable e) {
             Log.d(TAG, "onError " + e.getMessage());
             hideProgress();
-            parseExceptionMessage(e.getMessage());
+            AuthUtils.parseExceptionMessage(BaseAuthActivity.this, e.getMessage());
         }
 
         @Override

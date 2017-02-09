@@ -35,16 +35,14 @@ public class QBRestHelper extends BaseHelper {
 
     public static QMUser loadAndSaveUser(int userId) {
         QMUser resultUser = null;
-
         try {
             QMUser user = QMUserService.getInstance().getUserSync(userId, true);
             resultUser = user;
         } catch (QBResponseException e) {
             // user not found
             resultUser = UserFriendUtils.createDeletedUser(userId);
+            QMUserService.getInstance().getUserCache().createOrUpdate(resultUser);
         }
-
-        QMUserService.getInstance().getUserCache().createOrUpdate(resultUser);
 
         return resultUser;
     }

@@ -67,12 +67,8 @@ public class FinderUnknownUsers {
             if (loadIdsSet.size() == oneElement) {
                 int userId = loadIdsSet.iterator().next();
                 QMUser user = QBRestHelper.loadUser(userId);
-                QMUserService.getInstance().getUserCache().createOrUpdate(user);
             } else {
                 Collection<QMUser> userCollection = restHelper.loadUsers(loadIdsSet);
-                if (userCollection != null) {
-                    QMUserService.getInstance().getUserCache().createOrUpdateAll(userCollection);
-                }
             }
         } catch (QBResponseException e) {
             ErrorUtils.logError(e);

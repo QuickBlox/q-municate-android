@@ -312,13 +312,6 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     @Nullable
     private QMUser loadAndSaveUser(int userId) {
         QMUser user = QBRestHelper.loadUser(userId);
-
-        if (user == null) {
-            return null;
-        } else {
-            saveUser(user);
-        }
-
         return user;
     }
 

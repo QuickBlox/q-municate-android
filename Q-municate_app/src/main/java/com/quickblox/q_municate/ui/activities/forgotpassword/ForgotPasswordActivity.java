@@ -10,16 +10,15 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
 
 public class ForgotPasswordActivity extends BaseActivity {
 
@@ -44,7 +43,6 @@ public class ForgotPasswordActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         initFields();
         setUpActionBarWithUpButton();
-        addActions();
     }
 
     @Override
@@ -71,7 +69,6 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        removeActions();
     }
 
     @OnTextChanged(R.id.email_edittext)
@@ -85,47 +82,30 @@ public class ForgotPasswordActivity extends BaseActivity {
 
     private void forgotPassword() {
         KeyboardUtils.hideKeyboard(this);
-        String emailText = emailEditText.getText().toString();
+        final String emailText = emailEditText.getText().toString();
         if (new ValidationUtils(this).isForgotPasswordDataValid(emailTextInputLayout, emailText)) {
             showProgress();
-            QBResetPasswordCommand.start(this, emailText);
-        }
-    }
+            ServiceManager.getInstance().resetPassword(emailText).subscribe(new Subscriber<Void>() {
+                @Override
+                public void onCompleted() {
 
-    private void addActions() {
-        addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
-        addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, new ResetPasswordFailAction());
+                }
 
-        updateBroadcastActionList();
-    }
+                @Override
+                public void onError(Throwable e) {
+                    if (e != null) {
+                        emailEditText.setError(e.getMessage());
+                    }
 
-    private void removeActions() {
-        removeAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION);
+                    hideProgress();
+                }
 
-        updateBroadcastActionList();
-    }
-
-    private class ResetPasswordSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            hideProgress();
-            String emailText = bundle.getString(QBServiceConsts.EXTRA_EMAIL);
-            ToastUtils.longToast(getString(R.string.forgot_password_massage_email_was_sent, emailText));
-        }
-    }
-
-    private class ResetPasswordFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            if (exception != null) {
-                emailEditText.setError(exception.getMessage());
-            }
-
-            hideProgress();
+                @Override
+                public void onNext(Void aVoid) {
+                    hideProgress();
+                    ToastUtils.longToast(getString(R.string.forgot_password_massage_email_was_sent, emailText));
+                }
+            });
         }
     }
 }
