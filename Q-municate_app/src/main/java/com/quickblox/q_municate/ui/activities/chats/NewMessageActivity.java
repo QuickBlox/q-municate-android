@@ -178,7 +178,8 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     private void checkForOpenChat(QMUser user) {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
-            startPrivateChat(dialogOccupant.getDialog());
+            QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialogOccupant.getDialog());
+            startPrivateChat(chatDialog);
         } else {
             if (checkNetworkAvailableWithError()) {
                 showProgress();
@@ -187,7 +188,7 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
         }
     }
 
-    private void startPrivateChat(Dialog dialog) {
+    private void startPrivateChat(QBChatDialog dialog) {
         PrivateDialogActivity.start(this, selectedUser, dialog);
         finish();
     }
@@ -210,7 +211,7 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
         public void execute(Bundle bundle) {
             hideProgress();
             QBChatDialog qbDialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            startPrivateChat(ChatUtils.createLocalDialog(qbDialog));
+            startPrivateChat(qbDialog);
         }
     }
 }

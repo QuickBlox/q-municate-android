@@ -36,7 +36,6 @@ import butterknife.ButterKnife;
 public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessage> implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
     private static final String TAG = BaseChatMessagesAdapter.class.getSimpleName();
     protected static final int TYPE_REQUEST_MESSAGE = 5;
-    protected Dialog dialog;
     protected QBUser currentUser;
     protected final BaseActivity baseActivity;
     protected FileUtils fileUtils;

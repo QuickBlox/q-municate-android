@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
@@ -217,15 +218,16 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @OnItemClick(R.id.chats_listview)
     void startChat(int position) {
         Dialog dialog = dialogsListAdapter.getItem(position).getDialog();
+        QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
 
         if (!baseActivity.checkNetworkAvailableWithError() && isFirstOpeningDialog(dialog.getDialogId())) {
             return;
         }
 
-        if (dialog.getType() == Dialog.Type.PRIVATE) {
-            startPrivateChatActivity(dialog);
+        if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
+            startPrivateChatActivity(chatDialog);
         } else {
-            startGroupChatActivity(dialog);
+            startGroupChatActivity(chatDialog);
         }
     }
     @OnClick(R.id.fab_dialogs_new_chat)
@@ -307,18 +309,18 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         dialogsListView.setAdapter(dialogsListAdapter);
     }
 
-    private void startPrivateChatActivity(Dialog dialog) {
+    private void startPrivateChatActivity(QBChatDialog chatDialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(dialog.getDialogId());
+                .getDialogOccupantsListByDialogId(chatDialog.getDialogId());
         QMUser opponent = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
 
-        if (!TextUtils.isEmpty(dialog.getDialogId())) {
-            PrivateDialogActivity.start(baseActivity, opponent, dialog);
+        if (!TextUtils.isEmpty(chatDialog.getDialogId())) {
+            PrivateDialogActivity.start(baseActivity, opponent, chatDialog);
         }
     }
 
-    private void startGroupChatActivity(Dialog dialog) {
-        GroupDialogActivity.start(baseActivity, dialog);
+    private void startGroupChatActivity(QBChatDialog chatDialog) {
+        GroupDialogActivity.start(baseActivity, chatDialog);
     }
 
     private void updateDialogsList() {
@@ -350,7 +352,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                     chatHelper.sendGroupMessageToFriends(
                             localDialog,
                             DialogNotification.Type.OCCUPANTS_DIALOG, occupantsIdsList, true);
-                    DbUtils.deleteDialogLocal(dataManager, dialog.getDialogId());
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);
                 }

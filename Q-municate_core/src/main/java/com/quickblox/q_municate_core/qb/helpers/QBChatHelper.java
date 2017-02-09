@@ -661,8 +661,6 @@ public class QBChatHelper extends BaseHelper {
                             ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
                 }
             }
-
-            return;
         }
 
         QMUser user = QMUserService.getInstance().getUserCache().get((long) senderId);
