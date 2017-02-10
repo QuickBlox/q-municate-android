@@ -52,6 +52,7 @@ public class ChatNotificationHelper {
             saveOpeningDialogData(userId, dialogId);
         }
 
+        saveOpeningDialog(true);
         sendNotification(message);
     }
 

@@ -10,6 +10,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
@@ -30,15 +32,18 @@ import java.util.ArrayList;
 
 public class GroupDialogActivity extends BaseDialogActivity {
 
+
+    private static final String TAG = GroupDialogActivity.class.getSimpleName();
+
     public static void start(Context context, ArrayList<QMUser> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
         context.startActivity(intent);
     }
 
-    public static void start(Context context, Dialog dialog) {
+    public static void start(Context context, QBChatDialog chatDialog) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
         context.startActivity(intent);
     }
 
@@ -48,7 +53,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
         initFields();
 
-        if (dialog == null) {
+        if (currentChatDialog == null) {
             finish();
         }
 
@@ -64,7 +69,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList, dialog);
+        messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList);
         messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
@@ -149,7 +154,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_group_details:
-                GroupDialogDetailsActivity.start(this, dialog.getDialogId());
+                GroupDialogDetailsActivity.start(this, currentChatDialog.getDialogId());
                 break;
             default:
                 super.onOptionsItemSelected(item);
@@ -159,17 +164,19 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateActionBar() {
-        if (isNetworkAvailable() && dialog != null) {
-            setActionBarTitle(dialog.getTitle());
-            checkActionBarLogo(dialog.getPhoto(), R.drawable.placeholder_group);
+        if (isNetworkAvailable() && currentChatDialog != null) {
+            setActionBarTitle(getTitleForChatDialog(currentChatDialog));
+            checkActionBarLogo(currentChatDialog.getPhoto(), R.drawable.placeholder_group);
         }
     }
 
     private void initFields() {
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+//        currentChatDialog.initForChat(QBChatService.getInstance());
         combinationMessagesList = createCombinationMessagesList();
-        if (dialog != null)
-        title = dialog.getTitle();
+        if (currentChatDialog != null)
+        title = getTitleForChatDialog(currentChatDialog);
+        Log.d(TAG, "currentChatDialog: " + currentChatDialog);
     }
 
     private void processCombinationMessages(){
@@ -181,7 +188,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
             boolean ownMessage = !cm.isIncoming(currentUser.getId());
             if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
                 cm.setState(State.READ);
-                QBUpdateStatusMessageCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), cm, false);
+                QBUpdateStatusMessageCommand.start(this, currentChatDialog, cm, false);
             } else if (ownMessage) {
                 cm.setState(State.READ);
                 dataManager.getMessageDataManager().update(cm.toMessage(), false);

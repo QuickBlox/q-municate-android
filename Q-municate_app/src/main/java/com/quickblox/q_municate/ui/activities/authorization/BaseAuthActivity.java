@@ -422,6 +422,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
                         }
                     })
                     .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<QBUser>() {
                         @Override
                         public void onCompleted() {
@@ -481,6 +482,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
                         }
                     })
                     .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<QBUser>() {
                         @Override
                         public void onCompleted() {

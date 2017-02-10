@@ -329,8 +329,9 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 
     private void checkForExcludeMe(Collection<QMUser> usersCollection) {
         QBUser me = AppSession.getSession().getUser();
-        if (usersCollection.contains(me)) {
-            usersCollection.remove(me);
+        QMUser meQMUser = QMUser.convert(me);
+        if (usersCollection.contains(meQMUser)) {
+            usersCollection.remove(meQMUser);
             excludedMe = true;
             totalEntries--;
         }

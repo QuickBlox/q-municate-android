@@ -94,6 +94,7 @@ public class QBChatHelper extends BaseHelper {
         currentDialog = dialog;
         currentDialog.initForChat(chatService);
         if (QBDialogType.GROUP.equals(dialog.getType())) {
+            tryJoinRoomChat(currentDialog);
             currentDialog.addParticipantListener(participantListener);
         } else {
             currentDialog.addIsTypingListener(typingListener);
@@ -156,6 +157,10 @@ public class QBChatHelper extends BaseHelper {
     public void sendChatMessage(QBChatMessage message, QBChatDialog chatDialog) throws QBResponseException {
         message.setMarkable(true);
         chatDialog.initForChat(chatService);
+
+        if (QBDialogType.GROUP.equals(chatDialog.getType())){
+            tryJoinRoomChat(chatDialog);
+        }
 
         String error = null;
         try {
@@ -486,6 +491,7 @@ public class QBChatHelper extends BaseHelper {
     }
 
     public void joinRoomChat(QBChatDialog dialog) throws Exception {
+        dialog.initForChat(chatService);
         if (!dialog.isJoined()) {
             DiscussionHistory history = new DiscussionHistory();
             history.setMaxStanzas(0); // without getting messages
@@ -655,8 +661,6 @@ public class QBChatHelper extends BaseHelper {
                             ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
                 }
             }
-
-            return;
         }
 
         QMUser user = QMUserService.getInstance().getUserCache().get((long) senderId);

@@ -2,11 +2,14 @@ package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
 
+import com.quickblox.auth.QBAuth;
+import com.quickblox.auth.session.QBSession;
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.connections.tcp.QBTcpConfigurationBuilder;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.ConnectionListener;
@@ -45,6 +48,35 @@ public class QBChatRestHelper extends BaseHelper {
         if (!chatService.isLoggedIn() && user != null) {
             chatService.login(user);
             chatService.enableCarbons();
+        }
+    }
+
+    public synchronized void tryLoginChat(QBUser user) throws XMPPException, IOException, SmackException {
+        boolean isLoginViaSocial = QBSessionManager.getInstance().getSessionParameters().getSocialProvider() != null;
+        boolean isRestSessionValid = QBSessionManager.getInstance().isValidActiveSession();
+
+        if (!isLoginViaSocial){
+            login(user);
+            return;
+        }
+
+        if (isRestSessionValid){
+            login(user);
+        } else {
+            updateSessionAndLoginChatSocial(user);
+        }
+    }
+
+    private void updateSessionAndLoginChatSocial(QBUser user) throws IOException, XMPPException, SmackException {
+        QBSession currentSession = QBAuth.getSession().perform();
+        updateLocalUserIfNeed(currentSession);
+        user.setPassword(currentSession.getToken());
+        login(user);
+    }
+
+    private void updateLocalUserIfNeed(QBSession currentRestSession){
+        if (QBSessionManager.getInstance().getSessionParameters().getSocialProvider() != null) {
+            CoreSharedHelper.getInstance().saveUserPassword(currentRestSession.getToken());
         }
     }
 
