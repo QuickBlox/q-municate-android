@@ -98,7 +98,9 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                 if ((keyCode ==  android.view.KeyEvent.KEYCODE_BACK)) {
-                    getFragmentManager().popBackStack();
+                    if(getFragmentManager() != null) {
+                        getFragmentManager().popBackStack();
+                    }
                 }
                 return false;
             }
