@@ -15,11 +15,11 @@ allprojects {
         jcenter()
 
         maven {
+            url = qbRepository
             credentials {
-                username property('userName')
-                password property('password')
+                username qbUser
+                password qbPassword
             }
-            url = sdkRepository
         }
 
         maven { url 'https://maven.fabric.io/public' }
