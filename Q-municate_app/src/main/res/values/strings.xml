@@ -120,7 +120,7 @@
     <string name="dialog_ctx_menu_prv_message">Private Message</string>
     <string name="dialog_ctx_menu_video_call">Video Call</string>
     <string name="dialog_ctx_menu_profile">View Profile</string>
-    <string name="dialog_ctx_menu_remove">Delete dialog</string>
+    <string name="dialog_ctx_menu_remove">Leave and remove chat</string>
     <string name="dialog_loading_dialogs">Updating dialogs list… Please wait</string>
 
     <string-array name="dialog_attach_types_array">

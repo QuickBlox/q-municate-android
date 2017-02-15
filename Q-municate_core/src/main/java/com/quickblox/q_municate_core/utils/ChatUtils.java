@@ -31,7 +31,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ChatUtils {
+public class
+ChatUtils {
 
     public static final String OCCUPANT_IDS_DIVIDER = ",";
 
@@ -107,13 +108,7 @@ public class ChatUtils {
     }
 
     public static String getFullNameById(DataManager dataManager, int userId) {
-        QMUser user = null;
-        try {
-            user = QMUserService.getInstance().getUserSync(userId, false);
-        } catch (QBResponseException e) {
-            user = null;
-        }
-
+        QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
         return user != null ? user.getFullName() : "";
     }
 
