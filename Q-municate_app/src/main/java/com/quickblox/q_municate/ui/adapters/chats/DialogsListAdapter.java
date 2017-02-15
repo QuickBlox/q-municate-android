@@ -4,13 +4,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
@@ -26,7 +28,7 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         ViewHolder viewHolder;
 
         DialogWrapper dialogWrapper = getItem(position);
-        Dialog dialog = dialogWrapper.getDialog();
+        QBChatDialog currentDialog = dialogWrapper.getChatDialog();
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_dialog, null);
@@ -44,8 +46,7 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-
-        if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+        if (QBDialogType.PRIVATE.equals(currentDialog.getType())) {
             QMUser opponentUser = dialogWrapper.getOpponentUser();
             if (opponentUser.getFullName() != null) {
                 viewHolder.nameTextView.setText(opponentUser.getFullName());
@@ -54,9 +55,9 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
                 viewHolder.nameTextView.setText(resources.getString(R.string.deleted_user));
             }
         } else {
-            viewHolder.nameTextView.setText(dialog.getTitle());
+            viewHolder.nameTextView.setText(currentDialog.getName());
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
-            displayGroupPhotoImage(dialog.getPhoto(), viewHolder.avatarImageView);
+            displayGroupPhotoImage(currentDialog.getPhoto(), viewHolder.avatarImageView);
         }
 
         long totalCount = dialogWrapper.getTotalCount();

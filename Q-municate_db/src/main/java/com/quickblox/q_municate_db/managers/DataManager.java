@@ -18,7 +18,6 @@ public class DataManager {
     private static DataManager instance;
     private DataHelper dataHelper;
 
-   // private UserDataManager userDataManager;
     private FriendDataManager friendDataManager;
     private SocialDataManager socialDataManager;
     private UserRequestDataManager userRequestDataManager;
@@ -27,6 +26,7 @@ public class DataManager {
     private DialogNotificationDataManager dialogNotificationDataManager;
     private AttachmentManager attachmentDataManager;
     private MessageDataManager messageDataManager;
+    private QBChatDialogDataManager chatDialogDataManager;
 
     private DataManager(Context context) {
         dataHelper = new DataHelper(context);
@@ -81,6 +81,13 @@ public class DataManager {
                     getDataHelper().getDaoByClass(Dialog.class));
         }
         return dialogDataManager;
+    }
+
+    public QBChatDialogDataManager getQBChatDialogDataManager() {
+        if (chatDialogDataManager == null) {
+            chatDialogDataManager = new QBChatDialogDataManager(getDialogDataManager());
+        }
+        return chatDialogDataManager;
     }
 
     public DialogOccupantDataManager getDialogOccupantDataManager() {

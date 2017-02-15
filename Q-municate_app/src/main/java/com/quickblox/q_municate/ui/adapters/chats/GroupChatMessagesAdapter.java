@@ -7,9 +7,7 @@ import android.widget.TextView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.ColorUtils;
-import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
-import com.quickblox.q_municate_db.models.Dialog;
 
 import java.util.List;
 

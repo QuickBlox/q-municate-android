@@ -25,7 +25,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
@@ -53,7 +52,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
@@ -105,7 +103,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Bind(R.id.smile_panel_imagebutton)
     ImageButton smilePanelImageButton;
 
-//    protected Dialog dialog;
     protected QBChatDialog currentChatDialog;
     protected Resources resources;
     protected DataManager dataManager;
@@ -370,13 +367,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void addObservers() {
-        dataManager.getDialogDataManager().addObserver(dialogObserver);
+        dataManager.getQBChatDialogDataManager().addObserver(dialogObserver);
         dataManager.getMessageDataManager().addObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().addObserver(dialogNotificationObserver);
     }
 
     private void deleteObservers() {
-        dataManager.getDialogDataManager().deleteObserver(dialogObserver);
+        dataManager.getQBChatDialogDataManager().deleteObserver(dialogObserver);
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
     }
@@ -388,10 +385,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void updateData() {
-        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
-        currentChatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
-        currentChatDialog.initForChat(QBChatService.getInstance());
-        if (dialog != null) {
+        currentChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
+        if (currentChatDialog != null) {
             updateActionBar();
         }
         updateMessagesList();
@@ -666,14 +661,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         attachButton.setEnabled(enable);
     }
 
-    protected String getTitleForChatDialog(QBChatDialog chatDialog){
-        if (QBDialogType.GROUP.equals(chatDialog.getType())){
-            return chatDialog.getName();
-        } else {
-            return ChatUtils.getFullNameById(dataManager, chatDialog.getRecipientId());
-        }
-    }
-
     protected abstract void updateActionBar();
 
     protected abstract void onConnectServiceLocally(QBService service);
@@ -751,11 +738,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void update(Observable observable, Object data) {
             Log.d("Fix double message", "DialogObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            if (data != null && data.equals(dataManager.getDialogDataManager().getObserverKey()) && currentChatDialog != null) {
-                Dialog dialog = dataManager.getDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
-                if (dialog != null) {
-                    currentChatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
-                    if(QBChatService.getInstance().isLoggedIn()) {
+            if (data != null && data.equals(dataManager.getQBChatDialogDataManager().getObserverKey()) && currentChatDialog != null) {
+                currentChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
+                if (currentChatDialog != null) {
+                    // init chatDialog after getting from DB
+                    if (QBChatService.getInstance().isLoggedIn()) {
                         currentChatDialog.initForChat(QBChatService.getInstance());
                     }
                 } else {

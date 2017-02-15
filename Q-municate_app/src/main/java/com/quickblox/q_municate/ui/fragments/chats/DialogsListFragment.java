@@ -42,13 +42,8 @@ import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.DbUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.managers.DialogDataManager;
-import com.quickblox.q_municate_db.managers.DialogOccupantDataManager;
-import com.quickblox.q_municate_db.managers.MessageDataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -166,8 +161,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         switch (item.getItemId()) {
             case R.id.action_delete:
                 if (baseActivity.checkNetworkAvailableWithError()) {
-                    Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position).getDialog();
-                    deleteDialog(dialog);
+                    QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position).getChatDialog();
+                    deleteDialog(chatDialog);
                 }
                 break;
         }
@@ -217,10 +212,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @OnItemClick(R.id.chats_listview)
     void startChat(int position) {
-        Dialog dialog = dialogsListAdapter.getItem(position).getDialog();
-        QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
+        QBChatDialog chatDialog = dialogsListAdapter.getItem(position).getChatDialog();
 
-        if (!baseActivity.checkNetworkAvailableWithError() && isFirstOpeningDialog(dialog.getDialogId())) {
+        if (!baseActivity.checkNetworkAvailableWithError() && isFirstOpeningDialog(chatDialog.getDialogId())) {
             return;
         }
 
@@ -230,6 +224,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             startGroupChatActivity(chatDialog);
         }
     }
+
     @OnClick(R.id.fab_dialogs_new_chat)
     public void onAddChatClick(View view) {
         addChat();
@@ -273,7 +268,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void addObservers() {
-        dataManager.getDialogDataManager().addObserver(commonObserver);
+        dataManager.getQBChatDialogDataManager().addObserver(commonObserver);
         dataManager.getMessageDataManager().addObserver(commonObserver);
         ((Observable)QMUserService.getInstance().getUserCache()).addObserver(commonObserver);
         dataManager.getDialogOccupantDataManager().addObserver(commonObserver);
@@ -281,7 +276,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     private void deleteObservers() {
         if (dataManager != null) {
-            dataManager.getDialogDataManager().deleteObserver(commonObserver);
+            dataManager.getQBChatDialogDataManager().deleteObserver(commonObserver);
             dataManager.getMessageDataManager().deleteObserver(commonObserver);
             ((Observable)QMUserService.getInstance().getUserCache()).deleteObserver(commonObserver);
             dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
@@ -327,22 +322,25 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         onChangedData();
     }
 
-    private void deleteDialog(Dialog dialog) {
-        if(dialog == null || dialog.getDialogId() == null){
+    private void deleteDialog(QBChatDialog chatDialog) {
+        if(chatDialog == null || chatDialog.getDialogId() == null){
             return;
         }
-        if (Dialog.Type.GROUP.equals(dialog.getType())) {
+        if (QBDialogType.GROUP.equals(chatDialog.getType())) {
             if (chatHelper != null) {
                 try {
-                    Dialog storeDialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
-                    if (storeDialog == null || storeDialog.getDialogId() == null){
+                    QBChatDialog storeChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(chatDialog.getDialogId());
+                    if (storeChatDialog == null || storeChatDialog.getDialogId() == null){
                         return;
                     }
 
-                    QBChatDialog localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,storeDialog);
-                    localDialog.initForChat(QBChatService.getInstance());
+                    ArrayList<Integer> actualOpponentsIds =
+                            ChatUtils.createOccupantsIdsFromDialogOccupantsList(dataManager.getDialogOccupantDataManager()
+                                    .getActualDialogOccupantsByDialog(storeChatDialog.getDialogId()));
+                    storeChatDialog.setOccupantsIds(actualOpponentsIds);
+                    storeChatDialog.initForChat(QBChatService.getInstance());
 
-                    if(!chatHelper.isDialogJoined(localDialog)){
+                    if(!chatHelper.isDialogJoined(storeChatDialog)){
                         ToastUtils.shortToast(R.string.error_cant_delete_chat);
                         return;
                     }
@@ -350,7 +348,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                     List<Integer> occupantsIdsList = new ArrayList<>();
                     occupantsIdsList.add(qbUser.getId());
                     chatHelper.sendGroupMessageToFriends(
-                            localDialog,
+                            storeChatDialog,
                             DialogNotification.Type.OCCUPANTS_DIALOG, occupantsIdsList, true);
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);
@@ -358,7 +356,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             }
         }
         baseActivity.showProgress();
-        QBDeleteChatCommand.start(baseActivity, dialog.getDialogId());
+        QBDeleteChatCommand.start(baseActivity, chatDialog.getDialogId());
     }
 
     private void checkEmptyList(int listSize) {
@@ -397,11 +395,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
         @Override
         protected List<DialogWrapper> getItems() {
-            List<Dialog> dialogs = ChatUtils.fillTitleForPrivateDialogsList(getContext().getResources().getString(R.string.deleted_user),
-                    dataManager, dataManager.getDialogDataManager().getAllSorted());
-            List<DialogWrapper> dialogWrappers = new ArrayList<>(dialogs.size());
-            for(Dialog dialog : dialogs){
-                dialogWrappers.add(new DialogWrapper(getContext(), dataManager, dialog));
+            List<QBChatDialog> chatDialogs = dataManager.getQBChatDialogDataManager().getAllSorted();
+            List<DialogWrapper> dialogWrappers = new ArrayList<>(chatDialogs.size());
+            for(QBChatDialog chatDialog : chatDialogs){
+                dialogWrappers.add(new DialogWrapper(getContext(), dataManager, chatDialog));
             }
             return dialogWrappers;
         }
@@ -412,7 +409,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         @Override
         public void update(Observable observable, Object data) {
             if (data != null) {
-                if (data.equals(dataManager.getDialogDataManager().getObserverKey()) || data.equals(dataManager.getMessageDataManager().getObserverKey())
+                if (data.equals(dataManager.getQBChatDialogDataManager().getObserverKey()) || data.equals(dataManager.getMessageDataManager().getObserverKey())
                         || data.equals(QMUserCacheImpl.OBSERVE_KEY) || data.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
                     updateDialogsList();
                 }

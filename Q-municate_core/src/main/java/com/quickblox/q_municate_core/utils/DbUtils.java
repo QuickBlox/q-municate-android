@@ -1,7 +1,6 @@
 package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
@@ -10,7 +9,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
@@ -37,8 +35,7 @@ public class DbUtils {
     }
 
     public static void saveDialogToCache(DataManager dataManager, QBChatDialog qbDialog) {
-        Dialog dialog = ChatUtils.createLocalDialog(qbDialog);
-        dataManager.getDialogDataManager().createOrUpdate(dialog);
+        dataManager.getQBChatDialogDataManager().createOrUpdate(qbDialog);
 
         if (qbDialog.getOccupants() != null && !qbDialog.getOccupants().isEmpty()) {
             saveDialogsOccupants(dataManager, qbDialog, false);
@@ -47,7 +44,7 @@ public class DbUtils {
 
     public static void saveDialogsToCache(DataManager dataManager, List<QBChatDialog > qbChatDialogsList,
             QBChatDialog  currentDialog) {
-        dataManager.getDialogDataManager().createOrUpdateAll(ChatUtils.createLocalDialogsList(qbChatDialogsList));
+        dataManager.getQBChatDialogDataManager().createOrUpdateAll(qbChatDialogsList);
 
         saveDialogsOccupants(dataManager, qbChatDialogsList);
 
@@ -147,7 +144,7 @@ public class DbUtils {
 
     public static void updateDialogModifiedDate(DataManager dataManager, String dialogId, long modifiedDate,
             boolean notify) {
-        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
+        QBChatDialog dialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         updateDialogModifiedDate(dataManager, dialog, modifiedDate, notify);
     }
 
@@ -156,11 +153,11 @@ public class DbUtils {
         updateDialogModifiedDate(dataManager, dialogId, modifiedDate, notify);
     }
 
-    private static void updateDialogModifiedDate(DataManager dataManager, Dialog dialog, long modifiedDate,
+    private static void updateDialogModifiedDate(DataManager dataManager, QBChatDialog dialog, long modifiedDate,
             boolean notify) {
         if (dialog != null) {
-            dialog.setModifiedDateLocal(modifiedDate);
-            dataManager.getDialogDataManager().update(dialog, notify);
+            dialog.setLastMessageDateSent(modifiedDate);
+            dataManager.getQBChatDialogDataManager().update(dialog, notify);
         }
     }
 
@@ -192,7 +189,7 @@ public class DbUtils {
     }
 
     public static void deleteDialogLocal(DataManager dataManager, String dialogId) {
-        dataManager.getDialogDataManager().deleteById(dialogId);
+        dataManager.getQBChatDialogDataManager().deleteById(dialogId);
     }
 
     public static void updateDialogOccupants(DataManager dataManager, String dialogId,

@@ -10,9 +10,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.chats.BaseDialogActivity;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -43,10 +41,8 @@ public class ActivityUIHelper {
     }
 
     private boolean isMessagesDialogCorrect(String dialogId) {
-        Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(dialogId);
-        if (messagesDialog!= null){
-            messagesDialog = ChatUtils.createQBDialogFromLocalDialog(DataManager.getInstance(), dialog);
-        }
+        messagesDialog = DataManager.getInstance().getQBChatDialogDataManager().getByDialogId(dialogId);
+
         return messagesDialog != null;
     }
 

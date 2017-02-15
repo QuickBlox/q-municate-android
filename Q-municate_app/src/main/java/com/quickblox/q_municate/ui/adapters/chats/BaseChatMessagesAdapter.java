@@ -22,7 +22,6 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;

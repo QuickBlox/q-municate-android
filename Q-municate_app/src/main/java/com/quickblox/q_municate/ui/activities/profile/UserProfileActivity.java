@@ -24,11 +24,11 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.utils.DialogTransformUtils;
 import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -125,7 +125,7 @@ public class UserProfileActivity extends BaseLoggableActivity {
     void sendMessage(View view) {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
-            QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialogOccupant.getDialog());
+            QBChatDialog chatDialog = DialogTransformUtils.createQBDialogFromLocalDialog(dataManager, dialogOccupant.getDialog());
             PrivateDialogActivity.start(UserProfileActivity.this, user, chatDialog);
         } else {
             showProgress();

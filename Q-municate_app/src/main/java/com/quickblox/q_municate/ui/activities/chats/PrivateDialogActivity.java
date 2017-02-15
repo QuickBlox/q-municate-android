@@ -26,11 +26,9 @@ import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -183,7 +181,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         opponentUser = (QMUser) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         Log.d(TAG, "currentChatDialog: " + currentChatDialog);
-//        currentChatDialog.initForChat(QBChatService.getInstance());
+
+        if (QBChatService.getInstance().isLoggedIn()) {
+            currentChatDialog.initForChat(QBChatService.getInstance());
+        }
     }
 
     @Override
@@ -332,8 +333,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private void checkForCorrectChat() {
         QBChatDialog updatedDialog = null;
         if (currentChatDialog != null) {
-            Dialog dialog = dataManager.getDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
-            updatedDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
+            updatedDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
         } else {
             finish();
         }
@@ -342,6 +342,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
             finish();
         } else {
             currentChatDialog = updatedDialog;
+            currentChatDialog.initForChat(QBChatService.getInstance());
         }
     }
 

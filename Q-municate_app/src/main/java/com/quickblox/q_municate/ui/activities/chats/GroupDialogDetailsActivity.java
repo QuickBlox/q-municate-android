@@ -20,9 +20,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog ;
@@ -51,7 +48,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -61,9 +57,7 @@ import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -275,8 +269,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateDialog() {
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
-                dataManager.getDialogDataManager().getByDialogId(dialogId));
+        qbDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         qbDialog.initForChat(QBChatService.getInstance());
         occupantsList = getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
         qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
@@ -364,8 +357,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         newFriendIdsList = new ArrayList<>();
         newFriendIdsList.add(AppSession.getSession().getUser().getId());
         sendNotificationToGroup(true);
-        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this,
-                ChatUtils.createLocalDialog(qbDialog));
+        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, qbDialog);
     }
 
     private void handleAddedFriends(Intent data) {
@@ -414,8 +406,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateCurrentData() {
-        QBChatDialog  qbChatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
-                dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
+        QBChatDialog  qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(qbDialog.getDialogId());
         occupantsList = QMUserService.getInstance().getUserCache().getUsersByIDs(qbChatDialog.getOccupants());
         groupNameCurrent = groupNameEditText.getText().toString();
     }
@@ -458,8 +449,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
             try {
                 QBChatDialog localDialog = qbDialog;
                 if (qbDialog != null) {
-                    localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,
-                            dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
+                    localDialog = dataManager.getQBChatDialogDataManager().getByDialogId(qbDialog.getDialogId());
                 }
                 chatHelper.sendGroupMessageToFriends(localDialog, messagesNotificationType,
                         newFriendIdsList, leavedFromDialog);

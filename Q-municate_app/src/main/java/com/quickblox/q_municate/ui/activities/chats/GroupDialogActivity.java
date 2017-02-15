@@ -3,16 +3,15 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -20,8 +19,6 @@ import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -165,7 +162,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void updateActionBar() {
         if (isNetworkAvailable() && currentChatDialog != null) {
-            setActionBarTitle(getTitleForChatDialog(currentChatDialog));
+            setActionBarTitle(ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager));
             checkActionBarLogo(currentChatDialog.getPhoto(), R.drawable.placeholder_group);
         }
     }
@@ -174,8 +171,10 @@ public class GroupDialogActivity extends BaseDialogActivity {
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
 //        currentChatDialog.initForChat(QBChatService.getInstance());
         combinationMessagesList = createCombinationMessagesList();
-        if (currentChatDialog != null)
-        title = getTitleForChatDialog(currentChatDialog);
+        if (currentChatDialog != null) {
+            title = ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager);
+        }
+
         Log.d(TAG, "currentChatDialog: " + currentChatDialog);
     }
 
