@@ -12,6 +12,7 @@ import android.util.Log;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
 import com.quickblox.q_municate.utils.SchemeType;
+import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
@@ -85,7 +86,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         hideProgress();
         Log.w(GetFilepathFromUriTask.class.getSimpleName(), "onResult listener = " + listener);
         if (listener != null) {
-            listener.onImagePicked(requestCode, file, null);
+            listener.onImagePicked(requestCode, StringUtils.getAttachmentTypeByFile(file), file);
         }
     }
 

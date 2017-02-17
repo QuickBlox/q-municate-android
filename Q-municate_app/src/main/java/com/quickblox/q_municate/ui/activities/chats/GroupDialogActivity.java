@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
@@ -61,6 +62,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
         }
 
         initMessagesRecyclerView();
+        registerBroadcastReceivers();
     }
 
     @Override
@@ -168,9 +170,8 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     private void initFields() {
-        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-//        currentChatDialog.initForChat(QBChatService.getInstance());
-        combinationMessagesList = createCombinationMessagesList();
+//        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+//        combinationMessagesList = createCombinationMessagesList();
         if (currentChatDialog != null) {
             title = ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager);
         }

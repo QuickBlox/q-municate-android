@@ -48,6 +48,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -225,8 +226,10 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file, String url) {
-        startCropActivity(Uri.fromFile(file));
+    public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
+        if (Attachment.Type.PICTURE.equals(attachmentType)) {
+            startCropActivity(Uri.fromFile((File) attachment));
+        }
     }
 
     @Override

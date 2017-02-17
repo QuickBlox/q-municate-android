@@ -625,6 +625,7 @@ public class QBService extends Service {
             Log.d(TAG, "onReceive " + intent.getAction());
             String action = intent.getAction();
             if (action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)) {
+                Log.v(TAG, "RE_LOGIN_IN_CHAT_SUCCESS_ACTION");
                 ((QBChatHelper) getHelper(CHAT_HELPER)).init(AppSession.getSession().getUser());
                 ((QBCallChatHelper) getHelper(CALL_CHAT_HELPER)).init(QBChatService.getInstance());
             }

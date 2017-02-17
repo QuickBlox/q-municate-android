@@ -1,7 +1,9 @@
 package com.quickblox.q_municate.ui.activities.chats;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -12,6 +14,7 @@ import android.view.View;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
@@ -47,6 +50,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
+    private BroadcastReceiver typingMessageBroadcastReceiver;
     private int operationItemPosition;
     private final String TAG = PrivateDialogActivity.class.getSimpleName();
 
@@ -94,7 +98,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     protected void onResume() {
         super.onResume();
 
-        checkForCorrectChat();
+//        updateCurrentChatFromDB();
 
         if (isNetworkAvailable()) {
             startLoadDialogMessages(false);
@@ -144,8 +148,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        initActualExtras();
-        checkForCorrectChat();
+//        initActualExtras();
+//        updateCurrentChatFromDB();
 
         final int oldMessagesCount = messagesAdapter.getItemCount();
 
@@ -178,13 +182,12 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void initActualExtras() {
-        opponentUser = (QMUser) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+//        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         Log.d(TAG, "currentChatDialog: " + currentChatDialog);
-
-        if (QBChatService.getInstance().isLoggedIn()) {
-            currentChatDialog.initForChat(QBChatService.getInstance());
-        }
+//
+//        if (QBChatService.getInstance().isLoggedIn()) {
+//            currentChatDialog.initForChat(QBChatService.getInstance());
+//        }
     }
 
     @Override
@@ -238,9 +241,26 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private void initFields() {
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
-        initActualExtras();
-        combinationMessagesList = createCombinationMessagesList();
+        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
+        opponentUser = (QMUser) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+
+//        initActualExtras();
+//        combinationMessagesList = createCombinationMessagesList();
         title = opponentUser.getFullName();
+    }
+
+    @Override
+    protected void registerBroadcastReceivers() {
+        super.registerBroadcastReceivers();
+        Log.v(TAG,"registerBroadcastReceivers()");
+        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
+    }
+
+    @Override
+    protected void unregisterBroadcastReceivers() {
+        super.unregisterBroadcastReceivers();
+        localBroadcastManager.unregisterReceiver(typingMessageBroadcastReceiver);
     }
 
     private void addObservers() {
@@ -330,7 +350,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
                 });
     }
 
-    private void checkForCorrectChat() {
+    private void updateCurrentChatFromDB() {
         QBChatDialog updatedDialog = null;
         if (currentChatDialog != null) {
             updatedDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
@@ -344,6 +364,14 @@ public class PrivateDialogActivity extends BaseDialogActivity {
             currentChatDialog = updatedDialog;
             currentChatDialog.initForChat(QBChatService.getInstance());
         }
+    }
+
+    private void showTypingStatus() {
+        setActionBarSubtitle(R.string.dialog_now_typing);
+    }
+
+    private void hideTypingStatus() {
+        setActionBarSubtitle(null);
     }
 
     private class FriendOperationAction implements FriendOperationListener {
@@ -388,8 +416,28 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         @Override
         public void update(Observable observable, Object data) {
             if (data != null && data.equals(dataManager.getFriendDataManager().getObserverKey())) {
-                checkForCorrectChat();
+                updateCurrentChatFromDB();
                 checkMessageSendingPossibility();
+            }
+        }
+    }
+
+    private class TypingStatusBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
+            // TODO: now it is possible only for Private chats
+            if (currentChatDialog != null && opponentUser != null && userId == opponentUser.getId()) {
+                if (QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+                    boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+                    if (isTyping) {
+                        showTypingStatus();
+                    } else {
+                        hideTypingStatus();
+                    }
+                }
             }
         }
     }

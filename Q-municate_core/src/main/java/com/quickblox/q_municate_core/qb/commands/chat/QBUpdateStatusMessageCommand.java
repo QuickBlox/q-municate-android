@@ -34,19 +34,19 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBChatDialog dialog = (QBChatDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        QBChatDialog chatDialog = (QBChatDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         CombinationMessage combinationMessage = (CombinationMessage) extras.getSerializable(QBServiceConsts.EXTRA_MESSAGE);
         boolean forPrivate = extras.getBoolean(QBServiceConsts.EXTRA_IS_FOR_PRIVATE);
 
         try {
             if (combinationMessage.getNotificationType() != null) {
-                chatHelper.updateStatusNotificationMessageRead(dialog.getDialogId(), combinationMessage);
+                chatHelper.updateStatusNotificationMessageRead(chatDialog, combinationMessage);
             } else {
-                chatHelper.updateStatusMessageRead(dialog.getDialogId(), combinationMessage, forPrivate);
+                chatHelper.updateStatusMessageRead(chatDialog, combinationMessage, forPrivate);
             }
         } catch (Exception e) {
             ErrorUtils.logError(TAG,
-                    e + " --- dialogId = " + dialog.getDialogId() + ", messageId = " + combinationMessage
+                    e + " --- dialogId = " + chatDialog.getDialogId() + ", messageId = " + combinationMessage
                             .getMessageId());
         }
 

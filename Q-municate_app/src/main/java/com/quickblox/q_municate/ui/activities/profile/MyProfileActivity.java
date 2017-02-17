@@ -28,6 +28,7 @@ import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
@@ -125,11 +126,19 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
         fullNameTextInputLayout.setError(null);
         imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
     }
+//
+//    @Override
+//    public void onImagePicked(int requestCode, File file, String url) {
+//        canPerformLogout.set(true);
+//        startCropActivity(Uri.fromFile(file));
+//    }
 
     @Override
-    public void onImagePicked(int requestCode, File file, String url) {
-        canPerformLogout.set(true);
-        startCropActivity(Uri.fromFile(file));
+    public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
+        if (Attachment.Type.PICTURE.equals(attachmentType)){
+            canPerformLogout.set(true);
+            startCropActivity(Uri.fromFile((File)attachment));
+        }
     }
 
     @Override
