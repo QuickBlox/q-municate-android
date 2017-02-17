@@ -41,7 +41,7 @@ ext {
     lintAbortOnError = false
 
 //    QuickBlox SDK version
-    qbSdkVersion = '3.3.1-alpha'
+    qbSdkVersion = '3.3.1-alpha2'
     qbMessageAdapterVersion = '1.1.0-alpha'
 
     testRunnerVersion = "0.4.1"
@@ -63,7 +63,7 @@ ext {
     twitterDigitsSdkVersion = '2.0.0'
 
     // Dependency versions
-    playServicesVersion = '9.8.0'
+    playServicesVersion = '10.0.1'
     supportV4Version = '23.2.1'
     appcompatV7Version = '23.2.1'
     recyclerviewV7Version = '23.2.1'
@@ -77,5 +77,5 @@ ext {
     robotoTextViewVersion = '2.4.3'
     stickersVersion = '0.7.3'
     crashlyticsVersion = '2.2.2'
-    firebaseVersion = '9.8.0'
+    firebaseVersion = '10.0.1'
 }
