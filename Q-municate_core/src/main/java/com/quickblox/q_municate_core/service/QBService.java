@@ -34,10 +34,8 @@ import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogMessagesCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBLoadFriendListCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoadUserCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLogoutCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
@@ -135,7 +133,6 @@ public class QBService extends Service {
         // users/friends commands
         registerLoadUsersCommand();
         registerLoadFriendsCommand();
-        registerLoadUserCommand();
         registerAddFriendCommand();
         registerAcceptFriendCommand();
         registerRemoveFriendCommand();
@@ -310,16 +307,6 @@ public class QBService extends Service {
                 QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
 
         serviceCommandMap.put(QBServiceConsts.LOAD_FRIENDS_ACTION, loadFriendListCommand);
-    }
-
-    private void registerLoadUserCommand() {
-        QBRestHelper restHelper = (QBRestHelper) getHelper(REST_HELPER);
-
-        QBLoadUserCommand loadUserCommand = new QBLoadUserCommand(this, restHelper,
-                QBServiceConsts.LOAD_USER_SUCCESS_ACTION,
-                QBServiceConsts.LOAD_USER_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.LOAD_USER_ACTION, loadUserCommand);
     }
 
     private void registerAddFriendCommand() {

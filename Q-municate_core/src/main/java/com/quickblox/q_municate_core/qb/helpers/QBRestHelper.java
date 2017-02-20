@@ -19,20 +19,6 @@ public class QBRestHelper extends BaseHelper {
         super(context);
     }
 
-    public static QMUser loadUser(int userId) {
-        QMUser resultUser;
-
-        try {
-            QMUser user = QMUserService.getInstance().getUserSync(userId, true);
-            resultUser = user;
-        } catch (QBResponseException e) {
-            // user not found
-            resultUser = UserFriendUtils.createDeletedUser(userId);
-        }
-
-        return resultUser;
-    }
-
     public static QMUser loadAndSaveUser(int userId) {
         QMUser resultUser = null;
         try {
@@ -47,11 +33,4 @@ public class QBRestHelper extends BaseHelper {
         return resultUser;
     }
 
-    public Collection<QMUser> loadUsers(Collection<Integer> usersIdsList) throws QBResponseException {
-        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-        requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
-        requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
-        Collection<QMUser> usersList = QMUserService.getInstance().getUsersByIDsSync(usersIdsList, requestBuilder);
-        return usersList;
-    }
 }
