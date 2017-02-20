@@ -55,8 +55,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;

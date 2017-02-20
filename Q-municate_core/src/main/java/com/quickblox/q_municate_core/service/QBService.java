@@ -44,8 +44,6 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateGroupDialogCommand
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.BaseHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
@@ -103,7 +101,6 @@ public class QBService extends Service {
 
     private void initHelpers() {
         helpersMap.put(CHAT_REST_HELPER, new QBChatRestHelper(this));
-        helpersMap.put(AUTH_HELPER, new QBAuthHelper(this));
         helpersMap.put(CHAT_HELPER, new QBChatHelper(this));
         helpersMap.put(FRIEND_LIST_HELPER, new QBFriendListHelper(this));
         helpersMap.put(CALL_CHAT_HELPER, new QBCallChatHelper(this));
