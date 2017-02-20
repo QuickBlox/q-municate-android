@@ -11,6 +11,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.utils.listeners.SearchListener;
@@ -158,22 +160,23 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
 
             @Override
             public void onItemClicked(View view, Dialog dialog, int position) {
-                if (dialog.getType() == Dialog.Type.PRIVATE) {
-                    startPrivateChatActivity(dialog);
+                QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
+                if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
+                    startPrivateChatActivity(chatDialog);
                 } else {
-                    startGroupChatActivity(dialog);
+                    startGroupChatActivity(chatDialog);
                 }
             }
         });
     }
 
-    private void startPrivateChatActivity(Dialog dialog) {
+    private void startPrivateChatActivity(QBChatDialog chatDialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(dialog.getDialogId());
+                .getDialogOccupantsListByDialogId(chatDialog.getDialogId());
         QMUser occupant = ChatUtils.getOpponentFromPrivateDialog(
                 UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
-        if (!TextUtils.isEmpty(dialog.getDialogId())) {
-            PrivateDialogActivity.start(baseActivity, occupant, dialog);
+        if (!TextUtils.isEmpty(chatDialog.getDialogId())) {
+            PrivateDialogActivity.start(baseActivity, occupant, chatDialog);
         }
     }
 
@@ -201,8 +204,8 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         }
     }
 
-    private void startGroupChatActivity(Dialog dialog) {
-        GroupDialogActivity.start(baseActivity, dialog);
+    private void startGroupChatActivity(QBChatDialog chatDialog) {
+        GroupDialogActivity.start(baseActivity, chatDialog);
     }
 
     private static class DialogsListLoader extends BaseLoader<List<Dialog>> {

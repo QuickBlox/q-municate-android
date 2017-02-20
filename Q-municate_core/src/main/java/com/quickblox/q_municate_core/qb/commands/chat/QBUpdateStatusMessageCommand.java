@@ -7,7 +7,7 @@ import android.os.Bundle;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.CombinationMessage;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -16,12 +16,12 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
     private static String TAG = QBUpdateStatusMessageCommand.class.getName();
 
-    private QBBaseChatHelper baseChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBUpdateStatusMessageCommand(Context context, QBBaseChatHelper baseChatHelper, String successAction,
-            String failAction) {
+    public QBUpdateStatusMessageCommand(Context context, QBChatHelper chatHelper, String successAction,
+                                        String failAction) {
         super(context, successAction, failAction);
-        this.baseChatHelper = baseChatHelper;
+        this.chatHelper = chatHelper;
     }
 
     public static void start(Context context, QBChatDialog dialog, CombinationMessage combinationMessage, boolean forPrivate) {
@@ -40,9 +40,9 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
         try {
             if (combinationMessage.getNotificationType() != null) {
-                baseChatHelper.updateStatusNotificationMessageRead(dialog.getDialogId(), combinationMessage);
+                chatHelper.updateStatusNotificationMessageRead(dialog.getDialogId(), combinationMessage);
             } else {
-                baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), combinationMessage, forPrivate);
+                chatHelper.updateStatusMessageRead(dialog.getDialogId(), combinationMessage, forPrivate);
             }
         } catch (Exception e) {
             ErrorUtils.logError(TAG,

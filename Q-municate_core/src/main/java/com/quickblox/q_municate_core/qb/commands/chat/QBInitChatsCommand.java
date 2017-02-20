@@ -6,22 +6,18 @@ import android.os.Bundle;
 
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.users.model.QBUser;
 
 public class QBInitChatsCommand extends ServiceCommand {
 
-    private QBPrivateChatHelper privateChatHelper;
-    private QBGroupChatHelper multiChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBInitChatsCommand(Context context, QBPrivateChatHelper privateChatHelper,
-            QBGroupChatHelper multiChatHelper, String successAction, String failAction) {
+    public QBInitChatsCommand(Context context, QBChatHelper chatHelper, String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.privateChatHelper = privateChatHelper;
-        this.multiChatHelper = multiChatHelper;
+        this.chatHelper = chatHelper;
     }
 
     public static void start(Context context) {
@@ -39,8 +35,7 @@ public class QBInitChatsCommand extends ServiceCommand {
             user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         }
 
-        privateChatHelper.init(user);
-        multiChatHelper.init(user);
+        chatHelper.init(user);
 
         return extras;
     }

@@ -25,7 +25,6 @@ import java.util.List;
 
 public class ChatNotificationUtils {
 
-    public static final String PROPERTY_DIALOG_ID = "dialog_id";
     public static final String PROPERTY_ROOM_NAME = "room_name";
     public static final String PROPERTY_ROOM_PHOTO = "room_photo";
     public static final String PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS = "current_occupant_ids";
@@ -38,14 +37,13 @@ public class ChatNotificationUtils {
     public static final String PROPERTY_NOTIFICATION_TYPE = "notification_type";
     public static final String PROPERTY_CHAT_TYPE = "type";
     public static final String PROPERTY_DATE_SENT = "date_sent";
-    public static final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
 
-    public static final String VALUE_SAVE_TO_HISTORY = "1";
+    public static final boolean VALUE_SAVE_TO_HISTORY = true;
     public static final String VALUE_MODULE_IDENTIFIER = "SystemNotifications";
     public static final String VALUE_GROUP_CHAT_TYPE = "2";
 
     public static QBChatDialog parseDialogFromQBMessage(Context context, QBChatMessage qbChatMessage, QBDialogType qbDialogType) {
-        String dialogId = (String) qbChatMessage.getProperty(PROPERTY_DIALOG_ID);
+        String dialogId = qbChatMessage.getDialogId();
         String currentOccupantsIdsString = (String) qbChatMessage.getProperty(PROPERTY_ROOM_CURRENT_OCCUPANTS_IDS);
         String addedOccupantsIdsString = (String) qbChatMessage.getProperty(PROPERTY_ROOM_ADDED_OCCUPANTS_IDS);
         String dialogName = (String) qbChatMessage.getProperty(PROPERTY_ROOM_NAME);
@@ -246,14 +244,14 @@ public class ChatNotificationUtils {
         QBChatMessage qbChatMessage = new QBChatMessage();
         qbChatMessage.setSenderId(AppSession.getSession().getUser().getId());
         qbChatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
-        qbChatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
+        qbChatMessage.setSaveToHistory(VALUE_SAVE_TO_HISTORY);
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, String.valueOf(notificationType.getValue()));
         return qbChatMessage;
     }
 
     public static QBChatMessage createGroupMessageAboutCreateGroupChat(Context context, QBChatDialog qbDialog, String photoUrl) {
         QBChatMessage qbChatMessage = new QBChatMessage();
-        qbChatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
+        qbChatMessage.setSaveToHistory(VALUE_SAVE_TO_HISTORY);
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
                 String.valueOf(NotificationType.GROUP_CHAT_UPDATE.getValue()));
         qbChatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
@@ -273,7 +271,7 @@ public class ChatNotificationUtils {
     public static QBChatMessage createGroupMessageAboutUpdateChat(Context context, QBChatDialog qbDialog,
             DialogNotification.Type notificationType, Collection<Integer> occupantsIdsList, boolean leavedFromChat) {
         QBChatMessage qbChatMessage = new QBChatMessage();
-        qbChatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
+        qbChatMessage.setSaveToHistory(VALUE_SAVE_TO_HISTORY);
         qbChatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE,
                 String.valueOf(NotificationType.GROUP_CHAT_UPDATE.getValue()));
         qbChatMessage.setProperty(PROPERTY_ROOM_UPDATED_AT, String.valueOf(qbDialog.getUpdatedAt().getTime()));

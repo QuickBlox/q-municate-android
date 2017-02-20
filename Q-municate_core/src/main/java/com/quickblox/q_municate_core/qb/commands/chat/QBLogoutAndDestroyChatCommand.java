@@ -5,21 +5,21 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
 public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
 
     private QBChatRestHelper chatRestHelper;
-    private QBGroupChatHelper multiChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBLogoutAndDestroyChatCommand(Context context, QBChatRestHelper chatRestHelper, QBGroupChatHelper multiChatHelper, String successAction,
-            String failAction) {
+    public QBLogoutAndDestroyChatCommand(Context context, QBChatRestHelper chatRestHelper, QBChatHelper chatHelper, String successAction,
+                                         String failAction) {
         super(context, successAction, failAction);
         this.chatRestHelper = chatRestHelper;
-        this.multiChatHelper = multiChatHelper;
+        this.chatHelper = chatHelper;
     }
 
     public static void start(Context context, boolean destroyChat) {
@@ -41,7 +41,7 @@ public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
         }
 
         if (chatRestHelper != null && chatRestHelper.isLoggedIn()) {
-            multiChatHelper.leaveDialogs();
+            chatHelper.leaveDialogs();
             chatRestHelper.logout();
             if (destroy) {
                 chatRestHelper.destroy();

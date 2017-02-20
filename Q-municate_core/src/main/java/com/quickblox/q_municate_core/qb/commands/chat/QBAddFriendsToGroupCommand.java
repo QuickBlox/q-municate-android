@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -18,12 +18,12 @@ import java.util.ArrayList;
 
 public class QBAddFriendsToGroupCommand extends ServiceCommand {
 
-    private QBGroupChatHelper multiChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBAddFriendsToGroupCommand(Context context, QBGroupChatHelper chatHelper, String successAction,
-            String failAction) {
+    public QBAddFriendsToGroupCommand(Context context, QBChatHelper chatHelper, String successAction,
+                                      String failAction) {
         super(context, successAction, failAction);
-        this.multiChatHelper = chatHelper;
+        this.chatHelper = chatHelper;
     }
 
     public static void start(Context context, String dialogId, ArrayList<Integer> friendIdsList) {
@@ -39,7 +39,7 @@ public class QBAddFriendsToGroupCommand extends ServiceCommand {
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         ArrayList<Integer> friendIdsList = (ArrayList<Integer>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
 
-        QBChatDialog qbDialog = multiChatHelper.addUsersToDialog(dialogId, friendIdsList);
+        QBChatDialog qbDialog = chatHelper.addUsersToDialog(dialogId, friendIdsList);
 
         if (qbDialog != null) {
             Dialog dialog = ChatUtils.createLocalDialog(qbDialog);

@@ -18,13 +18,6 @@ dependencies {
     compile "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
     compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
 
-//    compile project(":quickblox-android-sdk-core" )
-//    compile project(":quickblox-android-sdk-content" )
-//    compile project(":quickblox-android-sdk-customobjects" )
-//    compile project(":quickblox-android-sdk-messages" )
-//    compile project(":quickblox-android-sdk-videochat-webrtc" )
-
-
     //    Other QuickBlox libs (core + chat) will be connected as transitive dependencies
 
     compile("com.digits.sdk.android:digits:${rootProject.twitterDigitsSdkVersion}@aar") {
@@ -40,6 +33,7 @@ dependencies {
     }
     compile ("com.quickblox:chat-message-adapter:$rootProject.qbMessageAdapterVersion"){
         exclude module: 'quickblox-android-sdk-chat'
+        exclude module: 'quickblox-android-sdk-content'
         exclude module: 'recyclerview-v7'
     }
     compile project(path: ':q-municate_user_service')

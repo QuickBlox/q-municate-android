@@ -3,15 +3,15 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.quickblox.content.model.QBFile;
-import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
@@ -26,6 +26,7 @@ import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -49,12 +50,12 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
     private int operationItemPosition;
-    private final String TAG = "PrivateDialogActivity";
+    private final String TAG = PrivateDialogActivity.class.getSimpleName();
 
-    public static void start(Context context, QMUser opponent, Dialog dialog) {
+    public static void start(Context context, QMUser opponent, QBChatDialog chatDialog) {
         Intent intent = new Intent(context, PrivateDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
         context.startActivity(intent);
     }
 
@@ -63,7 +64,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         super.onCreate(savedInstanceState);
         initFields();
 
-        if (dialog == null) {
+        if (currentChatDialog == null) {
             finish();
         }
 
@@ -124,31 +125,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void onFileLoaded(QBFile file, String dialogId) {
-        sendPrivateMessageWithAttach(dialogId, file, null);
-    }
-
-    @Override
-    protected void onLocationLoaded(String location, String dialogId) {
-        sendPrivateMessageWithAttach(dialogId, null, location);
-    }
-
-    private void sendPrivateMessageWithAttach(String dialogId, QBFile file, String location) {
-        if (!dialogId.equals(dialog.getDialogId())) {
-            return;
-        }
-        try {
-            if (file != null) {
-                privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getId());
-            } else if (!TextUtils.isEmpty(location)) {
-                privateChatHelper.sendPrivateMessageWithAttachLocation(location, opponentUser.getId());
-            }
-        } catch (QBResponseException exc) {
-            ErrorUtils.showError(this, exc);
-        }
-    }
-
-    @Override
     protected Bundle generateBundleToInitDialog() {
         Bundle bundle = new Bundle();
         bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentUser.getId());
@@ -158,7 +134,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, dialog);
+        messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, currentChatDialog);
         messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
@@ -205,7 +181,9 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     private void initActualExtras() {
         opponentUser = (QMUser) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        Log.d(TAG, "currentChatDialog: " + currentChatDialog);
+//        currentChatDialog.initForChat(QBChatService.getInstance());
     }
 
     @Override
@@ -257,7 +235,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void initFields() {
-        chatHelperIdentifier = QBService.PRIVATE_CHAT_HELPER;
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
         initActualExtras();
@@ -292,7 +269,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     public void sendMessage(View view) {
-        sendMessage(true);
+        sendMessage();
     }
 
     private void callToUser(QMUser user, QBRTCTypes.QBConferenceType qbConferenceType) {
@@ -353,9 +330,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void checkForCorrectChat() {
-        Dialog updatedDialog = null;
-        if (dialog != null) {
-            updatedDialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
+        QBChatDialog updatedDialog = null;
+        if (currentChatDialog != null) {
+            Dialog dialog = dataManager.getDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
+            updatedDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
         } else {
             finish();
         }
@@ -363,7 +341,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         if (updatedDialog == null) {
             finish();
         } else {
-            dialog = updatedDialog;
+            currentChatDialog = updatedDialog;
         }
     }
 

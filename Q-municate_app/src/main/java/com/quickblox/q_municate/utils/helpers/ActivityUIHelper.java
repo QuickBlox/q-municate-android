@@ -5,10 +5,12 @@ import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.chats.BaseDialogActivity;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -19,7 +21,7 @@ public class ActivityUIHelper {
 
     private BaseActivity baseActivity;
     private QMUser senderUser;
-    private Dialog messagesDialog;
+    private QBChatDialog messagesDialog;
     private String message;
     private boolean isPrivateMessage;
 
@@ -41,7 +43,10 @@ public class ActivityUIHelper {
     }
 
     private boolean isMessagesDialogCorrect(String dialogId) {
-        messagesDialog = DataManager.getInstance().getDialogDataManager().getByDialogId(dialogId);
+        Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(dialogId);
+        if (messagesDialog!= null){
+            messagesDialog = ChatUtils.createQBDialogFromLocalDialog(DataManager.getInstance(), dialog);
+        }
         return messagesDialog != null;
     }
 

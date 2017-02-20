@@ -135,13 +135,13 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (!appSharedHelper.isShownUserAgreement()) {
             UserAgreementDialogFragment
                     .show(getSupportFragmentManager(), new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    super.onPositive(dialog);
-                                    appSharedHelper.saveShownUserAgreement(true);
-                                    loginWithSocial();
-                                }
-                            });
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            appSharedHelper.saveShownUserAgreement(true);
+                            loginWithSocial();
+                        }
+                    });
         } else {
             loginWithSocial();
         }
@@ -150,9 +150,9 @@ public abstract class BaseAuthActivity extends BaseActivity {
     private void loginWithSocial() {
         appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
-        if (loginType.equals(LoginType.FACEBOOK)){
+        if (loginType.equals(LoginType.FACEBOOK)) {
             facebookHelper.login(new FacebookLoginCallback());
-        } else if (loginType.equals(LoginType.TWITTER_DIGITS)){
+        } else if (loginType.equals(LoginType.TWITTER_DIGITS)) {
             twitterDigitsHelper.login(twitterDigitsAuthCallback);
         }
     }

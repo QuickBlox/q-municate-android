@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -31,18 +32,18 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     private static final String TAG = PrivateChatMessageAdapter.class.getSimpleName();
 
     private static int EMPTY_POSITION = -1;
+    private final QBChatDialog chatDialog;
     private int lastRequestPosition = EMPTY_POSITION;
     private int lastInfoRequestPosition = EMPTY_POSITION;
     private FriendOperationListener friendOperationListener;
-    private Dialog dialog;
 
     protected DataManager dataManager;
 
-    public PrivateChatMessageAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages, FriendOperationListener friendOperationListener, Dialog dialog) {
+    public PrivateChatMessageAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages, FriendOperationListener friendOperationListener, QBChatDialog chatDialog) {
         super(baseActivity, chatMessages);
         this.friendOperationListener = friendOperationListener;
         dataManager = DataManager.getInstance();
-        this.dialog = dialog;
+        this.chatDialog = chatDialog;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
             Log.d(TAG, "onBindViewCustomHolder QBUpdateStatusMessageCommand.start");
             chatMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), chatMessage, true);
+            QBUpdateStatusMessageCommand.start(baseActivity, chatDialog, chatMessage, true);
         }
         // check if last messageCombination is request messageCombination
         boolean lastRequestMessage = (position == getItemCount() - 1 && friendsRequestMessage);
@@ -146,7 +147,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
             Log.d(TAG, "updateMessageState");
             chatMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), chatMessage, true);
+            QBUpdateStatusMessageCommand.start(baseActivity, chatDialog, chatMessage, true);
         }
     }
 

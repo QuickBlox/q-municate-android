@@ -95,13 +95,13 @@ public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListe
     }
 
     private void setOnlineStatus(ViewHolder viewHolder, QMUser user) {
-        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getId());
+        boolean online = qbFriendListHelper != null && user.getId()!= null && qbFriendListHelper.isUserOnline(user.getId());
 
         if (online) {
             viewHolder.labelTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
             viewHolder.labelTextView.setTextColor(resources.getColor(R.color.green));
         } else {
-            viewHolder.labelTextView.setText(resources.getString(R.string.last_seen,
+            viewHolder.labelTextView.setText(user.getLastRequestAt() == null ? null : resources.getString(R.string.last_seen,
                     DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
                     DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime())));
             viewHolder.labelTextView.setTextColor(resources.getColor(R.color.dark_gray));

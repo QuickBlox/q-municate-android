@@ -28,7 +28,6 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -126,7 +125,8 @@ public class UserProfileActivity extends BaseLoggableActivity {
     void sendMessage(View view) {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
-            PrivateDialogActivity.start(UserProfileActivity.this, user, dialogOccupant.getDialog());
+            QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialogOccupant.getDialog());
+            PrivateDialogActivity.start(UserProfileActivity.this, user, chatDialog);
         } else {
             showProgress();
             QBCreatePrivateChatCommand.start(this, user);
@@ -280,12 +280,12 @@ public class UserProfileActivity extends BaseLoggableActivity {
             finish();
         } else {
             String dialogId = dialogOccupant.getDialog().getDialogId();
-            QBDeleteChatCommand.start(this, dialogId, Dialog.Type.PRIVATE);
+            QBDeleteChatCommand.start(this, dialogId);
         }
     }
 
     private void startPrivateChat(QBChatDialog qbDialog) {
-        PrivateDialogActivity.start(UserProfileActivity.this, user, ChatUtils.createLocalDialog(qbDialog));
+        PrivateDialogActivity.start(UserProfileActivity.this, user, qbDialog);
     }
 
     private boolean isUserFriendOrUserRequest() {

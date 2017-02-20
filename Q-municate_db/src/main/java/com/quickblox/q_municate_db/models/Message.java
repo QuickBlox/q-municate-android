@@ -109,7 +109,7 @@ public class Message implements Serializable {
     }
 
     public boolean isIncoming(int currentUserId) {
-        return dialogOccupant != null && currentUserId != dialogOccupant.getUser().getId();
+        return dialogOccupant != null &&  dialogOccupant.getUser() != null && currentUserId != dialogOccupant.getUser().getId();
     }
 
     @Override

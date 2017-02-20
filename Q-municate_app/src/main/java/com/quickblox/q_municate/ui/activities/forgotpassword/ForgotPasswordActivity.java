@@ -9,6 +9,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.result.HttpStatus;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate.utils.ToastUtils;

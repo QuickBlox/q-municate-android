@@ -28,6 +28,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
@@ -53,11 +55,13 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
+import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
+import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -75,6 +79,8 @@ import butterknife.ButterKnife;
 
 public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
 
+    private static final String TAG = BaseActivity.class.getSimpleName();
+
     protected App app;
     protected Toolbar toolbar;
     protected SharedHelper appSharedHelper;
@@ -82,8 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected FailAction failAction;
     protected SuccessAction successAction;
     protected QBFriendListHelper friendListHelper;
-    protected QBPrivateChatHelper privateChatHelper;
-    protected QBGroupChatHelper groupChatHelper;
+    protected QBChatHelper chatHelper;
     protected QBService service;
     protected LocalBroadcastManager localBroadcastManager;
     protected String title;
@@ -103,6 +108,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
+
 
     protected abstract int getContentResId();
 
@@ -397,12 +403,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
         }
 
-        if (privateChatHelper == null) {
-            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
-        }
-
-        if (groupChatHelper == null) {
-            groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+        if (chatHelper == null){
+            chatHelper = (QBChatHelper) service.getHelper(QBService.CHAT_HELPER);
         }
 
         notifyConnectedToService();
@@ -578,12 +580,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return friendListHelper;
     }
 
-    public QBPrivateChatHelper getPrivateChatHelper() {
-        return privateChatHelper;
-    }
-
-    public QBGroupChatHelper getGroupChatHelper() {
-        return groupChatHelper;
+    public QBChatHelper getChatHelper(){
+        return chatHelper;
     }
 
     public FailAction getFailAction() {
@@ -591,15 +589,19 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void checkOpeningDialog() {
-        if (appSharedHelper.needToOpenDialog() && isChatInitializedAndUserLoggedIn()) {
+        if (appSharedHelper.needToOpenDialog()) {
             Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
             QMUser user = QMUserService.getInstance().getUserCache().get((long)appSharedHelper.getPushUserId());
 
+            Log.d(TAG, "chatDialog for oppeneng by push: " + dialog + " user: " + user);
+
             if (dialog != null && user != null) {
-                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-                    startPrivateChatActivity(user, dialog);
+                QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(DataManager.getInstance(), dialog);
+                Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog);
+                if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
+                    startPrivateChatActivity(user, chatDialog);
                 } else {
-                    startGroupChatActivity(dialog);
+                    startGroupChatActivity(chatDialog);
                 }
 
                 appSharedHelper.saveNeedToOpenDialog(false);
@@ -619,12 +621,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return isAppInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
-    public void startPrivateChatActivity(QMUser user, Dialog dialog) {
+    public void startPrivateChatActivity(QMUser user, QBChatDialog dialog) {
         PrivateDialogActivity.start(this, user, dialog);
     }
 
-    public void startGroupChatActivity(Dialog dialog) {
-        GroupDialogActivity.start(this, dialog);
+    public void startGroupChatActivity(QBChatDialog chatDialog) {
+        GroupDialogActivity.start(this, chatDialog);
     }
 
     protected void startLandingScreen() {
