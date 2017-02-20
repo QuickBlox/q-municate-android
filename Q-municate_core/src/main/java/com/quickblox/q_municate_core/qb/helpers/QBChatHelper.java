@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.chat.JIDHelper;
 import com.quickblox.chat.QBChatService;
@@ -60,7 +61,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class QBChatHelper extends BaseHelper {
+public class QBChatHelper extends BaseThreadPoolHelper{
 
     private static final String TAG = QBChatHelper.class.getSimpleName();
 
@@ -736,8 +737,13 @@ public class QBChatHelper extends BaseHelper {
     private class AllChatMessagesListener implements QBChatDialogMessageListener {
 
         @Override
-        public void processMessage(String dialogId, QBChatMessage qbChatMessage, Integer senderId) {
-            onChatMessageReceived(dialogId, qbChatMessage, senderId);
+        public void processMessage(final String dialogId, final QBChatMessage qbChatMessage, final Integer senderId) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    onChatMessageReceived(dialogId, qbChatMessage, senderId);
+                }
+            });
         }
 
         @Override
