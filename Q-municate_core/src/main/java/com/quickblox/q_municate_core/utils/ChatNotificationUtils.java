@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.helper.CollectionUtils;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ChatNotificationType;
@@ -65,7 +66,7 @@ public class ChatNotificationUtils {
             qbDialog.setOccupantsIds((ArrayList<Integer>) ChatUtils.getOccupantsIdsListFromString(addedOccupantsIdsString));
         }
 
-        if (!qbChatMessage.getAttachments().isEmpty()) {
+        if (!CollectionUtils.isEmpty(qbChatMessage.getAttachments())) {
             qbDialog.setLastMessage(context.getString(R.string.dlg_attached_last_message));
         } else if (!TextUtils.isEmpty(qbChatMessage.getBody())) {
             qbDialog.setLastMessage(qbChatMessage.getBody());
@@ -85,7 +86,7 @@ public class ChatNotificationUtils {
             String lastMessage, QBDialogType qbDialogType) {
         QBChatDialog qbDialog = parseDialogFromQBMessage(context, qbChatMessage, qbDialogType);
 
-        if (!qbChatMessage.getAttachments().isEmpty()) {
+        if (! CollectionUtils.isEmpty(qbChatMessage.getAttachments())) {
             qbDialog.setLastMessage(context.getString(R.string.dlg_attached_last_message));
         } else if (!TextUtils.isEmpty(lastMessage)) {
             qbDialog.setLastMessage(lastMessage);
