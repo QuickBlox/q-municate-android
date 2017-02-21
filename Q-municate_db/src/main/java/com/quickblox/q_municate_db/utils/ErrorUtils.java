@@ -7,7 +7,7 @@ import android.widget.Toast;
 
 public class ErrorUtils {
 
-    public static void showError(Context context, Exception e) {
+    public static void showError(Context context, Throwable e) {
         String errorMsg = !TextUtils.isEmpty(e.getMessage()) ? e.getMessage() : null;
         if (errorMsg != null) {
             Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();

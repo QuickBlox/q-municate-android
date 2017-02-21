@@ -131,7 +131,11 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     public void invite(int userId) throws Exception {
         sendInvitation(userId);
 
-        loadAndSaveUser(userId);
+        try {
+            loadAndSaveUser(userId);
+        } catch (QBResponseException e){
+            //TODO FIXME fix suppressing exception when moving to service
+        }
 
         QBChatMessage chatMessage = ChatNotificationUtils.createPrivateMessageAboutFriendsRequests(context,
                 NotificationType.FRIENDS_REQUEST);
@@ -310,15 +314,8 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     @Nullable
-    private QMUser loadAndSaveUser(int userId) {
-        QMUser user = QBRestHelper.loadUser(userId);
-
-        if (user == null) {
-            return null;
-        } else {
-            saveUser(user);
-        }
-
+    private QMUser loadAndSaveUser(int userId) throws QBResponseException {
+        QMUser user = QMUserService.getInstance().getUserSync(userId, true);
         return user;
     }
 
@@ -359,7 +356,7 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
 
     private void loadAndSaveUsers(Collection<Integer> userList, UserRequest.RequestStatus status) throws QBResponseException {
         if (!userList.isEmpty()) {
-            List<QMUser> loadedUserList = (List<QMUser>) restHelper.loadUsers(userList);
+            List<QMUser> loadedUserList = QMUserService.getInstance().getUsersByIDsSync(userList, null);
             for (QMUser user : loadedUserList) {
                 saveUser(user);
                 createUserRequest(user, status);
