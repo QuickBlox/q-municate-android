@@ -7,6 +7,7 @@ import com.j256.ormlite.stmt.Where;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
@@ -24,6 +25,24 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
             Dao<Dialog, Long> dialogDao) {
         super(dialogOccupantDao, DialogOccupantDataManager.class.getSimpleName());
         this.dialogDao = dialogDao;
+    }
+
+    @Override
+    public void createOrUpdate(Object object, boolean notify) {
+        DialogOccupant dialogOccupant = (DialogOccupant) object;
+        try {
+            if(existsByDialogIdAndUserId(dialogOccupant.getDialog().getDialogId(), dialogOccupant.getUser().getId())){
+                dao.update(dialogOccupant);
+            } else{
+                dao.create(dialogOccupant);
+            }
+
+            if (notify) {
+                notifyObservers(getObserverKey());
+            }
+        } catch (SQLException e) {
+            ErrorUtils.logError(TAG, "createOrUpdate(DialogOccupant) - " + e.getMessage());
+        }
     }
 
     public List<DialogOccupant> getDialogOccupantsListByDialogId(String dialogId) {
@@ -115,5 +134,9 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
         }
 
         return dialogOccupantsList;
+    }
+
+    public boolean existsByDialogIdAndUserId(String dialogId, int userId) {
+        return getDialogOccupant(dialogId, userId) != null;
     }
 }

@@ -6,6 +6,7 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Friend;
+import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;
@@ -23,6 +24,25 @@ public class FriendDataManager extends BaseManager<Friend> {
     public FriendDataManager(Dao<Friend, Long> friendDao, Dao<QMUser, Long> userDao) {
         super(friendDao, FriendDataManager.class.getSimpleName());
         this.userDao = userDao;
+    }
+
+
+    @Override
+    public void createOrUpdate(Object object, boolean notify) {
+        Friend friend = (Friend) object;
+        try {
+            if(existsByUserId(friend.getUser().getId())){
+                dao.update(friend);
+            } else{
+                dao.create(friend);
+            }
+
+            if (notify) {
+                notifyObservers(getObserverKey());
+            }
+        } catch (SQLException e) {
+            ErrorUtils.logError(TAG, "createOrUpdate(Friend) - " + e.getMessage());
+        }
     }
 
     public Friend getByUserId(int userId) {

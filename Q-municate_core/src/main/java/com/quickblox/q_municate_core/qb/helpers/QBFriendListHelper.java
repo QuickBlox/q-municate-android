@@ -20,6 +20,7 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.NotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -213,7 +214,10 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
-        List<QMUser> qmUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, new QBPagedRequestBuilder());
+        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
+        requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
+        requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
+        List<QMUser> qmUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, requestBuilder);
         saveUsersAndFriends(qmUsers);
     }
 
