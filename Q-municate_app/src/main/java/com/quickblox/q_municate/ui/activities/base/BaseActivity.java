@@ -427,6 +427,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void registerBroadcastReceivers() {
+        Log.v(TAG, "registerBroadcastReceivers()");
         IntentFilter globalActionsIntentFilter = new IntentFilter();
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL);
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
@@ -448,6 +449,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void addActions() {
+        Log.v(TAG, "addActions()");
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
@@ -743,8 +745,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             boolean activeConnection = intent
                     .getBooleanExtra(NetworkChangeReceiver.EXTRA_IS_ACTIVE_CONNECTION, false);
 
+            checkShowingConnectionError();
+
             if (activeConnection) {
-                checkShowingConnectionError();
 
                 if (!loggedIn && LoginHelper.isCorrectOldAppSession()) {
                     loggedIn = true;

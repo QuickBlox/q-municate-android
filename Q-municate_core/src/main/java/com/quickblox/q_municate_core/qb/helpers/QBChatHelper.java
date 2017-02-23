@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.chat.JIDHelper;
 import com.quickblox.chat.QBChatService;
@@ -90,17 +91,21 @@ public class QBChatHelper extends BaseHelper {
         dataManager = DataManager.getInstance();
     }
 
-    public synchronized QBChatDialog initCurrentChatDialog(QBChatDialog dialog, Bundle additional) throws QBResponseException {
+    public synchronized void initCurrentChatDialog(QBChatDialog dialog, Bundle additional) throws QBResponseException {
         currentDialog = dialog;
-        currentDialog.initForChat(chatService);
-        if (QBDialogType.GROUP.equals(dialog.getType())) {
-            tryJoinRoomChat(currentDialog);
-            currentDialog.addParticipantListener(participantListener);
-        } else {
-            currentDialog.addIsTypingListener(typingListener);
-        }
+        initCurrentDialogForChatIfPossible();
+    }
 
-        return dialog;
+    private void initCurrentDialogForChatIfPossible() {
+        if (currentDialog != null && chatService != null && chatService.isLoggedIn()) {
+            currentDialog.initForChat(chatService);
+            if (QBDialogType.GROUP.equals(currentDialog.getType())) {
+                tryJoinRoomChat(currentDialog);
+                currentDialog.addParticipantListener(participantListener);
+            } else {
+                currentDialog.addIsTypingListener(typingListener);
+            }
+        }
     }
 
     public synchronized void closeChat(QBChatDialog chatDialog, Bundle additional) {
@@ -112,8 +117,11 @@ public class QBChatHelper extends BaseHelper {
     }
 
     public void init(QBUser chatCreator) {
+        Log.v(TAG, "init()");
         this.chatService = QBChatService.getInstance();
         this.chatCreator = chatCreator;
+
+        initCurrentDialogForChatIfPossible();
 
         chatService.getMessageStatusesManager().addMessageStatusListener(privateChatMessagesStatusListener);
         chatService.getIncomingMessagesManager().addDialogMessageListener(allChatMessagesListener);
@@ -130,24 +138,12 @@ public class QBChatHelper extends BaseHelper {
         notificationChatListeners.add(notificationChatListener);
     }
 
-//    public void sendChatMessage(String message, QBChatDialog chatDialog) throws QBResponseException {
-//        sendChatMessage(message, chatDialog);
-//    }
-
-//    public void sendMessageWithAttachImage(QBFile file, QBChatDialog chatDialog) throws QBResponseException {
-//        sendChatMessage(file, context.getString(R.string.dlg_attached_last_message), chatDialog, null);
-//    }
-//
-//    public void sendMessageWithAttachLocation(String location, QBChatDialog chatDialog) throws QBResponseException {
-//        sendChatMessage(null, context.getString(R.string.dlg_location_last_message), chatDialog, location);
-//    }
-
     public void sendChatMessage(String message) throws QBResponseException {
         QBChatMessage qbChatMessage = getQBChatMessage(message);
         sendAndSaveChatMessage(qbChatMessage, currentDialog);
     }
 
-    public void sendMessageWithAttachment(Attachment.Type attachmentType, Object attachmentObject/*, QBChatDialog chatDialog*/) throws QBResponseException {
+    public void sendMessageWithAttachment(Attachment.Type attachmentType, Object attachmentObject) throws QBResponseException {
         String messageBody = "";
         QBAttachment attachment = null;
         switch (attachmentType) {
@@ -246,19 +242,10 @@ public class QBChatHelper extends BaseHelper {
         DbUtils.deleteDialogLocal(dataManager, dialogId);
     }
 
-    private QBChatMessage getQBChatMessage(String body/*, QBFile qbFile, String location*/) {
+    private QBChatMessage getQBChatMessage(String body) {
         long time = DateUtilsCore.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
-//
-//        if (qbFile != null) {
-//            QBAttachment attachment = getAttachment(qbFile);
-//            chatMessage.addAttachment(attachment);
-//        } else if (location != null) {
-//            QBAttachment attachment = getAttachment(location);
-//            chatMessage.addAttachment(attachment);
-//        }
-
         chatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, String.valueOf(time));
         chatMessage.setSaveToHistory(ChatNotificationUtils.VALUE_SAVE_TO_HISTORY);
 
@@ -287,32 +274,19 @@ public class QBChatHelper extends BaseHelper {
         return attachment;
     }
 
-    public void sendTypingStatusToServer(/*String dialogId, */boolean startTyping) {
-        try {
-//            QBChatDialog chatDialog = createPrivateChatIfNotExist(dialogId);
-            if (startTyping) {
-//                chatDialog.sendIsTypingNotification();
-                currentDialog.sendIsTypingNotification();
-            } else {
-//                chatDialog.sendStopTypingNotification();
-                currentDialog.sendStopTypingNotification();
+    public void sendTypingStatusToServer(boolean startTyping) {
+        if (currentDialog != null && chatService.isLoggedIn()) {
+            try {
+                if (startTyping) {
+                    currentDialog.sendIsTypingNotification();
+                } else {
+                    currentDialog.sendStopTypingNotification();
+                }
+            } catch (XMPPException | SmackException.NotConnectedException /*| QBResponseException*/ e) {
+                ErrorUtils.logError(e);
             }
-        } catch (XMPPException | SmackException.NotConnectedException /*| QBResponseException*/ e) {
-            ErrorUtils.logError(e);
         }
     }
-
-//    public QBChatDialog createPrivateChatIfNotExist(String dialogId) throws QBResponseException {
-//        if (!chatService.isLoggedIn()) {
-//            ErrorUtils.logError(TAG, " not logged to the chat");
-//            throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
-//        }
-//
-//        QBChatDialog chatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
-//        chatDialog.initForChat(chatService);
-//
-//        return chatDialog;
-//    }
 
     public QBChatDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
         QBChatDialog dialog = QBRestChatService.createChatDialog(DialogUtils.buildPrivateDialog(opponentId)).perform();
@@ -669,7 +643,6 @@ public class QBChatHelper extends BaseHelper {
     }
 
     private void onChatMessageReceived(String dialogId, QBChatMessage chatMessage, Integer senderId) {
-//        Message message = parseReceivedMessage(chatMessage);
         boolean ownMessage = chatMessage.getSenderId().equals(chatCreator.getId());
 
         if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {

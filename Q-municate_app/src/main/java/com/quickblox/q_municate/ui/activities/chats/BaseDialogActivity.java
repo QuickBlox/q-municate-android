@@ -24,7 +24,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
@@ -47,7 +46,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogMessagesCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -139,6 +137,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onCreate(savedInstanceState);
         initFields();
 
+        if (currentChatDialog == null) {
+            finish();
+        }
+
+        setUpActionBarWithUpButton();
+
         initCustomUI();
         initCustomListeners();
 
@@ -146,7 +150,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         addObservers();
         registerBroadcastReceivers();
 
+        if (isNetworkAvailable()) {
+            deleteTempMessages();
+        }
+
         hideSmileLayout();
+
+        initMessagesRecyclerView();
     }
 
     @OnTextChanged(R.id.message_edittext)
@@ -193,7 +203,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        initCurrentDialogForChat();
         checkPermissionSaveFiles();
     }
 
@@ -231,6 +240,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     public void onConnectedToService(QBService service) {
         super.onConnectedToService(service);
         onConnectServiceLocally(service);
+        initCurrentDialog();
     }
 
     @Override
@@ -293,12 +303,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.performLoginChatSuccessAction(bundle);
         Log.v(TAG, "performLoginChatSuccessAction(Bundle bundle)");
 
-        initCurrentDialogForChat();
 
         startLoadDialogMessages(false);
     }
 
-    private void initFields() {
+    protected void initFields() {
         mainThreadHandler = new Handler(Looper.getMainLooper());
         resources = getResources();
         dataManager = DataManager.getInstance();
@@ -316,6 +325,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         systemPermissionHelper = new SystemPermissionHelper(this);
         messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        Log.v(TAG, "initFields() currentChatDialog = " + currentChatDialog);
         combinationMessagesList = createCombinationMessagesList();
     }
 
@@ -368,13 +378,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         localBroadcastManager.unregisterReceiver(updatingDialogBroadcastReceiver);
     }
 
-    private void addObservers() {
+    protected void addObservers() {
         dataManager.getQBChatDialogDataManager().addObserver(dialogObserver);
         dataManager.getMessageDataManager().addObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().addObserver(dialogNotificationObserver);
     }
 
-    private void deleteObservers() {
+    protected void deleteObservers() {
         dataManager.getQBChatDialogDataManager().deleteObserver(dialogObserver);
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
@@ -387,12 +397,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void updateData() {
-//        currentChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
-//        if (currentChatDialog != null) {
-//            //need init for dialog for chat after getting it from DB
-//            initCurrentDialogForChat();
-            updateActionBar();
-//        }
+        updateActionBar();
         updateMessagesList();
     }
 
@@ -553,7 +558,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         if (!error) {
             messageEditText.setText(ConstsCore.EMPTY_STRING);
-//            scrollMessagesToBottom();
         }
     }
 
@@ -590,23 +594,20 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
-    protected void initCurrentDialogForChat() {
-//        if (isNetworkAvailable()) {
-            if (service != null) {
-                chatHelper = (QBChatHelper) service.getHelper(QBService.CHAT_HELPER);
-                Log.d("Fix double message", "chatHelper = " + chatHelper + "\n dialog = " + currentChatDialog);
-                if (chatHelper != null && currentChatDialog != null) {
-                    try {
-                        chatHelper.initCurrentChatDialog(currentChatDialog, generateBundleToInitDialog());
-                    } catch (QBResponseException e) {
-                        ErrorUtils.showError(this, e.getMessage());
-                        finish();
-                    }
+    protected void initCurrentDialog() {
+        if (service != null) {
+            Log.v(TAG, "chatHelper = " + chatHelper + "\n dialog = " + currentChatDialog);
+            if (chatHelper != null && currentChatDialog != null) {
+                try {
+                    chatHelper.initCurrentChatDialog(currentChatDialog, generateBundleToInitDialog());
+                } catch (QBResponseException e) {
+                    ErrorUtils.showError(this, e.getMessage());
+                    finish();
                 }
-            } else {
-                Log.d("BaseDialogActivity", "service == null");
             }
-//        }
+        } else {
+            Log.v(TAG, "service == null");
+        }
     }
 
     private void closeCurrentChat() {
@@ -627,7 +628,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 .getDialogNotificationsByDialogId(currentChatDialog.getDialogId());
 
         List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-//        Log.d(TAG, "combinationMessages= " + combinationMessages);
+        Log.d(TAG, "combinationMessages= " + combinationMessages);
         return combinationMessages;
     }
 
@@ -737,7 +738,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 currentChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
                 if (currentChatDialog != null) {
                     // need init current dialog after getting from DB
-                    initCurrentDialogForChat();
+                    initCurrentDialog();
                 }
 
                 updateActionBar();

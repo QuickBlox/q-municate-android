@@ -126,12 +126,6 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
         fullNameTextInputLayout.setError(null);
         imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
     }
-//
-//    @Override
-//    public void onImagePicked(int requestCode, File file, String url) {
-//        canPerformLogout.set(true);
-//        startCropActivity(Uri.fromFile(file));
-//    }
 
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {

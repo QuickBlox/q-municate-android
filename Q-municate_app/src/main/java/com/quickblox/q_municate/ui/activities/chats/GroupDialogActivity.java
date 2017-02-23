@@ -30,7 +30,6 @@ import java.util.ArrayList;
 
 public class GroupDialogActivity extends BaseDialogActivity {
 
-
     private static final String TAG = GroupDialogActivity.class.getSimpleName();
 
     public static void start(Context context, ArrayList<QMUser> friends) {
@@ -48,21 +47,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        initFields();
-
-        if (currentChatDialog == null) {
-            finish();
-        }
-
-        setUpActionBarWithUpButton();
-
-        if (isNetworkAvailable()) {
-            deleteTempMessages();
-        }
-
-        initMessagesRecyclerView();
-        registerBroadcastReceivers();
     }
 
     @Override
@@ -169,14 +153,12 @@ public class GroupDialogActivity extends BaseDialogActivity {
         }
     }
 
-    private void initFields() {
-//        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-//        combinationMessagesList = createCombinationMessagesList();
+    @Override
+    protected void initFields() {
+        super.initFields();
         if (currentChatDialog != null) {
             title = ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager);
         }
-
-        Log.d(TAG, "currentChatDialog: " + currentChatDialog);
     }
 
     private void processCombinationMessages(){

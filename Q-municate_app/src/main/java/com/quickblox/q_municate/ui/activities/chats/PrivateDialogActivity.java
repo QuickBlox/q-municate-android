@@ -64,21 +64,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initFields();
-
-        if (currentChatDialog == null) {
-            finish();
-        }
-
-        setUpActionBarWithUpButton();
-
-        if (isNetworkAvailable()) {
-            deleteTempMessages();
-        }
-
-        addObservers();
-
-        initMessagesRecyclerView();
     }
 
     @Override
@@ -98,8 +83,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     protected void onResume() {
         super.onResume();
 
-//        updateCurrentChatFromDB();
-
         if (isNetworkAvailable()) {
             startLoadDialogMessages(false);
         }
@@ -110,7 +93,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        deleteObservers();
     }
 
     @Override
@@ -181,15 +163,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         findLastFriendsRequest(false);
     }
 
-    private void initActualExtras() {
-//        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        Log.d(TAG, "currentChatDialog: " + currentChatDialog);
-//
-//        if (QBChatService.getInstance().isLoggedIn()) {
-//            currentChatDialog.initForChat(QBChatService.getInstance());
-//        }
-    }
-
     @Override
     public void notifyChangedUserStatus(int userId, boolean online) {
         super.notifyChangedUserStatus(userId, online);
@@ -238,14 +211,13 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         UserProfileActivity.start(this, opponentUser.getId());
     }
 
-    private void initFields() {
+    @Override
+    protected void initFields() {
+        super.initFields();
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
         typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
         opponentUser = (QMUser) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-
-//        initActualExtras();
-//        combinationMessagesList = createCombinationMessagesList();
         title = opponentUser.getFullName();
     }
 
@@ -263,11 +235,15 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         localBroadcastManager.unregisterReceiver(typingMessageBroadcastReceiver);
     }
 
-    private void addObservers() {
+    @Override
+    protected void addObservers() {
+        super.addObservers();
         dataManager.getFriendDataManager().addObserver(friendObserver);
     }
 
-    private void deleteObservers() {
+    @Override
+    protected void deleteObservers() {
+        super.deleteObservers();
         dataManager.getFriendDataManager().deleteObserver(friendObserver);
     }
 
@@ -371,7 +347,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void hideTypingStatus() {
-        setActionBarSubtitle(null);
+        setOnlineStatus(opponentUser);
     }
 
     private class FriendOperationAction implements FriendOperationListener {
