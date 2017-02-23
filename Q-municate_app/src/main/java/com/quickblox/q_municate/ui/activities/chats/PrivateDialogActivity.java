@@ -130,9 +130,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-//        initActualExtras();
-//        updateCurrentChatFromDB();
-
         final int oldMessagesCount = messagesAdapter.getItemCount();
 
         (new BaseAsyncTask<Void, Void, Boolean>() {

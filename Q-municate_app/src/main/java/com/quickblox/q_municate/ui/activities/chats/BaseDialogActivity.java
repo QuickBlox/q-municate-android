@@ -510,7 +510,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void sendTypingStatus() {
-        chatHelper.sendTypingStatusToServer(/*currentChatDialog.getDialogId(), */isTypingNow);
+        chatHelper.sendTypingStatusToServer(isTypingNow);
     }
 
     private void setSmilePanelIcon(int resourceId) {
@@ -543,7 +543,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void sendMessage() {
         boolean error = false;
         try {
-            chatHelper.sendChatMessage(messageEditText.getText().toString()/*, currentChatDialog*/);
+            chatHelper.sendChatMessage(messageEditText.getText().toString());
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
             error = true;
@@ -674,7 +674,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             return;
         }
         try {
-            chatHelper.sendMessageWithAttachment(attachmentType, attachmentObject/*, currentChatDialog*/);
+            chatHelper.sendMessageWithAttachment(attachmentType, attachmentObject);
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
