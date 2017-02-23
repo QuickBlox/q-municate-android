@@ -1,18 +1,15 @@
 package com.quickblox.q_municate_db.managers;
 
 import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.core.helper.CollectionsUtil;
+import com.quickblox.q_municate_db.managers.base.Manager;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.DialogTransformUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collection;
 import java.util.List;
 import java.util.Observer;
 
-public class QBChatDialogDataManager {
+public class QBChatDialogDataManager implements Manager<QBChatDialog> {
     private final DialogDataManager dialogDataManager;
 
     public QBChatDialogDataManager(DialogDataManager dialogDataManager) {
@@ -41,28 +38,69 @@ public class QBChatDialogDataManager {
         return chatDialog;
     }
 
-    public void createOrUpdate(QBChatDialog chatDialog){
+    @Override
+    public void create(QBChatDialog object) {
+        Dialog dialog = DialogTransformUtils.createLocalDialog(object);
+        dialogDataManager.create(dialog);
+    }
+
+    @Override
+    public void createOrUpdate(QBChatDialog chatDialog) {
         Dialog dialog = DialogTransformUtils.createLocalDialog(chatDialog);
         dialogDataManager.createOrUpdate(dialog);
     }
 
-    public void update(QBChatDialog chatDialog){
+    @Override
+    public void createOrUpdate(QBChatDialog object, boolean notify) {
+        Dialog dialog = DialogTransformUtils.createLocalDialog(object);
+        dialogDataManager.createOrUpdate(dialog, notify);
+    }
+
+    @Override
+    public QBChatDialog get(long id) {
+        return DialogTransformUtils.createQBDialogFromLocalDialog(
+                DataManager.getInstance(),
+                dialogDataManager.get(id));
+    }
+
+    @Override
+    public void update(QBChatDialog chatDialog) {
         Dialog dialog = DialogTransformUtils.createLocalDialog(chatDialog);
         dialogDataManager.update(dialog);
     }
 
+    @Override
     public void update(QBChatDialog chatDialog, boolean notify) {
         Dialog dialog = DialogTransformUtils.createLocalDialog(chatDialog);
         dialogDataManager.update(dialog, notify);
     }
 
-    public void createOrUpdateAll(List<QBChatDialog> qbChatDialogsList) {
-        List<Dialog> dialogsList = new ArrayList<>(qbChatDialogsList.size());
-        for (QBChatDialog chatDialog : qbChatDialogsList){
-            dialogsList.add(DialogTransformUtils.createLocalDialog(chatDialog));
-        }
+    @Override
+    public void updateAll(Collection<QBChatDialog> objectsCollection) {
+        dialogDataManager.updateAll(
+                DialogTransformUtils.getListLocalDialogsFromQBDialogs(objectsCollection));
+    }
 
-        dialogDataManager.createOrUpdateAll(dialogsList);
+    @Override
+    public void delete(QBChatDialog object) {
+        Dialog dialog = DialogTransformUtils.createLocalDialog(object);
+        dialogDataManager.delete(dialog);
+    }
+
+    @Override
+    public void deleteById(long id) {
+        dialogDataManager.deleteById(id);
+    }
+
+    @Override
+    public boolean exists(long id) {
+        return dialogDataManager.exists(id);
+    }
+
+    @Override
+    public void createOrUpdateAll(Collection<QBChatDialog> qbChatDialogsList) {
+        dialogDataManager.createOrUpdateAll(
+                DialogTransformUtils.getListLocalDialogsFromQBDialogs(qbChatDialogsList));
     }
 
     public void deleteById(String dialogId) {
@@ -70,29 +108,17 @@ public class QBChatDialogDataManager {
     }
 
     public List<QBChatDialog> getAllSorted() {
-        List<Dialog> dialogsList = dialogDataManager.getAllSorted();
-        List<QBChatDialog> chatDialogList = new ArrayList<>();
-
-        if (!CollectionsUtil.isEmpty(dialogsList)) {
-            for (Dialog dialog : dialogsList) {
-                chatDialogList.add(DialogTransformUtils.createQBDialogFromLocalDialog(DataManager.getInstance(), dialog));
-            }
-        }
-
-        return chatDialogList;
+        return DialogTransformUtils.getListQBDialogsFromLocalDialogs(dialogDataManager.getAllSorted());
     }
 
     public List<QBChatDialog> getAll() {
-        List<Dialog> dialogsList = dialogDataManager.getAll();
-        List<QBChatDialog> chatDialogList = new ArrayList<>();
+        return DialogTransformUtils.getListQBDialogsFromLocalDialogs(dialogDataManager.getAll());
+    }
 
-        if (!CollectionsUtil.isEmpty(dialogsList)) {
-            for (Dialog dialog : dialogsList) {
-                chatDialogList.add(DialogTransformUtils.createQBDialogFromLocalDialog(DataManager.getInstance(), dialog));
-            }
-        }
-
-        return chatDialogList;
+    @Override
+    public List<QBChatDialog> getAllSorted(String sortedColumn, boolean ascending) {
+        return DialogTransformUtils.getListQBDialogsFromLocalDialogs(
+                dialogDataManager.getAllSorted(sortedColumn, ascending));
     }
 
     public void addObserver(Observer observer) {
@@ -106,7 +132,4 @@ public class QBChatDialogDataManager {
     public String getObserverKey() {
         return dialogDataManager.getObserverKey();
     }
-
-
-
 }

@@ -2,11 +2,13 @@ package com.quickblox.q_municate_db.utils;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -60,5 +62,26 @@ public class DialogTransformUtils {
         }
 
         return dialog;
+    }
+
+    public static List<Dialog> getListLocalDialogsFromQBDialogs(Collection<QBChatDialog> chatDialogs){
+        List<Dialog> dialogsList = new ArrayList<>(chatDialogs.size());
+        for (QBChatDialog chatDialog : chatDialogs){
+            dialogsList.add(DialogTransformUtils.createLocalDialog(chatDialog));
+        }
+
+        return dialogsList;
+    }
+
+    public static List<QBChatDialog> getListQBDialogsFromLocalDialogs(Collection<Dialog> dialogsList) {
+        List<QBChatDialog> chatDialogList = new ArrayList<>();
+
+        if (!CollectionsUtil.isEmpty(dialogsList)) {
+            for (Dialog dialog : dialogsList) {
+                chatDialogList.add(DialogTransformUtils.createQBDialogFromLocalDialog(DataManager.getInstance(), dialog));
+            }
+        }
+
+        return chatDialogList;
     }
 }
