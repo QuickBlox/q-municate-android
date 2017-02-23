@@ -67,7 +67,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
                 notifyObservers(getObserverKey());
             }
         } catch (SQLException e) {
-            ErrorUtils.logError(TAG, "createOrUpdateAll(Object) - " + e.getMessage());
+            ErrorUtils.logError(TAG, "createOrUpdate(Object) - " + e.getMessage());
         }
     }
 

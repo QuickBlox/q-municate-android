@@ -20,6 +20,7 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.NotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -131,7 +132,11 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     public void invite(int userId) throws Exception {
         sendInvitation(userId);
 
-        loadAndSaveUser(userId);
+        try {
+            loadAndSaveUser(userId);
+        } catch (QBResponseException e){
+            //TODO FIXME fix suppressing exception when moving to service
+        }
 
         QBChatMessage chatMessage = ChatNotificationUtils.createPrivateMessageAboutFriendsRequests(context,
                 NotificationType.FRIENDS_REQUEST);
@@ -209,14 +214,11 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
-        List<QMUser> qmUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, new QBPagedRequestBuilder());
-        List<QMUser> usersList = new ArrayList<QMUser>(qmUsers.size());
-        QMUser user = null;
-        for (QBUser qbUser : qmUsers){
-            user = QMUser.convert(qbUser);
-            usersList.add(user);
-        }
-        saveUsersAndFriends(usersList);
+        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
+        requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
+        requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
+        List<QMUser> qmUsers = QMUserService.getInstance().getUsersByIDsSync(friendIdsList, requestBuilder);
+        saveUsersAndFriends(qmUsers);
     }
 
     private void updateUsersAndFriends(Collection<Integer> idsList) throws QBResponseException {
@@ -273,13 +275,8 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         dataManager.getUserRequestDataManager().deleteByUserId(userId);
     }
 
-    private void saveUser(QMUser user) {
-        QMUserService.getInstance().getUserCache().createOrUpdate(user);
-    }
-
     private void saveUsersAndFriends(Collection<QMUser> usersCollection) {
         for (QMUser user : usersCollection) {
-            saveUser(user);
             saveFriend(user);
         }
     }
@@ -310,15 +307,8 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     @Nullable
-    private QMUser loadAndSaveUser(int userId) {
-        QMUser user = QBRestHelper.loadUser(userId);
-
-        if (user == null) {
-            return null;
-        } else {
-            saveUser(user);
-        }
-
+    private QMUser loadAndSaveUser(int userId) throws QBResponseException {
+        QMUser user = QMUserService.getInstance().getUserSync(userId, true);
         return user;
     }
 
@@ -359,9 +349,8 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
 
     private void loadAndSaveUsers(Collection<Integer> userList, UserRequest.RequestStatus status) throws QBResponseException {
         if (!userList.isEmpty()) {
-            List<QMUser> loadedUserList = (List<QMUser>) restHelper.loadUsers(userList);
+            List<QMUser> loadedUserList = QMUserService.getInstance().getUsersByIDsSync(userList, null);
             for (QMUser user : loadedUserList) {
-                saveUser(user);
                 createUserRequest(user, status);
             }
         }

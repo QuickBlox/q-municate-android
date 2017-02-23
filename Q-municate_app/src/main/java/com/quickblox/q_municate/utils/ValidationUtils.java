@@ -16,6 +16,7 @@ public class ValidationUtils {
     private static final int FULL_NAME_MIN_LENGTH = 3;
     private static final int FULL_NAME_MAX_LENGTH = 50;
     private static final int PASSWORD_MIN_LENGTH = 8;
+    private final static String NULL = "null";
 
     private Context context;
     private QBUser qbUser;
@@ -169,10 +170,15 @@ public class ValidationUtils {
         return false;
     }
 
+    public static boolean isNull(String value){
+        return value == null || value.equals(NULL);
+    }
+
     private boolean isEmailValid(String email) {
         String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
         Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
     }
+
 }

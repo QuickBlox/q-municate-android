@@ -20,6 +20,25 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
         super(userRequestDao, UserRequestDataManager.class.getSimpleName());
     }
 
+
+    @Override
+    public void createOrUpdate(Object object, boolean notify) {
+        UserRequest userRequest = (UserRequest) object;
+        try {
+            if(existsByUserId(userRequest.getUser().getId())){
+                dao.update(userRequest);
+            } else{
+                dao.create(userRequest);
+            }
+
+            if (notify) {
+                notifyObservers(getObserverKey());
+            }
+        } catch (SQLException e) {
+            ErrorUtils.logError(TAG, "createOrUpdate(UserRequest) - " + e.getMessage());
+        }
+    }
+
     public QMUser getUserRequestById(int userId) {
         UserRequest userRequest = null;
 

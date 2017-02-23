@@ -24,14 +24,14 @@ import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSignUpCommand;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
@@ -40,6 +40,7 @@ import java.io.File;
 import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
 
 public class SignUpActivity extends BaseAuthActivity implements OnImagePickedListener {
 
@@ -224,7 +225,27 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     private void performSignUpSuccessAction(Bundle bundle) {
         File image = (File) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
         QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-        QBUpdateUserCommand.start(SignUpActivity.this, user, image);
+        ServiceManager.getInstance().updateUser(user, image).subscribe(new Subscriber<QMUser>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(QMUser qmUser) {
+                appSharedHelper.saveFirstAuth(true);
+                appSharedHelper.saveSavedRememberMe(true);
+                startMainActivity(qmUser);
+
+                // send analytics data
+                GoogleAnalyticsHelper.pushAnalyticsData(SignUpActivity.this, qmUser, "User Sign Up");
+            }
+        });
     }
 
     private InputFilter fullNameFilter = new InputFilter() {

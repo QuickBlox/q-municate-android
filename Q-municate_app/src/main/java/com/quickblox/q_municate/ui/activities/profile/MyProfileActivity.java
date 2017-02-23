@@ -19,17 +19,18 @@ import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
@@ -38,6 +39,7 @@ import java.io.File;
 import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
 
 public class MyProfileActivity extends BaseLoggableActivity implements OnImagePickedListener {
 
@@ -77,7 +79,6 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
         setUpActionBarWithUpButton();
 
         initData();
-        addActions();
         updateOldData();
     }
 
@@ -113,7 +114,6 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        removeActions();
     }
 
     @OnTextChanged(R.id.full_name_edittext)
@@ -189,20 +189,6 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
         initCurrentData();
     }
 
-    private void addActions() {
-        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
-        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new UpdateUserFailAction());
-
-        updateBroadcastActionList();
-    }
-
-    private void removeActions() {
-        removeAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION);
-
-        updateBroadcastActionList();
-    }
-
     private void handleCrop(int resultCode, Intent result) {
         if (resultCode == RESULT_OK) {
             isNeedUpdateImage = true;
@@ -255,40 +241,36 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
         if (new ValidationUtils(this).isFullNameValid(fullNameTextInputLayout, oldFullName.trim(), currentFullName.trim())) {
             showProgress();
 
+            QBUser newUser = createUserForUpdating();
+            File file = null;
             if (isNeedUpdateImage && imageUri != null) {
-                QBUser newUser = createUserForUpdating();
-                QBUpdateUserCommand.start(this, newUser, ImageUtils.getCreatedFileFromUri(imageUri));
-            } else {
-                QBUser newUser = createUserForUpdating();
-                QBUpdateUserCommand.start(this, newUser, null);
+                file = ImageUtils.getCreatedFileFromUri(imageUri);
             }
+            ServiceManager.getInstance().updateUser(newUser, file).subscribe(new Subscriber<QMUser>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    hideProgress();
+
+                    if (e != null) {
+                        ToastUtils.longToast(e.getMessage());
+                    }
+
+                    resetUserData();
+                }
+
+                @Override
+                public void onNext(QMUser qmUser) {
+                    hideProgress();
+                    AppSession.getSession().updateUser(qmUser);
+                    updateOldData();
+                }
+            });
         }
     }
 
-    public class UpdateUserFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            hideProgress();
-
-            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            if (exception != null) {
-                ToastUtils.longToast(exception.getMessage());
-            }
-
-            resetUserData();
-        }
-    }
-
-    private class UpdateUserSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            hideProgress();
-
-            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            AppSession.getSession().updateUser(user);
-            updateOldData();
-        }
-    }
 }

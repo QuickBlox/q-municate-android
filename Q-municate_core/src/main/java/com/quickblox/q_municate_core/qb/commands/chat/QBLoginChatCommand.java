@@ -56,7 +56,7 @@ public class QBLoginChatCommand extends ServiceCommand {
             currentTime = new Date().getTime();
             try {
                 if (ConnectivityUtils.isNetworkAvailable(context)) {
-                    chatRestHelper.tryLoginChat(currentUser);
+                    chatRestHelper.login(currentUser);
                 }
             } catch (SmackException ignore) {
                 ignore.printStackTrace();

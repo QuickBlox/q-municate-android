@@ -66,17 +66,17 @@ public class FinderUnknownUsers {
         try {
             if (loadIdsSet.size() == oneElement) {
                 int userId = loadIdsSet.iterator().next();
-                QMUser user = QBRestHelper.loadUser(userId);
-                QMUserService.getInstance().getUserCache().createOrUpdate(user);
+                QMUser user = QMUserService.getInstance().getUserSync(userId, true);
             } else {
-                Collection<QMUser> userCollection = restHelper.loadUsers(loadIdsSet);
-                if (userCollection != null) {
-                    QMUserService.getInstance().getUserCache().createOrUpdateAll(userCollection);
-                }
+                Collection<QMUser> userCollection = loadUsers(loadIdsSet);
             }
         } catch (QBResponseException e) {
             ErrorUtils.logError(e);
         }
+    }
+
+    private List<QMUser> loadUsers(Set<Integer> loadIdsSet) throws QBResponseException {
+        return QMUserService.getInstance().getUsersByIDsSync(loadIdsSet, null);
     }
 
     private void findUserInDialog(QBChatDialog  dialog) {

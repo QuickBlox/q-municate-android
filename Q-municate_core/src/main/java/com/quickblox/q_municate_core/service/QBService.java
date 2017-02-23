@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
@@ -19,7 +18,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBAddFriendsToGroupCommand;
-import com.quickblox.q_municate_core.qb.commands.QBChangePasswordCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
@@ -36,32 +34,21 @@ import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogMessagesCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBLoadFriendListCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoadUserCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLogoutCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLogoutRestCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRemoveFriendCommand;
-import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBSignUpCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBSignUpRestCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.BaseHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
@@ -114,7 +101,6 @@ public class QBService extends Service {
 
     private void initHelpers() {
         helpersMap.put(CHAT_REST_HELPER, new QBChatRestHelper(this));
-        helpersMap.put(AUTH_HELPER, new QBAuthHelper(this));
         helpersMap.put(CHAT_HELPER, new QBChatHelper(this));
         helpersMap.put(FRIEND_LIST_HELPER, new QBFriendListHelper(this));
         helpersMap.put(CALL_CHAT_HELPER, new QBCallChatHelper(this));
@@ -124,12 +110,6 @@ public class QBService extends Service {
     private void initCommands() {
         // first call init
         registerInitCallChatCommand();
-
-        // login/signUp commands
-        registerLoginRestCommand();
-        registerLoginRestSocialCommand();
-        registerSignUpCommand();
-        registerLoginCommand();
 
         // chat commands
         registerCreatePrivateChatCommand();
@@ -149,8 +129,6 @@ public class QBService extends Service {
         // users/friends commands
         registerLoadUsersCommand();
         registerLoadFriendsCommand();
-        registerUpdateUserCommand();
-        registerLoadUserCommand();
         registerAddFriendCommand();
         registerAcceptFriendCommand();
         registerRemoveFriendCommand();
@@ -159,34 +137,12 @@ public class QBService extends Service {
 
         // other commands
         registerGetFileCommand();
-        registerChangePasswordCommand();
-        registerResetPasswordCommand();
         registerSendPushCommand();
 
         // logout commands
         registerLogoutCommand();
     }
 
-    // ------------------ login commands
-    private void registerLoginRestCommand() {
-        QBAuthHelper authHelper = (QBAuthHelper) getHelper(AUTH_HELPER);
-
-        QBLoginRestCommand loginRestCommand = new QBLoginRestCommand(this, authHelper,
-                QBServiceConsts.LOGIN_REST_SUCCESS_ACTION,
-                QBServiceConsts.LOGIN_REST_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.LOGIN_REST_ACTION, loginRestCommand);
-    }
-
-    private void registerLoginRestSocialCommand() {
-        QBAuthHelper authHelper = (QBAuthHelper) getHelper(AUTH_HELPER);
-
-        QBSocialLoginCommand loginRestCommand = new QBSocialLoginCommand(this, authHelper,
-                QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION,
-                QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.SOCIAL_LOGIN_ACTION, loginRestCommand);
-    }
 
     private void registerLoginChatCommand() {
         CompositeServiceCommand loginChatCommand = new QBLoginChatCompositeCommand(this,
@@ -198,22 +154,6 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_COMPOSITE_ACTION, loginChatCommand);
     }
 
-    private void registerSignUpCommand() {
-        QBAuthHelper authHelper = (QBAuthHelper) getHelper(AUTH_HELPER);
-
-        QBSignUpCommand signUpCommand = new QBSignUpCommand(this,
-                QBServiceConsts.SIGNUP_SUCCESS_ACTION,
-                QBServiceConsts.SIGNUP_FAIL_ACTION);
-        QBSignUpRestCommand signUpRestCommand = new QBSignUpRestCommand(this, authHelper,
-                QBServiceConsts.SIGNUP_REST_SUCCESS_ACTION,
-                QBServiceConsts.SIGNUP_REST_FAIL_ACTION);
-
-        signUpCommand.addCommand(signUpRestCommand);
-
-        addLoginChatAndInitCommands(signUpCommand);
-
-        serviceCommandMap.put(QBServiceConsts.SIGNUP_ACTION, signUpCommand);
-    }
 
     // ------------------ chat commands
     private void registerCreatePrivateChatCommand() {
@@ -364,27 +304,6 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.LOAD_FRIENDS_ACTION, loadFriendListCommand);
     }
 
-    private void registerUpdateUserCommand() {
-        QBAuthHelper authHelper = (QBAuthHelper) getHelper(AUTH_HELPER);
-        QBFriendListHelper friendListHelper = (QBFriendListHelper) getHelper(FRIEND_LIST_HELPER);
-
-        QBUpdateUserCommand updateUserCommand = new QBUpdateUserCommand(this, authHelper, friendListHelper,
-                QBServiceConsts.UPDATE_USER_SUCCESS_ACTION,
-                QBServiceConsts.UPDATE_USER_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, updateUserCommand);
-    }
-
-    private void registerLoadUserCommand() {
-        QBRestHelper restHelper = (QBRestHelper) getHelper(REST_HELPER);
-
-        QBLoadUserCommand loadUserCommand = new QBLoadUserCommand(this, restHelper,
-                QBServiceConsts.LOAD_USER_SUCCESS_ACTION,
-                QBServiceConsts.LOAD_USER_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.LOAD_USER_ACTION, loadUserCommand);
-    }
-
     private void registerAddFriendCommand() {
         QBFriendListHelper friendListHelper = (QBFriendListHelper) getHelper(FRIEND_LIST_HELPER);
 
@@ -445,26 +364,6 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.GET_FILE_ACTION, getFileCommand);
     }
 
-    private void registerResetPasswordCommand() {
-        QBAuthHelper authHelper = (QBAuthHelper) getHelper(AUTH_HELPER);
-
-        QBResetPasswordCommand resetPasswordCommand = new QBResetPasswordCommand(this, authHelper,
-                QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION,
-                QBServiceConsts.RESET_PASSWORD_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.RESET_PASSWORD_ACTION, resetPasswordCommand);
-    }
-
-    private void registerChangePasswordCommand() {
-        QBAuthHelper authHelper = (QBAuthHelper) getHelper(AUTH_HELPER);
-
-        QBChangePasswordCommand changePasswordCommand = new QBChangePasswordCommand(this, authHelper,
-                QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION,
-                QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.CHANGE_PASSWORD_ACTION, changePasswordCommand);
-    }
-
     private void registerSendPushCommand() {
         QBSendPushCommand sendPushCommand = new QBSendPushCommand(this,
                 QBServiceConsts.SEND_PUSH_MESSAGES_SUCCESS_ACTION,
@@ -485,32 +384,15 @@ public class QBService extends Service {
 
     // ------------------ logout commands
     private void registerLogoutCommand() {
-        QBAuthHelper authHelper = (QBAuthHelper) getHelper(AUTH_HELPER);
-
         QBLogoutCompositeCommand logoutCommand = new QBLogoutCompositeCommand(this,
                 QBServiceConsts.LOGOUT_SUCCESS_ACTION,
                 QBServiceConsts.LOGOUT_FAIL_ACTION);
         QBLogoutAndDestroyChatCommand logoutChatCommand = (QBLogoutAndDestroyChatCommand) serviceCommandMap.get(
                 QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION);
-        QBLogoutRestCommand logoutRestCommand = new QBLogoutRestCommand(this, authHelper,
-                QBServiceConsts.LOGOUT_REST_SUCCESS_ACTION,
-                QBServiceConsts.LOGOUT_REST_FAIL_ACTION);
 
         logoutCommand.addCommand(logoutChatCommand);
-        logoutCommand.addCommand(logoutRestCommand);
 
         serviceCommandMap.put(QBServiceConsts.LOGOUT_ACTION, logoutCommand);
-    }
-
-    private void registerLoginCommand() {
-        QBLoginCompositeCommand loginCommand = new QBLoginCompositeCommand(this,
-                QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION);
-        QBLoginRestCommand loginRestCommand = (QBLoginRestCommand) serviceCommandMap.get(
-                QBServiceConsts.LOGIN_REST_ACTION);
-
-        loginCommand.addCommand(loginRestCommand);
-
-        serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, loginCommand);
     }
 
     private void addLoginChatAndInitCommands(CompositeServiceCommand loginCommand) {
