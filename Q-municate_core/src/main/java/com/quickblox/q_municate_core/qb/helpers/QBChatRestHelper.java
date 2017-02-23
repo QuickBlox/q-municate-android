@@ -50,36 +50,7 @@ public class QBChatRestHelper extends BaseHelper {
             chatService.enableCarbons();
         }
     }
-
-    public synchronized void tryLoginChat(QBUser user) throws XMPPException, IOException, SmackException {
-        boolean isLoginViaSocial = QBSessionManager.getInstance().getSessionParameters().getSocialProvider() != null;
-        boolean isRestSessionValid = QBSessionManager.getInstance().isValidActiveSession();
-
-        if (!isLoginViaSocial){
-            login(user);
-            return;
-        }
-
-        if (isRestSessionValid){
-            login(user);
-        } else {
-            updateSessionAndLoginChatSocial(user);
-        }
-    }
-
-    private void updateSessionAndLoginChatSocial(QBUser user) throws IOException, XMPPException, SmackException {
-        QBSession currentSession = QBAuth.getSession().perform();
-        updateLocalUserIfNeed(currentSession);
-        user.setPassword(currentSession.getToken());
-        login(user);
-    }
-
-    private void updateLocalUserIfNeed(QBSession currentRestSession){
-        if (QBSessionManager.getInstance().getSessionParameters().getSocialProvider() != null) {
-            CoreSharedHelper.getInstance().saveUserPassword(currentRestSession.getToken());
-        }
-    }
-
+    
     public synchronized void logout() throws QBResponseException, SmackException.NotConnectedException {
         if (chatService != null) {
             chatService.logout();
