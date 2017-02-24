@@ -14,6 +14,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
 
 
@@ -72,7 +73,7 @@ public class ImagePickHelperFragment extends Fragment {
                     double longitude = bundle.getDouble(ConstsCore.EXTRA_LOCATION_LONGITUDE);
                     String location = LocationUtils.generateLocationJson(new Pair<>(ConstsCore.LATITUDE_PARAM, latitude),
                             new Pair<>(ConstsCore.LONGITUDE_PARAM, longitude));
-                    listener.onImagePicked(requestCode, null, location);
+                    listener.onImagePicked(requestCode, Attachment.Type.LOCATION, location);
                 }
             } else {
                 if (requestCode == ImageUtils.CAMERA_REQUEST_CODE && (data == null || data.getData() == null)) {

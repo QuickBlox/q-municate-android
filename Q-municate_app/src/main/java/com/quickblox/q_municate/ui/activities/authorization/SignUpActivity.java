@@ -29,6 +29,7 @@ import com.quickblox.q_municate_core.qb.commands.rest.QBSignUpCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
@@ -259,8 +260,10 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     };
 
     @Override
-    public void onImagePicked(int requestCode, File file, String url) {
-        startCropActivity(Uri.fromFile(file));
+    public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
+        if (Attachment.Type.PICTURE.equals(attachmentType)) {
+            startCropActivity(Uri.fromFile((File)attachment));
+        }
     }
 
     @Override

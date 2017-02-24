@@ -3,16 +3,14 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -20,8 +18,6 @@ import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -31,7 +27,6 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import java.util.ArrayList;
 
 public class GroupDialogActivity extends BaseDialogActivity {
-
 
     private static final String TAG = GroupDialogActivity.class.getSimpleName();
 
@@ -50,27 +45,12 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        initFields();
-
-        if (currentChatDialog == null) {
-            finish();
-        }
-
-        setUpActionBarWithUpButton();
-
-        if (isNetworkAvailable()) {
-            deleteTempMessages();
-        }
-
-        initMessagesRecyclerView();
     }
 
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
         messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList);
-        messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
@@ -165,18 +145,17 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void updateActionBar() {
         if (isNetworkAvailable() && currentChatDialog != null) {
-            setActionBarTitle(getTitleForChatDialog(currentChatDialog));
+            setActionBarTitle(ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager));
             checkActionBarLogo(currentChatDialog.getPhoto(), R.drawable.placeholder_group);
         }
     }
 
-    private void initFields() {
-        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-//        currentChatDialog.initForChat(QBChatService.getInstance());
-        combinationMessagesList = createCombinationMessagesList();
-        if (currentChatDialog != null)
-        title = getTitleForChatDialog(currentChatDialog);
-        Log.d(TAG, "currentChatDialog: " + currentChatDialog);
+    @Override
+    protected void initFields() {
+        super.initFields();
+        if (currentChatDialog != null) {
+            title = ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager);
+        }
     }
 
     private void processCombinationMessages(){

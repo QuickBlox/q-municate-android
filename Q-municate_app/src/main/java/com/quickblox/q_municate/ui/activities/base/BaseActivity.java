@@ -32,6 +32,7 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
@@ -59,10 +60,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
-import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -423,6 +421,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void registerBroadcastReceivers() {
+        Log.v(TAG, "registerBroadcastReceivers()");
         IntentFilter globalActionsIntentFilter = new IntentFilter();
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL);
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
@@ -444,6 +443,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void addActions() {
+        Log.v(TAG, "addActions()");
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
@@ -588,13 +588,13 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void checkOpeningDialog() {
         if (appSharedHelper.needToOpenDialog()) {
-            Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
+            QBChatDialog chatDialog = DataManager.getInstance().getQBChatDialogDataManager()
+                    .getByDialogId(appSharedHelper.getPushDialogId());
             QMUser user = QMUserService.getInstance().getUserCache().get((long)appSharedHelper.getPushUserId());
 
-            Log.d(TAG, "chatDialog for oppeneng by push: " + dialog + " user: " + user);
+            Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog + " user: " + user);
 
-            if (dialog != null && user != null) {
-                QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(DataManager.getInstance(), dialog);
+            if (chatDialog != null && user != null) {
                 Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog);
                 if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
                     startPrivateChatActivity(user, chatDialog);
@@ -708,8 +708,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             boolean activeConnection = intent
                     .getBooleanExtra(NetworkChangeReceiver.EXTRA_IS_ACTIVE_CONNECTION, false);
 
+            checkShowingConnectionError();
+
             if (activeConnection) {
-                checkShowingConnectionError();
 
                 if (!loggedIn && LoginHelper.isCorrectOldAppSession()) {
                     loggedIn = true;

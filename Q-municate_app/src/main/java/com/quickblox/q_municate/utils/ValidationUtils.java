@@ -130,16 +130,12 @@ public class ValidationUtils {
         return false;
     }
 
-    public boolean isFullNameValid(TextInputLayout fullNameTextInputLayout, String oldFullName,
-            String newFullName) {
+    public boolean isFullNameValid(TextInputLayout fullNameTextInputLayout, String newFullName) {
         boolean fullNameEntered = !TextUtils.isEmpty(newFullName.trim());
         boolean valid = true;
 
         if (fullNameEntered) {
-            if (newFullName.equals(oldFullName)) {
-                valid = false;
-                fullNameTextInputLayout.setError(context.getString(R.string.profile_full_name_not_changed));
-            } else if (newFullName.length() < FULL_NAME_MIN_LENGTH) {
+            if (newFullName.length() < FULL_NAME_MIN_LENGTH) {
                 valid = false;
                 fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_field_is_too_short));
             } else if (newFullName.length() > FULL_NAME_MAX_LENGTH) {

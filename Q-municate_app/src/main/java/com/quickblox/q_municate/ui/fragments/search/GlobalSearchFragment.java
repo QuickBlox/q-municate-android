@@ -12,14 +12,8 @@ import android.view.ViewGroup;
 
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
-import com.quickblox.auth.session.QBSessionManager;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.authorization.BaseAuthActivity;
-import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
-import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.utils.listeners.SearchListener;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
@@ -31,16 +25,11 @@ import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoratio
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
-import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.managers.FriendDataManager;
-import com.quickblox.q_municate_db.managers.UserRequestDataManager;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
@@ -60,6 +49,7 @@ import rx.schedulers.Schedulers;
 
 public class GlobalSearchFragment extends BaseFragment implements SearchListener, SwipyRefreshLayout.OnRefreshListener {
 
+    private static final String TAG = GlobalSearchFragment.class.getSimpleName();
     private static final int SEARCH_DELAY = 1000;
     private static final int MIN_VALUE_FOR_SEARCH = 3;
 
@@ -155,6 +145,8 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         if (!usersList.isEmpty() && usersList.size() < totalEntries) {
             page++;
             searchUsers();
+        } else {
+            swipyRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -274,11 +266,13 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 
                 @Override
                 public void onCompleted() {
+                    Log.d(TAG, "onCompleted()");
                 }
 
                 @Override
                 public void onError(Throwable e) {
-                    Log.d("TAG", "onError" + e.getMessage());
+                    Log.d(TAG, "onError" + e.getMessage());
+                    swipyRefreshLayout.setRefreshing(false);
                 }
 
                 @Override
@@ -296,7 +290,6 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
                     checkForEnablingRefreshLayout();
                 }
             });
-
         }
     }
 

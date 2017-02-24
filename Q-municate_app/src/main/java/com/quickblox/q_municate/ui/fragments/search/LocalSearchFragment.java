@@ -28,9 +28,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.managers.FriendDataManager;
-import com.quickblox.q_municate_db.managers.UserRequestDataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
@@ -42,7 +39,7 @@ import java.util.Observer;
 import butterknife.Bind;
 import butterknife.OnTouch;
 
-public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implements SearchListener {
+public class LocalSearchFragment extends BaseLoaderFragment<List<QBChatDialog>> implements SearchListener {
 
     private final static int LOADER_ID = LocalSearchFragment.class.hashCode();
 
@@ -53,7 +50,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     private Observer commonObserver;
     private LocalSearchAdapter localSearchAdapter;
     private String searchQuery;
-    private List<Dialog> dialogsList;
+    private List<QBChatDialog> dialogsList;
 
     public static LocalSearchFragment newInstance() {
         return new LocalSearchFragment();
@@ -117,12 +114,12 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     }
 
     @Override
-    protected Loader<List<Dialog>> createDataLoader() {
+    protected Loader<List<QBChatDialog>> createDataLoader() {
         return new DialogsListLoader(getActivity(), dataManager);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Dialog>> loader, List<Dialog> dialogsList) {
+    public void onLoadFinished(Loader<List<QBChatDialog>> loader, List<QBChatDialog> dialogsList) {
         this.dialogsList = dialogsList;
         updateLocal();
     }
@@ -156,11 +153,10 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     }
 
     private void initCustomListeners() {
-        localSearchAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<Dialog>() {
+        localSearchAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QBChatDialog>() {
 
             @Override
-            public void onItemClicked(View view, Dialog dialog, int position) {
-                QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
+            public void onItemClicked(View view, QBChatDialog chatDialog, int position) {
                 if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
                     startPrivateChatActivity(chatDialog);
                 } else {
@@ -208,16 +204,15 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         GroupDialogActivity.start(baseActivity, chatDialog);
     }
 
-    private static class DialogsListLoader extends BaseLoader<List<Dialog>> {
+    private static class DialogsListLoader extends BaseLoader<List<QBChatDialog>> {
 
         public DialogsListLoader(Context context, DataManager dataManager) {
             super(context, dataManager);
         }
 
         @Override
-        protected List<Dialog> getItems() {
-            return ChatUtils.fillTitleForPrivateDialogsList(getContext().getResources().getString(R.string.deleted_user),
-                    dataManager, dataManager.getDialogDataManager().getAllSorted());
+        protected List<QBChatDialog> getItems() {
+            return dataManager.getQBChatDialogDataManager().getAllSorted();
         }
     }
 

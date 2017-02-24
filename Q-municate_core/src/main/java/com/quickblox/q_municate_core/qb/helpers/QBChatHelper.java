@@ -41,11 +41,11 @@ import com.quickblox.q_municate_core.utils.DbUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
+import com.quickblox.q_municate_db.utils.DialogTransformUtils;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -65,9 +65,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     private static final String TAG = QBChatHelper.class.getSimpleName();
 
-    protected QBChatService chatService;
-    protected QBUser chatCreator;
-    protected QBChatDialog currentDialog;
+    private QBChatService chatService;
+    private QBUser chatCreator;
+    private QBChatDialog currentDialog;
     protected DataManager dataManager;
     private TypingListener typingListener;
     private PrivateChatMessagesStatusListener privateChatMessagesStatusListener;
@@ -91,28 +91,39 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         dataManager = DataManager.getInstance();
     }
 
-    public synchronized QBChatDialog createChatLocally(QBChatDialog dialog, Bundle additional) throws QBResponseException {
+    public synchronized void initCurrentChatDialog(QBChatDialog dialog, Bundle additional) throws QBResponseException {
         currentDialog = dialog;
-        currentDialog.initForChat(chatService);
-        if (QBDialogType.GROUP.equals(dialog.getType())) {
-            tryJoinRoomChat(currentDialog);
-            currentDialog.addParticipantListener(participantListener);
-        } else {
-            currentDialog.addIsTypingListener(typingListener);
-        }
-
-        return dialog;
+        initCurrentDialogForChatIfPossible();
     }
 
-    public void closeChat(QBChatDialog dialogId, Bundle additional) {
-        if (currentDialog != null && currentDialog.getDialogId().equals(dialogId)) {
+    private void initCurrentDialogForChatIfPossible() {
+        if (currentDialog != null && chatService != null && chatService.isLoggedIn()) {
+            currentDialog.initForChat(chatService);
+            if (QBDialogType.GROUP.equals(currentDialog.getType())) {
+                tryJoinRoomChat(currentDialog);
+                currentDialog.addParticipantListener(participantListener);
+            } else {
+                currentDialog.addIsTypingListener(typingListener);
+            }
+        }
+    }
+
+    public synchronized void closeChat(QBChatDialog chatDialog, Bundle additional) {
+        if (currentDialog != null
+                && currentDialog.getDialogId().equals(chatDialog.getDialogId())
+                && chatService != null) {
+            currentDialog.removeParticipantListener(participantListener);
+            currentDialog.removeIsTypingListener(typingListener);
             currentDialog = null;
         }
     }
 
     public void init(QBUser chatCreator) {
+        Log.v(TAG, "init()");
         this.chatService = QBChatService.getInstance();
         this.chatCreator = chatCreator;
+
+        initCurrentDialogForChatIfPossible();
 
         chatService.getMessageStatusesManager().addMessageStatusListener(privateChatMessagesStatusListener);
         chatService.getIncomingMessagesManager().addDialogMessageListener(allChatMessagesListener);
@@ -129,21 +140,37 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         notificationChatListeners.add(notificationChatListener);
     }
 
-    public void sendChatMessage(String message, QBChatDialog chatDialog) throws QBResponseException {
-        sendChatMessage(null, message, chatDialog, null);
+    public void sendChatMessage(String message) throws QBResponseException {
+        QBChatMessage qbChatMessage = getQBChatMessage(message);
+        sendAndSaveChatMessage(qbChatMessage, currentDialog);
     }
 
-    public void sendMessageWithAttachImage(QBFile file, QBChatDialog chatDialog) throws QBResponseException {
-        sendChatMessage(file, context.getString(R.string.dlg_attached_last_message), chatDialog, null);
-    }
+    public void sendMessageWithAttachment(Attachment.Type attachmentType, Object attachmentObject) throws QBResponseException {
+        String messageBody = "";
+        QBAttachment attachment = null;
+        switch (attachmentType) {
+            case PICTURE:
+                messageBody = context.getString(R.string.dlg_attached_last_message);
+                attachment = getAttachment((QBFile) attachmentObject);
+                break;
+            case LOCATION:
+                messageBody = context.getString(R.string.dlg_location_last_message);
+                attachment = getAttachment((String) attachmentObject);
+                break;
+            case VIDEO:
+                break;
+            case AUDIO:
+                break;
+            case DOC:
+                break;
+            case OTHER:
+                break;
+        }
 
-    public void sendMessageWithAttachLocation(String location, QBChatDialog chatDialog) throws QBResponseException {
-        sendChatMessage(null, context.getString(R.string.dlg_location_last_message), chatDialog, location);
-    }
+        QBChatMessage message = getQBChatMessage(messageBody);
+        message.addAttachment(attachment);
 
-    private void sendChatMessage(QBFile file, String message, QBChatDialog chatDialog, String location) throws QBResponseException {
-        QBChatMessage qbChatMessage = getQBChatMessage(message, file, location);
-        sendAndSaveChatMessage(qbChatMessage, chatDialog);
+        sendAndSaveChatMessage(message, currentDialog);
     }
 
     public void sendAndSaveChatMessage(QBChatMessage qbChatMessage, QBChatDialog chatDialog) throws QBResponseException {
@@ -152,7 +179,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         sendChatMessage(qbChatMessage, chatDialog);
         DbUtils.saveMessageOrNotificationToCache(context, dataManager, chatDialog.getDialogId(), qbChatMessage, null, true);
         DbUtils.updateDialogModifiedDate(dataManager, chatDialog.getDialogId(), ChatUtils.getMessageDateSent(qbChatMessage),
-                true);
+                false);
     }
 
     public void sendChatMessage(QBChatMessage message, QBChatDialog chatDialog) throws QBResponseException {
@@ -217,20 +244,11 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         DbUtils.deleteDialogLocal(dataManager, dialogId);
     }
 
-    private QBChatMessage getQBChatMessage(String body, QBFile qbFile, String location) {
+    private QBChatMessage getQBChatMessage(String body) {
         long time = DateUtilsCore.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
-
-        if (qbFile != null) {
-            QBAttachment attachment = getAttachment(qbFile);
-            chatMessage.addAttachment(attachment);
-        } else if (location != null) {
-            QBAttachment attachment = getAttachment(location);
-            chatMessage.addAttachment(attachment);
-        }
-
-        chatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
+        chatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, String.valueOf(time));
         chatMessage.setSaveToHistory(ChatNotificationUtils.VALUE_SAVE_TO_HISTORY);
 
         return chatMessage;
@@ -258,31 +276,18 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         return attachment;
     }
 
-    public void sendTypingStatusToServer(String dialogId, boolean startTyping) {
-        try {
-            QBChatDialog chatDialog = createPrivateChatIfNotExist(dialogId);
-            if (startTyping) {
-                chatDialog.sendIsTypingNotification();
-            } else {
-                chatDialog.sendStopTypingNotification();
+    public void sendTypingStatusToServer(boolean startTyping) {
+        if (currentDialog != null && chatService.isLoggedIn()) {
+            try {
+                if (startTyping) {
+                    currentDialog.sendIsTypingNotification();
+                } else {
+                    currentDialog.sendStopTypingNotification();
+                }
+            } catch (XMPPException | SmackException.NotConnectedException /*| QBResponseException*/ e) {
+                ErrorUtils.logError(e);
             }
-        } catch (XMPPException | SmackException.NotConnectedException | QBResponseException e) {
-            ErrorUtils.logError(e);
         }
-    }
-
-    public QBChatDialog createPrivateChatIfNotExist(String dialogId) throws QBResponseException {
-        if (!chatService.isLoggedIn()) {
-            ErrorUtils.logError(TAG, " not logged to the chat");
-            throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
-        }
-
-        Dialog tempDialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
-        QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, tempDialog);
-
-        chatDialog.initForChat(chatService);
-
-        return chatDialog;
     }
 
     public QBChatDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
@@ -361,9 +366,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
         if (dialogOccupant == null) {
             dialogOccupant = new DialogOccupant();
-            Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
-            if (dialog != null) {
-                dialogOccupant.setDialog(dialog);
+            QBChatDialog chatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+            if (chatDialog != null) {
+                dialogOccupant.setDialog(DialogTransformUtils.createLocalDialog(chatDialog));
             }
             QMUser user = QMUserService.getInstance().getUserCache().get((long) qbChatMessage.getSenderId());
             if (user != null) {
@@ -392,33 +397,34 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         return attachment.getType();
     }
 
-    public void updateStatusNotificationMessageRead(String dialogId, CombinationMessage combinationMessage) throws Exception {
-        updateStatusMessageReadServer(dialogId, combinationMessage, false);
+    //Update message status
+
+    public void updateStatusNotificationMessageRead(QBChatDialog chatDialog, CombinationMessage combinationMessage) throws Exception {
+        updateStatusMessageReadServer(chatDialog, combinationMessage, false);
         DbUtils.updateStatusNotificationMessageLocal(dataManager, combinationMessage.toDialogNotification());
     }
 
-    public void updateStatusMessageRead(String dialogId, CombinationMessage combinationMessage,
+    public void updateStatusMessageRead(QBChatDialog chatDialog, CombinationMessage combinationMessage,
                                         boolean forPrivate) throws Exception {
-        updateStatusMessageReadServer(dialogId, combinationMessage, forPrivate);
+        updateStatusMessageReadServer(chatDialog, combinationMessage, forPrivate);
         DbUtils.updateStatusMessageLocal(dataManager, combinationMessage.toMessage());
     }
 
-    public void updateStatusMessageReadServer(String dialogId, CombinationMessage combinationMessage,
+    public void updateStatusMessageReadServer(QBChatDialog chatDialog, CombinationMessage combinationMessage,
                                               boolean fromPrivate) throws Exception {
         if (fromPrivate) {
-            QBChatDialog privateChat = createPrivateChatIfNotExist(dialogId);
-            if (privateChat != null) {
-                QBChatMessage qbChatMessage = new QBChatMessage();
-                qbChatMessage.setId(combinationMessage.getMessageId());
-                qbChatMessage.setDialogId(dialogId);
-                qbChatMessage.setSenderId(combinationMessage.getDialogOccupant().getUser().getId());
+            chatDialog.initForChat(chatService);
 
-                privateChat.readMessage(qbChatMessage);
-            }
+            QBChatMessage qbChatMessage = new QBChatMessage();
+            qbChatMessage.setId(combinationMessage.getMessageId());
+            qbChatMessage.setDialogId(chatDialog.getDialogId());
+            qbChatMessage.setSenderId(combinationMessage.getDialogOccupant().getUser().getId());
+
+            chatDialog.readMessage(qbChatMessage);
         } else {
             StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
             messagesIdsList.add(combinationMessage.getMessageId());
-            QBRestChatService.markMessagesAsRead(dialogId, messagesIdsList).perform();
+            QBRestChatService.markMessagesAsRead(chatDialog.getDialogId(), messagesIdsList).perform();
         }
     }
 
@@ -465,12 +471,8 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     }
 
     public void tryJoinRoomChats() {
-        List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
-
-        if (dialogsList != null) {
-            List<QBChatDialog> qbDialogsList = ChatUtils.createQBDialogsListFromDialogsList(dataManager, dialogsList);
-            tryJoinRoomChats(qbDialogsList);
-        }
+        List<QBChatDialog> qbDialogsList = dataManager.getQBChatDialogDataManager().getAll();
+        tryJoinRoomChats(qbDialogsList);
     }
 
     private void initGroupDialogsList(boolean needClean) {
@@ -510,13 +512,12 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
-    public void leaveRoomChat(Dialog dialog) throws Exception {
-        QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
+    public void leaveRoomChat(QBChatDialog chatDialog) throws Exception {
         chatDialog.initForChat(chatService);
         chatDialog.leave();
         List<Integer> userIdsList = new ArrayList<Integer>();
         userIdsList.add(chatCreator.getId());
-        removeUsersFromDialog(dialog, userIdsList);
+        removeUsersFromDialog(chatDialog, userIdsList);
     }
 
     public boolean isDialogJoined(QBChatDialog dialog) {
@@ -532,19 +533,18 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     public QBChatDialog addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
         StringifyArrayList<Integer> occupantsIdsList = new StringifyArrayList<>(userIdsList);
-        QBChatDialog dialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
-                dataManager.getDialogDataManager().getByDialogId(dialogId));
+        QBChatDialog chatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, occupantsIdsList.getItemsAsString());
-        return updateDialog(dialog, requestBuilder);
+        return updateDialog(chatDialog, requestBuilder);
     }
 
-    public void removeUsersFromDialog(Dialog dialog, List<Integer> userIdsList) throws QBResponseException {
+    public void removeUsersFromDialog(QBChatDialog chatDialog, List<Integer> userIdsList) throws QBResponseException {
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.pullAll(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, userIdsList.toArray());
-        updateDialog(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), requestBuilder);
-        DataManager.getInstance().getDialogDataManager().delete(dialog);
+        updateDialog(chatDialog, requestBuilder);
+        DataManager.getInstance().getQBChatDialogDataManager().deleteById(chatDialog.getDialogId());
     }
 
     public QBChatDialog updateDialog(QBChatDialog dialog) throws QBResponseException {
@@ -557,8 +557,8 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         return updateDialog(dialog, (QBRequestUpdateBuilder) null);
     }
 
-    private QBChatDialog updateDialog(QBChatDialog dialog, QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
-        QBChatDialog updatedDialog = QBRestChatService.updateGroupChatDialog(dialog, requestBuilder).perform();
+    private QBChatDialog updateDialog(QBChatDialog chatDialog, QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
+        QBChatDialog updatedDialog = QBRestChatService.updateGroupChatDialog(chatDialog, requestBuilder).perform();
         return updatedDialog;
     }
 
@@ -628,12 +628,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     private void updateGroupDialogByNotification(QBChatMessage qbChatMessage) {
         String dialogId = qbChatMessage.getDialogId();
-        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
-        QBChatDialog qbDialog;
-        if (dialog == null) {
+        QBChatDialog qbDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        if (qbDialog == null) {
             qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.GROUP);
-        } else {
-            qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
         }
 
         ChatNotificationUtils.updateDialogFromQBMessage(context, dataManager, qbChatMessage, qbDialog);
@@ -648,8 +645,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     }
 
     private void onChatMessageReceived(String dialogId, QBChatMessage chatMessage, Integer senderId) {
-        Message message = parseReceivedMessage(chatMessage);
-        boolean ownMessage = !message.isIncoming(chatCreator.getId());
+        boolean ownMessage = chatMessage.getSenderId().equals(chatCreator.getId());
 
         if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
             if (isNotificationToGroupChat(chatMessage)) {
@@ -665,28 +661,25 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
 
         QMUser user = QMUserService.getInstance().getUserCache().get((long) senderId);
-        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
+        QBChatDialog chatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
 
         boolean isPrivateChatMessage;
 
         //Can receive message from unknown dialog only for QBDialogType.PRIVATE
-        if (dialog == null) {
-            QBChatDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, QBDialogType.PRIVATE);
-            ChatUtils.addOccupantsToQBDialog(qbDialog, chatMessage);
-            DbUtils.saveDialogToCache(dataManager, qbDialog);
-            qbDialog.initForChat(chatService);
-            qbDialog.addMessageListener(allChatMessagesListener);
-            qbDialog.addIsTypingListener(typingListener);  // in current version Q-municate typing status used only for QBDialogType.PRIVATE chats
+        if (chatDialog == null) {
+            QBChatDialog newChatDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, QBDialogType.PRIVATE);
+            ChatUtils.addOccupantsToQBDialog(newChatDialog, chatMessage);
+            DbUtils.saveDialogToCache(dataManager, newChatDialog);
 
             isPrivateChatMessage = true;
         } else {
-            isPrivateChatMessage = Dialog.Type.PRIVATE.equals(dialog.getType());
+            isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());
         }
 
         //To QBDialogType.GROUP chat receive own messages
         if (!ownMessage) {
             DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage, State.DELIVERED, true);
-            DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(chatMessage), true);
+            DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(chatMessage), false);
         }
 
         checkForSendingNotification(ownMessage, chatMessage, user, isPrivateChatMessage);
@@ -715,12 +708,12 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);
         dialogNotification.setType(notificationType);
 
-        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
-        if (dialog == null) {
-            QBChatDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
+        QBChatDialog chatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        if (chatDialog == null) {
+            QBChatDialog newChatDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
             ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(chatCreator.getId(), qbChatMessage.getSenderId());
-            qbDialog.setOccupantsIds(occupantsIdsList);
-            DbUtils.saveDialogToCache(dataManager, qbDialog);
+            newChatDialog.setOccupantsIds(occupantsIdsList);
+            DbUtils.saveDialogToCache(dataManager, newChatDialog);
         }
 
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());

@@ -21,12 +21,11 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
+import com.quickblox.q_municate_db.utils.DialogTransformUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
@@ -178,7 +177,7 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     private void checkForOpenChat(QMUser user) {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
-            QBChatDialog chatDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialogOccupant.getDialog());
+            QBChatDialog chatDialog = DialogTransformUtils.createQBDialogFromLocalDialog(dataManager, dialogOccupant.getDialog());
             startPrivateChat(chatDialog);
         } else {
             if (checkNetworkAvailableWithError()) {
