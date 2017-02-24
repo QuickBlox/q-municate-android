@@ -146,7 +146,6 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
             page++;
             searchUsers();
         } else {
-            //TODO VT maybe need show notification
             swipyRefreshLayout.setRefreshing(false);
         }
     }
@@ -272,7 +271,6 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 
                 @Override
                 public void onError(Throwable e) {
-                    //TODO VT maybe need show notification
                     Log.d(TAG, "onError" + e.getMessage());
                     swipyRefreshLayout.setRefreshing(false);
                 }

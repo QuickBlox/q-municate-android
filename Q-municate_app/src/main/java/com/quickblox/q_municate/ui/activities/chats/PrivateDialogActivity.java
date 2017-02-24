@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -119,7 +118,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
         messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, currentChatDialog);
-        messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         findLastFriendsRequest(true);
@@ -221,7 +219,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void registerBroadcastReceivers() {
         super.registerBroadcastReceivers();
-        Log.v(TAG,"registerBroadcastReceivers()");
         localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
     }

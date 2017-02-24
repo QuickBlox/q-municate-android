@@ -23,12 +23,15 @@ import android.widget.ImageButton;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
+import com.quickblox.q_municate.ui.activities.location.MapsActivity;
+import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
@@ -56,6 +59,8 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -111,8 +116,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected QMUser opponentUser;
     protected List<CombinationMessage> combinationMessagesList;
     protected ImagePickHelper imagePickHelper;
-    protected MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
 
+    private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
+    private LocationAttachClickListener locationAttachClickListener;
+    private ImageAttachClickListener imageAttachClickListener;
     private Handler mainThreadHandler;
     private View emojiconsFragment;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
@@ -203,6 +210,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+        addChatMessagesAdapterListeners();
         checkPermissionSaveFiles();
     }
 
@@ -223,6 +231,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onStop() {
         super.onStop();
+        removeChatMessagesAdapterListeners();
         readAllMessages();
     }
 
@@ -233,7 +242,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         removeActions();
         deleteObservers();
         unregisterBroadcastReceivers();
-        removeMsgTextViewLinkClickListener();
     }
 
     @Override
@@ -298,11 +306,23 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
+    private void addChatMessagesAdapterListeners() {
+        messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
+        messagesAdapter.setAttachLocationClickListener(locationAttachClickListener);
+        messagesAdapter.setAttachImageClickListener(imageAttachClickListener);
+    }
+
+    private void removeChatMessagesAdapterListeners() {
+        if (messagesAdapter != null) {
+            messagesAdapter.removeMessageTextViewLinkClickListener();
+            messagesAdapter.removeLocationImageClickListener(locationAttachClickListener);
+            messagesAdapter.removeAttachImageClickListener(imageAttachClickListener);
+        }
+    }
+
     @Override
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
-        Log.v(TAG, "performLoginChatSuccessAction(Bundle bundle)");
-
 
         startLoadDialogMessages(false);
     }
@@ -324,8 +344,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         imagePickHelper = new ImagePickHelper();
         systemPermissionHelper = new SystemPermissionHelper(this);
         messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
+        locationAttachClickListener = new LocationAttachClickListener();
+        imageAttachClickListener = new ImageAttachClickListener();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        Log.v(TAG, "initFields() currentChatDialog = " + currentChatDialog);
         combinationMessagesList = createCombinationMessagesList();
     }
 
@@ -369,7 +390,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void registerBroadcastReceivers() {
-        Log.v(TAG, "registerBroadcastReceivers()");
         localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
@@ -388,12 +408,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         dataManager.getQBChatDialogDataManager().deleteObserver(dialogObserver);
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
-    }
-
-    private void removeMsgTextViewLinkClickListener() {
-        if (messagesAdapter != null) {
-            messagesAdapter.removeMessageTextViewLinkClickListener();
-        }
     }
 
     protected void updateData() {
@@ -634,7 +648,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected List<CombinationMessage> buildCombinationMessagesListByDate(long createDate, boolean moreDate) {
         if (currentChatDialog == null) {
-            Log.d("BaseDialogActivity", "dialog = " + currentChatDialog);
             return new ArrayList<>();
         }
 
@@ -710,8 +723,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
-            Log.e("Fix double message", "MessageObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            Log.e("Fix double message", "observeKey =  " + data);
+            Log.i(TAG, "==== MessageObserver  'update' ====");
             if (data != null && data.equals(dataManager.getMessageDataManager().getObserverKey())) {
                 updateMessagesList();
             }
@@ -722,7 +734,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
-            Log.d("Fix double message", "DialogNotificationObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
+            Log.i(TAG, "==== DialogNotificationObserver  'update' ====");
             if (data != null && data.equals(dataManager.getDialogNotificationDataManager().getObserverKey())) {
                 updateMessagesList();
             }
@@ -733,7 +745,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
-            Log.d("Fix double message", "DialogObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
+            Log.i(TAG, "==== DialogObserver  'update' ====");
             if (data != null && data.equals(dataManager.getQBChatDialogDataManager().getObserverKey()) && currentChatDialog != null) {
                 currentChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
                 if (currentChatDialog != null) {
@@ -863,7 +875,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onLinkClicked(String linkText, QBMessageTextClickMovement.QBLinkType qbLinkType, int position) {
-            Log.i(TAG, "Link clicked. Text = " + linkText + " Type = " + qbLinkType + " Position: " + position);
 
             if (!QBMessageTextClickMovement.QBLinkType.NONE.equals(qbLinkType)) {
                 canPerformLogout.set(false);
@@ -875,5 +886,21 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         }
 
+    }
+
+    protected class LocationAttachClickListener implements QBChatAttachLocationClickListener{
+
+        @Override
+        public void onLinkClicked(QBAttachment qbAttachment, int i) {
+            MapsActivity.startMapForResult(BaseDialogActivity.this, qbAttachment.getData());
+        }
+    }
+
+    protected class ImageAttachClickListener implements QBChatAttachImageClickListener{
+
+        @Override
+        public void onLinkClicked(QBAttachment qbAttachment, int i) {
+            PreviewImageActivity.start(BaseDialogActivity.this, qbAttachment.getUrl());
+        }
     }
 }

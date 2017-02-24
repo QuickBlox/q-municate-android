@@ -81,9 +81,8 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     @Override
     protected RequestListener getRequestListener(QBMessageViewHolder holder, int position) {
         CombinationMessage chatMessage = getItem(position);
-        QBAttachment attachment = chatMessage.getAttachments().iterator().next();
 
-        return new ImageRequestListener((ImageAttachHolder) holder, attachment.getData(), isIncoming(chatMessage));
+        return new ImageRequestListener((ImageAttachHolder) holder, isIncoming(chatMessage));
     }
 
     @Override
@@ -135,13 +134,10 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     public class ImageRequestListener implements RequestListener<String, GlideBitmapDrawable> {
         private ImageAttachHolder viewHolder;
         private Bitmap loadedImageBitmap;
-        private String imageUrl;
-        private String location;
         private boolean isIncoming;
 
-        public ImageRequestListener(ImageAttachHolder viewHolder, String location, boolean isIncoming) {
+        public ImageRequestListener(ImageAttachHolder viewHolder, boolean isIncoming) {
             this.viewHolder = viewHolder;
-            this.location = location;
             this.isIncoming = isIncoming;
         }
 
@@ -150,7 +146,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
             updateUIAfterLoading();
             resetAttachUI(viewHolder);
             Log.d(TAG, "onLoadingFailed");
-            imageUrl = null;
             return false;
         }
 
@@ -158,13 +153,11 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         public boolean onResourceReady(GlideBitmapDrawable loadedBitmap, String imageUri, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
             initMaskedImageView(loadedBitmap.getBitmap());
             fileUtils.checkExistsFile(imageUri, loadedBitmap.getBitmap());
-            this.imageUrl = imageUri;
             return false;
         }
 
         protected void initMaskedImageView(Bitmap loadedBitmap) {
             loadedImageBitmap = loadedBitmap;
-            viewHolder.attachImageView.setOnClickListener(receiveImageFileOnClickListener());
             viewHolder.attachImageView.setImageBitmap(loadedImageBitmap);
 
             showAttachUI(viewHolder, isIncoming);
@@ -176,22 +169,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
             if (viewHolder.attachmentProgressBar != null) {
                 setViewVisibility(viewHolder.attachmentProgressBar, View.GONE);
             }
-        }
-
-        private View.OnClickListener receiveImageFileOnClickListener() {
-            return new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    if (location != null) {
-                        Log.d("BaseDialogAdapter", "location= " + location);
-                        MapsActivity.startMapForResult(context, location);
-                    } else if (imageUrl != null) {
-                        view.startAnimation(AnimationUtils.loadAnimation(baseActivity, R.anim.chat_attached_file_click));
-                        PreviewImageActivity.start(baseActivity, imageUrl);
-                    }
-                }
-            };
         }
     }
 

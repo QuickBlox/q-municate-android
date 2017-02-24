@@ -3,13 +3,11 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
@@ -53,7 +51,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
         messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList);
-        messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);

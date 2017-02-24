@@ -19,7 +19,7 @@ public class ActivityUIHelper {
 
     private BaseActivity baseActivity;
     private QMUser senderUser;
-    private QBChatDialog messagesDialog;
+    private QBChatDialog chatDialog;
     private String message;
     private boolean isPrivateMessage;
 
@@ -32,7 +32,7 @@ public class ActivityUIHelper {
         message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
-        if (isMessagesDialogCorrect(dialogId) && senderUser != null) {
+        if (isChatDialogExist(dialogId) && senderUser != null) {
             message = baseActivity.getString(R.string.snackbar_new_message_title, senderUser.getFullName(), message);
             if (!TextUtils.isEmpty(message)) {
                 showNewNotification();
@@ -40,10 +40,10 @@ public class ActivityUIHelper {
         }
     }
 
-    private boolean isMessagesDialogCorrect(String dialogId) {
-        messagesDialog = DataManager.getInstance().getQBChatDialogDataManager().getByDialogId(dialogId);
+    private boolean isChatDialogExist(String dialogId) {
+        chatDialog = DataManager.getInstance().getQBChatDialogDataManager().getByDialogId(dialogId);
 
-        return messagesDialog != null;
+        return chatDialog != null;
     }
 
     public void showContactRequestNotification(Bundle extras) {
@@ -55,7 +55,7 @@ public class ActivityUIHelper {
         if (dialogOccupant != null && senderUser != null) {
             String dialogId = dialogOccupant.getDialog().getDialogId();
             isPrivateMessage = true;
-            if (isMessagesDialogCorrect(dialogId)) {
+            if (isChatDialogExist(dialogId)) {
                 message = baseActivity.getString(R.string.snackbar_new_contact_request_title, senderUser.getFullName());
                 if (!TextUtils.isEmpty(message)) {
                     showNewNotification();
@@ -82,9 +82,9 @@ public class ActivityUIHelper {
         }
 
         if (isPrivateMessage) {
-            baseActivity.startPrivateChatActivity(senderUser, messagesDialog);
+            baseActivity.startPrivateChatActivity(senderUser, chatDialog);
         } else {
-            baseActivity.startGroupChatActivity(messagesDialog);
+            baseActivity.startGroupChatActivity(chatDialog);
         }
     }
 }

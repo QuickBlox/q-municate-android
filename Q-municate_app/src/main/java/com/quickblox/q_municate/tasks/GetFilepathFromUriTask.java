@@ -50,10 +50,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         boolean isFromGoogleApp = uri.toString().startsWith(SchemeType.SCHEME_CONTENT_GOOGLE);
         boolean isKitKatAndUpper = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
-        Log.d("test_rotation", "performInBackground()");
-
         if (SchemeType.SCHEME_CONTENT.equalsIgnoreCase(uriScheme) && !isFromGoogleApp && !isKitKatAndUpper) {
-            Log.d("test_rotation", "performInBackground(). 1");
             String[] filePathColumn = { MediaStore.Images.Media.DATA};
             Cursor cursor = App.getInstance().getContentResolver().query(uri, filePathColumn, null, null, null);
             if (cursor != null) {
@@ -65,18 +62,14 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
                 cursor.close();
             }
         } else if (SchemeType.SCHEME_FILE.equalsIgnoreCase(uriScheme)) {
-            Log.d("test_rotation", "performInBackground(). 2");
             imageFilePath = uri.getPath();
         } else {
-            Log.d("test_rotation", "performInBackground(). 3");
             imageFilePath = ImageUtils.saveUriToFile(uri);
         }
 
         if (TextUtils.isEmpty(imageFilePath)) {
             throw new IOException("Can't find a filepath for URI " + uri.toString());
         }
-
-        Log.d("test_rotation", "performInBackground(). END, imageFilePath = " + imageFilePath);
 
         return new File(imageFilePath);
     }

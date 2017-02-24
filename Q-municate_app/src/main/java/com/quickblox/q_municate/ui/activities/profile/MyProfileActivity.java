@@ -23,10 +23,8 @@ import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
-import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -39,6 +37,7 @@ import java.io.File;
 import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import rx.Observable;
 import rx.Subscriber;
 
 public class MyProfileActivity extends BaseLoggableActivity implements OnImagePickedListener {
@@ -238,7 +237,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     }
 
     private void saveChanges() {
-        if (new ValidationUtils(this).isFullNameValid(fullNameTextInputLayout, oldFullName.trim(), currentFullName.trim())) {
+        if (new ValidationUtils(this).isFullNameValid(fullNameTextInputLayout, currentFullName.trim())) {
             showProgress();
 
             QBUser newUser = createUserForUpdating();
@@ -246,7 +245,16 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
             if (isNeedUpdateImage && imageUri != null) {
                 file = ImageUtils.getCreatedFileFromUri(imageUri);
             }
-            ServiceManager.getInstance().updateUser(newUser, file).subscribe(new Subscriber<QMUser>() {
+
+            Observable<QMUser> qmUserObservable;
+
+            if (file != null){
+                qmUserObservable = ServiceManager.getInstance().updateUser(newUser, file);
+            } else {
+                qmUserObservable = ServiceManager.getInstance().updateUser(newUser);
+            }
+
+            qmUserObservable.subscribe(new Subscriber<QMUser>() {
                 @Override
                 public void onCompleted() {
 
@@ -272,5 +280,4 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
             });
         }
     }
-
 }

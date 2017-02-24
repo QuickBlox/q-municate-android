@@ -3,7 +3,6 @@ package com.quickblox.q_municate_core.qb.commands.chat;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -36,7 +35,6 @@ public class QBInitChatsCommand extends ServiceCommand {
             user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         }
 
-        Log.v("QBInitChatsCommand", "INIT_CHATS_ACTION");
         chatHelper.init(user);
 
         return extras;

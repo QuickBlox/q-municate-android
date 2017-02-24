@@ -25,7 +25,6 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;

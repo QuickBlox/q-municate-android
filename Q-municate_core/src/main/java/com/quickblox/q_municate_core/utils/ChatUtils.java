@@ -9,6 +9,7 @@ import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.models.NotificationType;
@@ -37,11 +38,9 @@ ChatUtils {
     public static final String OCCUPANT_IDS_DIVIDER = ",";
 
     public static String getAttachUrlFromMessage(Collection<QBAttachment> attachmentsCollection) {
-        if (attachmentsCollection != null) {
+        if (!CollectionsUtil.isEmpty(attachmentsCollection)) {
             ArrayList<QBAttachment> attachmentsList = new ArrayList<>(attachmentsCollection);
-            if (!attachmentsList.isEmpty()) {
-                return attachmentsList.get(0).getUrl();
-            }
+            return attachmentsList.get(0).getUrl();
         }
         return ConstsCore.EMPTY_STRING;
     }
@@ -49,7 +48,7 @@ ChatUtils {
     public static String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = ConstsCore.EMPTY_STRING;
         Collection<QBAttachment> attachmentCollection = chatMessage.getAttachments();
-        if (attachmentCollection != null && attachmentCollection.size() > 0) {
+        if (!CollectionsUtil.isEmpty(attachmentCollection)) {
             attachURL = getAttachUrlFromMessage(attachmentCollection);
         }
         return attachURL;

@@ -97,6 +97,10 @@ public class QBChatDialogDataManager implements Manager<QBChatDialog> {
         return dialogDataManager.exists(id);
     }
 
+    public boolean exists(String dialogId) {
+        return getByDialogId(dialogId) != null;
+    }
+
     @Override
     public void createOrUpdateAll(Collection<QBChatDialog> qbChatDialogsList) {
         dialogDataManager.createOrUpdateAll(

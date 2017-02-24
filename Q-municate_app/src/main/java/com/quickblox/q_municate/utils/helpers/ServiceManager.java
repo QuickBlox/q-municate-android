@@ -196,7 +196,7 @@ public class ServiceManager {
                         } else {
                             qmUser.setPassword(QBSessionManager.getInstance().getToken());
                         }
-                        return null;
+                        return qmUser;
                     }
                 });
 
