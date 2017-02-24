@@ -73,7 +73,6 @@ public class ServiceManager {
 
         Observable<QBUser> result = authService.login(user)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<QBUser,QBUser>() {
                     @Override
                     public QBUser call(QBUser qbUser) {
@@ -98,15 +97,15 @@ public class ServiceManager {
                         AppSession.startSession(qbUser);
 
                         return qbUser;
-            }
-        });
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread());
 
         return result;
     }
 
     public  Observable<QBUser>  login(final String socialProvider, final String accessToken, final String accessTokenSecret) {
-        Observable<QBUser> result = authService.login(QBProvider.FACEBOOK, accessToken, accessTokenSecret).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        Observable<QBUser> result = authService.login(socialProvider, accessToken, accessTokenSecret).subscribeOn(Schedulers.io())
                 .map(new Func1<QBUser, QBUser>() {
                     @Override
                     public QBUser call(QBUser qbUser) {
@@ -126,9 +125,17 @@ public class ServiceManager {
                             Log.d(TAG, "updateUser " + e.getMessage());
                             throw Exceptions.propagate(e);
                         }
+
+                        qbUser.setPassword(QBSessionManager.getInstance().getToken());
+
+                        saveOwnerUser(qbUser);
+
+                        AppSession.startSession(qbUser);
+
                         return qbUser;
                     }
-                });
+                })
+                .observeOn(AndroidSchedulers.mainThread());
 
         return result;
     }
@@ -138,14 +145,14 @@ public class ServiceManager {
 
         Observable<Void> result = QMAuthService.getInstance().logout()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<Void, Void>() {
                     @Override
                     public Void call(Void aVoid) {
                         clearDataAfterLogOut();
                         return null;
                     }
-                });
+                })
+                .observeOn(AndroidSchedulers.mainThread());
         return result;
     }
 
@@ -161,7 +168,6 @@ public class ServiceManager {
         QMUser qmUser = QMUser.convert(inputUser);
         Observable<QMUser> result  =   QMUserService.getInstance().updateUser(qmUser)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<QBUser,QMUser>() {
                     @Override
                     public QMUser call(QBUser qbUser) {
@@ -169,7 +175,8 @@ public class ServiceManager {
                         user.setPassword(password);
                         return user;
                     }
-        });
+                })
+                .observeOn(AndroidSchedulers.mainThread());
 
         return result;
     }
@@ -187,7 +194,6 @@ public class ServiceManager {
         QMUser qmUser = QMUser.convert(inputUser);
         result =  QMUserService.getInstance().updateUser(qmUser)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<QMUser, QMUser>() {
                     @Override
                     public QMUser call(QMUser qmUser) {
@@ -196,9 +202,10 @@ public class ServiceManager {
                         } else {
                             qmUser.setPassword(QBSessionManager.getInstance().getToken());
                         }
-                        return null;
+                        return qmUser;
                     }
-                });
+                })
+                .observeOn(AndroidSchedulers.mainThread());
 
         return result;
     }
@@ -212,24 +219,25 @@ public class ServiceManager {
 
         result = observable
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+
                 .flatMap(new Func1<QBFile, Observable<QMUser>>() {
-                @Override
-                public Observable<QMUser> call(QBFile qbFile) {
-                    QBUser newUser = new QBUser();
+                    @Override
+                    public Observable<QMUser> call(QBFile qbFile) {
+                        QBUser newUser = new QBUser();
 
-                    newUser.setId(user.getId());
-                    newUser.setPassword(user.getPassword());
-                    newUser.setFileId(qbFile.getId());
-                    newUser.setFullName(user.getFullName());
+                        newUser.setId(user.getId());
+                        newUser.setPassword(user.getPassword());
+                        newUser.setFileId(qbFile.getId());
+                        newUser.setFullName(user.getFullName());
 
-                    UserCustomData userCustomData = getUserCustomData(user);
-                    userCustomData.setAvatarUrl(qbFile.getPublicUrl());
-                    newUser.setCustomData(Utils.customDataToString(userCustomData));
+                        UserCustomData userCustomData = getUserCustomData(user);
+                        userCustomData.setAvatarUrl(qbFile.getPublicUrl());
+                        newUser.setCustomData(Utils.customDataToString(userCustomData));
 
-                    return updateUser(newUser);
-                }
-        });
+                        return updateUser(newUser);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread());
 
         return result;
     }
