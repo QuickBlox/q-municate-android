@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.chats.BaseDialogActivity;
@@ -18,70 +19,65 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 public class ActivityUIHelper {
 
     private BaseActivity baseActivity;
-    private QMUser senderUser;
-    private QBChatDialog chatDialog;
-    private String message;
-    private boolean isPrivateMessage;
 
     public ActivityUIHelper(BaseActivity baseActivity) {
         this.baseActivity = baseActivity;
     }
 
     public void showChatMessageNotification(Bundle extras) {
-        senderUser = (QMUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
-        message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+        QMUser senderUser = (QMUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
+        String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-        isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
         if (isChatDialogExist(dialogId) && senderUser != null) {
             message = baseActivity.getString(R.string.snackbar_new_message_title, senderUser.getFullName(), message);
             if (!TextUtils.isEmpty(message)) {
-                showNewNotification();
+                showNewNotification(getChatDialogForNotification(dialogId), senderUser, message);
             }
         }
     }
 
     private boolean isChatDialogExist(String dialogId) {
-        chatDialog = DataManager.getInstance().getQBChatDialogDataManager().getByDialogId(dialogId);
+        return DataManager.getInstance().getQBChatDialogDataManager().exists(dialogId);
+    }
 
-        return chatDialog != null;
+    private QBChatDialog getChatDialogForNotification(String dialogId) {
+        return DataManager.getInstance().getQBChatDialogDataManager().getByDialogId(dialogId);
     }
 
     public void showContactRequestNotification(Bundle extras) {
         int senderUserId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-        senderUser = QMUserService.getInstance().getUserCache().get((long)senderUserId);
-        message = extras.getString(QBServiceConsts.EXTRA_MESSAGE);
+        QMUser senderUser = QMUserService.getInstance().getUserCache().get((long) senderUserId);
         DialogOccupant dialogOccupant = DataManager.getInstance().getDialogOccupantDataManager().getDialogOccupantForPrivateChat(senderUserId);
 
         if (dialogOccupant != null && senderUser != null) {
             String dialogId = dialogOccupant.getDialog().getDialogId();
-            isPrivateMessage = true;
             if (isChatDialogExist(dialogId)) {
-                message = baseActivity.getString(R.string.snackbar_new_contact_request_title, senderUser.getFullName());
+                String message = baseActivity.getString(R.string.snackbar_new_contact_request_title, senderUser.getFullName());
                 if (!TextUtils.isEmpty(message)) {
-                    showNewNotification();
+                    showNewNotification(getChatDialogForNotification(dialogId), senderUser, message);
                 }
             }
         }
     }
 
-    public void showNewNotification() {
+    private void showNewNotification(final QBChatDialog chatDialog, final QMUser senderUser, String message) {
         baseActivity.hideSnackBar();
         baseActivity.showSnackbar(message, Snackbar.LENGTH_LONG, R.string.dialog_reply,
                 new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
-                        showDialog();
+                        showDialog(chatDialog, senderUser);
                     }
                 });
     }
 
-    private void showDialog() {
+    private void showDialog(QBChatDialog chatDialog, QMUser senderUser) {
         if (baseActivity instanceof BaseDialogActivity) {
             baseActivity.finish();
         }
 
-        if (isPrivateMessage) {
+        if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
             baseActivity.startPrivateChatActivity(senderUser, chatDialog);
         } else {
             baseActivity.startGroupChatActivity(chatDialog);
