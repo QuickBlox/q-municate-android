@@ -141,8 +141,7 @@ public class ServiceManager {
     }
 
     public Observable<Void>  logout() {
-        AppSession.getSession().closeAndClear();
-
+        SubscribeService.unSubscribeFromPushes(context);
         Observable<Void> result = QMAuthService.getInstance().logout()
                 .subscribeOn(Schedulers.io())
                 .map(new Func1<Void, Void>() {
@@ -324,12 +323,9 @@ public class ServiceManager {
     }
 
     public void logoutSync() throws QBResponseException {
-        AppSession activeSession = AppSession.getSession();
-        if (activeSession != null) {
-            activeSession.closeAndClear();
-        }
-
+        SubscribeService.unSubscribeFromPushes(context);
         QMAuthService.getInstance().logoutSync();
+        clearDataAfterLogOut();
     }
 
     public QBUser updateUserSync(QBUser inputUser) throws QBResponseException {
@@ -387,7 +383,7 @@ public class ServiceManager {
     }
 
     private void clearDataAfterLogOut() {
-        SubscribeService.unSubscribeFromPushes(context);
+        AppSession.getSession().closeAndClear();
         DataManager.getInstance().clearAllTables();
         CoreSharedHelper.getInstance().clearAll();
 

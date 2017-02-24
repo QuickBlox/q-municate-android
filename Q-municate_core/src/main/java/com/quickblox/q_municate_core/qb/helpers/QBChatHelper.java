@@ -781,14 +781,20 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     private class SystemMessageListener implements QBSystemMessageListener {
 
         @Override
-        public void processMessage(QBChatMessage qbChatMessage) {
-            String notificationTypeString = (String) qbChatMessage
-                    .getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE);
-            NotificationType notificationType = NotificationType.parseByValue(
-                    Integer.parseInt(notificationTypeString));
-            if (NotificationType.GROUP_CHAT_CREATE.equals(notificationType)) {
-                createGroupDialogByNotification(qbChatMessage, DialogNotification.Type.CREATE_DIALOG);
-            }
+        public void processMessage(final QBChatMessage qbChatMessage) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    String notificationTypeString = (String) qbChatMessage
+                            .getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE);
+                    NotificationType notificationType = NotificationType.parseByValue(
+                            Integer.parseInt(notificationTypeString));
+                    if (NotificationType.GROUP_CHAT_CREATE.equals(notificationType)) {
+                        createGroupDialogByNotification(qbChatMessage, DialogNotification.Type.CREATE_DIALOG);
+                    }
+                }
+            });
+
         }
 
         @Override
