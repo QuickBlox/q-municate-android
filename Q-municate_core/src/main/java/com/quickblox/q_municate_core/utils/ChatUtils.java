@@ -480,13 +480,20 @@ ChatUtils {
         if (message == null && dialogNotification != null) {
             lastMessage = defaultLasMessage;
         } else if (dialogNotification == null && message != null) {
-            lastMessage = message.getBody();
+            lastMessage = getAbbreviatedLastMessage(message.getBody());
         } else if (message != null && dialogNotification != null) {
             lastMessage = message.getCreatedDate() > dialogNotification.getCreatedDate()
-                    ? message.getBody() : defaultLasMessage;
+                    ? getAbbreviatedLastMessage(message.getBody()) : defaultLasMessage;
         }
 
         return lastMessage;
+    }
+
+    private static String getAbbreviatedLastMessage(String fullMessage){
+        return fullMessage.substring(0,
+                fullMessage.length() > ConstsCore.LAST_MESSAGE_LENGTH
+                        ? ConstsCore.LAST_MESSAGE_LENGTH
+                        : fullMessage.length() -1);
     }
 
     public static long getDialogMessageCreatedDate(boolean lastMessage, Message message, DialogNotification dialogNotification) {

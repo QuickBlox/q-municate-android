@@ -48,4 +48,6 @@ public class ConstsCore {
     public static final String EXTRA_LOCATION_LONGITUDE = "location_longitude";
     public static final String LATITUDE_PARAM = "lat";
     public static final String LONGITUDE_PARAM = "lng";
+
+    public static final int LAST_MESSAGE_LENGTH = 100;
 }
