@@ -719,7 +719,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
         DbUtils.saveDialogNotificationToCache(context, dataManager, dialogOccupant, qbChatMessage, true);
 
-        checkForSendingNotification(false, qbChatMessage, dialogOccupant.getUser(), true);
+        if (dialogOccupant != null) {
+            checkForSendingNotification(false, qbChatMessage, dialogOccupant.getUser(), true);
+        }
     }
 
     interface QBNotificationChatListener {

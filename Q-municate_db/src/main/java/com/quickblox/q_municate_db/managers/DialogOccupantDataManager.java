@@ -31,7 +31,7 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
     public void createOrUpdate(Object object, boolean notify) {
         DialogOccupant dialogOccupant = (DialogOccupant) object;
         try {
-            if(existsByDialogIdAndUserId(dialogOccupant.getDialog().getDialogId(), dialogOccupant.getUser().getId())){
+            if(dialogOccupant.getDialog() != null && existsByDialogIdAndUserId(dialogOccupant.getDialog().getDialogId(), dialogOccupant.getUser().getId())){
                 dao.update(dialogOccupant);
             } else{
                 dao.create(dialogOccupant);

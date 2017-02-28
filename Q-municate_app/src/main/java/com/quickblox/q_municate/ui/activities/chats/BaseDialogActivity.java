@@ -32,6 +32,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
+import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
 import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
@@ -359,7 +360,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void initMessagesRecyclerView() {
-        messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        messagesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(this));
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
