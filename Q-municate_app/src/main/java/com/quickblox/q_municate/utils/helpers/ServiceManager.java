@@ -15,6 +15,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.server.Performer;
 import com.quickblox.extensions.RxJavaPerformProcessor;
+import com.quickblox.messages.services.QBPushManager;
 import com.quickblox.messages.services.SubscribeService;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate_auth_service.QMAuthService;
@@ -34,8 +35,10 @@ import com.quickblox.users.model.QBUser;
 import java.io.File;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.exceptions.Exceptions;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -140,9 +143,28 @@ public class ServiceManager {
         return result;
     }
 
-    public Observable<Void>  logout() {
-        SubscribeService.unSubscribeFromPushes(context);
-        Observable<Void> result = QMAuthService.getInstance().logout()
+    public void logout(final Subscriber<Void> subscriber) {
+        if(QBPushManager.getInstance().isSubscribedToPushes()) {
+            QBPushManager.getInstance().addListener(new QBPushManager.QBSubscribeListener() {
+                @Override
+                public void onSubscriptionCreated() { }
+
+                @Override
+                public void onSubscriptionError(Exception e, int i) { }
+
+                @Override
+                public void onSubscriptionDeleted(boolean b) {
+                    logoutInternal(subscriber);
+                }
+            });
+            SubscribeService.unSubscribeFromPushes(context);
+        } else{
+           logoutInternal(subscriber);
+        }
+    }
+
+    private void logoutInternal(final Subscriber<Void> subscriber){
+        QMAuthService.getInstance().logout()
                 .subscribeOn(Schedulers.io())
                 .map(new Func1<Void, Void>() {
                     @Override
@@ -151,8 +173,8 @@ public class ServiceManager {
                         return null;
                     }
                 })
-                .observeOn(AndroidSchedulers.mainThread());
-        return result;
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber);
     }
 
     public  Observable<Void> resetPassword(String email) {
@@ -323,7 +345,9 @@ public class ServiceManager {
     }
 
     public void logoutSync() throws QBResponseException {
-        SubscribeService.unSubscribeFromPushes(context);
+        if(QBPushManager.getInstance().isSubscribedToPushes()) {
+            SubscribeService.unSubscribeFromPushes(context);
+        }
         QMAuthService.getInstance().logoutSync();
         clearDataAfterLogOut();
     }

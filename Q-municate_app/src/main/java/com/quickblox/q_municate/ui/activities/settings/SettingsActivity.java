@@ -138,22 +138,28 @@ public class SettingsActivity extends BaseLoggableActivity {
                                     facebookHelper.logout();
                                     twitterDigitsHelper.logout();
 
-                                    ServiceManager.getInstance().logout().subscribe(new Action1<Void>() {
+                                    ServiceManager.getInstance().logout(new Subscriber<Void>() {
                                         @Override
-                                        public void call(Void aVoid) {
+                                        public void onCompleted() {
+
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            ErrorUtils.showError(SettingsActivity.this, e);
+                                            hideProgress();
+                                        }
+
+                                        @Override
+                                        public void onNext(Void aVoid) {
                                             hideProgress();
                                             startLandingScreen();
-                                        }
-                                    }, new Action1<Throwable>() {
-                                        @Override
-                                        public void call(Throwable throwable) {
-                                            ErrorUtils.showError(SettingsActivity.this, throwable);
-                                            hideProgress();
                                         }
                                     });
                                 }
                             });
         }
+
     }
 
 
@@ -203,7 +209,7 @@ public class SettingsActivity extends BaseLoggableActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            ServiceManager.getInstance().logout().subscribe(new Subscriber<Void>() {
+            ServiceManager.getInstance().logout(new Subscriber<Void>() {
                 @Override
                 public void onCompleted() {
 
