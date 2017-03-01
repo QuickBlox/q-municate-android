@@ -177,9 +177,11 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         addNecessaryPropertyForQBChatMessage(qbChatMessage, chatDialog.getDialogId());
 
         sendChatMessage(qbChatMessage, chatDialog);
-        DbUtils.saveMessageOrNotificationToCache(context, dataManager, chatDialog.getDialogId(), qbChatMessage, null, true);
-        DbUtils.updateDialogModifiedDate(dataManager, chatDialog.getDialogId(), ChatUtils.getMessageDateSent(qbChatMessage),
-                false);
+        if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
+            DbUtils.saveMessageOrNotificationToCache(context, dataManager, chatDialog.getDialogId(), qbChatMessage, null, true);
+            DbUtils.updateDialogModifiedDate(dataManager, chatDialog.getDialogId(), ChatUtils.getMessageDateSent(qbChatMessage),
+                    false);
+        }
     }
 
     public void sendChatMessage(QBChatMessage message, QBChatDialog chatDialog) throws QBResponseException {
@@ -318,7 +320,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             if (!ownMessage && !currentDialog.getDialogId().equals(dialogId)) {
                 sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL, qbChatMessage, user, dialogId, isPrivateChat);
             }
-        } else {
+        } else if (!ownMessage) {
             sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL, qbChatMessage, user, dialogId,
                     isPrivateChat);
         }
@@ -676,11 +678,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());
         }
 
-        //To QBDialogType.GROUP chat receive own messages
-        if (!ownMessage) {
-            DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage, State.DELIVERED, true);
-            DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(chatMessage), false);
-        }
+        //Save group messages and own carbon messages
+        DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage, null, true);
+        DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(chatMessage), false);
 
         checkForSendingNotification(ownMessage, chatMessage, user, isPrivateChatMessage);
     }
@@ -719,7 +719,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
         DbUtils.saveDialogNotificationToCache(context, dataManager, dialogOccupant, qbChatMessage, true);
 
-        checkForSendingNotification(false, qbChatMessage, dialogOccupant.getUser(), true);
+        if (dialogOccupant != null) {
+            checkForSendingNotification(false, qbChatMessage, dialogOccupant.getUser(), true);
+        }
     }
 
     interface QBNotificationChatListener {
