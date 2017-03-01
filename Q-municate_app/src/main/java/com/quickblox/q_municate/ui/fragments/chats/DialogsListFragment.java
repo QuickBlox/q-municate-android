@@ -152,7 +152,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
         MenuInflater menuInflater = baseActivity.getMenuInflater();
-        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
+        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position).getChatDialog();
+        if(chatDialog.getType().equals(QBDialogType.GROUP)){
+            menuInflater.inflate(R.menu.dialogs_list_group_ctx_menu, menu);
+        } else{
+            menuInflater.inflate(R.menu.dialogs_list_private_ctx_menu, menu);
+        }
     }
 
     @Override
