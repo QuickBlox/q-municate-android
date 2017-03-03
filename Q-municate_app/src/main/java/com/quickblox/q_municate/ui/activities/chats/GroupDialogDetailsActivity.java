@@ -164,9 +164,13 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                 startAddFriendsActivity();
                 break;
             case R.id.action_leave:
-                boolean joined = chatHelper != null && chatHelper.isDialogJoined(qbDialog);
-                if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError() && joined) {
-                    showLeaveGroupDialog();
+                if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError()) {
+                    boolean joined = chatHelper != null && chatHelper.isDialogJoined(qbDialog);
+                    if(joined) {
+                        showLeaveGroupDialog();
+                    } else{
+                        ToastUtils.longToast(R.string.dialog_details_service_is_initializing);
+                    }
                 } else {
                     ToastUtils.longToast(R.string.dialog_details_service_is_initializing);
                 }
