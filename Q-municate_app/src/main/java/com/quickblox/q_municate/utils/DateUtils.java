@@ -90,8 +90,8 @@ public class DateUtils {
     /**
      * @return string in "Hours:Minutes" format, i.e. <b>11:23</b>
      */
-    public static String formatDateSimpleTime(long seconds) {
-        return SIMPLE_TIME_FORMAT.format(new Date(seconds * SECOND_IN_MILLIS));
+    public static String formatDateSimpleTime(long milliSeconds) {
+        return SIMPLE_TIME_FORMAT.format(new Date(milliSeconds));
     }
 
     /**
@@ -247,8 +247,8 @@ public class DateUtils {
     /**
      * @return today/yesterday string or "Day Month" format, i.e. <b>Dec 27</b>
      */
-    public static String toTodayYesterdayShortDateWithoutYear2(long seconds) {
-        return toTodayYesterdayDateByFormat(seconds, SHORT_MONTH_AND_DAY_FORMAT);
+    public static String toTodayYesterdayShortDateWithoutYear2(long milliSeconds) {
+        return toTodayYesterdayDateByFormat(milliSeconds / SECOND_IN_MILLIS, SHORT_MONTH_AND_DAY_FORMAT);
     }
 
     private static String toTodayYesterdayDateByFormat(long seconds, SimpleDateFormat simpleDateFormat) {

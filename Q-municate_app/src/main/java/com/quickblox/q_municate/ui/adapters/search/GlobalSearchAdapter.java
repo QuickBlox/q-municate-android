@@ -18,7 +18,6 @@ import com.quickblox.q_municate.utils.helpers.TextViewHelper;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -137,8 +136,8 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<QBUser, BaseClickList
             viewHolder.statusTextView.setTextColor(resources.getColor(R.color.green));
         } else {
             viewHolder.statusTextView.setText(resources.getString(R.string.last_seen,
-                    DateUtils.toTodayYesterdayShortDateWithoutYear2(DateUtilsCore.getTime(user.getLastRequestAt())),
-                    DateUtils.formatDateSimpleTime(DateUtilsCore.getTime(user.getLastRequestAt()))));
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
+                    DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime())));
             viewHolder.statusTextView.setTextColor(resources.getColor(R.color.dark_gray));
         }
     }
