@@ -2,8 +2,10 @@ package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.chat.JIDHelper;
@@ -145,13 +147,13 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         sendAndSaveChatMessage(qbChatMessage, currentDialog);
     }
 
-    public void sendMessageWithAttachment(Attachment.Type attachmentType, Object attachmentObject) throws QBResponseException {
+    public void sendMessageWithAttachment(Attachment.Type attachmentType, Object attachmentObject, String localPath) throws QBResponseException {
         String messageBody = "";
         QBAttachment attachment = null;
         switch (attachmentType) {
-            case PICTURE:
+            case IMAGE:
                 messageBody = context.getString(R.string.dlg_attached_last_message);
-                attachment = getAttachment((QBFile) attachmentObject);
+                attachment = getAttachment((QBFile) attachmentObject, localPath);
                 break;
             case LOCATION:
                 messageBody = context.getString(R.string.dlg_location_last_message);
@@ -257,15 +259,27 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     }
 
     private QBAttachment getAttachment(QBFile file) {
+        return getAttachment(file, null);
+    }
+
+    private QBAttachment getAttachment(QBFile file, String localPath) {
         // TODO temp value
         String contentType = "image/jpeg";
 
-        QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
+        QBAttachment attachment = new QBAttachment(QBAttachment.IMAGE_TYPE);
         attachment.setId(file.getUid());
         attachment.setName(file.getName());
         attachment.setContentType(contentType);
         attachment.setUrl(file.getPublicUrl());
         attachment.setSize(file.getSize());
+
+        if(!TextUtils.isEmpty(localPath)){
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(localPath, options);
+            attachment.setWidth(options.outWidth);
+            attachment.setHeight(options.outHeight);
+       }
 
         return attachment;
     }
@@ -385,7 +399,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             if (getAttachmentType(qbChatMessage.getAttachments()).equalsIgnoreCase(Attachment.Type.LOCATION.toString())) {
                 attachment.setType(Attachment.Type.LOCATION);
             } else {
-                attachment.setType(Attachment.Type.PICTURE);
+                attachment.setType(Attachment.Type.IMAGE);
             }
             attachment.setRemoteUrl(attachUrl);
             message.setAttachment(attachment);

@@ -362,6 +362,9 @@ ChatUtils {
         attachment.setRemoteUrl(remoteUrl);
         attachment.setName(qbAttachment.getName());
         attachment.setSize(qbAttachment.getSize());
+        attachment.setHeight(qbAttachment.getHeight());
+        attachment.setWidth(qbAttachment.getWidth());
+        attachment.setDuration(qbAttachment.getDuration());
         return attachment;
     }
 

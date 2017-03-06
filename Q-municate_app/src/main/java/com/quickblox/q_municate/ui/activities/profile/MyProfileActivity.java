@@ -128,7 +128,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
 
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
-        if (Attachment.Type.PICTURE.equals(attachmentType)){
+        if (Attachment.Type.IMAGE.equals(attachmentType)){
             canPerformLogout.set(true);
             startCropActivity(Uri.fromFile((File)attachment));
         }
