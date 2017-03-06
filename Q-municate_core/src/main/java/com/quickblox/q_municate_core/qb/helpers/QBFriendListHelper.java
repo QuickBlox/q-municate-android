@@ -36,6 +36,7 @@ import org.jivesoftware.smack.roster.packet.RosterPacket;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -409,6 +410,12 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
             if (user == null) {
                 ErrorUtils.logError(TAG, PRESENCE_CHANGE_ERROR + presence.getUserId());
             } else {
+                //Save user's last online status
+                if (QBPresence.Type.online.equals(presence.getType())){
+                    user.setLastRequestAt(new Date(System.currentTimeMillis()));
+                    QMUserService.getInstance().getUserCache().update(user);
+                }
+
                 notifyUserStatusChanged(user.getId());
             }
         }

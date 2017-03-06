@@ -251,10 +251,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private void setOnlineStatus(QMUser user) {
         if (user != null) {
             if (friendListHelper != null) {
-                String offlineStatus = getString(R.string.last_seen, DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
-                        DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime()));
+                QMUser actualUser = QMUserService.getInstance().getUserCache().get((long) user.getId());
+                String offlineStatus = getString(R.string.last_seen, DateUtils.toTodayYesterdayShortDateWithoutYear2(actualUser.getLastRequestAt().getTime()/1000),
+                        DateUtils.formatDateSimpleTime(actualUser.getLastRequestAt().getTime()/1000));
                 setActionBarSubtitle(
-                        OnlineStatusUtils.getOnlineStatus(this, friendListHelper.isUserOnline(user.getId()), offlineStatus));
+                        OnlineStatusUtils.getOnlineStatus(this, friendListHelper.isUserOnline(actualUser.getId()), offlineStatus));
             }
         }
     }
