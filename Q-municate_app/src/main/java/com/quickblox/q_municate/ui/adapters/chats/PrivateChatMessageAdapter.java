@@ -28,6 +28,7 @@ import butterknife.ButterKnife;
 
 public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
     private static final String TAG = PrivateChatMessageAdapter.class.getSimpleName();
+    private static final int SECOND_IN_MILLIS = 1000;
 
     private static int EMPTY_POSITION = -1;
     private final QBChatDialog chatDialog;
@@ -57,13 +58,13 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
         if (friendsRequestMessage) {
             textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()*SECOND_IN_MILLIS));
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
             Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
             textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()*SECOND_IN_MILLIS));
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
 
@@ -71,7 +72,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         } else {
             Log.d(TAG, "else onBindViewCustomHolderr combinationMessage getBody= " + chatMessage.getBody());
             textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()));
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()*SECOND_IN_MILLIS));
         }
 
         if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {

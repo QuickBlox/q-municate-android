@@ -48,6 +48,7 @@ import butterknife.OnClick;
 public class PrivateDialogActivity extends BaseDialogActivity {
 
     private FriendOperationAction friendOperationAction;
+    private QMUser opponentUser;
     private FriendObserver friendObserver;
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private int operationItemPosition;
@@ -163,7 +164,20 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         super.notifyChangedUserStatus(userId, online);
 
         if (opponentUser != null && opponentUser.getId() == userId) {
+            if (online){
+                //gets opponentUser from DB with updated field 'last_request_at'
+                actualizeOpponentUserFromDb();
+            }
+
             setOnlineStatus(opponentUser);
+        }
+    }
+
+    private void actualizeOpponentUserFromDb() {
+        QMUser opponentUserFromDb = QMUserService.getInstance().getUserCache().get((long) opponentUser.getId());
+
+        if (opponentUserFromDb != null){
+            opponentUser = opponentUserFromDb;
         }
     }
 
