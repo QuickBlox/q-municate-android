@@ -789,11 +789,16 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     ConstsCore.ZERO_INT_VALUE);
             final boolean isLoadedOldMessages = bundle.getBoolean(QBServiceConsts.EXTRA_IS_LOAD_OLD_MESSAGES);
 
+            String dialogId = bundle.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+
             Log.d("BaseDialogActivity", "Laoding messages finished" + " totalEntries = " + totalEntries
                     + " lastMessageDate = " + lastMessageDate
-                    + " isLoadedOldMessages = " + isLoadedOldMessages);
+                    + " isLoadedOldMessages = " + isLoadedOldMessages
+                    + " dialogId = " + dialogId);
 
-            if (messagesAdapter != null && totalEntries != ConstsCore.ZERO_INT_VALUE) {
+            if (messagesAdapter != null
+                    && totalEntries != ConstsCore.ZERO_INT_VALUE
+                    && dialogId.equals(currentChatDialog.getDialogId())) {
 
                 (new BaseAsyncTask<Void, Void, Boolean>() {
                     @Override
