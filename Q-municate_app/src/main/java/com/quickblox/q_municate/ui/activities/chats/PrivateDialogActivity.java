@@ -48,6 +48,7 @@ import butterknife.OnClick;
 public class PrivateDialogActivity extends BaseDialogActivity {
 
     private FriendOperationAction friendOperationAction;
+    private QMUser opponentUser;
     private FriendObserver friendObserver;
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private int operationItemPosition;
@@ -163,7 +164,19 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         super.notifyChangedUserStatus(userId, online);
 
         if (opponentUser != null && opponentUser.getId() == userId) {
+            if (online){
+                actualizeOpponentUserFromDb();
+            }
+
             setOnlineStatus(opponentUser);
+        }
+    }
+
+    private void actualizeOpponentUserFromDb() {
+        QMUser opponentUserFromDb = QMUserService.getInstance().getUserCache().get((long) opponentUser.getId());
+
+        if (opponentUserFromDb != null){
+            opponentUser = opponentUserFromDb;
         }
     }
 
@@ -251,11 +264,10 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private void setOnlineStatus(QMUser user) {
         if (user != null) {
             if (friendListHelper != null) {
-                QMUser actualUser = QMUserService.getInstance().getUserCache().get((long) user.getId());
-                String offlineStatus = getString(R.string.last_seen, DateUtils.toTodayYesterdayShortDateWithoutYear2(actualUser.getLastRequestAt().getTime()),
-                        DateUtils.formatDateSimpleTime(actualUser.getLastRequestAt().getTime()));
+                String offlineStatus = getString(R.string.last_seen, DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
+                        DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime()));
                 setActionBarSubtitle(
-                        OnlineStatusUtils.getOnlineStatus(this, friendListHelper.isUserOnline(actualUser.getId()), offlineStatus));
+                        OnlineStatusUtils.getOnlineStatus(this, friendListHelper.isUserOnline(user.getId()), offlineStatus));
             }
         }
     }
