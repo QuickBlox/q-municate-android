@@ -490,6 +490,10 @@ ChatUtils {
     }
 
     private static String getAbbreviatedLastMessage(String fullMessage){
+        if (fullMessage == null){
+            return "";
+        }
+
         return fullMessage.substring(0,
                 fullMessage.length() > ConstsCore.LAST_MESSAGE_LENGTH
                         ? ConstsCore.LAST_MESSAGE_LENGTH
