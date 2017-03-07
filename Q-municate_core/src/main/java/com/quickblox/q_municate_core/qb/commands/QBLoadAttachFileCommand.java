@@ -41,6 +41,7 @@ public class QBLoadAttachFileCommand extends ServiceCommand {
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_ATTACH_FILE, qbFile);
         result.putString(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
+        result.putString(QBServiceConsts.EXTRA_FILE_PATH, file.getAbsolutePath());
 
         return result;
     }

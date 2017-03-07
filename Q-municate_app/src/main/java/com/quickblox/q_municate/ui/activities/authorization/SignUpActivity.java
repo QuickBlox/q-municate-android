@@ -261,7 +261,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
 
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
-        if (Attachment.Type.PICTURE.equals(attachmentType)) {
+        if (Attachment.Type.IMAGE.equals(attachmentType)) {
             startCropActivity(Uri.fromFile((File)attachment));
         }
     }

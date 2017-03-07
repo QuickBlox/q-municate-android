@@ -231,7 +231,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
-        if (Attachment.Type.PICTURE.equals(attachmentType)) {
+        if (Attachment.Type.IMAGE.equals(attachmentType)) {
             startCropActivity(Uri.fromFile((File) attachment));
         }
     }

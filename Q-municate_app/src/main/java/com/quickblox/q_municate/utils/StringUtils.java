@@ -43,7 +43,7 @@ public class StringUtils {
         String attachmentName = "";
 
         switch (type) {
-            case PICTURE:
+            case IMAGE:
                 attachmentName = context.getString(R.string.dialog_attach);
                 break;
             case LOCATION:
@@ -65,7 +65,7 @@ public class StringUtils {
         String mimeType = MimeUtils.guessMimeTypeFromExtension(extension);
 
         if (mimeType.startsWith("image")){
-            attachmentType = Attachment.Type.PICTURE;
+            attachmentType = Attachment.Type.IMAGE;
         } else if (mimeType.startsWith("audio")){
             attachmentType = Attachment.Type.AUDIO;
         } else if (mimeType.startsWith("video")){

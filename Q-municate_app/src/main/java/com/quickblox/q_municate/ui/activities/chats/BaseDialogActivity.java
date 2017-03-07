@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -482,9 +481,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                         super.onPositive(dialog);
                         switch (type){
                             case LOCATION:
-                                sendMessageWithAttachment(dialogId, Attachment.Type.LOCATION, attachment);
+                                sendMessageWithAttachment(dialogId, Attachment.Type.LOCATION, attachment, null);
                                 break;
-                            case PICTURE:
+                            case IMAGE:
                                 showProgress();
                                 QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
                                 break;
@@ -682,12 +681,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void updateMessagesList();
 
-    protected void sendMessageWithAttachment(String dialogId, Attachment.Type attachmentType, Object attachmentObject){
+    protected void sendMessageWithAttachment(String dialogId, Attachment.Type attachmentType, Object attachmentObject, String localPath){
         if (!dialogId.equals(currentChatDialog.getDialogId())) {
             return;
         }
         try {
-            chatHelper.sendMessageWithAttachment(attachmentType, attachmentObject);
+            chatHelper.sendMessageWithAttachment(attachmentType, attachmentObject, localPath);
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
@@ -773,7 +772,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-            sendMessageWithAttachment(dialogId, StringUtils.getAttachmentTypeByFileName(file.getName()), file);
+            String localPath = (String) bundle.getSerializable(QBServiceConsts.EXTRA_FILE_PATH);
+
+            sendMessageWithAttachment(dialogId, StringUtils.getAttachmentTypeByFileName(file.getName()), file, localPath);
             hideProgress();
         }
     }

@@ -153,7 +153,7 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
             return;
         }
         if(attachment.getType() == null){
-            attachType = QBAttachment.PHOTO_TYPE;
+            attachType = QBAttachment.IMAGE_TYPE;
         } else {
             attachType = attachment.getType().name();
         }
@@ -162,6 +162,9 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
         qbAttachment.setUrl(attachment.getRemoteUrl());
         qbAttachment.setName(attachment.getName());
         qbAttachment.setSize(attachment.getSize());
+        qbAttachment.setHeight(attachment.getHeight());
+        qbAttachment.setWidth(attachment.getWidth());
+        qbAttachment.setDuration(attachment.getDuration());
         qbAttachment.setData(attachment.getAdditionalInfo());
         this.addAttachment(qbAttachment);
     }

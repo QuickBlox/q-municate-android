@@ -129,7 +129,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
 
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
-        if (Attachment.Type.PICTURE.equals(attachmentType)){
+        if (Attachment.Type.IMAGE.equals(attachmentType)){
             canPerformLogout.set(true);
             startCropActivity(Uri.fromFile((File) attachment));
         }
