@@ -165,6 +165,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         if (opponentUser != null && opponentUser.getId() == userId) {
             if (online){
+                //gets opponentUser from DB with updated field 'last_request_at'
                 actualizeOpponentUserFromDb();
             }
 
