@@ -113,9 +113,14 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     public synchronized void closeChat(QBChatDialog chatDialog, Bundle additional) {
         if (currentDialog != null
                 && currentDialog.getDialogId().equals(chatDialog.getDialogId())
-                && chatService != null) {
-            currentDialog.removeParticipantListener(participantListener);
-            currentDialog.removeIsTypingListener(typingListener);
+                && chatService != null
+                && chatService.isLoggedIn()) {
+            if (QBDialogType.GROUP.equals(currentDialog.getType())) {
+                currentDialog.removeParticipantListener(participantListener);
+            } else {
+                currentDialog.removeIsTypingListener(typingListener);
+            }
+
             currentDialog = null;
         }
     }
