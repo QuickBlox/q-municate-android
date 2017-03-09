@@ -636,9 +636,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             return new ArrayList<>();
         }
 
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(currentChatDialog.getDialogId());
+        String currentDialogId = currentChatDialog.getDialogId();
+
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(currentDialogId);
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogId(currentChatDialog.getDialogId());
+                .getDialogNotificationsByDialogId(currentDialogId);
 
         List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
         Log.d(TAG, "combinationMessages= " + combinationMessages);
