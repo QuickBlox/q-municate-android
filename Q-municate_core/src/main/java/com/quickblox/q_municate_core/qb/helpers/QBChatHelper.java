@@ -27,6 +27,7 @@ import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.core.request.QBRequestUpdateBuilder;
@@ -351,8 +352,10 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         String messageBody = chatMessage.getBody();
         String extraChatMessage;
 
-        if (chatMessage.getAttachments() != null && !chatMessage.getAttachments().isEmpty()) {
-            extraChatMessage = context.getResources().getString(R.string.file_was_attached);
+        if (!CollectionsUtil.isEmpty(chatMessage.getAttachments())) {
+            //in current version we can send only one attachment
+            QBAttachment attachment = chatMessage.getAttachments().iterator().next();
+            extraChatMessage = context.getResources().getString(R.string.was_attached, attachment.getType());
         } else {
             extraChatMessage = messageBody;
         }
