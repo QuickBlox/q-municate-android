@@ -415,8 +415,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         @Override
         public void update(Observable observable, Object data) {
             if (data != null) {
-                if (data.equals(dataManager.getQBChatDialogDataManager().getObserverKey()) || data.equals(dataManager.getMessageDataManager().getObserverKey())
-                        || data.equals(QMUserCacheImpl.OBSERVE_KEY) || data.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
+                if (data.equals(dataManager.getQBChatDialogDataManager().getObserverKey())
+                        || data.equals(dataManager.getMessageDataManager().getObserverKey())
+                        || data.equals(QMUserCacheImpl.OBSERVE_KEY)
+                        || data.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
                     updateDialogsList();
                 }
             }
