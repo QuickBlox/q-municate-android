@@ -417,11 +417,14 @@ public class QMUserService extends QMBaseService {
 
     private QBUser getUserWithLatestLastActivity(QBUser loadedUser) {
         if (loadedUser != null && loadedUser.getLastRequestAt() != null){
-            QBUser existUser = QMUser.convert(userCache.getUserByColumn(QMUserColumns.ID, String.valueOf(loadedUser.getId())));
-            if (existUser != null && existUser.getLastRequestAt() != null){
-                if (existUser.getLastRequestAt().after(loadedUser.getLastRequestAt())){
-                    //sets for loaded user last activity saved before from roster listener
-                    loadedUser.setLastRequestAt(existUser.getLastRequestAt());
+            QMUser tempQmUser = userCache.getUserByColumn(QMUserColumns.ID, String.valueOf(loadedUser.getId()));
+            if (tempQmUser != null) {
+                QBUser existUser = QMUser.convert(tempQmUser);
+                if (existUser.getLastRequestAt() != null) {
+                    if (existUser.getLastRequestAt().after(loadedUser.getLastRequestAt())) {
+                        //sets for loaded user last activity saved before from roster listener
+                        loadedUser.setLastRequestAt(existUser.getLastRequestAt());
+                    }
                 }
             }
         }
