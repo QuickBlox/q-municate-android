@@ -386,7 +386,9 @@ public class QMUserService extends QMBaseService {
         result = observable.map(new Func1<QBUser,QMUser>() {
             @Override
             public QMUser call(QBUser qbUser) {
-                QMUser result = QMUser.convert(qbUser);
+                //TODO VT temp code before implement feature "last user activity" in SDK
+                QBUser userWithActualLastActivity = getUserWithLatestLastActivity(qbUser);
+                QMUser result = QMUser.convert(userWithActualLastActivity);
                 userCache.createOrUpdate(result);
                 return result;
             }
@@ -403,9 +405,31 @@ public class QMUserService extends QMBaseService {
            return  qbUser == null ? getUserByColumnSync(column, value, true) : qbUser;
         }
 
-        result = QMUser.convert(getUserByColumnFromServer(column,value).perform());
+        QBUser loadedUser = getUserByColumnFromServer(column,value).perform();
+
+        //TODO VT temp code before implement feature "last user activity" in SDK
+        QBUser userWithActualLastActivity = getUserWithLatestLastActivity(loadedUser);
+
+        result = QMUser.convert(userWithActualLastActivity);
         userCache.createOrUpdate(result);
         return result;
+    }
+
+    private QBUser getUserWithLatestLastActivity(QBUser loadedUser) {
+        if (loadedUser != null && loadedUser.getLastRequestAt() != null){
+            QMUser tempQmUser = userCache.getUserByColumn(QMUserColumns.ID, String.valueOf(loadedUser.getId()));
+            if (tempQmUser != null) {
+                QBUser existUser = QMUser.convert(tempQmUser);
+                if (existUser.getLastRequestAt() != null) {
+                    if (existUser.getLastRequestAt().after(loadedUser.getLastRequestAt())) {
+                        //sets for loaded user last activity saved before from roster listener
+                        loadedUser.setLastRequestAt(existUser.getLastRequestAt());
+                    }
+                }
+            }
+        }
+
+        return loadedUser;
     }
 
     private Observable<List<QMUser>> getUsersByColumn(final String column, final String value, final QBPagedRequestBuilder requestBuilder,  boolean forceLoad){

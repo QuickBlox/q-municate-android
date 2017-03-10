@@ -147,7 +147,7 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     private synchronized void sendNotificationToFriend(QBChatMessage qbChatMessage, int userId) throws QBResponseException {
         QBChatDialog qbDialog = chatHelper.createPrivateDialogIfNotExist(userId);
         if (qbDialog != null) {
-            chatHelper.sendChatMessage(qbChatMessage, qbDialog);
+            chatHelper.sendAndSaveChatMessage(qbChatMessage, qbDialog);
         }
     }
 

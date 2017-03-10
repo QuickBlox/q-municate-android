@@ -346,7 +346,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
             finish();
         } else {
             currentChatDialog = updatedDialog;
-            currentChatDialog.initForChat(QBChatService.getInstance());
+            initCurrentDialog();
         }
     }
 

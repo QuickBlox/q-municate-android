@@ -500,7 +500,7 @@ ChatUtils {
         return fullMessage.substring(0,
                 fullMessage.length() > ConstsCore.LAST_MESSAGE_LENGTH
                         ? ConstsCore.LAST_MESSAGE_LENGTH
-                        : fullMessage.length() -1);
+                        : fullMessage.length());
     }
 
     public static long getDialogMessageCreatedDate(boolean lastMessage, Message message, DialogNotification dialogNotification) {
