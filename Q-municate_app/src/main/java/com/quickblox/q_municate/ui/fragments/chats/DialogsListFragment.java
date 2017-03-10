@@ -346,7 +346,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void launchContactsFragment() {
-        baseActivity.setCurrentFragment(SearchFragment.newInstance());
+        baseActivity.setCurrentFragment(SearchFragment.newInstance(), true);
     }
 
     private class DeleteDialogSuccessAction implements Command {

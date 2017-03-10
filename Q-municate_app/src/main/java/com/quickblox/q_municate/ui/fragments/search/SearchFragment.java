@@ -103,7 +103,7 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
     @Override
     public boolean onMenuItemActionCollapse(MenuItem item) {
         cancelSearch();
-        launchDialogsListFragment();
+        baseActivity.getSupportFragmentManager().popBackStack();
         return true;
     }
 

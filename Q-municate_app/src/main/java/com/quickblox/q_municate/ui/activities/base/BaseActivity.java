@@ -483,10 +483,24 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         setCurrentFragment(fragment, null);
     }
 
+    public void setCurrentFragment(Fragment fragment, boolean needAddToBackStack) {
+        setCurrentFragment(fragment, null, needAddToBackStack);
+    }
+
     private void setCurrentFragment(Fragment fragment, String tag) {
         currentFragment = fragment;
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction transaction = buildTransaction();
+        transaction.replace(R.id.container_fragment, fragment, tag);
+        transaction.commit();
+    }
+
+    private void setCurrentFragment(Fragment fragment, String tag, boolean needAddToBackStack) {
+        currentFragment = fragment;
+        FragmentTransaction transaction = buildTransaction();
+        if(needAddToBackStack) {
+            transaction.addToBackStack(null);
+        }
         transaction.replace(R.id.container_fragment, fragment, tag);
         transaction.commit();
     }

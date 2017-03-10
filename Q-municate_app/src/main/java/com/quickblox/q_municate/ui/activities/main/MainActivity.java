@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -42,6 +43,15 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     protected int getContentResId() {
         return R.layout.activity_main;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if( getSupportFragmentManager().getBackStackEntryCount() == 1){
+           finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -173,7 +183,7 @@ public class MainActivity extends BaseLoggableActivity {
 
     private void launchDialogsListFragment() {
         Log.d("MainActivity", "launchDialogsListFragment()");
-        setCurrentFragment(DialogsListFragment.newInstance());
+        setCurrentFragment(DialogsListFragment.newInstance(),true);
     }
 
     private void startImportFriends(){
