@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.fragments.chats;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.Log;
@@ -115,6 +116,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "onViewCreated");
+        baseActivity.showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
         initDataLoader(LOADER_ID);
     }
 
@@ -258,6 +260,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
         dialogsListAdapter.setNewData(dialogsList);
         checkEmptyList(dialogsList.size());
+        if(!baseActivity.isDialogLoading()) {
+            baseActivity.hideSnackBar();
+        }
     }
 
     private void addChat(){

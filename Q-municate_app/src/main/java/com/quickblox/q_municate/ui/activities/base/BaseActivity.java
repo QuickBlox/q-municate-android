@@ -104,6 +104,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
+    private boolean isDialogLoading = false;
 
 
     protected abstract int getContentResId();
@@ -600,6 +601,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return failAction;
     }
 
+    public boolean isDialogLoading() {
+        return isDialogLoading;
+    }
+
     private void checkOpeningDialog() {
         if (appSharedHelper.needToOpenDialog()) {
             QBChatDialog chatDialog = DataManager.getInstance().getQBChatDialogDataManager()
@@ -622,6 +627,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     protected void loginChat() {
+        isDialogLoading = true;
+        showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
         QBLoginChatCompositeCommand.start(this);
     }
 
@@ -655,7 +662,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void showSnackbarUpdatingDialogs() {
-        showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
         loadDialogs();
     }
 
@@ -675,6 +681,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void performLoadChatsSuccessAction(Bundle bundle) {
         hideSnackBar();
+        isDialogLoading = false;
     }
 
     public class LoadChatsSuccessAction implements Command {
