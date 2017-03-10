@@ -244,14 +244,37 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         return qbMessagesList;
     }
 
-    public void deleteDialog(String dialogId) {
+    public void deleteDialog(String dialogId, QBDialogType dialogType) {
         try {
+            if (QBDialogType.GROUP.equals(dialogType)){
+                prepareAndSendNotificationsToOpponents(dialogId);
+            }
+
             QBRestChatService.deleteDialog(dialogId, false).perform();
         } catch (QBResponseException e) {
             ErrorUtils.logError(e);
         }
 
         DbUtils.deleteDialogLocal(dataManager, dialogId);
+    }
+
+    private void prepareAndSendNotificationsToOpponents(String dialogId) throws QBResponseException {
+        QBChatDialog storeChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        if (storeChatDialog == null || storeChatDialog.getDialogId() == null) {
+            return;
+        }
+
+        ArrayList<Integer> actualOpponentsIds =
+                ChatUtils.createOccupantsIdsFromDialogOccupantsList(dataManager.getDialogOccupantDataManager()
+                        .getActualDialogOccupantsByDialog(storeChatDialog.getDialogId()));
+        storeChatDialog.setOccupantsIds(actualOpponentsIds);
+        storeChatDialog.initForChat(QBChatService.getInstance());
+
+        List<Integer> occupantsIdsList = new ArrayList<>();
+        occupantsIdsList.add(AppSession.getSession().getUser().getId());
+        sendGroupMessageToFriends(
+                storeChatDialog,
+                DialogNotification.Type.OCCUPANTS_DIALOG, occupantsIdsList, true);
     }
 
     private QBChatMessage getQBChatMessage(String body) {

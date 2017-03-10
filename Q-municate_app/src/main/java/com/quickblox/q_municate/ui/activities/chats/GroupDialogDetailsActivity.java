@@ -40,8 +40,8 @@ import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -69,7 +69,7 @@ import butterknife.OnTextChanged;
 public class GroupDialogDetailsActivity extends BaseLoggableActivity implements AdapterView.OnItemClickListener, OnImagePickedListener {
 
     public static final int UPDATE_DIALOG_REQUEST_CODE = 100;
-    public static final int RESULT_LEAVE_GROUP = 2;
+    public static final int RESULT_DELETE_GROUP = 2;
 
     @Bind(R.id.name_textview)
     EditText groupNameEditText;
@@ -293,8 +293,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void addActions() {
-        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION, new LeaveGroupDialogSuccessAction());
-        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new DeleteGroupDialogSuccessAction());
+        addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, failAction);
 
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION, new UpdateGroupDialogSuccessAction());
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION, new UpdateGroupFailAction());
@@ -306,8 +306,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void removeActions() {
-        removeAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION);
+        removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
 
         removeAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION);
         removeAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION);
@@ -353,18 +353,18 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        leaveGroup();
+                        deleteDialog(qbDialog);
                     }
                 });
     }
 
-    private void leaveGroup() {
-        showProgress();
-        currentNotificationTypeList.add(DialogNotification.Type.OCCUPANTS_DIALOG);
-        newFriendIdsList = new ArrayList<>();
-        newFriendIdsList.add(AppSession.getSession().getUser().getId());
-        sendNotificationToGroup(true);
-        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, qbDialog);
+    private void deleteDialog(QBChatDialog chatDialog) {
+        if(chatDialog == null || chatDialog.getDialogId() == null){
+            return;
+        }
+
+        this.showProgress();
+        QBDeleteChatCommand.start(this, chatDialog.getDialogId(), chatDialog.getType().getCode());
     }
 
     private void handleAddedFriends(Intent data) {
@@ -620,12 +620,12 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         }
     }
 
-    private class LeaveGroupDialogSuccessAction implements Command {
+    private class DeleteGroupDialogSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            setResult(RESULT_LEAVE_GROUP, getIntent());
+            setResult(RESULT_DELETE_GROUP, getIntent());
             finish();
         }
     }

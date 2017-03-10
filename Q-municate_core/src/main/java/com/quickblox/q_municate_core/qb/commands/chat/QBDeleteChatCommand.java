@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -19,16 +20,18 @@ public class QBDeleteChatCommand extends ServiceCommand {
         this.chatHelper = chatHelper;
     }
 
-    public static void start(Context context, String dialogId) {
+    public static void start(Context context, String dialogId, int dialogType) {
         Intent intent = new Intent(QBServiceConsts.DELETE_DIALOG_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_TYPE, dialogType);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-        chatHelper.deleteDialog(dialogId);
+        QBDialogType dialogType = QBDialogType.parseByCode(extras.getInt(QBServiceConsts.EXTRA_DIALOG_TYPE));
+        chatHelper.deleteDialog(dialogId, dialogType);
         return extras;
     }
 }

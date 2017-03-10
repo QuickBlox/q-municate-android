@@ -332,37 +332,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if(chatDialog == null || chatDialog.getDialogId() == null){
             return;
         }
-        if (QBDialogType.GROUP.equals(chatDialog.getType())) {
-            if (chatHelper != null) {
-                try {
-                    QBChatDialog storeChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(chatDialog.getDialogId());
-                    if (storeChatDialog == null || storeChatDialog.getDialogId() == null){
-                        return;
-                    }
 
-                    ArrayList<Integer> actualOpponentsIds =
-                            ChatUtils.createOccupantsIdsFromDialogOccupantsList(dataManager.getDialogOccupantDataManager()
-                                    .getActualDialogOccupantsByDialog(storeChatDialog.getDialogId()));
-                    storeChatDialog.setOccupantsIds(actualOpponentsIds);
-                    storeChatDialog.initForChat(QBChatService.getInstance());
-
-                    if(!chatHelper.isDialogJoined(storeChatDialog)){
-                        ToastUtils.shortToast(R.string.error_cant_delete_chat);
-                        return;
-                    }
-
-                    List<Integer> occupantsIdsList = new ArrayList<>();
-                    occupantsIdsList.add(qbUser.getId());
-                    chatHelper.sendGroupMessageToFriends(
-                            storeChatDialog,
-                            DialogNotification.Type.OCCUPANTS_DIALOG, occupantsIdsList, true);
-                } catch (QBResponseException e) {
-                    ErrorUtils.logError(e);
-                }
-            }
-        }
         baseActivity.showProgress();
-        QBDeleteChatCommand.start(baseActivity, chatDialog.getDialogId());
+        QBDeleteChatCommand.start(baseActivity, chatDialog.getDialogId(), chatDialog.getType().getCode());
     }
 
     private void checkEmptyList(int listSize) {
