@@ -10,6 +10,8 @@ import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.cache.QMUserCache;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
@@ -87,6 +89,11 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<QMUser> {
             viewHolder.onlineStatusTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
             viewHolder.onlineStatusTextView.setTextColor(context.getResources().getColor(R.color.green));
         } else {
+            QMUser userFromDb = QMUserService.getInstance().getUserCache().get((long) user.getId());
+            if (userFromDb != null){
+                user = userFromDb;
+            }
+
             viewHolder.onlineStatusTextView.setText(context.getString(R.string.last_seen,
                     DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastRequestAt().getTime()),
                     DateUtils.formatDateSimpleTime(user.getLastRequestAt().getTime())));

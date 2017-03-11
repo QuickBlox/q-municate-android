@@ -36,6 +36,7 @@ import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -163,6 +164,9 @@ public class UserProfileActivity extends BaseLoggableActivity {
     public void notifyChangedUserStatus(int userId, boolean online) {
         super.notifyChangedUserStatus(userId, online);
         if (user.getId() == userId) {
+            if (online) {
+                user.setLastRequestAt(new Date(System.currentTimeMillis()));
+            }
             setOnlineStatus(online);
         }
     }
