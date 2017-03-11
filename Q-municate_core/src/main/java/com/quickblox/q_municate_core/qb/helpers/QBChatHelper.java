@@ -867,7 +867,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
 
         private void clearFriendOrUserRequestLocal(int userId) {
-            boolean friend = dataManager.getFriendDataManager().getByUserId(userId) != null;
+            boolean friend = dataManager.getFriendDataManager().existsByUserId(userId);
             boolean outgoingUserRequest = dataManager.getUserRequestDataManager().existsByUserId(userId);
             if (friend) {
                 dataManager.getFriendDataManager().deleteByUserId(userId);

@@ -29,7 +29,6 @@ import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
@@ -122,12 +121,13 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     public void removeFriend(int userId) throws Exception {
         roster.unsubscribe(userId);
         clearRosterEntry(userId);
-        deleteFriendOrUserRequest(userId);
 
         QBChatMessage qbChatMessage = ChatNotificationUtils.createPrivateMessageAboutFriendsRequests(context,
                 NotificationType.FRIENDS_REMOVE);
         qbChatMessage.setRecipientId(userId);
         sendNotificationToFriend(qbChatMessage, userId);
+
+        deleteFriendOrUserRequest(userId);
     }
 
     public void invite(int userId) throws Exception {
@@ -291,7 +291,7 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     private void deleteFriendOrUserRequest(int userId) {
-        boolean friend = dataManager.getFriendDataManager().getByUserId(userId) != null;
+        boolean friend = dataManager.getFriendDataManager().existsByUserId(userId);
         boolean outgoingUserRequest = dataManager.getUserRequestDataManager().existsByUserId(userId);
 
         if (friend) {

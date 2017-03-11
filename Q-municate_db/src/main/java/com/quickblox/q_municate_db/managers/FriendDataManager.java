@@ -6,7 +6,6 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;

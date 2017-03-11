@@ -73,7 +73,8 @@ public class UserFriendUtils {
     }
 
     public static boolean isNoneFriend(QBRosterEntry rosterEntry) {
-        return RosterPacket.ItemType.none.equals(rosterEntry.getType());
+        return RosterPacket.ItemType.none.equals(rosterEntry.getType())
+                || RosterPacket.ItemType.from.equals(rosterEntry.getType());
     }
 
     public static boolean isEmptyFriendsStatus(QBRosterEntry rosterEntry) {

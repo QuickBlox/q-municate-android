@@ -752,9 +752,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 if (currentChatDialog != null) {
                     // need init current dialog after getting from DB
                     initCurrentDialog();
+                    updateActionBar();
+                } else {
+                    finish();
                 }
-
-                updateActionBar();
             }
         }
     }

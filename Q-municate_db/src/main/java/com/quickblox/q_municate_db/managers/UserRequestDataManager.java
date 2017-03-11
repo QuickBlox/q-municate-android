@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.util.Log;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;

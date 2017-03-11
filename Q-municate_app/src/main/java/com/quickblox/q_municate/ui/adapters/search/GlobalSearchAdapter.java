@@ -102,7 +102,7 @@ public class GlobalSearchAdapter extends BaseFilterAdapter<QBUser, BaseClickList
     }
 
     private void checkVisibilityItemsAllUsers(ViewHolder viewHolder, QBUser user) {
-        boolean me = AppSession.getSession().getUser().getId() == user.getId();
+        boolean me = AppSession.getSession().getUser().getId().equals(user.getId());
         viewHolder.addFriendImageView.setVisibility(me ? View.GONE : View.VISIBLE);
         viewHolder.statusTextView.setVisibility(View.GONE);
     }
