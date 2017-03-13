@@ -20,6 +20,7 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.helpers.TextViewHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.DialogSearchWrapper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
@@ -34,57 +35,45 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class LocalSearchAdapter extends BaseFilterAdapter<QBChatDialog, BaseClickListenerViewHolder<QBChatDialog>> {
+public class LocalSearchAdapter extends BaseFilterAdapter<DialogSearchWrapper, BaseClickListenerViewHolder<DialogSearchWrapper>> {
 
     private DataManager dataManager;
     private QBFriendListHelper qbFriendListHelper;
 
-    public LocalSearchAdapter(BaseActivity baseActivity, List<QBChatDialog> list) {
+    public LocalSearchAdapter(BaseActivity baseActivity, List<DialogSearchWrapper> list) {
         super(baseActivity, list);
-        dataManager = DataManager.getInstance();
     }
 
     @Override
-    protected boolean isMatch(QBChatDialog item, String query) {
-        String chatTitle = ChatDialogUtils.getTitleForChatDialog(item, dataManager);
+    protected boolean isMatch(DialogSearchWrapper item, String query) {
+        String chatTitle = ChatDialogUtils.getTitleForChatDialog(item.getChatDialog(), dataManager);
         return chatTitle != null && chatTitle.toLowerCase().contains(query);
     }
 
     @Override
-    public BaseClickListenerViewHolder<QBChatDialog> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseClickListenerViewHolder<DialogSearchWrapper> onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(this, layoutInflater.inflate(R.layout.item_local_search, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(BaseClickListenerViewHolder<QBChatDialog> baseClickListenerViewHolder, int position) {
-        QBChatDialog chatDialog = getItem(position);
+    public void onBindViewHolder(BaseClickListenerViewHolder<DialogSearchWrapper> baseClickListenerViewHolder, int position) {
+        DialogSearchWrapper dialogWrapper = getItem(position);
         ViewHolder viewHolder = (ViewHolder) baseClickListenerViewHolder;
 
-        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(chatDialog.getDialogId());
 
         String label;
 
-        if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
-            QMUser currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
-            QMUser opponentUser = ChatUtils.getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
+        if (QBDialogType.PRIVATE.equals(dialogWrapper.getChatDialog().getType())) {
+            QMUser opponentUser = dialogWrapper.getOpponentUser();
             setOnlineStatus(viewHolder, opponentUser);
             displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
             viewHolder.titleTextView.setText(opponentUser.getFullName());
         } else {
-            List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-            Message message = dataManager.getMessageDataManager().getLastMessageWithTempByDialogId(dialogOccupantsIdsList);
-            DialogNotification dialogNotification = dataManager.getDialogNotificationDataManager()
-                    .getLastDialogNotificationByDialogId(dialogOccupantsIdsList);
-            label = ChatUtils.getDialogLastMessage(
-                    resources.getString(R.string.cht_notification_message),
-                    message,
-                    dialogNotification);
-
+            label = dialogWrapper.getLabel();
             viewHolder.labelTextView.setText(label);
             viewHolder.labelTextView.setTextColor(resources.getColor(R.color.dark_gray));
-            displayGroupPhotoImage(chatDialog.getPhoto(), viewHolder.avatarImageView);
-            viewHolder.titleTextView.setText(chatDialog.getName());
+            displayGroupPhotoImage(dialogWrapper.getChatDialog().getPhoto(), viewHolder.avatarImageView);
+            viewHolder.titleTextView.setText(dialogWrapper.getChatDialog().getName());
         }
 
         if (!TextUtils.isEmpty(query)) {
@@ -116,7 +105,7 @@ public class LocalSearchAdapter extends BaseFilterAdapter<QBChatDialog, BaseClic
                 ImageLoaderUtils.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
     }
 
-    protected static class ViewHolder extends BaseViewHolder<QBChatDialog> {
+    protected static class ViewHolder extends BaseViewHolder<DialogSearchWrapper> {
 
         @Bind(R.id.avatar_imageview)
         RoundedImageView avatarImageView;

@@ -346,7 +346,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         locationAttachClickListener = new LocationAttachClickListener();
         imageAttachClickListener = new ImageAttachClickListener();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        combinationMessagesList = createCombinationMessagesList();
+        combinationMessagesList = new ArrayList<>();
     }
 
     private void initCustomUI() {
@@ -574,24 +574,41 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
-    protected void startLoadDialogMessages(boolean isLoadOldMessages) {
+    protected void startLoadDialogMessages(final boolean isLoadOldMessages) {
         if (currentChatDialog == null) {
             return;
         }
-
         showActionBarProgress();
 
-        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
-        List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+        (new BaseAsyncTask<Void, Void, Boolean>() {
+            private long messageDateSent;
+            @Override
+            public Boolean performInBackground(Void... params) throws Exception {
+                List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
+                List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
 
-        Message message;
-        DialogNotification dialogNotification;
+                Message message;
+                DialogNotification dialogNotification;
 
-        message = dataManager.getMessageDataManager().getMessageByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
-        dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
-        long messageDateSent = ChatUtils.getDialogMessageCreatedDate(!isLoadOldMessages, message, dialogNotification);
+                message = dataManager.getMessageDataManager().getMessageByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+                dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+                messageDateSent =  ChatUtils.getDialogMessageCreatedDate(!isLoadOldMessages, message, dialogNotification);
+                return true;
+            }
 
-        startLoadDialogMessages(currentChatDialog, messageDateSent, isLoadOldMessages);
+            @Override
+            public void onResult(Boolean aBoolean) {
+                startLoadDialogMessages(currentChatDialog, messageDateSent, isLoadOldMessages);
+            }
+
+            @Override
+            public void onException(Exception e) {
+                hideActionBarProgress();
+                ErrorUtils.showError(BaseDialogActivity.this, e);
+            }
+
+        }).execute();
+
     }
 
     private void readAllMessages() {
