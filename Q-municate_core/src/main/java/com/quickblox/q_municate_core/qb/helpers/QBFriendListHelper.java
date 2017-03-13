@@ -203,7 +203,11 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         for (QBRosterEntry rosterEntry : rosterEntryCollection) {
             if (!UserFriendUtils.isOutgoingFriend(rosterEntry) && !UserFriendUtils.isNoneFriend(rosterEntry)) {
                 friendList.add(rosterEntry.getUserId());
+            } else if (UserFriendUtils.isNoneFriend(rosterEntry)){
+                //need remove friend from DB which deleted me when I was offline
+                removeFriendLocal(rosterEntry.getUserId());
             }
+
             if (UserFriendUtils.isOutgoingFriend(rosterEntry)) {
                 userList.add(rosterEntry.getUserId());
             }
@@ -212,6 +216,10 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         loadAndSaveUsers(userList, UserRequest.RequestStatus.OUTGOING);
 
         return friendList;
+    }
+
+    private void removeFriendLocal(Integer userId) {
+        dataManager.getFriendDataManager().deleteByUserId(userId);
     }
 
     private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
