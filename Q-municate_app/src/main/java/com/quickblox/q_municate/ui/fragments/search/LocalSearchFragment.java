@@ -24,13 +24,16 @@ import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoratio
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.DialogSearchWrapper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
@@ -39,7 +42,7 @@ import java.util.Observer;
 import butterknife.Bind;
 import butterknife.OnTouch;
 
-public class LocalSearchFragment extends BaseLoaderFragment<List<QBChatDialog>> implements SearchListener {
+public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWrapper>> implements SearchListener {
 
     private final static int LOADER_ID = LocalSearchFragment.class.hashCode();
 
@@ -50,7 +53,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<QBChatDialog>> 
     private Observer commonObserver;
     private LocalSearchAdapter localSearchAdapter;
     private String searchQuery;
-    private List<QBChatDialog> dialogsList;
+    private List<DialogSearchWrapper> dialogsList;
 
     public static LocalSearchFragment newInstance() {
         return new LocalSearchFragment();
@@ -114,12 +117,12 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<QBChatDialog>> 
     }
 
     @Override
-    protected Loader<List<QBChatDialog>> createDataLoader() {
+    protected Loader<List<DialogSearchWrapper>> createDataLoader() {
         return new DialogsListLoader(getActivity(), dataManager);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<QBChatDialog>> loader, List<QBChatDialog> dialogsList) {
+    public void onLoadFinished(Loader<List<DialogSearchWrapper>> loader, List<DialogSearchWrapper> dialogsList) {
         this.dialogsList = dialogsList;
         updateLocal();
     }
@@ -153,14 +156,14 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<QBChatDialog>> 
     }
 
     private void initCustomListeners() {
-        localSearchAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QBChatDialog>() {
+        localSearchAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<DialogSearchWrapper>() {
 
             @Override
-            public void onItemClicked(View view, QBChatDialog chatDialog, int position) {
-                if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
-                    startPrivateChatActivity(chatDialog);
+            public void onItemClicked(View view, DialogSearchWrapper dialogSearchWrapper, int position) {
+                if (QBDialogType.PRIVATE.equals(dialogSearchWrapper.getChatDialog().getType())) {
+                    startPrivateChatActivity(dialogSearchWrapper.getChatDialog());
                 } else {
-                    startGroupChatActivity(chatDialog);
+                    startGroupChatActivity(dialogSearchWrapper.getChatDialog());
                 }
             }
         });
@@ -204,15 +207,20 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<QBChatDialog>> 
         GroupDialogActivity.start(baseActivity, chatDialog);
     }
 
-    private static class DialogsListLoader extends BaseLoader<List<QBChatDialog>> {
+    private static class DialogsListLoader extends BaseLoader<List<DialogSearchWrapper>> {
 
         public DialogsListLoader(Context context, DataManager dataManager) {
             super(context, dataManager);
         }
 
         @Override
-        protected List<QBChatDialog> getItems() {
-            return dataManager.getQBChatDialogDataManager().getAllSorted();
+        protected List<DialogSearchWrapper> getItems() {
+            List<QBChatDialog> dialogsList=  dataManager.getQBChatDialogDataManager().getAllSorted();
+            List<DialogSearchWrapper> wrappedList = new ArrayList<>(dialogsList.size());
+            for (QBChatDialog dialog : dialogsList){
+                wrappedList.add(new DialogSearchWrapper(getContext(), dataManager, dialog));
+            }
+            return wrappedList;
         }
     }
 
