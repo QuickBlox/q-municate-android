@@ -220,16 +220,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     public List<QBChatDialog> getDialogs(QBRequestGetBuilder qbRequestGetBuilder, Bundle returnedBundle) throws QBResponseException {
         List<QBChatDialog> qbDialogsList = QBRestChatService.getChatDialogs(null, qbRequestGetBuilder).perform();
-
-        if (qbDialogsList != null && !qbDialogsList.isEmpty()) {
-            FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbDialogsList);
-            finderUnknownUsers.find();
-            DbUtils.saveDialogsToCache(dataManager, qbDialogsList, currentDialog);
-            DbUtils.updateDialogsOccupantsStatusesIfNeeded(dataManager, qbDialogsList);
-        }
-
         return qbDialogsList;
     }
+
 
     public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
                                                  Bundle returnedBundle, QBChatDialog qbDialog,
@@ -256,6 +249,15 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
 
         DbUtils.deleteDialogLocal(dataManager, dialogId);
+    }
+
+    public void saveDialogsToCache(List<QBChatDialog> qbDialogsList){
+        if (qbDialogsList != null && !qbDialogsList.isEmpty()) {
+            FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbDialogsList);
+            finderUnknownUsers.find();
+            DbUtils.saveDialogsToCache(DataManager.getInstance(), qbDialogsList, currentDialog);
+            DbUtils.updateDialogsOccupantsStatusesIfNeeded(DataManager.getInstance(), qbDialogsList);
+        }
     }
 
     private void prepareAndSendNotificationsToOpponents(String dialogId) throws QBResponseException {
