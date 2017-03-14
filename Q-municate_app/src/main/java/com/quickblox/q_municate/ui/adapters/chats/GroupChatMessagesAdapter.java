@@ -1,13 +1,16 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.ColorUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
+import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 
 import java.util.List;
 
@@ -43,12 +46,17 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
 
     @Override
     protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
+        holder.timeTextMessageTextView.setVisibility(View.GONE);
+
         String senderName;
         senderName = chatMessage.getDialogOccupant().getUser().getFullName();
-        TextView textView = (TextView) holder.itemView.findViewById(R.id.custom_text_view);
 
-        textView.setTextColor(colorUtils.getRandomTextColorById(chatMessage.getDialogOccupant().getUser().getId()));
-        textView.setText(senderName);
+        TextView opponentNameTextView = (TextView) holder.itemView.findViewById(R.id.opponent_name_text_view);
+        opponentNameTextView.setTextColor(colorUtils.getRandomTextColorById(chatMessage.getDialogOccupant().getUser().getId()));
+        opponentNameTextView.setText(senderName);
+
+        TextView customMessageTimeTextView = (TextView) holder.itemView.findViewById(R.id.custom_msg_text_time_message);
+        customMessageTimeTextView.setText(getDate(chatMessage.getDateSent()));
 
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);
     }
