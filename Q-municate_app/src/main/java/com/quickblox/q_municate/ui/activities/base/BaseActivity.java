@@ -447,12 +447,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         Log.v(TAG, "addActions()");
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
+        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, new LoginChatCompositeFailAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
         updateBroadcastActionList();
     }
 
     private void removeActions() {
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
 
         updateBroadcastActionList();
@@ -716,7 +718,16 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
+            QBLoginChatCompositeCommand.setIsRunning(false);
             performLoginChatSuccessAction(bundle);
+        }
+    }
+
+    public class LoginChatCompositeFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBLoginChatCompositeCommand.setIsRunning(false);
         }
     }
 

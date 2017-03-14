@@ -3,14 +3,12 @@ package com.quickblox.q_municate.ui.adapters.chats;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.ColorUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
-import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 
 import java.util.List;
 
