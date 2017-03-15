@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.quickblox.chat.model.QBChatDialog;
@@ -97,7 +98,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void onBindViewMsgRightHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
-        ImageView view = (ImageView) holder.itemView.findViewById(R.id.custom_text_view);
+        ImageView view = (ImageView) holder.itemView.findViewById(R.id.message_status_image_view);
         setViewVisibility(holder.avatar, View.GONE);
 
         if (chatMessage.getState() != null) {
@@ -112,9 +113,9 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void onBindViewMsgLeftHolder(TextMessageHolder holder, CombinationMessage chatMessage, int position) {
-        TextView textView = (TextView) holder.itemView.findViewById(R.id.custom_text_view);
+        LinearLayout linearLayout = (LinearLayout) holder.itemView.findViewById(R.id.msg_custom_widget_frame_top);
         setViewVisibility(holder.avatar, View.GONE);
-        setViewVisibility(textView, View.GONE);
+        setViewVisibility(linearLayout, View.GONE);
 
         updateMessageState(chatMessage);
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);

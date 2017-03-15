@@ -39,6 +39,7 @@ import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -266,12 +267,18 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void addChat(){
-        boolean isFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
-        if (isFriends) {
-            NewMessageActivity.start(getActivity());
-        } else {
+        boolean hasFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
+        if (isFriendsLoading()){
+            ToastUtils.longToast(R.string.chat_service_is_initializing);
+        } else if (!hasFriends){
             ToastUtils.longToast(R.string.new_message_no_friends_for_new_message);
+        } else {
+            NewMessageActivity.start(getActivity());
         }
+    }
+
+    private boolean isFriendsLoading(){
+        return QBLoginChatCompositeCommand.isRunning();
     }
 
     private void checkVisibilityEmptyLabel() {

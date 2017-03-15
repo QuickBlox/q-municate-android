@@ -8,13 +8,23 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
 public class QBLoginChatCompositeCommand extends CompositeServiceCommand {
+    private static boolean isRunning;
 
     public QBLoginChatCompositeCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 
     public static void start(Context context) {
+        setIsRunning(true);
         Intent intent = new Intent(QBServiceConsts.LOGIN_CHAT_COMPOSITE_ACTION, null, context, QBService.class);
         context.startService(intent);
+    }
+
+    public static boolean isRunning(){
+        return isRunning;
+    }
+
+    public static void setIsRunning(boolean isRunning) {
+        QBLoginChatCompositeCommand.isRunning = isRunning;
     }
 }
