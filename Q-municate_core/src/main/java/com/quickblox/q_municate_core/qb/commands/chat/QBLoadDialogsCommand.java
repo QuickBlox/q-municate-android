@@ -142,9 +142,13 @@ public class QBLoadDialogsCommand extends ServiceCommand {
                 needToLoadMoreGroup = loadAllDialogsByType(QBDialogType.GROUP, returnedBundle, qbRequestGetBuilderGroup, allDialogsListGroup, pageNumber);
             }
 
-            List<QBChatDialog> dialogsList = new ArrayList<>(dialogsListPrivate.size() + dialogsListGroup.size());
-            dialogsList.addAll(dialogsListPrivate);
-            dialogsList.addAll(dialogsListGroup);
+            int sizeListPrivate = dialogsListPrivate == null ? 0 : dialogsListPrivate.size();
+            int sizeListGroup = dialogsListGroup == null ? 0 : dialogsListGroup.size();
+
+
+            List<QBChatDialog> dialogsList = new ArrayList<>(sizeListPrivate + sizeListGroup);
+            if (dialogsListPrivate != null) dialogsList.addAll(dialogsListPrivate);
+            if (dialogsListGroup != null) dialogsList.addAll(dialogsListGroup);
 
             chatHelper.saveDialogsToCache(dialogsList);
 

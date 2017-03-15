@@ -680,7 +680,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void performLoadChatsSuccessAction(Bundle bundle) {
-        hideSnackBar();
+       // hideSnackBar();
         isDialogLoading = false;
     }
 
