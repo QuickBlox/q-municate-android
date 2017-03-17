@@ -159,15 +159,13 @@ public class MessageDataManager extends BaseManager<Message> {
 
         try {
             QueryBuilder<Message, Long> messageQueryBuilder = dao.queryBuilder();
-            if (moreDate){
-                messageQueryBuilder.where().gt(Message.Column.CREATED_DATE, createdDate);
-            } else {
-                messageQueryBuilder.where().lt(Message.Column.CREATED_DATE, createdDate);
-            }
 
             Where<Message, Long> where = messageQueryBuilder.where();
             where.and(where.ne(Message.Column.STATE, State.TEMP_LOCAL),
-                    where.ne(Message.Column.STATE, State.TEMP_LOCAL_UNREAD));
+                    where.ne(Message.Column.STATE, State.TEMP_LOCAL_UNREAD),
+                    moreDate
+                            ? where.gt(Message.Column.CREATED_DATE, createdDate)
+                            : where.lt(Message.Column.CREATED_DATE, createdDate));
 
             QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
 

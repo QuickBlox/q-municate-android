@@ -42,7 +42,7 @@ ext {
 
 //    QuickBlox SDK version
     qbSdkVersion = '3.3.1-alpha7'
-    qbMessageAdapterVersion = '1.1.0-alpha3'
+    qbMessageAdapterVersion = '1.1.0-alpha5'
 
     testRunnerVersion = "0.4.1"
 
