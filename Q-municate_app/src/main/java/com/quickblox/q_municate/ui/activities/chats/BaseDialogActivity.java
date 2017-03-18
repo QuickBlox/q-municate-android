@@ -823,7 +823,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 (new BaseAsyncTask<Void, Void, Boolean>() {
                     @Override
                     public Boolean performInBackground(Void... params) throws Exception {
-                        combinationMessagesList = buildCombinationMessagesListByDate(lastMessageDate, isLoadedOldMessages);
+                        combinationMessagesList = buildCombinationMessagesListByDate(lastMessageDate, !isLoadedOldMessages);
                         additionalActionsAfterLoadMessages();
                         return true;
                     }
