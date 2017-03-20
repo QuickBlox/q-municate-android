@@ -155,7 +155,7 @@ public class CombinationMessage extends QBChatMessage implements Serializable {
         if(attachment.getType() == null){
             attachType = QBAttachment.IMAGE_TYPE;
         } else {
-            attachType = attachment.getType().name();
+            attachType = attachment.getType().name().toLowerCase();
         }
         qbAttachment = new QBAttachment(attachType);
         qbAttachment.setId(attachment.getAttachmentId());

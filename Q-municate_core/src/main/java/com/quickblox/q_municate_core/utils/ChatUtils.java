@@ -354,6 +354,8 @@ ChatUtils {
             attachment.setType(Attachment.Type.LOCATION);
             attachment.setAdditionalInfo(qbAttachment.getData());
             remoteUrl = LocationUtils.getRemoteUri(qbAttachment.getData(), LocationUtils.defaultUrlLocationParams(context));
+        } else{
+            attachment.setType(Attachment.Type.valueOf(qbAttachment.getType().toUpperCase()));
         }
         if (qbAttachment.getId() == null) {
             qbAttachment.setId(String.valueOf(qbAttachment.getData().hashCode()));
@@ -367,6 +369,7 @@ ChatUtils {
         attachment.setDuration(qbAttachment.getDuration());
         return attachment;
     }
+
 
     public static DialogNotification createLocalDialogNotification(Context context, DataManager dataManager, QBChatMessage qbChatMessage, DialogOccupant dialogOccupant) {
         DialogNotification dialogNotification = new DialogNotification();
