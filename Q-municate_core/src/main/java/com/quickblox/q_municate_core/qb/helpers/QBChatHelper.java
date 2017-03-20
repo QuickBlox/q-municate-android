@@ -434,7 +434,11 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 //            } else {
 //                attachment.setType(Attachment.Type.IMAGE);
 //            }
-            attachment.setType(Attachment.Type.valueOf(getAttachmentType(qbChatMessage.getAttachments()).toUpperCase()));
+            if (getAttachmentType(qbChatMessage.getAttachments()).equalsIgnoreCase(QBAttachment.PHOTO_TYPE)) {
+                attachment.setType(Attachment.Type.IMAGE);
+            } else {
+                attachment.setType(Attachment.Type.valueOf(getAttachmentType(qbChatMessage.getAttachments()).toUpperCase()));
+            }
             attachment.setRemoteUrl(attachUrl);
             message.setAttachment(attachment);
         }
