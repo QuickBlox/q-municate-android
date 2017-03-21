@@ -148,7 +148,14 @@ public class ImageUtils {
         BufferedInputStream bis = new BufferedInputStream(inputStream);
 
         File parentDir = StorageUtil.getAppExternalDataDirectoryFile();
-        String fileName = String.valueOf(System.currentTimeMillis()) + CAMERA_FILE_EXT;
+        String path = uri.getPath();
+        String extension = "";
+        if(path.lastIndexOf(".") != -1) {
+            extension = path.substring(path.lastIndexOf("."), path.length());
+        } else{
+            extension = CAMERA_FILE_EXT;
+        }
+        String fileName = String.valueOf(System.currentTimeMillis()) + extension;
         File resultFile = new File(parentDir, fileName);
 
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(resultFile));

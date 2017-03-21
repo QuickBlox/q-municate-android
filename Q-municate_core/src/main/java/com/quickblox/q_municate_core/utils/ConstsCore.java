@@ -50,4 +50,9 @@ public class ConstsCore {
     public static final String LONGITUDE_PARAM = "lng";
 
     public static final int LAST_MESSAGE_LENGTH = 100;
+
+    public static final long MAX_IMAGE_SIZE = 10*1024*1024; //10Mb
+    public static final long MAX_AUDIO_VIDEO_SIZE = 100*1024*1024; //100mb
+    public static final long MAX_FILENAME_LENGTH = 100;
+
 }
