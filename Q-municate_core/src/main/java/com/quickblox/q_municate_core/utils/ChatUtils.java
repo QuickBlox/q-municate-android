@@ -350,13 +350,16 @@ ChatUtils {
     public static Attachment createLocalAttachment(QBAttachment qbAttachment, Context context) {
         Attachment attachment = new Attachment();
         String remoteUrl = qbAttachment.getUrl();
-        if (qbAttachment.getType().equalsIgnoreCase(Attachment.Type.LOCATION.toString())) {
+        if (qbAttachment.getType().equalsIgnoreCase(QBAttachment.LOCATION_TYPE)) {
             attachment.setType(Attachment.Type.LOCATION);
             attachment.setAdditionalInfo(qbAttachment.getData());
             remoteUrl = LocationUtils.getRemoteUri(qbAttachment.getData(), LocationUtils.defaultUrlLocationParams(context));
-        } else{
+        } else if(qbAttachment.getType().equalsIgnoreCase(QBAttachment.PHOTO_TYPE)){
+            attachment.setType(Attachment.Type.IMAGE);
+        }else {
             attachment.setType(Attachment.Type.valueOf(qbAttachment.getType().toUpperCase()));
         }
+
         if (qbAttachment.getId() == null) {
             qbAttachment.setId(String.valueOf(qbAttachment.getData().hashCode()));
         }
