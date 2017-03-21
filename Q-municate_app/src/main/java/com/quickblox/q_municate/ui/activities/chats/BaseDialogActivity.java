@@ -823,7 +823,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 (new BaseAsyncTask<Void, Void, Boolean>() {
                     @Override
                     public Boolean performInBackground(Void... params) throws Exception {
-                        combinationMessagesList = buildCombinationMessagesListByDate(lastMessageDate, !isLoadedOldMessages);
+                        combinationMessagesList = createCombinationMessagesList();
                         additionalActionsAfterLoadMessages();
                         return true;
                     }
@@ -831,12 +831,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public void onResult(Boolean aBoolean) {
                         if (isLoadedOldMessages) {
-                            //messagesAdapter.setList(combinationMessagesList, false);
-                            //messagesAdapter.notifyItemRangeInserted(0, totalEntries);
-                            messagesAdapter.addAllInBegin(combinationMessagesList);
+                            messagesAdapter.setList(combinationMessagesList, false);
+                            messagesAdapter.notifyItemRangeInserted(0, totalEntries);
                         } else {
-                            //messagesAdapter.setList(combinationMessagesList, true);
-                            messagesAdapter.addAllInEnd(combinationMessagesList);
+                            messagesAdapter.setList(combinationMessagesList, true);
                             scrollMessagesToBottom();
                         }
 
