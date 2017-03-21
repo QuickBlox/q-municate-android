@@ -153,7 +153,7 @@ public class DbUtils {
         updateDialogModifiedDate(dataManager, dialogId, modifiedDate, notify);
     }
 
-    private static void updateDialogModifiedDate(DataManager dataManager, QBChatDialog dialog, long modifiedDate,
+    public static void updateDialogModifiedDate(DataManager dataManager, QBChatDialog dialog, long modifiedDate,
             boolean notify) {
         if (dialog != null) {
             dialog.setLastMessageDateSent(modifiedDate);

@@ -186,9 +186,8 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
         sendChatMessage(qbChatMessage, chatDialog);
         if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
+            DbUtils.updateDialogModifiedDate(dataManager, chatDialog, ChatUtils.getMessageDateSent(qbChatMessage), false);
             DbUtils.saveMessageOrNotificationToCache(context, dataManager, chatDialog.getDialogId(), qbChatMessage, null, true);
-            DbUtils.updateDialogModifiedDate(dataManager, chatDialog.getDialogId(), ChatUtils.getMessageDateSent(qbChatMessage),
-                    false);
         }
     }
 
@@ -717,22 +716,21 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         QMUser user = QMUserService.getInstance().getUserCache().get((long) senderId);
         QBChatDialog chatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
 
-        boolean isPrivateChatMessage;
-
         //Can receive message from unknown dialog only for QBDialogType.PRIVATE
         if (chatDialog == null) {
-            QBChatDialog newChatDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, QBDialogType.PRIVATE);
-            ChatUtils.addOccupantsToQBDialog(newChatDialog, chatMessage);
-            DbUtils.saveDialogToCache(dataManager, newChatDialog);
-
-            isPrivateChatMessage = true;
-        } else {
-            isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());
+            chatDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, QBDialogType.PRIVATE);
+            ChatUtils.addOccupantsToQBDialog(chatDialog, chatMessage);
+            DbUtils.saveDialogToCache(dataManager, chatDialog);
         }
 
-        //Save group messages and own carbon messages
-        DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage, null, true);
-        DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(chatMessage), false);
+        boolean isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());
+
+        DbUtils.updateDialogModifiedDate(dataManager, chatDialog, ChatUtils.getMessageDateSent(chatMessage), false);
+        DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage,
+                currentDialog == null
+                        ? State.TEMP_LOCAL_UNREAD
+                        : null,
+                true);
 
         checkForSendingNotification(ownMessage, chatMessage, user, isPrivateChatMessage);
     }
