@@ -34,6 +34,7 @@ import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
 import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
 import com.quickblox.q_municate.utils.StringUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
@@ -264,42 +265,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onImagePicked(int requestCode, Attachment.Type type, Object attachment) {
         canPerformLogout.set(true);
-        if(validateAttachment(type, attachment)){
+        if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getIntArray(R.array.supported_attachment_types), type, attachment)){
             startLoadAttachFile(type, attachment, currentChatDialog.getDialogId());
         }
-
-    }
-
-    private boolean validateAttachment(Attachment.Type type, Object attachment){
-
-        if(type.equals(Attachment.Type.DOC) || type.equals(Attachment.Type.OTHER) || type.equals(Attachment.Type.AUDIO) || type.equals(Attachment.Type.VIDEO)){
-            OneButtonDialogFragment.show(getSupportFragmentManager(), R.string.dlg_unsupported_file, false);
-            return false;
-        }
-
-        if(attachment instanceof File){
-            File file = (File)attachment;
-            if(file.getName().length() > ConstsCore.MAX_FILENAME_LENGTH){
-                OneButtonDialogFragment.show(getSupportFragmentManager(), R.string.dlg_filename_long, false);
-                return false;
-            }
-        }
-
-        if(type.equals(Attachment.Type.IMAGE)){
-            File file = (File)attachment;
-            if(file.length() > ConstsCore.MAX_IMAGE_SIZE){
-                OneButtonDialogFragment.show(getSupportFragmentManager(), R.string.dlg_image_big, false);
-                return false;
-            }
-        } else if (type.equals(Attachment.Type.AUDIO) || type.equals(Attachment.Type.VIDEO)) {
-            File file = (File)attachment;
-            if(file.length() > ConstsCore.MAX_AUDIO_VIDEO_SIZE){
-                OneButtonDialogFragment.show(getSupportFragmentManager(), R.string.dlg_audio_video_big, false);
-                return false;
-            }
-        }
-
-        return true;
     }
 
     @Override
