@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -118,6 +119,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
+        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  START");
         messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, currentChatDialog);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
@@ -125,6 +127,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         messagesRecyclerView.setAdapter(messagesAdapter);
         scrollMessagesToBottom();
+        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  END");
     }
 
     @Override
@@ -134,6 +137,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         (new BaseAsyncTask<Void, Void, Boolean>() {
             @Override
             public Boolean performInBackground(Void... params) throws Exception {
+                Log.e("TIME MARK", TAG + " updateMessagesList()  START");
                 combinationMessagesList = createCombinationMessagesList();
                 return true;
             }
@@ -144,6 +148,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
                 findLastFriendsRequest(true);
 
                 checkForScrolling(oldMessagesCount);
+                Log.e("TIME MARK", TAG + " updateMessagesList()  START");
         }
 
             @Override
@@ -256,6 +261,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void findLastFriendsRequest(boolean needNotifyAdapter) {
+        Log.e("TIME MARK", TAG + " findLastFriendsRequest()  START");
         ((PrivateChatMessageAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         if (needNotifyAdapter) {
             messagesAdapter.notifyDataSetChanged();

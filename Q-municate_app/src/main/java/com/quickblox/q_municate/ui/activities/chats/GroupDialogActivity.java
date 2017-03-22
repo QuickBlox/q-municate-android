@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,12 +51,14 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
+        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  START");
         messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
 
         scrollMessagesToBottom();
+        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  END");
     }
 
     @Override
@@ -101,6 +104,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
         (new BaseAsyncTask<Void, Void, Boolean>() {
             @Override
             public Boolean performInBackground(Void... params) throws Exception {
+                Log.e("TIME MARK", TAG + " updateMessagesList()  START");
                 combinationMessagesList = createCombinationMessagesList();
                 processCombinationMessages();
                 return true;
@@ -110,6 +114,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
             public void onResult(Boolean aBoolean) {
                 messagesAdapter.addList(combinationMessagesList);
                 checkForScrolling(oldMessagesCount);
+                Log.e("TIME MARK", TAG + " updateMessagesList()  END");
             }
 
             @Override
@@ -162,7 +167,9 @@ public class GroupDialogActivity extends BaseDialogActivity {
         if(combinationMessagesList == null){
             return;
         }
+        Log.e("TIME MARK", TAG + " processCombinationMessages()  START");
         QBUser currentUser = AppSession.getSession().getUser();
+        Log.e("TIME MARK", TAG + " combinationMessagesList size = " + combinationMessagesList.size());
         for (CombinationMessage cm :combinationMessagesList){
             boolean ownMessage = !cm.isIncoming(currentUser.getId());
             if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
@@ -173,6 +180,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
                 dataManager.getMessageDataManager().update(cm.toMessage(), false);
             }
         }
+        Log.e("TIME MARK", TAG + " processCombinationMessages()  END");
     }
 
     public void sendMessage(View view) {

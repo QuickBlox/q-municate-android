@@ -226,12 +226,17 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
                                                  Bundle returnedBundle, QBChatDialog qbDialog,
                                                  long lastDateLoad) throws QBResponseException {
+        Log.e("TIME MARK", TAG + " get Messages from server  START");
         List<QBChatMessage> qbMessagesList = QBRestChatService.getDialogMessages(qbDialog,
                 customObjectRequestBuilder).perform();
+        Log.e("TIME MARK", TAG + " get Messages from server  END");
+
+        Log.e("TIME MARK", TAG + " save messages to DB START");
 
         if (qbMessagesList != null && !qbMessagesList.isEmpty()) {
             DbUtils.saveMessagesToCache(context, dataManager, qbMessagesList, qbDialog.getDialogId());
         }
+        Log.e("TIME MARK", TAG + " save messages to DB END");
 
         return qbMessagesList;
     }

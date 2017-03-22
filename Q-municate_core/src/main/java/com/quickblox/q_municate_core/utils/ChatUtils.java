@@ -475,11 +475,15 @@ ChatUtils {
 
     public static List<CombinationMessage> createCombinationMessagesList(List<Message> messagesList,
                                                                          List<DialogNotification> dialogNotificationsList) {
+        Log.e("TIME MARK", "ChatUtils" + " createCombinationMessagesList() start concatenation lists");
         List<CombinationMessage> combinationMessagesList = new ArrayList<>();
         combinationMessagesList.addAll(getCombinationMessagesListFromMessagesList(messagesList));
         combinationMessagesList.addAll(getCombinationMessagesListFromDialogNotificationsList(
                 dialogNotificationsList));
+        Log.e("TIME MARK", "ChatUtils" + " createCombinationMessagesList() finish concatenation lists");
+        Log.e("TIME MARK", "ChatUtils" + " createCombinationMessagesList() start sorting list");
         Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
+        Log.e("TIME MARK", "ChatUtils" + " createCombinationMessagesList() finish sorting list");
         return combinationMessagesList;
     }
 
