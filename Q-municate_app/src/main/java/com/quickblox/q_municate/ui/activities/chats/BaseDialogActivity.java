@@ -265,7 +265,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onImagePicked(int requestCode, Attachment.Type type, Object attachment) {
         canPerformLogout.set(true);
-        if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getIntArray(R.array.supported_attachment_types), type, attachment)){
+        if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), type, attachment)){
             startLoadAttachFile(type, attachment, currentChatDialog.getDialogId());
         }
     }

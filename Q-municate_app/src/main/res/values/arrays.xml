@@ -22,9 +22,9 @@
         <item>34</item>
     </integer-array>
 
-    <integer-array name="supported_attachment_types">
-        <item>2</item>
-        <item>4</item>
-    </integer-array>
+    <string-array name="supported_attachment_types">
+        <item>IMAGE</item>
+        <item>LOCATION</item>
+    </string-array>
 
 </resources>

@@ -175,13 +175,9 @@ public class ValidationUtils {
         return value == null || value.equals(NULL);
     }
 
-    public static boolean validateAttachment(FragmentManager fragmentManager, int[] supportedAttachmentCodes, Attachment.Type type, Object attachment) {
+    public static boolean validateAttachment(FragmentManager fragmentManager, String[] supportedAttachmentTypes, Attachment.Type type, Object attachment) {
 
-        if (!isSupportAttachmentType(supportedAttachmentCodes, type)){
-            return false;
-        }
-
-        if(type.equals(Attachment.Type.DOC) || type.equals(Attachment.Type.OTHER) || type.equals(Attachment.Type.AUDIO) || type.equals(Attachment.Type.VIDEO)){
+        if (!isSupportAttachmentType(supportedAttachmentTypes, type)){
             OneButtonDialogFragment.show(fragmentManager, R.string.dlg_unsupported_file, false);
             return false;
         }
@@ -211,10 +207,10 @@ public class ValidationUtils {
         return true;
     }
 
-    private static boolean isSupportAttachmentType(int[] supportedAttachmentCodes, Attachment.Type type){
+    private static boolean isSupportAttachmentType(String[] supportedAttachmentTypes, Attachment.Type type){
         boolean supported = false;
-        for(int code : supportedAttachmentCodes){
-            Attachment.Type supportedType =  Attachment.Type.parseByCode(code);
+        for(String supportedTypeSrt : supportedAttachmentTypes){
+            Attachment.Type supportedType =  Attachment.Type.valueOf(supportedTypeSrt);
             if(type.equals(supportedType)){
                 supported  = true;
                 break;
