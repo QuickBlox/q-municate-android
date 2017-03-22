@@ -63,8 +63,9 @@ public class StringUtils {
         Attachment.Type attachmentType;
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
         String mimeType = MimeUtils.guessMimeTypeFromExtension(extension);
-
-        if (mimeType.startsWith("image")){
+        if (mimeType == null){
+            attachmentType = Attachment.Type.OTHER;
+        } else if (mimeType.startsWith("image")){
             attachmentType = Attachment.Type.IMAGE;
         } else if (mimeType.startsWith("audio")){
             attachmentType = Attachment.Type.AUDIO;

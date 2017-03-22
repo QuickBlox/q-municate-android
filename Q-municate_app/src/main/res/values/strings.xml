@@ -290,6 +290,10 @@
     <string name="location_title">Location</string>
     <string name="send_current_location">Send my location</string>
     <string name="send_selected_location">Send selected location</string>
+    <string name="dlg_unsupported_file">This file format isn\'t supported</string>
+    <string name="dlg_filename_long">File name must be less than 100 characters</string>
+    <string name="dlg_image_big">File mustn’\t be more than 10 MB</string>
+    <string name="dlg_audio_video_big">File mustn’\t be more than 100 MB</string>
 
     <!--   Location Permissions   -->
     <string name="permission_rationale_location">Access to the location service is required to show your current location on the map.</string>

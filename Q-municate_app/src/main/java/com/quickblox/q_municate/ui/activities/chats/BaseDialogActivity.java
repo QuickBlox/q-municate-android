@@ -31,8 +31,10 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
+import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
 import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
 import com.quickblox.q_municate.utils.StringUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
@@ -263,7 +265,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onImagePicked(int requestCode, Attachment.Type type, Object attachment) {
         canPerformLogout.set(true);
-        startLoadAttachFile(type, attachment, currentChatDialog.getDialogId());
+        if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), type, attachment)){
+            startLoadAttachFile(type, attachment, currentChatDialog.getDialogId());
+        }
     }
 
     @Override
