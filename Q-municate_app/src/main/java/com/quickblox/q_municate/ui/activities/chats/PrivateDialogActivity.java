@@ -84,11 +84,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     protected void onResume() {
         super.onResume();
 
-        if (isNetworkAvailable()) {
-            startLoadDialogMessages(false);
-        }
-
-        checkMessageSendingPossibility();
+//        if (isNetworkAvailable()) {
+//            startLoadDialogMessages(false);
+//        }
+//
+//        checkMessageSendingPossibility();
     }
 
     @Override
@@ -138,16 +138,16 @@ public class PrivateDialogActivity extends BaseDialogActivity {
             @Override
             public Boolean performInBackground(Void... params) throws Exception {
                 Log.e("TIME MARK", TAG + " updateMessagesList()  START");
-                combinationMessagesList = createCombinationMessagesList();
+//                combinationMessagesList = createCombinationMessagesList();
                 return true;
             }
 
             @Override
             public void onResult(Boolean aBoolean) {
-                messagesAdapter.addList(combinationMessagesList);
+//                messagesAdapter.addList(combinationMessagesList);
                 findLastFriendsRequest(true);
 
-                checkForScrolling(oldMessagesCount);
+//                checkForScrolling(oldMessagesCount);
                 Log.e("TIME MARK", TAG + " updateMessagesList()  START");
         }
 

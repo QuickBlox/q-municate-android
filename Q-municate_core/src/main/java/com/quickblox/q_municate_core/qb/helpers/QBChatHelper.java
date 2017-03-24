@@ -140,6 +140,10 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         addSystemMessageListener(new SystemMessageListener());
     }
 
+    public boolean isLoggedInToChat(){
+        return chatService != null && chatService.isLoggedIn();
+    }
+
     protected void addSystemMessageListener(QBSystemMessageListener systemMessageListener) {
         systemMessagesManager.addSystemMessageListener(systemMessageListener);
     }

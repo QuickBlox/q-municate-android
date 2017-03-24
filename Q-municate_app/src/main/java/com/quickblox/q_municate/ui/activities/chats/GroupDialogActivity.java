@@ -64,13 +64,13 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateData();
-
-        if (isNetworkAvailable()) {
-            startLoadDialogMessages(false);
-        }
-
-        checkMessageSendingPossibility();
+//        updateData();
+//
+//        if (isNetworkAvailable() && chatHelper != null && chatHelper.isLoggedInToChat()) {
+//            startLoadDialogMessages(false);
+//        }
+//
+//        checkMessageSendingPossibility();
     }
 
     @Override
@@ -105,15 +105,15 @@ public class GroupDialogActivity extends BaseDialogActivity {
             @Override
             public Boolean performInBackground(Void... params) throws Exception {
                 Log.e("TIME MARK", TAG + " updateMessagesList()  START");
-                combinationMessagesList = createCombinationMessagesList();
+//                combinationMessagesList = createCombinationMessagesList();
                 processCombinationMessages();
                 return true;
             }
 
             @Override
             public void onResult(Boolean aBoolean) {
-                messagesAdapter.addList(combinationMessagesList);
-                checkForScrolling(oldMessagesCount);
+//                messagesAdapter.addList(combinationMessagesList);
+//                checkForScrolling(oldMessagesCount);
                 Log.e("TIME MARK", TAG + " updateMessagesList()  END");
             }
 
@@ -167,20 +167,40 @@ public class GroupDialogActivity extends BaseDialogActivity {
         if(combinationMessagesList == null){
             return;
         }
-        Log.e("TIME MARK", TAG + " processCombinationMessages()  START");
-        QBUser currentUser = AppSession.getSession().getUser();
-        Log.e("TIME MARK", TAG + " combinationMessagesList size = " + combinationMessagesList.size());
-        for (CombinationMessage cm :combinationMessagesList){
-            boolean ownMessage = !cm.isIncoming(currentUser.getId());
-            if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
-                cm.setState(State.READ);
-                QBUpdateStatusMessageCommand.start(this, currentChatDialog, cm, false);
-            } else if (ownMessage) {
-                cm.setState(State.READ);
-                dataManager.getMessageDataManager().update(cm.toMessage(), false);
+        (new BaseAsyncTask<Void, Void, Void>() {
+            @Override
+            public Void performInBackground(Void... params) throws Exception {
+                Log.e("TIME MARK", TAG + " processCombinationMessages()  START");
+                QBUser currentUser = AppSession.getSession().getUser();
+                Log.e("TIME MARK", TAG + " combinationMessagesList size = " + combinationMessagesList.size());
+                for (
+                        CombinationMessage cm : combinationMessagesList)
+
+                {
+                    boolean ownMessage = !cm.isIncoming(currentUser.getId());
+                    if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
+                        cm.setState(State.READ);
+                        QBUpdateStatusMessageCommand.start(GroupDialogActivity.this, currentChatDialog, cm, false);
+                    } else if (ownMessage) {
+                        cm.setState(State.READ);
+                        dataManager.getMessageDataManager().update(cm.toMessage(), false);
+                    }
+                }
+                Log.e("TIME MARK", TAG + " processCombinationMessages()  END");
+
+                return null;
             }
-        }
-        Log.e("TIME MARK", TAG + " processCombinationMessages()  END");
+
+            @Override
+            public void onResult(Void aVoid) {
+
+            }
+
+            @Override
+            public void onException(Exception e) {
+
+            }
+        }).execute();
     }
 
     public void sendMessage(View view) {

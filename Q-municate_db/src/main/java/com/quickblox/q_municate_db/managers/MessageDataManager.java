@@ -145,6 +145,33 @@ public class MessageDataManager extends BaseManager<Message> {
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
             messageQueryBuilder.join(dialogOccupantQueryBuilder);
 
+            Log.e("TIME MARK", TAG + " query select messages from DB " + messageQueryBuilder.prepareStatementString());
+
+            PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
+            messagesList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return messagesList;
+    }
+
+    public List<Message> getMessagesByDialogIdLimeted(String dialogId, long limit) {
+        List<Message> messagesList = new ArrayList<>();
+
+        try {
+            QueryBuilder<Message, Long> messageQueryBuilder = dao.queryBuilder();
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder).limit(limit);
+
+            Log.e("TIME MARK", TAG + " query select messages from DB " + messageQueryBuilder.prepareStatementString());
+
             PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
             messagesList = dao.query(preparedQuery);
         } catch (SQLException e) {
@@ -184,6 +211,36 @@ public class MessageDataManager extends BaseManager<Message> {
         return messagesList;
     }
 
+    public List<Message> getMessagesByDialogIdAndDate(String dialogId, long createdDate, boolean moreDate, long limit){
+        List<Message> messagesList = new ArrayList<>();
+
+        try {
+            QueryBuilder<Message, Long> messageQueryBuilder = dao.queryBuilder();
+
+            Where<Message, Long> where = messageQueryBuilder.where();
+            where.and(where.ne(Message.Column.STATE, State.TEMP_LOCAL),
+                    where.ne(Message.Column.STATE, State.TEMP_LOCAL_UNREAD),
+                    moreDate
+                            ? where.gt(Message.Column.CREATED_DATE, createdDate)
+                            : where.lt(Message.Column.CREATED_DATE, createdDate));
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder).limit(limit);
+
+            PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
+            messagesList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return messagesList;
+    }
+
     public void deleteTempMessages(List<Long> dialogOccupantsIdsList) {
         try {
             DeleteBuilder<Message, Long> deleteBuilder = dao.deleteBuilder();
@@ -197,14 +254,12 @@ public class MessageDataManager extends BaseManager<Message> {
                     )
             );
 
-            Log.e(TAG, "Deleted " + deleteBuilder.delete() + " items");
-
             deleteBuilder.delete();
+            notifyObservers(getObserverKey());
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
 
-        notifyObservers(getObserverKey());
     }
 
     public List<Message> getTempMessagesByDialogId(String dialogId){

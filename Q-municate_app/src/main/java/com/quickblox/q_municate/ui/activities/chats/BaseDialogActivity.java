@@ -91,6 +91,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final int TYPING_DELAY = 1000;
     private static final int DELAY_SCROLLING_LIST = 300;
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
+    private static final int MESSAGES_PAGE_SIZE = ConstsCore.DIALOG_MESSAGES_PER_PAGE;
 
     @Bind(R.id.messages_swiperefreshlayout)
     SwipeRefreshLayout messageSwipeRefreshLayout;
@@ -134,6 +135,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BroadcastReceiver updatingDialogBroadcastReceiver;
     private SystemPermissionHelper systemPermissionHelper;
     private boolean isLoadingMessages;
+    private int sizeLastGettedMessagesFromDb;
 
     @Override
     protected int getContentResId() {
@@ -166,6 +168,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         hideSmileLayout();
 
         initMessagesRecyclerView();
+
         Log.e("TIME MARK", TAG + " onCreate() END");
     }
 
@@ -224,7 +227,17 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onResume();
         Log.e("TIME MARK", TAG + " onResume() START");
         restoreDefaultCanPerformLogout();
+
+        loadNextPartMessagesFromDb(false);
+
+
+        if (isNetworkAvailable()) {
+            startLoadDialogMessages(false);
+        }
+
+        checkMessageSendingPossibility();
         Log.e("TIME MARK", TAG + " onResume() END");
+
     }
 
     @Override
@@ -512,6 +525,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected void startLoadDialogMessages(QBChatDialog chatDialog, long lastDateLoad, boolean isLoadOldMessages) {
         Log.e("TIME MARK", TAG + " startLoadDialogMessages");
+        isLoadingMessages = true;
         QBLoadDialogMessagesCommand.start(this, chatDialog, lastDateLoad, isLoadOldMessages);
     }
 
@@ -594,31 +608,31 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadDialogMessages(final boolean isLoadOldMessages) {
-        if (currentChatDialog == null) {
+        if (currentChatDialog == null || isLoadingMessages) {
             return;
         }
         showActionBarProgress();
 
-        (new BaseAsyncTask<Void, Void, Boolean>() {
-            private long messageDateSent;
+        (new BaseAsyncTask<Void, Void, Long>() {
+//            private long messageDateSent;
             @Override
-            public Boolean performInBackground(Void... params) throws Exception {
-                Log.e("TIME MARK", TAG + " calcukate message date for loading START");
-                List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
-                List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-
-                Message message;
-                DialogNotification dialogNotification;
-
-                message = dataManager.getMessageDataManager().getMessageByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
-                dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
-                messageDateSent =  ChatUtils.getDialogMessageCreatedDate(!isLoadOldMessages, message, dialogNotification);
-                Log.e("TIME MARK", TAG + " calcukate message date for loading END");
-                return true;
+            public Long performInBackground(Void... params) throws Exception {
+//                Log.e("TIME MARK", TAG + " calculate message date for loading START");
+//                List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
+//                List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+//
+//                Message message;
+//                DialogNotification dialogNotification;
+//
+//                message = dataManager.getMessageDataManager().getMessageByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+//                dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+//                messageDateSent =  ChatUtils.getDialogMessageCreatedDate(!isLoadOldMessages, message, dialogNotification);
+//                Log.e("TIME MARK", TAG + " calculate message date for loading END");
+                return getMessageDateForLoad(isLoadOldMessages);
             }
 
             @Override
-            public void onResult(Boolean aBoolean) {
+            public void onResult(Long messageDateSent) {
                 startLoadDialogMessages(currentChatDialog, messageDateSent, isLoadOldMessages);
             }
 
@@ -631,6 +645,43 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }).execute();
 
     }
+
+    protected long getMessageDateForLoad(boolean isLoadOldMessages){
+        long messageDateSent;
+        Log.e("TIME MARK", TAG + " calcukate message date for loading START");
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
+        List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+
+        Message message;
+        DialogNotification dialogNotification;
+
+        message = dataManager.getMessageDataManager().getMessageByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+        dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+        messageDateSent =  ChatUtils.getDialogMessageCreatedDate(!isLoadOldMessages, message, dialogNotification);
+        Log.e("TIME MARK", TAG + " calcukate message date for loading END");
+
+        return messageDateSent;
+    }
+
+    protected long getMessageDateForLoadByCurrentList(boolean isLoadOld){
+        if (combinationMessagesList.size() == 0){
+            return 0;
+        }
+
+        return !isLoadOld
+                ? combinationMessagesList.get(combinationMessagesList.size() - 1).getCreatedDate()
+                : combinationMessagesList.get(0).getCreatedDate();
+
+//        if (messagesAdapter.getItemCount() == 0){
+//            return 0;
+//        }
+//
+//        return !isLoadOld
+//                ? messagesAdapter.getItem(messagesAdapter.getItemCount() - 1).getCreatedDate()
+//                : messagesAdapter.getItem(0).getCreatedDate();
+    }
+
+
 
     private void readAllMessages() {
         if (currentChatDialog != null) {
@@ -700,14 +751,76 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
 
         Log.e("TIME MARK", TAG + " buildCombinationMessagesListByDate() START");
+        String currentDialogId = currentChatDialog.getDialogId();
 
         List<Message> messagesList = dataManager.getMessageDataManager()
-                .getMessagesByDialogIdAndDate(currentChatDialog.getDialogId(), createDate, moreDate);
+                .getMessagesByDialogIdAndDate(currentDialogId, createDate, moreDate);
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogIdAndDate(currentChatDialog.getDialogId(), createDate, moreDate);
+                .getDialogNotificationsByDialogIdAndDate(currentDialogId, createDate, moreDate);
         List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
         Log.e("TIME MARK", TAG + " buildCombinationMessagesListByDate() START");
         return combinationMessages;
+    }
+
+    protected List<CombinationMessage> buildLimitedCombinationMessagesListByDate(long createDate, boolean moreDate, long limit){
+        if (currentChatDialog == null) {
+            return new ArrayList<>();
+        }
+
+        Log.e("TIME MARK", TAG + " buildCombinationMessagesListByDate() START");
+        String currentDialogId = currentChatDialog.getDialogId();
+        List<Message> messagesList = dataManager.getMessageDataManager()
+                .getMessagesByDialogIdAndDate(currentDialogId, createDate, moreDate, limit);
+        Log.e("TIME MARK", TAG + " messagesList.size() = " + messagesList.size());
+        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                .getDialogNotificationsByDialogIdAndDate(currentDialogId, createDate, moreDate, limit);
+
+        Log.e("TIME MARK", TAG + " dialogNotificationsList.size() = " + dialogNotificationsList.size());
+        List<CombinationMessage> combinationMessages = ChatUtils.createLimitedCombinationMessagesList(messagesList, dialogNotificationsList, (int) limit);
+        Log.e("TIME MARK", TAG + " buildCombinationMessagesListByDate() START");
+        if (!moreDate){
+            sizeLastGettedMessagesFromDb = combinationMessages.size();
+        }
+        return combinationMessages;
+    }
+
+    protected void loadNextPartMessagesFromDb(boolean isLoadOld){
+//        long oldestMessageDate = combinationMessagesList.size() != 0
+//                ? combinationMessagesList.get(0).getCreatedDate()
+//                : 0;
+//
+//        long newestMessageDate = combinationMessagesList.size() != 0
+//                ? combinationMessagesList.get(combinationMessagesList.size()-1).getCreatedDate()
+//                : 0;
+
+        long messageDate = combinationMessagesList.size()== 0
+                ? 0
+                : isLoadOld
+                    ? combinationMessagesList.get(0).getCreatedDate()
+                    : combinationMessagesList.get(combinationMessagesList.size()-1).getCreatedDate();
+
+        List<CombinationMessage> requestedMessages = buildLimitedCombinationMessagesListByDate(
+                messageDate, !isLoadOld, ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+
+        if (isLoadOld) {
+            combinationMessagesList.addAll(0, requestedMessages);
+        } else {
+            combinationMessagesList.addAll(requestedMessages);
+        }
+
+        updateMessagesAdapter(isLoadOld, requestedMessages.size());
+    }
+
+    private void updateMessagesAdapter(boolean isLoadOld, int partSize) {
+        messagesAdapter.setList(combinationMessagesList, !isLoadOld);
+
+        if (isLoadOld) {
+            messagesAdapter.notifyItemRangeInserted(0, partSize);
+        } else {
+            scrollMessagesToBottom();
+        }
+
+        messageSwipeRefreshLayout.setRefreshing(false);
     }
 
     private void visibleOrHideSmilePanel() {
@@ -778,6 +891,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             Log.i(TAG, "==== MessageObserver  'update' ====");
             if (data != null && data.equals(dataManager.getMessageDataManager().getObserverKey())) {
                 Log.e("TIME MARK", TAG + " MessageObserver  START");
+                loadNextPartMessagesFromDb(false);
                 updateMessagesList();
                 Log.e("TIME MARK", TAG + " MessageObserver  END");
             }
@@ -790,6 +904,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         public void update(Observable observable, Object data) {
             Log.i(TAG, "==== DialogNotificationObserver  'update' ====");
             if (data != null && data.equals(dataManager.getDialogNotificationDataManager().getObserverKey())) {
+                loadNextPartMessagesFromDb(false);
                 updateMessagesList();
             }
         }
@@ -861,20 +976,30 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public Boolean performInBackground(Void... params) throws Exception {
                         Log.e("TIME MARK", TAG + " LoadDialogMessagesSuccessAction  START process");
-                        combinationMessagesList = createCombinationMessagesList();
+
+                        List<CombinationMessage> requestedMessages = buildCombinationMessagesListByDate(
+                                lastMessageDate, !isLoadedOldMessages);
+
+                        if (isLoadedOldMessages){
+                            combinationMessagesList.addAll(0, requestedMessages);
+                        } else {
+                            combinationMessagesList.addAll(requestedMessages);
+                        }
+
                         additionalActionsAfterLoadMessages();
                         return true;
                     }
 
                     @Override
                     public void onResult(Boolean aBoolean) {
-                        if (isLoadedOldMessages) {
-                            messagesAdapter.setList(combinationMessagesList, false);
-                            messagesAdapter.notifyItemRangeInserted(0, totalEntries);
-                        } else {
-                            messagesAdapter.setList(combinationMessagesList, true);
-                            scrollMessagesToBottom();
-                        }
+                        updateMessagesAdapter(isLoadedOldMessages, totalEntries);
+//                        if (isLoadedOldMessages) {
+//                            messagesAdapter.setList(combinationMessagesList, false);
+//                            messagesAdapter.notifyItemRangeInserted(0, totalEntries);
+//                        } else {
+//                            messagesAdapter.setList(combinationMessagesList, true);
+//                            scrollMessagesToBottom();
+//                        }
 
                         messageSwipeRefreshLayout.setRefreshing(false);
                         hideActionBarProgress();
@@ -885,6 +1010,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public void onException(Exception e) {
                         ErrorUtils.showError(BaseDialogActivity.this, e);
+                        messageSwipeRefreshLayout.setRefreshing(false);
                         isLoadingMessages = false;
                     }
 
@@ -930,8 +1056,25 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             }
 
             if (!isLoadingMessages) {
-                isLoadingMessages = true;
-                startLoadDialogMessages(true);
+                if (combinationMessagesList.size() == 0){
+                    startLoadDialogMessages(true);
+                    return;
+                }
+
+                long oldestMessageInDb = getMessageDateForLoad(true);
+                long oldestMessageInCurrentList = combinationMessagesList.get(0).getCreatedDate();
+
+                Log.v(TAG, "comparing dates for load: " +
+                        "oldestMessageInDb = " + oldestMessageInDb +
+                        " oldestMessageInCurrentList = " + oldestMessageInCurrentList);
+
+                if ((oldestMessageInCurrentList - oldestMessageInDb) > 0){
+                    Log.v(TAG, "oldestMessageInCurrentList - oldestMessageInDb " + (oldestMessageInCurrentList - oldestMessageInDb));
+                    loadNextPartMessagesFromDb(true);
+                } else {
+                    Log.v(TAG, " else oldestMessageInCurrentList - oldestMessageInDb " + (oldestMessageInCurrentList - oldestMessageInDb));
+                    startLoadDialogMessages(true);
+                }
             }
         }
     }

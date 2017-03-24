@@ -487,6 +487,24 @@ ChatUtils {
         return combinationMessagesList;
     }
 
+    public static List<CombinationMessage> createLimitedCombinationMessagesList(List<Message> messagesList,
+                                                                         List<DialogNotification> dialogNotificationsList, int limit) {
+        Log.e("TIME MARK", "ChatUtils" + " createLimitedCombinationMessagesList() start concatenation lists");
+        List<CombinationMessage> combinationMessagesList = new ArrayList<>();
+        combinationMessagesList.addAll(getCombinationMessagesListFromMessagesList(messagesList));
+        combinationMessagesList.addAll(getCombinationMessagesListFromDialogNotificationsList(
+                dialogNotificationsList));
+        Log.e("TIME MARK", "ChatUtils" + " createLimitedCombinationMessagesList() finish concatenation lists");
+        Log.e("TIME MARK", "ChatUtils" + " createLimitedCombinationMessagesList() start sorting list");
+        Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
+        Log.e("TIME MARK", "ChatUtils" + " createLimitedCombinationMessagesList() finish sorting list");
+
+        int indexStart = combinationMessagesList.size() < limit ? 0 : combinationMessagesList.size() - limit;
+        int indexEnd = combinationMessagesList.size();
+
+        return combinationMessagesList.subList(indexStart, indexEnd);
+    }
+
     public static String getDialogLastMessage(String defaultLasMessage, Message message, DialogNotification dialogNotification) {
         String lastMessage = "";
 
