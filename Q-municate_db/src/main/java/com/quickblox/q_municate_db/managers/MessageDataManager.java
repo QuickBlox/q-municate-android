@@ -255,6 +255,9 @@ public class MessageDataManager extends BaseManager<Message> {
             );
 
             deleteBuilder.delete();
+
+            //TODO VT need notify observers
+
             notifyObservers(getObserverKey());
         } catch (SQLException e) {
             ErrorUtils.logError(e);

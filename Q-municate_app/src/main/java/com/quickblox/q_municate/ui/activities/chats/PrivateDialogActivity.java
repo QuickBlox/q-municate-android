@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
@@ -32,6 +31,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -83,12 +83,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-//        if (isNetworkAvailable()) {
-//            startLoadDialogMessages(false);
-//        }
-//
-//        checkMessageSendingPossibility();
     }
 
     @Override
@@ -405,9 +399,12 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(dataManager.getFriendDataManager().getObserverKey())) {
-                updateCurrentChatFromDB();
-                checkMessageSendingPossibility();
+            if (data != null) {
+                String observerKey = ((Bundle) data).getString(FriendDataManager.EXTRA_OBSERVE_KEY);
+                if (observerKey.equals(dataManager.getFriendDataManager().getObserverKey())) {
+                    updateCurrentChatFromDB();
+                    checkMessageSendingPossibility();
+                }
             }
         }
     }

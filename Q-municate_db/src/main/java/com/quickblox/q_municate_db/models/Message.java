@@ -117,7 +117,8 @@ public class Message implements Serializable {
         return "Message [messageId='" + messageId
                 + "', dialogOccupant='" + dialogOccupant
                 + "', body='" + body
-                + "', createdDate='" + createdDate + "']";
+                + "', createdDate='" + createdDate
+                + "', state='" + state + "']";
     }
 
     public interface Column {

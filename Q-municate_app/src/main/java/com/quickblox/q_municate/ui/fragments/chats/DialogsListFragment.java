@@ -46,6 +46,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -399,10 +400,14 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         @Override
         public void update(Observable observable, Object data) {
             if (data != null) {
-                if (data.equals(dataManager.getQBChatDialogDataManager().getObserverKey())
-                        || data.equals(dataManager.getMessageDataManager().getObserverKey())
-                        || data.equals(QMUserCacheImpl.OBSERVE_KEY)
-                        || data.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
+                if (data instanceof Bundle) {
+                    String observeKey = ((Bundle) data).getString(BaseManager.EXTRA_OBSERVE_KEY);
+                    if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())
+                            || observeKey.equals(dataManager.getMessageDataManager().getObserverKey())
+                            || observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
+                        updateDialogsList();
+                    }
+                } else if (data.equals(QMUserCacheImpl.OBSERVE_KEY)) {
                     updateDialogsList();
                 }
             }
