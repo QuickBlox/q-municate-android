@@ -44,11 +44,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
         Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  START");
@@ -59,18 +54,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
         scrollMessagesToBottom();
         Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  END");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        updateData();
-//
-//        if (isNetworkAvailable() && chatHelper != null && chatHelper.isLoggedInToChat()) {
-//            startLoadDialogMessages(false);
-//        }
-//
-//        checkMessageSendingPossibility();
     }
 
     @Override

@@ -26,6 +26,7 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.core.helper.StringifyArrayList;
@@ -733,13 +734,15 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
 
         boolean isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());
+        boolean needNotifyObserver = (currentDialog != null && currentDialog.getDialogId().equals(chatMessage.getDialogId()))
+                || currentDialog == null;
 
         DbUtils.updateDialogModifiedDate(dataManager, chatDialog, ChatUtils.getMessageDateSent(chatMessage), false);
         DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage,
-                currentDialog == null
-                        ? State.TEMP_LOCAL_UNREAD
+                !ownMessage
+                        ? State.DELIVERED
                         : null,
-                true);
+                needNotifyObserver);
 
         checkForSendingNotification(ownMessage, chatMessage, user, isPrivateChatMessage);
     }

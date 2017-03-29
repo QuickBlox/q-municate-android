@@ -63,11 +63,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     protected void addActions() {
         super.addActions();
 
@@ -78,16 +73,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
 
         updateBroadcastActionList();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override

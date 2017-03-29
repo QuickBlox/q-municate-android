@@ -202,7 +202,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         try {
             dao.deleteById(id);
 
-            notifyObservers(getObserverKey());
+            notifyObservers(null, DELETE_ACTION);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

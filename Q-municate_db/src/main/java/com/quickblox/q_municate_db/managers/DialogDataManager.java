@@ -53,12 +53,14 @@ public class DialogDataManager extends BaseManager<Dialog> {
         try {
             DeleteBuilder<Dialog, Long> deleteBuilder = dao.deleteBuilder();
             deleteBuilder.where().eq(Dialog.Column.ID, dialogId);
-            deleteBuilder.delete();
+
+            if (deleteBuilder.delete() > 0){
+                //TODO VT need to think how to send ID to observers
+                notifyObservers(null, DELETE_ACTION);
+            }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
-
-        notifyObservers(getObserverKey());
     }
 
     public List<Dialog> getAllSorted() {

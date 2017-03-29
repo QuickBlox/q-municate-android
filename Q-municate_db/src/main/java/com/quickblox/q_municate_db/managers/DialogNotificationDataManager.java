@@ -69,7 +69,10 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
             dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
 
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
-            messageQueryBuilder.join(dialogOccupantQueryBuilder).limit(limit);
+            messageQueryBuilder
+                    .join(dialogOccupantQueryBuilder)
+                    .orderBy(DialogNotification.Column.CREATED_DATE, false)
+                    .limit(limit);
 
             PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
             dialogNotificationsList = dao.query(preparedQuery);
@@ -131,7 +134,10 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
             dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
 
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
-            messageQueryBuilder.join(dialogOccupantQueryBuilder).limit(limit);
+            messageQueryBuilder
+                    .join(dialogOccupantQueryBuilder)
+                    .orderBy(DialogNotification.Column.CREATED_DATE, false)
+                    .limit(limit);
 
             PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
             dialogNotificationsList = dao.query(preparedQuery);

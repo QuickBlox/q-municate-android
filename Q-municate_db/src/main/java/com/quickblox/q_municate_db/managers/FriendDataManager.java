@@ -82,15 +82,14 @@ public class FriendDataManager extends BaseManager<Friend> {
         try {
             DeleteBuilder<Friend, Long> deleteBuilder = dao.deleteBuilder();
             deleteBuilder.where().eq(QMUserColumns.ID, userId);
-            deleteBuilder.delete();
-            //TODO VT need notify observers
 
-            notifyObservers(getObserverKey());
+            if (deleteBuilder.delete() > 0) {
+                //TODO VT need to think how to send ID to observers
+                notifyObservers(null, DELETE_ACTION);
+            }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
-
-
     }
 
     public boolean existsByUserId(int userId) {

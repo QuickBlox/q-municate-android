@@ -168,7 +168,10 @@ public class MessageDataManager extends BaseManager<Message> {
             dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
 
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
-            messageQueryBuilder.join(dialogOccupantQueryBuilder).limit(limit);
+            messageQueryBuilder
+                    .join(dialogOccupantQueryBuilder)
+                    .orderBy(Message.Column.CREATED_DATE, false)
+                    .limit(limit);
 
             Log.e("TIME MARK", TAG + " query select messages from DB " + messageQueryBuilder.prepareStatementString());
 
@@ -230,7 +233,10 @@ public class MessageDataManager extends BaseManager<Message> {
             dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
 
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
-            messageQueryBuilder.join(dialogOccupantQueryBuilder).limit(limit);
+            messageQueryBuilder
+                    .join(dialogOccupantQueryBuilder)
+                    .orderBy(Message.Column.CREATED_DATE, false)
+                    .limit(limit);
 
             PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
             messagesList = dao.query(preparedQuery);
@@ -254,11 +260,10 @@ public class MessageDataManager extends BaseManager<Message> {
                     )
             );
 
-            deleteBuilder.delete();
-
-            //TODO VT need notify observers
-
-            notifyObservers(getObserverKey());
+            if (deleteBuilder.delete() > 0) {
+                //TODO VT need to think how to send IDs to observers
+                notifyObservers(null, DELETE_ACTION);
+            }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
