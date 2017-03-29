@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,7 +19,6 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageComma
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
@@ -46,14 +44,12 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  START");
         messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
 
         scrollMessagesToBottom();
-        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  END");
     }
 
     @Override
@@ -83,29 +79,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        final int oldMessagesCount = messagesAdapter.getItemCount();
-        (new BaseAsyncTask<Void, Void, Boolean>() {
-            @Override
-            public Boolean performInBackground(Void... params) throws Exception {
-                Log.e("TIME MARK", TAG + " updateMessagesList()  START");
-//                combinationMessagesList = createCombinationMessagesList();
-                processCombinationMessages();
-                return true;
-            }
-
-            @Override
-            public void onResult(Boolean aBoolean) {
-//                messagesAdapter.addList(combinationMessagesList);
-//                checkForScrolling(oldMessagesCount);
-                Log.e("TIME MARK", TAG + " updateMessagesList()  END");
-            }
-
-            @Override
-            public void onException(Exception e) {
-                ErrorUtils.showError(GroupDialogActivity.this, e);
-            }
-
-        }).execute();
+        processCombinationMessages();
     }
 
     @Override
@@ -153,13 +127,8 @@ public class GroupDialogActivity extends BaseDialogActivity {
         (new BaseAsyncTask<Void, Void, Void>() {
             @Override
             public Void performInBackground(Void... params) throws Exception {
-                Log.e("TIME MARK", TAG + " processCombinationMessages()  START");
                 QBUser currentUser = AppSession.getSession().getUser();
-                Log.e("TIME MARK", TAG + " combinationMessagesList size = " + combinationMessagesList.size());
-                for (
-                        CombinationMessage cm : combinationMessagesList)
-
-                {
+                for (CombinationMessage cm : combinationMessagesList) {
                     boolean ownMessage = !cm.isIncoming(currentUser.getId());
                     if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
                         cm.setState(State.READ);
@@ -169,8 +138,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
                         dataManager.getMessageDataManager().update(cm.toMessage(), false);
                     }
                 }
-                Log.e("TIME MARK", TAG + " processCombinationMessages()  END");
-
                 return null;
             }
 

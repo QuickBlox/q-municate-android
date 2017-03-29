@@ -26,7 +26,6 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.core.helper.StringifyArrayList;
@@ -231,17 +230,12 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
                                                  Bundle returnedBundle, QBChatDialog qbDialog,
                                                  long lastDateLoad) throws QBResponseException {
-        Log.e("TIME MARK", TAG + " get Messages from server  START");
         List<QBChatMessage> qbMessagesList = QBRestChatService.getDialogMessages(qbDialog,
                 customObjectRequestBuilder).perform();
-        Log.e("TIME MARK", TAG + " get Messages from server  END");
-
-        Log.e("TIME MARK", TAG + " save messages to DB START");
 
         if (qbMessagesList != null && !qbMessagesList.isEmpty()) {
             DbUtils.saveMessagesToCache(context, dataManager, qbMessagesList, qbDialog.getDialogId());
         }
-        Log.e("TIME MARK", TAG + " save messages to DB END");
 
         return qbMessagesList;
     }

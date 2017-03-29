@@ -1,7 +1,5 @@
 package com.quickblox.q_municate_db.managers;
 
-import android.util.Log;
-
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -145,8 +143,6 @@ public class MessageDataManager extends BaseManager<Message> {
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
             messageQueryBuilder.join(dialogOccupantQueryBuilder);
 
-            Log.e("TIME MARK", TAG + " query select messages from DB " + messageQueryBuilder.prepareStatementString());
-
             PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
             messagesList = dao.query(preparedQuery);
         } catch (SQLException e) {
@@ -172,8 +168,6 @@ public class MessageDataManager extends BaseManager<Message> {
                     .join(dialogOccupantQueryBuilder)
                     .orderBy(Message.Column.CREATED_DATE, false)
                     .limit(limit);
-
-            Log.e("TIME MARK", TAG + " query select messages from DB " + messageQueryBuilder.prepareStatementString());
 
             PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
             messagesList = dao.query(preparedQuery);

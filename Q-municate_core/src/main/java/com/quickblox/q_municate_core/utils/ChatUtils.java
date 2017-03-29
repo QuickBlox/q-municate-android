@@ -8,7 +8,6 @@ import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -475,29 +474,21 @@ ChatUtils {
 
     public static List<CombinationMessage> createCombinationMessagesList(List<Message> messagesList,
                                                                          List<DialogNotification> dialogNotificationsList) {
-        Log.e("TIME MARK", "ChatUtils" + " createCombinationMessagesList() start concatenation lists");
         List<CombinationMessage> combinationMessagesList = new ArrayList<>();
         combinationMessagesList.addAll(getCombinationMessagesListFromMessagesList(messagesList));
         combinationMessagesList.addAll(getCombinationMessagesListFromDialogNotificationsList(
                 dialogNotificationsList));
-        Log.e("TIME MARK", "ChatUtils" + " createCombinationMessagesList() finish concatenation lists");
-        Log.e("TIME MARK", "ChatUtils" + " createCombinationMessagesList() start sorting list");
         Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
-        Log.e("TIME MARK", "ChatUtils" + " createCombinationMessagesList() finish sorting list");
         return combinationMessagesList;
     }
 
     public static List<CombinationMessage> createLimitedCombinationMessagesList(List<Message> messagesList,
                                                                          List<DialogNotification> dialogNotificationsList, int limit) {
-        Log.e("TIME MARK", "ChatUtils" + " createLimitedCombinationMessagesList() start concatenation lists");
         List<CombinationMessage> combinationMessagesList = new ArrayList<>();
         combinationMessagesList.addAll(getCombinationMessagesListFromMessagesList(messagesList));
         combinationMessagesList.addAll(getCombinationMessagesListFromDialogNotificationsList(
                 dialogNotificationsList));
-        Log.e("TIME MARK", "ChatUtils" + " createLimitedCombinationMessagesList() finish concatenation lists");
-        Log.e("TIME MARK", "ChatUtils" + " createLimitedCombinationMessagesList() start sorting list");
         Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
-        Log.e("TIME MARK", "ChatUtils" + " createLimitedCombinationMessagesList() finish sorting list");
 
         int indexStart = combinationMessagesList.size() < limit ? 0 : combinationMessagesList.size() - limit;
         int indexEnd = combinationMessagesList.size();

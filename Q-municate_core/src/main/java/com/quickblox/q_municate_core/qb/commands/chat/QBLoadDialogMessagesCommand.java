@@ -3,7 +3,6 @@ package com.quickblox.q_municate_core.qb.commands.chat;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.quickblox.chat.Consts;
 import com.quickblox.chat.model.QBChatMessage;
@@ -30,22 +29,17 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     public static void start(Context context, QBChatDialog dialog, long lastDateLoad, boolean isLoadOldMessages) {
         Intent intent = new Intent(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, null, context,
                 QBService.class);
-        Log.e("TIME MARK", "QBLoadDialogMessagesCommand" + " start()  START");
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         intent.putExtra(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY, lastDateLoad);
         intent.putExtra(QBServiceConsts.EXTRA_LOAD_MORE, isLoadOldMessages);
-        Log.e("TIME MARK", "QBLoadDialogMessagesCommand" + " start()  END");
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        Log.e("TIME MARK", "QBLoadDialogMessagesCommand" + " perform()  START");
         QBChatDialog dialog = (QBChatDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
         boolean isLoadOldMessages = extras.getBoolean(QBServiceConsts.EXTRA_LOAD_MORE);
-
-        Log.e("TIME MARK", "QBLoadDialogMessagesCommand" + " perform() config QBRequestGetBuilder START");
 
         Bundle returnedBundle = new Bundle();
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
@@ -63,8 +57,6 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
             }
         }
 
-        Log.e("TIME MARK", "QBLoadDialogMessagesCommand" + " perform() config QBRequestGetBuilder END");
-
         List<QBChatMessage> dialogMessagesList = chatHelper.getDialogMessages(customObjectRequestBuilder,
                 returnedBundle, dialog, lastDateLoad);
 
@@ -76,7 +68,6 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         bundleResult.putInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, dialogMessagesList != null
                 ?  dialogMessagesList.size() : ConstsCore.ZERO_INT_VALUE);
 
-        Log.e("TIME MARK", "QBLoadDialogMessagesCommand" + " perform()  END");
         return bundleResult;
     }
 }

@@ -203,7 +203,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         for (int i = 0; i < getList().size(); i++) {
             findLastFriendsRequest(i, getList().get(i));
         }
-        Log.e("TIME MARK", TAG + " findLastFriendsRequest()  END");
     }
 
     public void clearLastRequestMessagePosition() {

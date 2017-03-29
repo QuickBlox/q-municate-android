@@ -145,7 +145,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("TIME MARK", TAG + " onCreate() START");
         initFields();
 
         if (currentChatDialog == null) {
@@ -168,8 +167,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
 
         hideSmileLayout();
-
-        Log.e("TIME MARK", TAG + " onCreate() END");
     }
 
     @OnTextChanged(R.id.message_edittext)
@@ -216,16 +213,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        Log.e("TIME MARK", TAG + " onStart() START");
         addChatMessagesAdapterListeners();
         checkPermissionSaveFiles();
-        Log.e("TIME MARK", TAG + " onStart() END");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e("TIME MARK", TAG + " onResume() START");
         restoreDefaultCanPerformLogout();
 
         loadNextPartMessagesFromDb(false, true);
@@ -235,8 +229,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
 
         checkMessageSendingPossibility();
-        Log.e("TIME MARK", TAG + " onResume() END");
-
     }
 
     @Override
@@ -349,7 +341,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void initFields() {
-        Log.e("TIME MARK", TAG + " initFields() START");
         mainThreadHandler = new Handler(Looper.getMainLooper());
         resources = getResources();
         dataManager = DataManager.getInstance();
@@ -370,7 +361,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         imageAttachClickListener = new ImageAttachClickListener();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = new ArrayList<>();
-        Log.e("TIME MARK", TAG + " initFields() END");
     }
 
     private void initCustomUI() {
@@ -382,10 +372,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void initMessagesRecyclerView() {
-        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  START");
         messagesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(this));
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  END");
     }
 
     protected void addActions() {
@@ -436,22 +424,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void updateData() {
-        Log.e("TIME MARK", TAG + " updateData()  START");
         updateActionBar();
         updateMessagesList();
-        Log.e("TIME MARK", TAG + " updateData()  END");
     }
 
     protected void onConnectServiceLocally() {
     }
 
     protected void deleteTempMessages() {
-        Log.e("TIME MARK", TAG + " deleteTempMessages() START");
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
         List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
         dataManager.getMessageDataManager().deleteTempMessages(dialogOccupantsIdsList);
-        Log.e("TIME MARK", TAG + " deleteTempMessages() END");
     }
 
     private void hideSmileLayout() {
@@ -523,7 +507,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadDialogMessages(QBChatDialog chatDialog, long lastDateLoad, boolean isLoadOldMessages) {
-        Log.e("TIME MARK", TAG + " startLoadDialogMessages");
         isLoadingMessages = true;
         QBLoadDialogMessagesCommand.start(this, chatDialog, lastDateLoad, isLoadOldMessages);
     }
@@ -635,7 +618,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected long getMessageDateForLoad(boolean isLoadOldMessages){
         long messageDateSent;
-        Log.e("TIME MARK", TAG + " calcukate message date for loading START");
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
         List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
 
@@ -645,7 +627,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         message = dataManager.getMessageDataManager().getMessageByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
         dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
         messageDateSent =  ChatUtils.getDialogMessageCreatedDate(!isLoadOldMessages, message, dialogNotification);
-        Log.e("TIME MARK", TAG + " calcukate message date for loading END");
 
         return messageDateSent;
     }
@@ -664,7 +645,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void readAllMessages() {
         if (currentChatDialog != null) {
-            Log.e("TIME MARK", TAG + " readAllMessages() START");
             List<Message> messagesList = dataManager.getMessageDataManager()
                     .getMessagesByDialogId(currentChatDialog.getDialogId());
             dataManager.getMessageDataManager().createOrUpdateAll(ChatUtils.readAllMessages(messagesList, AppSession.getSession().getUser()));
@@ -673,7 +653,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     .getDialogNotificationsByDialogId(currentChatDialog.getDialogId());
             dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils
                     .readAllDialogNotification(dialogNotificationsList, AppSession.getSession().getUser()));
-            Log.e("TIME MARK", TAG + " readAllMessages() END");
         }
     }
 
@@ -682,9 +661,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             Log.v(TAG, "chatHelper = " + chatHelper + "\n dialog = " + currentChatDialog);
             if (chatHelper != null && currentChatDialog != null) {
                 try {
-                    Log.e("TIME MARK", TAG + " initCurrentDialog() START");
                     chatHelper.initCurrentChatDialog(currentChatDialog, generateBundleToInitDialog());
-                    Log.e("TIME MARK", TAG + " initCurrentDialog() END");
                 } catch (QBResponseException e) {
                     ErrorUtils.showError(this, e.getMessage());
                     finish();
@@ -707,20 +684,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             Log.d("BaseDialogActivity", "dialog = " + currentChatDialog);
             return new ArrayList<>();
         }
-        Log.e("TIME MARK", TAG + " createCombinationMessagesList() START");
 
         String currentDialogId = currentChatDialog.getDialogId();
-
-        Log.e("TIME MARK", TAG + " createCombinationMessagesList() start selecting from DB");
 
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(currentDialogId);
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(currentDialogId);
-        Log.e("TIME MARK", TAG + " createCombinationMessagesList() finish selecting from DB");
 
         List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-        Log.d(TAG, "combinationMessages= " + combinationMessages);
-        Log.e("TIME MARK", TAG + " createCombinationMessagesList() END");
         return combinationMessages;
     }
 
@@ -729,7 +700,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             return new ArrayList<>();
         }
 
-        Log.e("TIME MARK", TAG + " buildCombinationMessagesListByDate() START");
         String currentDialogId = currentChatDialog.getDialogId();
 
         List<Message> messagesList = dataManager.getMessageDataManager()
@@ -737,7 +707,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogIdAndDate(currentDialogId, createDate, moreDate);
         List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-        Log.e("TIME MARK", TAG + " buildCombinationMessagesListByDate() START");
         return combinationMessages;
     }
 
@@ -746,19 +715,17 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             return new ArrayList<>();
         }
 
-        Log.e(TAG, "selection parameters: createDate = " + createDate + " moreDate = " + moreDate + " limit = " + limit);
+        Log.d(TAG, "selection parameters: createDate = " + createDate + " moreDate = " + moreDate + " limit = " + limit);
 
-        Log.e("TIME MARK", TAG + " buildLimitedCombinationMessagesListByDate() START");
         String currentDialogId = currentChatDialog.getDialogId();
         List<Message> messagesList = dataManager.getMessageDataManager()
                 .getMessagesByDialogIdAndDate(currentDialogId, createDate, moreDate, limit);
-        Log.e("TIME MARK", TAG + " messagesList.size() = " + messagesList.size());
+        Log.d(TAG, " messagesList.size() = " + messagesList.size());
+
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogIdAndDate(currentDialogId, createDate, moreDate, limit);
-
-        Log.e("TIME MARK", TAG + " dialogNotificationsList.size() = " + dialogNotificationsList.size());
+        Log.d(TAG, " dialogNotificationsList.size() = " + dialogNotificationsList.size());
         List<CombinationMessage> combinationMessages = ChatUtils.createLimitedCombinationMessagesList(messagesList, dialogNotificationsList, (int) limit);
-        Log.e("TIME MARK", TAG + " buildLimitedCombinationMessagesListByDate() START");
         return combinationMessages;
     }
 
@@ -890,10 +857,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 if (message != null) {
                     CombinationMessage combinationMessage = new CombinationMessage(message);
                     if (action == MessageDataManager.UPDATE_ACTION) {
-                        Log.v(TAG, "updated message = " + message);
+                        Log.d(TAG, "updated message = " + message);
                         updateMessageItemInAdapter(combinationMessage);
                     } else if (action == MessageDataManager.CREATE_OR_UPDATE_ACTION) {
-                        Log.v(TAG, "created message = " + message);
+                        Log.d(TAG, "created message = " + message);
                         addMessageItemToAdapter(combinationMessage);
                         additionalActionsAfterLoadMessages();
                     }
@@ -919,8 +886,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 if (dialogNotification != null) {
                     CombinationMessage combinationMessage = new CombinationMessage(dialogNotification);
                     if (action == DialogNotificationDataManager.UPDATE_ACTION) {
+                        Log.d(TAG, "updated dialogNotification = " + dialogNotification);
                         updateMessageItemInAdapter(combinationMessage);
                     } else if (action == DialogNotificationDataManager.CREATE_OR_UPDATE_ACTION) {
+                        Log.d(TAG, "created dialogNotification = " + dialogNotification);
                         addMessageItemToAdapter(combinationMessage);
                         additionalActionsAfterLoadMessages();
                     }
@@ -1029,11 +998,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            messageSwipeRefreshLayout.setRefreshing(false);
-
-            isLoadingMessages = false;
-
-            hideActionBarProgress();
+            afterLoadingMessagesActions();
         }
     }
 

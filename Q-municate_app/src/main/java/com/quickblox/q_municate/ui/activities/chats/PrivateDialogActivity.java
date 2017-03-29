@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,7 +22,6 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
@@ -32,7 +30,6 @@ import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
@@ -98,7 +95,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  START");
         messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, currentChatDialog);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
@@ -106,36 +102,11 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         messagesRecyclerView.setAdapter(messagesAdapter);
         scrollMessagesToBottom();
-        Log.e("TIME MARK", TAG + " initMessagesRecyclerView()  END");
     }
 
     @Override
     protected void updateMessagesList() {
-        final int oldMessagesCount = messagesAdapter.getItemCount();
-
-        (new BaseAsyncTask<Void, Void, Boolean>() {
-            @Override
-            public Boolean performInBackground(Void... params) throws Exception {
-                Log.e("TIME MARK", TAG + " updateMessagesList()  START");
-//                combinationMessagesList = createCombinationMessagesList();
-                return true;
-            }
-
-            @Override
-            public void onResult(Boolean aBoolean) {
-//                messagesAdapter.addList(combinationMessagesList);
-                findLastFriendsRequest(true);
-
-//                checkForScrolling(oldMessagesCount);
-                Log.e("TIME MARK", TAG + " updateMessagesList()  START");
-        }
-
-            @Override
-            public void onException(Exception e) {
-                ErrorUtils.showError(PrivateDialogActivity.this, e);
-            }
-
-        }).execute();
+        findLastFriendsRequest(true);
     }
 
     @Override
@@ -240,7 +211,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void findLastFriendsRequest(boolean needNotifyAdapter) {
-        Log.e("TIME MARK", TAG + " findLastFriendsRequest()  START");
         ((PrivateChatMessageAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         if (needNotifyAdapter) {
             messagesAdapter.notifyDataSetChanged();
