@@ -598,7 +598,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         (new BaseAsyncTask<Void, Void, Long>() {
             @Override
             public Long performInBackground(Void... params) throws Exception {
-                return getMessageDateForLoad(isLoadOldMessages);
+                return getMessageDateForLoadByCurrentList(isLoadOldMessages);
             }
 
             @Override

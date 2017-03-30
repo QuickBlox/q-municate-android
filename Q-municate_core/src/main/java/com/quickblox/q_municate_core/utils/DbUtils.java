@@ -85,9 +85,18 @@ public class DbUtils {
         dataManager.getMessageDataManager().update(message, false);
     }
 
+    public static void updateStatusMessagesLocal(DataManager dataManager, List<Message> messages) {
+        dataManager.getMessageDataManager().updateAll(messages);
+    }
+
     public static void updateStatusNotificationMessageLocal(DataManager dataManager,
             DialogNotification dialogNotification) {
         dataManager.getDialogNotificationDataManager().update(dialogNotification, false);
+    }
+
+    public static void updateStatusNotificationsLocal(DataManager dataManager,
+            List<DialogNotification> dialogNotifications) {
+        dataManager.getDialogNotificationDataManager().updateAll(dialogNotifications);
     }
 
     public static void updateStatusMessageLocal(DataManager dataManager, String messageId, State state) {
@@ -133,7 +142,7 @@ public class DbUtils {
             if (qbChatMessage.getAttachments() != null && !qbChatMessage.getAttachments().isEmpty()) {
                 ArrayList<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(
                         qbChatMessage.getAttachments());
-                Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0), context);
+                Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0), context, message.getMessageId().hashCode());
                 message.setAttachment(attachment);
                 dataManager.getAttachmentDataManager().createOrUpdate(attachment, notify);
             }

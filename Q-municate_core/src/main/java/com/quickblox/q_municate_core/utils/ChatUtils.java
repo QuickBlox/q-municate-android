@@ -346,7 +346,7 @@ ChatUtils {
                 .concat(QBSettings.getInstance().getChatEndpoint());
     }
 
-    public static Attachment createLocalAttachment(QBAttachment qbAttachment, Context context) {
+    public static Attachment createLocalAttachment(QBAttachment qbAttachment, Context context, int internalAttachmentId) {
         Attachment attachment = new Attachment();
         String remoteUrl = qbAttachment.getUrl();
         if (qbAttachment.getType().equalsIgnoreCase(QBAttachment.LOCATION_TYPE)) {
@@ -360,7 +360,7 @@ ChatUtils {
         }
 
         if (qbAttachment.getId() == null) {
-            qbAttachment.setId(String.valueOf(qbAttachment.getData().hashCode()));
+            qbAttachment.setId(String.valueOf(internalAttachmentId));
         }
         attachment.setAttachmentId(qbAttachment.getId());
         attachment.setRemoteUrl(remoteUrl);

@@ -124,33 +124,10 @@ public class GroupDialogActivity extends BaseDialogActivity {
         if(combinationMessagesList == null){
             return;
         }
-        (new BaseAsyncTask<Void, Void, Void>() {
-            @Override
-            public Void performInBackground(Void... params) throws Exception {
-                QBUser currentUser = AppSession.getSession().getUser();
-                for (CombinationMessage cm : combinationMessagesList) {
-                    boolean ownMessage = !cm.isIncoming(currentUser.getId());
-                    if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
-                        cm.setState(State.READ);
-                        QBUpdateStatusMessageCommand.start(GroupDialogActivity.this, currentChatDialog, cm, false);
-                    } else if (ownMessage) {
-                        cm.setState(State.READ);
-                        dataManager.getMessageDataManager().update(cm.toMessage(), false);
-                    }
-                }
-                return null;
-            }
 
-            @Override
-            public void onResult(Void aVoid) {
-
-            }
-
-            @Override
-            public void onException(Exception e) {
-
-            }
-        }).execute();
+        if (isNetworkAvailable()) {
+            QBUpdateStatusMessageCommand.start(GroupDialogActivity.this, currentChatDialog, combinationMessagesList);
+        }
     }
 
     public void sendMessage(View view) {
