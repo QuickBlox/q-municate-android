@@ -39,13 +39,19 @@ public class QBLoginChatCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         final QBUser currentUser = AppSession.getSession().getUser();
 
-        tryLogin(currentUser);
+        login(currentUser);
 
         if (!chatRestHelper.isLoggedIn()) {
             throw new Exception(QBChatErrorsConstants.AUTHENTICATION_FAILED);
         }
 
         return extras;
+    }
+
+    private void login(QBUser currentUser) throws Exception{
+        if (ConnectivityUtils.isNetworkAvailable(context)) {
+            chatRestHelper.login(currentUser);
+        }
     }
 
     private void tryLogin(QBUser currentUser) throws Exception {
@@ -58,7 +64,7 @@ public class QBLoginChatCommand extends ServiceCommand {
                 if (ConnectivityUtils.isNetworkAvailable(context)) {
                     chatRestHelper.login(currentUser);
                 }
-            } catch (SmackException ignore) {
+            } catch (Exception ignore) {
                 ignore.printStackTrace();
             }
         }

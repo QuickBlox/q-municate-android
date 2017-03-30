@@ -24,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -65,6 +66,12 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -105,6 +112,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
     private boolean isDialogLoading = false;
+    private ConnectionListener chatConnectionListener;
+    private boolean stopUserInteractions = false;
 
 
     protected abstract int getContentResId();
@@ -116,8 +125,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         Log.d("BaseActivity", "onCreate");
 
         initFields();
-
         activateButterKnife();
+        initChatConnectionListener();
+        QBChatService.getInstance().addConnectionListener(chatConnectionListener);
     }
 
     @Override
@@ -125,6 +135,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         super.onStop();
         Log.d("BaseActivity", "onStop");
         unbindService();
+    }
+
+    @Override
+    protected void onDestroy() {
+        QBChatService.getInstance().removeConnectionListener(chatConnectionListener);
+        super.onDestroy();
     }
 
     @Override
@@ -323,6 +339,15 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (stopUserInteractions) {
+            return true;
+        } else {
+            return super.dispatchTouchEvent(ev);
+        }
+    }
+
     private void initFields() {
         Log.d("BaseActivity", "initFields()");
         app = App.getInstance();
@@ -449,6 +474,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, new LoginChatCompositeFailAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
+
         updateBroadcastActionList();
     }
 
@@ -456,6 +482,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
+
 
         updateBroadcastActionList();
     }
@@ -677,6 +706,50 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         QBLoadDialogsCommand.start(this);
     }
 
+    private void initChatConnectionListener() {
+        chatConnectionListener = new ConnectionListener() {
+            @Override
+            public void connected(XMPPConnection xmppConnection) {
+
+            }
+
+            @Override
+            public void authenticated(XMPPConnection xmppConnection, boolean b) {
+
+            }
+
+            @Override
+            public void connectionClosed() {
+
+            }
+
+            @Override
+            public void connectionClosedOnError(Exception e) {
+
+            }
+
+            @Override
+            public void reconnectionSuccessful() {
+                    hideSnackBar();
+                    blockUI(false);
+            }
+
+            @Override
+            public void reconnectingIn(int i) {
+
+            }
+
+            @Override
+            public void reconnectionFailed(Exception e) {
+
+            }
+        };
+    }
+
+    private void blockUI(boolean stopUserInteractions){
+        this.stopUserInteractions = stopUserInteractions;
+    }
+
     private void activateButterKnife() {
         ButterKnife.bind(this);
     }
@@ -728,6 +801,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         @Override
         public void execute(Bundle bundle) {
             QBLoginChatCompositeCommand.setIsRunning(false);
+            blockUI(true);
+            showSnackbar(R.string.error_login_to_chat, Snackbar.LENGTH_INDEFINITE);
         }
     }
 
