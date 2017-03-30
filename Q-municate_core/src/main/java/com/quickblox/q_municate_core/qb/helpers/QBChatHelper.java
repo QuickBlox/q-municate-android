@@ -117,9 +117,13 @@ public class QBChatHelper extends BaseThreadPoolHelper{
                 && chatService != null
                 && chatService.isLoggedIn()) {
             if (QBDialogType.GROUP.equals(currentDialog.getType())) {
-                currentDialog.removeParticipantListener(participantListener);
+                if (currentDialog.getParticipantListeners().contains(participantListener)) {
+                    currentDialog.removeParticipantListener(participantListener);
+                }
             } else {
-                currentDialog.removeIsTypingListener(typingListener);
+                if (currentDialog.getIsTypingListeners().contains(typingListener)) {
+                    currentDialog.removeIsTypingListener(typingListener);
+                }
             }
 
             currentDialog = null;
@@ -191,7 +195,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         sendChatMessage(qbChatMessage, chatDialog);
         if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
             DbUtils.updateDialogModifiedDate(dataManager, chatDialog, ChatUtils.getMessageDateSent(qbChatMessage), false);
-            DbUtils.saveMessageOrNotificationToCache(context, dataManager, chatDialog.getDialogId(), qbChatMessage, null, true);
+            DbUtils.saveMessageOrNotificationToCache(context, dataManager, chatDialog.getDialogId(), qbChatMessage, State.SYNC, true);
         }
     }
 
@@ -735,7 +739,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage,
                 !ownMessage
                         ? State.DELIVERED
-                        : null,
+                        : State.SYNC,
                 needNotifyObserver);
 
         checkForSendingNotification(ownMessage, chatMessage, user, isPrivateChatMessage);

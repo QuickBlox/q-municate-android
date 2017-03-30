@@ -102,7 +102,7 @@ public class DbUtils {
             List<QBChatMessage> qbMessagesList, String dialogId) {
         for (int i = 0; i < qbMessagesList.size(); i++) {
             QBChatMessage qbChatMessage = qbMessagesList.get(i);
-            saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, null, false);
+            saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, State.SYNC, false);
         }
 
         updateDialogModifiedDate(dataManager, dialogId, true);

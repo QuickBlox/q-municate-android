@@ -75,6 +75,12 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     }
 
     @Override
+    protected int customViewType(int position) {
+        //TODO VT temp fix before implementation attachment's type 'audio' and 'video' in ChatMessagesAdapter-android lib
+        return isIncoming(getItem(position)) ? TYPE_TEXT_LEFT : TYPE_TEXT_RIGHT;
+    }
+
+    @Override
     protected RequestListener getRequestListener(QBMessageViewHolder holder, int position) {
         CombinationMessage chatMessage = getItem(position);
 
