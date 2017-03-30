@@ -21,10 +21,13 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.quickblox.chat.QBChatService;
@@ -65,6 +68,12 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -105,19 +114,23 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
     private boolean isDialogLoading = false;
-
+    private ConnectionListener chatConnectionListener;
+    private ViewGroup root;
 
     protected abstract int getContentResId();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(getContentResId());
+        root = (ViewGroup) getLayoutInflater().inflate(getContentResId(), null);
+        setContentView(root);
+        //setContentView(getContentResId());
         Log.d("BaseActivity", "onCreate");
 
         initFields();
-
         activateButterKnife();
+        initChatConnectionListener();
+        QBChatService.getInstance().addConnectionListener(chatConnectionListener);
     }
 
     @Override
@@ -125,6 +138,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         super.onStop();
         Log.d("BaseActivity", "onStop");
         unbindService();
+    }
+
+    @Override
+    protected void onDestroy() {
+        QBChatService.getInstance().removeConnectionListener(chatConnectionListener);
+        super.onDestroy();
     }
 
     @Override
@@ -449,6 +468,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, new LoginChatCompositeFailAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
+
         updateBroadcastActionList();
     }
 
@@ -456,6 +476,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
+
 
         updateBroadcastActionList();
     }
@@ -677,6 +700,65 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         QBLoadDialogsCommand.start(this);
     }
 
+    private void initChatConnectionListener() {
+        chatConnectionListener = new ConnectionListener() {
+            @Override
+            public void connected(XMPPConnection xmppConnection) {
+
+            }
+
+            @Override
+            public void authenticated(XMPPConnection xmppConnection, boolean b) {
+
+            }
+
+            @Override
+            public void connectionClosed() {
+
+            }
+
+            @Override
+            public void connectionClosedOnError(Exception e) {
+                blockUI(true);
+                showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE);
+            }
+
+            @Override
+            public void reconnectionSuccessful() {
+                hideSnackBar();
+                blockUI(false);
+            }
+
+            @Override
+            public void reconnectingIn(int i) {
+
+            }
+
+            @Override
+            public void reconnectionFailed(Exception e) {
+
+            }
+        };
+    }
+
+    private void blockUI(boolean stopUserInteractions){
+        disableEnableControls(!stopUserInteractions, root);
+    }
+
+    private void disableEnableControls(boolean enable, ViewGroup vg){
+        if(vg instanceof Toolbar) {
+            return;
+        }
+
+        for (int i = 0; i < vg.getChildCount(); i++){
+            View child = vg.getChildAt(i);
+            child.setEnabled(enable);
+            if (child instanceof ViewGroup){
+                disableEnableControls(enable, (ViewGroup)child);
+            }
+        }
+    }
+
     private void activateButterKnife() {
         ButterKnife.bind(this);
     }
@@ -728,6 +810,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         @Override
         public void execute(Bundle bundle) {
             QBLoginChatCompositeCommand.setIsRunning(false);
+            blockUI(true);
+            showSnackbar(R.string.error_login_to_chat, Snackbar.LENGTH_INDEFINITE);
         }
     }
 
