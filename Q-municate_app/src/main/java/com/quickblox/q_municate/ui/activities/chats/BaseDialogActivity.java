@@ -821,8 +821,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void checkMessageSendingPossibility();
 
-    protected abstract void additionalActionsAfterLoadMessages();
-
     public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
 
         private String dialogId;
@@ -862,7 +860,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     } else if (action == MessageDataManager.CREATE_OR_UPDATE_ACTION) {
                         Log.d(TAG, "created message = " + message);
                         addMessageItemToAdapter(combinationMessage);
-                        additionalActionsAfterLoadMessages();
+                        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+                            updateMessagesList();
+                        }
                     }
                 }
 
@@ -891,7 +891,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     } else if (action == DialogNotificationDataManager.CREATE_OR_UPDATE_ACTION) {
                         Log.d(TAG, "created dialogNotification = " + dialogNotification);
                         addMessageItemToAdapter(combinationMessage);
-                        additionalActionsAfterLoadMessages();
+                        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+                            updateMessagesList();
+                        }
                     }
                 }
 
@@ -971,6 +973,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public Boolean performInBackground(Void... params) throws Exception {
                         loadNextPartMessagesFromDb(isLoadedOldMessages, false);
+                        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+                            updateMessagesList();
+                        }
                         return true;
                     }
 

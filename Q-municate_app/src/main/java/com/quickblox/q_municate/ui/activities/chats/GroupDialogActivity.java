@@ -11,16 +11,11 @@ import android.view.View;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
-import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
@@ -83,11 +78,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void additionalActionsAfterLoadMessages() {
-        processCombinationMessages();
-    }
-
-    @Override
     protected void checkMessageSendingPossibility() {
         checkMessageSendingPossibility(isNetworkAvailable());
     }
@@ -132,5 +122,11 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     public void sendMessage(View view) {
         sendMessage();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        processCombinationMessages();
     }
 }

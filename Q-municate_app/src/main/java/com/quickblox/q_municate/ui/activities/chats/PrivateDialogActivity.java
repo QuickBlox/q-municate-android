@@ -110,11 +110,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void additionalActionsAfterLoadMessages() {
-        findLastFriendsRequest(false);
-    }
-
-    @Override
     public void notifyChangedUserStatus(int userId, boolean online) {
         super.notifyChangedUserStatus(userId, online);
 
