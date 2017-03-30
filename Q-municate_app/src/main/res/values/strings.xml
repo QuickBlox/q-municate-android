@@ -259,6 +259,7 @@
     <string name="error_unauthorized">Unauthorized</string>
     <string name="error_unauthorized_from_app">Incorrect Email or Password</string>
     <string name="error_login_to_chat">Not logged in to chat.</string>
+    <string name="error_disconnected">Disconnected… Please check your Internet connection!</string>
     <string name="dlg_choose_image_from">Select image from…</string>
     <string name="snackbar_new_message_title">%1$s\nMessage: %2$s</string>
     <string name="snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>

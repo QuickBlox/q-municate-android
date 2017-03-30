@@ -21,11 +21,13 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.quickblox.chat.QBChatService;
@@ -113,15 +115,16 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private ActivityUIHelper activityUIHelper;
     private boolean isDialogLoading = false;
     private ConnectionListener chatConnectionListener;
-    private boolean stopUserInteractions = false;
-
+    private ViewGroup root;
 
     protected abstract int getContentResId();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(getContentResId());
+        root = (ViewGroup) getLayoutInflater().inflate(getContentResId(), null);
+        setContentView(root);
+        //setContentView(getContentResId());
         Log.d("BaseActivity", "onCreate");
 
         initFields();
@@ -336,15 +339,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             if (resultCode == CallActivity.CALL_ACTIVITY_CLOSE_WIFI_DISABLED) {
                 ToastUtils.longToast(R.string.wifi_disabled);
             }
-        }
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (stopUserInteractions) {
-            return true;
-        } else {
-            return super.dispatchTouchEvent(ev);
         }
     }
 
@@ -725,13 +719,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
             @Override
             public void connectionClosedOnError(Exception e) {
-
+                blockUI(true);
+                showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE);
             }
 
             @Override
             public void reconnectionSuccessful() {
-                    hideSnackBar();
-                    blockUI(false);
+                hideSnackBar();
+                blockUI(false);
             }
 
             @Override
@@ -747,7 +742,21 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void blockUI(boolean stopUserInteractions){
-        this.stopUserInteractions = stopUserInteractions;
+        disableEnableControls(!stopUserInteractions, root);
+    }
+
+    private void disableEnableControls(boolean enable, ViewGroup vg){
+        if(vg instanceof Toolbar) {
+            return;
+        }
+
+        for (int i = 0; i < vg.getChildCount(); i++){
+            View child = vg.getChildAt(i);
+            child.setEnabled(enable);
+            if (child instanceof ViewGroup){
+                disableEnableControls(enable, (ViewGroup)child);
+            }
+        }
     }
 
     private void activateButterKnife() {
