@@ -1034,7 +1034,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 long oldestMessageInDb = getMessageDateForLoad(true);
                 long oldestMessageInCurrentList = combinationMessagesList.get(0).getCreatedDate();
 
-                if ((oldestMessageInCurrentList - oldestMessageInDb) > 0){
+                if ((oldestMessageInCurrentList - oldestMessageInDb) > 0 && oldestMessageInDb != 0){
                     loadNextPartMessagesFromDb(true, true);
                     messageSwipeRefreshLayout.setRefreshing(false);
                 } else {

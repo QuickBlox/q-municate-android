@@ -85,13 +85,16 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                processCombinationMessages();
+                break;
             case R.id.action_group_details:
                 GroupDialogDetailsActivity.start(this, currentChatDialog.getDialogId());
                 break;
             default:
                 super.onOptionsItemSelected(item);
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -111,6 +114,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     private void processCombinationMessages(){
+        //TODO VT need rewrite logic of marking messages as read in messagesAdapter (as in PRIVATE chat)
         if(combinationMessagesList == null){
             return;
         }
@@ -125,8 +129,8 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onBackPressed() {
         processCombinationMessages();
+        super.onBackPressed();
     }
 }
