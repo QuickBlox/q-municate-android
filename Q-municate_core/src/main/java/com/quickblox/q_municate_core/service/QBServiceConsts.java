@@ -206,6 +206,7 @@ public class QBServiceConsts {
     public static final String EXTRA_DATE_SENT = "date_sent";
     public static final String EXTRA_EMOJIS = "emojis";
     public static final String EXTRA_MESSAGE = "message";
+    public static final String EXTRA_MESSAGES = "messages";
     public static final String EXTRA_FILE_PATH = "file_path";
     public static final String EXTRA_FRIEND_ALERT_MESSAGE = "alert_message";
     public static final String EXTRA_IS_TYPING = "is_typing";

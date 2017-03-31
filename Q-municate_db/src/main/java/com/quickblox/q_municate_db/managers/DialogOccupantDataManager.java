@@ -31,14 +31,18 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
     public void createOrUpdate(Object object, boolean notify) {
         DialogOccupant dialogOccupant = (DialogOccupant) object;
         try {
+            int action;
+
             if(dialogOccupant.getDialog() != null && existsByDialogIdAndUserId(dialogOccupant.getDialog().getDialogId(), dialogOccupant.getUser().getId())){
                 dao.update(dialogOccupant);
+                action = UPDATE_ACTION;
             } else{
                 dao.create(dialogOccupant);
+                action = CREATE_ACTION;
             }
 
             if (notify) {
-                notifyObservers(getObserverKey());
+                notifyObservers(dialogOccupant, action);
             }
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate(DialogOccupant) - " + e.getMessage());

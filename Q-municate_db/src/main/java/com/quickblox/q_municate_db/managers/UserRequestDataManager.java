@@ -1,7 +1,5 @@
 package com.quickblox.q_municate_db.managers;
 
-import android.util.Log;
-
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -22,19 +20,22 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
         super(userRequestDao, UserRequestDataManager.class.getSimpleName());
     }
 
-
     @Override
     public void createOrUpdate(Object object, boolean notify) {
         UserRequest userRequest = (UserRequest) object;
         try {
+            int action;
+
             if(existsByUserId(userRequest.getUser().getId())){
                 dao.update(userRequest);
+                action = UPDATE_ACTION;
             } else{
                 dao.create(userRequest);
+                action = CREATE_ACTION;
             }
 
             if (notify) {
-                notifyObservers(getObserverKey());
+                notifyObservers(userRequest, action);
             }
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate(UserRequest) - " + e.getMessage());
@@ -60,12 +61,15 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
         try {
             DeleteBuilder<UserRequest, Long> deleteBuilder = dao.deleteBuilder();
             deleteBuilder.where().eq(QMUserColumns.ID, userId);
-            deleteBuilder.delete();
+
+            if (deleteBuilder.delete() > 0) {
+                //TODO VT need to think how to send ID to observers
+                notifyObservers(null, DELETE_ACTION);
+            }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
 
-        notifyObservers(getObserverKey());
     }
 
     public boolean existsByUserId(int userId) {

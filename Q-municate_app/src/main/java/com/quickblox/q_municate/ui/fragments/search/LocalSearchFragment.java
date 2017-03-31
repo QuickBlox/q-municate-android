@@ -29,6 +29,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -229,7 +230,8 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
         @Override
         public void update(Observable observable, Object data) {
             if (data != null) {
-                if (data.equals(dataManager.getUserRequestDataManager().getObserverKey()) || data.equals(dataManager.getFriendDataManager().getObserverKey())) {
+                String observerKey = ((Bundle) data).getString(BaseManager.EXTRA_OBSERVE_KEY);
+                if (observerKey.equals(dataManager.getUserRequestDataManager().getObserverKey()) || observerKey.equals(dataManager.getFriendDataManager().getObserverKey())) {
                     updateList();
                 }
             }

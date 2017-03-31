@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
@@ -23,7 +22,6 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
@@ -31,7 +29,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
@@ -62,11 +60,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     protected void addActions() {
         super.addActions();
 
@@ -77,22 +70,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
 
         updateBroadcastActionList();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (isNetworkAvailable()) {
-            startLoadDialogMessages(false);
-        }
-
-        checkMessageSendingPossibility();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -129,33 +106,6 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        final int oldMessagesCount = messagesAdapter.getItemCount();
-
-        (new BaseAsyncTask<Void, Void, Boolean>() {
-            @Override
-            public Boolean performInBackground(Void... params) throws Exception {
-                combinationMessagesList = createCombinationMessagesList();
-                return true;
-            }
-
-            @Override
-            public void onResult(Boolean aBoolean) {
-                messagesAdapter.addList(combinationMessagesList);
-                findLastFriendsRequest(true);
-
-                checkForScrolling(oldMessagesCount);
-        }
-
-            @Override
-            public void onException(Exception e) {
-                ErrorUtils.showError(PrivateDialogActivity.this, e);
-            }
-
-        }).execute();
-    }
-
-    @Override
-    protected void additionalActionsAfterLoadMessages() {
         findLastFriendsRequest(false);
     }
 
@@ -399,9 +349,12 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(dataManager.getFriendDataManager().getObserverKey())) {
-                updateCurrentChatFromDB();
-                checkMessageSendingPossibility();
+            if (data != null) {
+                String observerKey = ((Bundle) data).getString(FriendDataManager.EXTRA_OBSERVE_KEY);
+                if (observerKey.equals(dataManager.getFriendDataManager().getObserverKey())) {
+                    updateCurrentChatFromDB();
+                    checkMessageSendingPossibility();
+                }
             }
         }
     }

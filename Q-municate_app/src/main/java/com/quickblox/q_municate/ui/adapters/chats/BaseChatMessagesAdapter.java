@@ -6,18 +6,14 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate.ui.activities.location.MapsActivity;
-import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -76,6 +72,12 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
             return TYPE_REQUEST_MESSAGE;
         }
         return super.getItemViewType(position);
+    }
+
+    @Override
+    protected int customViewType(int position) {
+        //TODO VT temp fix before implementation attachment's type 'audio' and 'video' in ChatMessagesAdapter-android lib
+        return isIncoming(getItem(position)) ? TYPE_TEXT_LEFT : TYPE_TEXT_RIGHT;
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -347,7 +346,7 @@ ChatUtils {
                 .concat(QBSettings.getInstance().getChatEndpoint());
     }
 
-    public static Attachment createLocalAttachment(QBAttachment qbAttachment, Context context) {
+    public static Attachment createLocalAttachment(QBAttachment qbAttachment, Context context, int internalAttachmentId) {
         Attachment attachment = new Attachment();
         String remoteUrl = qbAttachment.getUrl();
         if (qbAttachment.getType().equalsIgnoreCase(QBAttachment.LOCATION_TYPE)) {
@@ -361,7 +360,7 @@ ChatUtils {
         }
 
         if (qbAttachment.getId() == null) {
-            qbAttachment.setId(String.valueOf(qbAttachment.getData().hashCode()));
+            qbAttachment.setId(String.valueOf(internalAttachmentId));
         }
         attachment.setAttachmentId(qbAttachment.getId());
         attachment.setRemoteUrl(remoteUrl);
@@ -481,6 +480,20 @@ ChatUtils {
                 dialogNotificationsList));
         Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
         return combinationMessagesList;
+    }
+
+    public static List<CombinationMessage> createLimitedCombinationMessagesList(List<Message> messagesList,
+                                                                         List<DialogNotification> dialogNotificationsList, int limit) {
+        List<CombinationMessage> combinationMessagesList = new ArrayList<>();
+        combinationMessagesList.addAll(getCombinationMessagesListFromMessagesList(messagesList));
+        combinationMessagesList.addAll(getCombinationMessagesListFromDialogNotificationsList(
+                dialogNotificationsList));
+        Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
+
+        int indexStart = combinationMessagesList.size() < limit ? 0 : combinationMessagesList.size() - limit;
+        int indexEnd = combinationMessagesList.size();
+
+        return combinationMessagesList.subList(indexStart, indexEnd);
     }
 
     public static String getDialogLastMessage(String defaultLasMessage, Message message, DialogNotification dialogNotification) {

@@ -11,17 +11,11 @@ import android.view.View;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
-import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
@@ -43,11 +37,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
         messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList);
@@ -56,18 +45,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
         messagesRecyclerView.setAdapter(messagesAdapter);
 
         scrollMessagesToBottom();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateData();
-
-        if (isNetworkAvailable()) {
-            startLoadDialogMessages(false);
-        }
-
-        checkMessageSendingPossibility();
     }
 
     @Override
@@ -97,31 +74,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        final int oldMessagesCount = messagesAdapter.getItemCount();
-        (new BaseAsyncTask<Void, Void, Boolean>() {
-            @Override
-            public Boolean performInBackground(Void... params) throws Exception {
-                combinationMessagesList = createCombinationMessagesList();
-                processCombinationMessages();
-                return true;
-            }
-
-            @Override
-            public void onResult(Boolean aBoolean) {
-                messagesAdapter.addList(combinationMessagesList);
-                checkForScrolling(oldMessagesCount);
-            }
-
-            @Override
-            public void onException(Exception e) {
-                ErrorUtils.showError(GroupDialogActivity.this, e);
-            }
-
-        }).execute();
-    }
-
-    @Override
-    protected void additionalActionsAfterLoadMessages() {
         processCombinationMessages();
     }
 
@@ -162,20 +114,19 @@ public class GroupDialogActivity extends BaseDialogActivity {
         if(combinationMessagesList == null){
             return;
         }
-        QBUser currentUser = AppSession.getSession().getUser();
-        for (CombinationMessage cm :combinationMessagesList){
-            boolean ownMessage = !cm.isIncoming(currentUser.getId());
-            if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
-                cm.setState(State.READ);
-                QBUpdateStatusMessageCommand.start(this, currentChatDialog, cm, false);
-            } else if (ownMessage) {
-                cm.setState(State.READ);
-                dataManager.getMessageDataManager().update(cm.toMessage(), false);
-            }
+
+        if (isNetworkAvailable()) {
+            QBUpdateStatusMessageCommand.start(GroupDialogActivity.this, currentChatDialog, combinationMessagesList);
         }
     }
 
     public void sendMessage(View view) {
         sendMessage();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        processCombinationMessages();
     }
 }

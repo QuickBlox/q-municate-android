@@ -30,14 +30,18 @@ public class FriendDataManager extends BaseManager<Friend> {
     public void createOrUpdate(Object object, boolean notify) {
         Friend friend = (Friend) object;
         try {
+            int action;
+
             if(existsByUserId(friend.getUser().getId())){
                 dao.update(friend);
+                action = UPDATE_ACTION;
             } else{
                 dao.create(friend);
+                action = CREATE_ACTION;
             }
 
             if (notify) {
-                notifyObservers(getObserverKey());
+                notifyObservers(friend, action);
             }
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate(Friend) - " + e.getMessage());
@@ -78,12 +82,14 @@ public class FriendDataManager extends BaseManager<Friend> {
         try {
             DeleteBuilder<Friend, Long> deleteBuilder = dao.deleteBuilder();
             deleteBuilder.where().eq(QMUserColumns.ID, userId);
-            deleteBuilder.delete();
+
+            if (deleteBuilder.delete() > 0) {
+                //TODO VT need to think how to send ID to observers
+                notifyObservers(null, DELETE_ACTION);
+            }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
-
-        notifyObservers(getObserverKey());
     }
 
     public boolean existsByUserId(int userId) {

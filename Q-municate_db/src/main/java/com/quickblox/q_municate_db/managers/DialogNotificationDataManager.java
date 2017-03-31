@@ -55,6 +55,34 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         return dialogNotificationsList;
     }
 
+    public List<DialogNotification> getDialogNotificationsByDialogId(String dialogId, long limit) {
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>();
+
+        try {
+            QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao
+                    .queryBuilder();
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
+                    .queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder
+                    .join(dialogOccupantQueryBuilder)
+                    .orderBy(DialogNotification.Column.CREATED_DATE, false)
+                    .limit(limit);
+
+            PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
+    }
+
     public List<DialogNotification> getDialogNotificationsByDialogIdAndDate(String dialogId, long createdDate, boolean moreDate) {
         List<DialogNotification> dialogNotificationsList = new ArrayList<>();
 
@@ -76,6 +104,40 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
 
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
             messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
+    }
+
+    public List<DialogNotification> getDialogNotificationsByDialogIdAndDate(String dialogId, long createdDate, boolean moreDate, long limit) {
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>();
+
+        try {
+            QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao.queryBuilder();
+
+            Where<DialogNotification, Long> where = messageQueryBuilder.where();
+            where.and(where.ne(DialogNotification.Column.STATE, State.TEMP_LOCAL),
+                    where.ne(DialogNotification.Column.STATE, State.TEMP_LOCAL_UNREAD),
+                    moreDate
+                            ? where.gt(DialogNotification.Column.CREATED_DATE, createdDate)
+                            : where.lt(DialogNotification.Column.CREATED_DATE, createdDate));
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
+                    .queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder
+                    .join(dialogOccupantQueryBuilder)
+                    .orderBy(DialogNotification.Column.CREATED_DATE, false)
+                    .limit(limit);
 
             PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
             dialogNotificationsList = dao.query(preparedQuery);

@@ -27,6 +27,7 @@ public interface Manager<T> {
 
     void delete(T object);
 
+    //TODO VT some objects have id with type 'String'. Need review this method
     void deleteById(long id);
 
     boolean exists(long id);

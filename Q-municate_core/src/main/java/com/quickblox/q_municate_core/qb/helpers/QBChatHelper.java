@@ -117,9 +117,13 @@ public class QBChatHelper extends BaseThreadPoolHelper{
                 && chatService != null
                 && chatService.isLoggedIn()) {
             if (QBDialogType.GROUP.equals(currentDialog.getType())) {
-                currentDialog.removeParticipantListener(participantListener);
+                if (currentDialog.getParticipantListeners().contains(participantListener)) {
+                    currentDialog.removeParticipantListener(participantListener);
+                }
             } else {
-                currentDialog.removeIsTypingListener(typingListener);
+                if (currentDialog.getIsTypingListeners().contains(typingListener)) {
+                    currentDialog.removeIsTypingListener(typingListener);
+                }
             }
 
             currentDialog = null;
@@ -138,6 +142,10 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
         systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
         addSystemMessageListener(new SystemMessageListener());
+    }
+
+    public boolean isLoggedInToChat(){
+        return chatService != null && chatService.isLoggedIn();
     }
 
     protected void addSystemMessageListener(QBSystemMessageListener systemMessageListener) {
@@ -187,7 +195,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         sendChatMessage(qbChatMessage, chatDialog);
         if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
             DbUtils.updateDialogModifiedDate(dataManager, chatDialog, ChatUtils.getMessageDateSent(qbChatMessage), false);
-            DbUtils.saveMessageOrNotificationToCache(context, dataManager, chatDialog.getDialogId(), qbChatMessage, null, true);
+            DbUtils.saveMessageOrNotificationToCache(context, dataManager, chatDialog.getDialogId(), qbChatMessage, State.SYNC, true);
         }
     }
 
@@ -463,6 +471,39 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         DbUtils.updateStatusMessageLocal(dataManager, combinationMessage.toMessage());
     }
 
+    public void updateStatusMessagesReadLocal(List<CombinationMessage> combinationMessagesList) throws Exception {
+        List<Message> messagesList = new ArrayList<>(combinationMessagesList.size());
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>(combinationMessagesList.size());
+
+        for (CombinationMessage combinationMessage : combinationMessagesList) {
+            if(combinationMessage.getNotificationType() != null){
+                dialogNotificationsList.add(combinationMessage.toDialogNotification());
+            } else {
+                messagesList.add(combinationMessage.toMessage());
+            }
+        }
+
+        if (!messagesList.isEmpty()) {
+            DbUtils.updateStatusMessagesLocal(dataManager, messagesList);
+        }
+
+        if (!dialogNotificationsList.isEmpty()) {
+            DbUtils.updateStatusNotificationsLocal(dataManager, dialogNotificationsList);
+        }
+    }
+
+    public void updateStatusMessagesReadServer(QBChatDialog chatDialog, List<CombinationMessage> combinationMessagesList) throws Exception {
+        StringifyArrayList<String> messagesIdsList = new StringifyArrayList<>();
+
+        for (CombinationMessage combinationMessage : combinationMessagesList) {
+            messagesIdsList.add(combinationMessage.getMessageId());
+        }
+
+        if (!messagesIdsList.isEmpty()) {
+            QBRestChatService.markMessagesAsRead(chatDialog.getDialogId(), messagesIdsList).perform();
+        }
+    }
+
     public void updateStatusMessageReadServer(QBChatDialog chatDialog, CombinationMessage combinationMessage,
                                               boolean fromPrivate) throws Exception {
         if (fromPrivate) {
@@ -724,13 +765,15 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
 
         boolean isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());
+        boolean needNotifyObserver = (currentDialog != null && currentDialog.getDialogId().equals(chatMessage.getDialogId()))
+                || currentDialog == null;
 
         DbUtils.updateDialogModifiedDate(dataManager, chatDialog, ChatUtils.getMessageDateSent(chatMessage), false);
         DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage,
-                currentDialog == null
-                        ? State.TEMP_LOCAL_UNREAD
-                        : null,
-                true);
+                !ownMessage
+                        ? State.DELIVERED
+                        : State.SYNC,
+                needNotifyObserver);
 
         checkForSendingNotification(ownMessage, chatMessage, user, isPrivateChatMessage);
     }
