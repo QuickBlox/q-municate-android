@@ -860,9 +860,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     } else if (action == MessageDataManager.CREATE_OR_UPDATE_ACTION) {
                         Log.d(TAG, "created message = " + message);
                         addMessageItemToAdapter(combinationMessage);
-                        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
-                            updateMessagesList();
-                        }
                     }
                 }
 
@@ -893,6 +890,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                         addMessageItemToAdapter(combinationMessage);
                         if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
                             updateMessagesList();
+                            messagesAdapter.notifyDataSetChanged();
+                            scrollMessagesToBottom();
                         }
                     }
                 }
