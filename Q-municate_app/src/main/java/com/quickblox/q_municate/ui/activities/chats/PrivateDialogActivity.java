@@ -106,7 +106,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        findLastFriendsRequest(true);
+        findLastFriendsRequest(false);
     }
 
     @Override

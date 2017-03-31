@@ -973,15 +973,15 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public Boolean performInBackground(Void... params) throws Exception {
                         loadNextPartMessagesFromDb(isLoadedOldMessages, false);
-                        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
-                            updateMessagesList();
-                        }
                         return true;
                     }
 
                     @Override
                     public void onResult(Boolean aBoolean) {
                         updateMessagesAdapter(isLoadedOldMessages, totalEntries);
+                        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+                            updateMessagesList();
+                        }
                         afterLoadingMessagesActions();
                     }
 
