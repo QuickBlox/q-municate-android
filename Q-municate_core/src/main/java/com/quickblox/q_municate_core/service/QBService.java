@@ -457,6 +457,7 @@ public class QBService extends Service {
         if (broadcastReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         }
+        threadPool.shutdown();
     }
 
     @Override
