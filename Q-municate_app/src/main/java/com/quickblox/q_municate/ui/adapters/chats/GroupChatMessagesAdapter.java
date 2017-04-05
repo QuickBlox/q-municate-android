@@ -5,10 +5,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.ColorUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
+import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate_db.models.State;
 
 import java.util.List;
 
@@ -16,9 +19,12 @@ import java.util.List;
 public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     private static final String TAG = GroupChatMessagesAdapter.class.getSimpleName();
     private ColorUtils colorUtils;
+    private QBChatDialog chatDialog;
 
-    public GroupChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
+    public GroupChatMessagesAdapter(BaseActivity baseActivity, QBChatDialog chatDialog,
+                                    List<CombinationMessage> chatMessages) {
         super(baseActivity, chatMessages);
+        this.chatDialog = chatDialog;
         colorUtils = new ColorUtils();
     }
 
@@ -33,6 +39,10 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
             viewHolder.timeTextMessageTextView.setText(getDate(chatMessage.getCreatedDate()));
         } else {
             Log.d(TAG, "onBindViewCustomHolder else");
+        }
+
+        if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
+            updateMessageState(chatMessage, chatDialog);
         }
     }
 
@@ -56,6 +66,7 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         TextView customMessageTimeTextView = (TextView) holder.itemView.findViewById(R.id.custom_msg_text_time_message);
         customMessageTimeTextView.setText(getDate(chatMessage.getDateSent()));
 
+        updateMessageState(chatMessage, chatDialog);
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);
     }
 }

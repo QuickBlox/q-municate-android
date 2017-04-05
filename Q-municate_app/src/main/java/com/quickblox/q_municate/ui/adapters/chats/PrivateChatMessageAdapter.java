@@ -77,9 +77,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         }
 
         if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
-            Log.d(TAG, "onBindViewCustomHolder QBUpdateStatusMessageCommand.start");
-            chatMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, chatDialog, chatMessage, true);
+            updateMessageState(chatMessage, chatDialog);
         }
         // check if last messageCombination is request messageCombination
         boolean lastRequestMessage = (position == getItemCount() - 1 && friendsRequestMessage);
@@ -117,7 +115,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         setViewVisibility(holder.avatar, View.GONE);
         setViewVisibility(linearLayout, View.GONE);
 
-        updateMessageState(chatMessage);
+        updateMessageState(chatMessage, chatDialog);
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);
     }
 
@@ -139,16 +137,8 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
         setViewVisibility(holder.avatar, View.GONE);
 
-        updateMessageState(chatMessage);
+        updateMessageState(chatMessage, chatDialog);
         super.onBindViewAttachLeftHolder(holder, chatMessage, position);
-    }
-
-    private void updateMessageState(CombinationMessage chatMessage) {
-        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
-            Log.d(TAG, "updateMessageState");
-            chatMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, chatDialog, chatMessage, true);
-        }
     }
 
     @Override

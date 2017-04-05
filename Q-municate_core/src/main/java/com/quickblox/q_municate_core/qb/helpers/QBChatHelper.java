@@ -466,47 +466,14 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     }
 
     public void updateStatusMessageRead(QBChatDialog chatDialog, CombinationMessage combinationMessage,
-                                        boolean forPrivate) throws Exception {
-        updateStatusMessageReadServer(chatDialog, combinationMessage, forPrivate);
+                                        boolean isOnline) throws Exception {
+        updateStatusMessageReadServer(chatDialog, combinationMessage, isOnline);
         DbUtils.updateStatusMessageLocal(dataManager, combinationMessage.toMessage());
     }
 
-    public void updateStatusMessagesReadLocal(List<CombinationMessage> combinationMessagesList) throws Exception {
-        List<Message> messagesList = new ArrayList<>(combinationMessagesList.size());
-        List<DialogNotification> dialogNotificationsList = new ArrayList<>(combinationMessagesList.size());
-
-        for (CombinationMessage combinationMessage : combinationMessagesList) {
-            if(combinationMessage.getNotificationType() != null){
-                dialogNotificationsList.add(combinationMessage.toDialogNotification());
-            } else {
-                messagesList.add(combinationMessage.toMessage());
-            }
-        }
-
-        if (!messagesList.isEmpty()) {
-            DbUtils.updateStatusMessagesLocal(dataManager, messagesList);
-        }
-
-        if (!dialogNotificationsList.isEmpty()) {
-            DbUtils.updateStatusNotificationsLocal(dataManager, dialogNotificationsList);
-        }
-    }
-
-    public void updateStatusMessagesReadServer(QBChatDialog chatDialog, List<CombinationMessage> combinationMessagesList) throws Exception {
-        StringifyArrayList<String> messagesIdsList = new StringifyArrayList<>();
-
-        for (CombinationMessage combinationMessage : combinationMessagesList) {
-            messagesIdsList.add(combinationMessage.getMessageId());
-        }
-
-        if (!messagesIdsList.isEmpty()) {
-            QBRestChatService.markMessagesAsRead(chatDialog.getDialogId(), messagesIdsList).perform();
-        }
-    }
-
     public void updateStatusMessageReadServer(QBChatDialog chatDialog, CombinationMessage combinationMessage,
-                                              boolean fromPrivate) throws Exception {
-        if (fromPrivate) {
+                                              boolean isOnline) throws Exception {
+        if (isOnline) {
             chatDialog.initForChat(chatService);
 
             QBChatMessage qbChatMessage = new QBChatMessage();
