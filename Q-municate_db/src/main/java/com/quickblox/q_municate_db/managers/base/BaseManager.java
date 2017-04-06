@@ -3,6 +3,7 @@ package com.quickblox.q_municate_db.managers.base;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcelable;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -80,7 +81,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
             dao.createOrUpdate((T) object);
 
             if (notify) {
-                notifyObservers((T)object, CREATE_OR_UPDATE_ACTION);
+                notifyObservers((T) object, CREATE_OR_UPDATE_ACTION);
             }
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate(Object) - " + e.getMessage());
@@ -93,13 +94,11 @@ public abstract class BaseManager<T> extends Observable implements Manager {
             dao.callBatchTasks(new Callable() {
                 @Override
                 public T call() throws Exception {
-                    Object lastObject = null;
                     for (Object object : objectsCollection) {
-                        lastObject = object;
                         createOrUpdate(object, false);
                     }
 
-                    notifyObservers((T)lastObject, CREATE_OR_UPDATE_ALL_ACTION);
+                    notifyObservers(null, CREATE_OR_UPDATE_ALL_ACTION);
                     return null;
                 }
             });
@@ -170,12 +169,10 @@ public abstract class BaseManager<T> extends Observable implements Manager {
             dao.callBatchTasks(new Callable() {
                 @Override
                 public T call() throws Exception {
-                    Object lastObject = null;
                     for (Object object : objectsCollection) {
-                        lastObject = object;
                         update(object, false);
                     }
-                    notifyObservers((T)lastObject, UPDATE_ALL_ACTION);
+                    notifyObservers(null, UPDATE_ALL_ACTION);
 
                     return null;
                 }
@@ -229,5 +226,33 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         bundle.putInt(EXTRA_ACTION, action);
         bundle.putString(EXTRA_OBSERVE_KEY, getObserverKey());
         return bundle;
+    }
+
+    protected EventObject<T> getEventToNotify(T data, int action){
+        return new EventObject<T>(data, action, getObserverKey());
+    }
+
+    public static class EventObject<T>{
+        private T data;
+        private int action;
+        private String observerKey;
+
+        public EventObject(T data, int action, String observerKey) {
+            this.data = data;
+            this.action = action;
+            this.observerKey = observerKey;
+        }
+
+        public T getData() {
+            return data;
+        }
+
+        public int getAction() {
+            return action;
+        }
+
+        public String getObserverKey() {
+            return observerKey;
+        }
     }
 }
