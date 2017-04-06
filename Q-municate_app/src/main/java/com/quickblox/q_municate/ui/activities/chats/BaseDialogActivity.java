@@ -234,6 +234,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onResume();
         restoreDefaultCanPerformLogout();
 
+        loadNextPartMessagesFromDbAsync();
+
         if (isNetworkAvailable()) {
             startLoadDialogMessages(false);
         }
@@ -244,7 +246,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        loadNextPartMessagesFromDbAsync();
         hideSmileLayout();
         checkStartTyping();
     }
