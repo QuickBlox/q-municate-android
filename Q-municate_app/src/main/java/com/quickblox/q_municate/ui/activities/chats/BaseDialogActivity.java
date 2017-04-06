@@ -78,6 +78,10 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -93,6 +97,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final int DELAY_SCROLLING_LIST = 300;
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
     private static final int MESSAGES_PAGE_SIZE = ConstsCore.DIALOG_MESSAGES_PER_PAGE;
+    private static final int KEEP_ALIVE_TIME = 1;
+    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
+    private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
     @Bind(R.id.messages_swiperefreshlayout)
     SwipeRefreshLayout messageSwipeRefreshLayout;
@@ -137,6 +144,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private SystemPermissionHelper systemPermissionHelper;
     private boolean isLoadingMessages;
 
+    private BlockingQueue<Runnable> threadQueue;
+    private ThreadPoolExecutor threadPool;
+
     @Override
     protected int getContentResId() {
         return R.layout.activity_dialog;
@@ -155,6 +165,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         initCustomUI();
         initCustomListeners();
+        initThreads();
 
         addActions();
         addObservers();
@@ -162,11 +173,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         initMessagesRecyclerView();
 
+        hideSmileLayout();
+
         if (isNetworkAvailable()) {
-            deleteTempMessages();
+            deleteTempMessagesAsync();
         }
 
-        hideSmileLayout();
     }
 
     @OnTextChanged(R.id.message_edittext)
@@ -222,8 +234,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onResume();
         restoreDefaultCanPerformLogout();
 
-        loadNextPartMessagesFromDb(false, true);
-
         if (isNetworkAvailable()) {
             startLoadDialogMessages(false);
         }
@@ -234,7 +244,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-
+        loadNextPartMessagesFromDbAsync();
         hideSmileLayout();
         checkStartTyping();
     }
@@ -243,12 +253,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onStop() {
         super.onStop();
         removeChatMessagesAdapterListeners();
-        readAllMessages();
+        readAllMessagesAsync();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        cancelTasks();
         closeCurrentChat();
         removeActions();
         deleteObservers();
@@ -311,6 +322,43 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             setActionBarTitle(title);
             updateActionBar();
         }
+    }
+
+    private void deleteTempMessagesAsync(){
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                deleteTempMessages();
+            }
+        });
+    }
+
+    private void loadNextPartMessagesFromDbAsync(){
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                loadNextPartMessagesFromDb(false, true);
+            }
+        });
+    }
+    private void readAllMessagesAsync(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                readAllMessages();
+            }
+        }).start();
+
+    }
+
+    private void cancelTasks(){
+        threadPool.shutdownNow();
+    }
+
+    private void initThreads() {
+        threadQueue = new LinkedBlockingQueue<>();
+        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, threadQueue);
+        threadPool.allowCoreThreadTimeOut(true);
     }
 
     private void restoreDefaultCanPerformLogout() {
@@ -594,25 +642,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             return;
         }
         showActionBarProgress();
-
-        (new BaseAsyncTask<Void, Void, Long>() {
-            @Override
-            public Long performInBackground(Void... params) throws Exception {
-                return getMessageDateForLoadByCurrentList(isLoadOldMessages);
-            }
-
-            @Override
-            public void onResult(Long messageDateSent) {
-                startLoadDialogMessages(currentChatDialog, messageDateSent, isLoadOldMessages);
-            }
-
-            @Override
-            public void onException(Exception e) {
-                hideActionBarProgress();
-                ErrorUtils.showError(BaseDialogActivity.this, e);
-            }
-
-        }).execute();
+        long messageDateSent = getMessageDateForLoadByCurrentList(isLoadOldMessages);
+        startLoadDialogMessages(currentChatDialog, messageDateSent, isLoadOldMessages);
 
     }
 
@@ -644,13 +675,15 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
 
     private void readAllMessages() {
-        if (currentChatDialog != null) {
+        if (currentChatDialog != null && currentChatDialog.getDialogId() != null) {
+            String dialogId = currentChatDialog.getDialogId();
+
             List<Message> messagesList = dataManager.getMessageDataManager()
-                    .getMessagesByDialogId(currentChatDialog.getDialogId());
+                    .getMessagesByDialogId(dialogId);
             dataManager.getMessageDataManager().createOrUpdateAll(ChatUtils.readAllMessages(messagesList, AppSession.getSession().getUser()));
 
             List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                    .getDialogNotificationsByDialogId(currentChatDialog.getDialogId());
+                    .getDialogNotificationsByDialogId(dialogId);
             dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils
                     .readAllDialogNotification(dialogNotificationsList, AppSession.getSession().getUser()));
         }
@@ -711,7 +744,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected List<CombinationMessage> buildLimitedCombinationMessagesListByDate(long createDate, boolean moreDate, long limit){
-        if (currentChatDialog == null) {
+        if (currentChatDialog == null || currentChatDialog.getDialogId() == null) {
             return new ArrayList<>();
         }
 
@@ -729,10 +762,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         return combinationMessages;
     }
 
-    protected void loadNextPartMessagesFromDb(boolean isLoadOld, boolean needUpdateAdapter) {
+    protected void loadNextPartMessagesFromDb(final boolean isLoadOld, final boolean needUpdateAdapter) {
         long messageDate = getMessageDateForLoadByCurrentList(isLoadOld);
 
-        List<CombinationMessage> requestedMessages = buildLimitedCombinationMessagesListByDate(
+        final List<CombinationMessage> requestedMessages = buildLimitedCombinationMessagesListByDate(
                 messageDate, !isLoadOld, ConstsCore.DIALOG_MESSAGES_PER_PAGE);
 
         if (isLoadOld) {
@@ -742,7 +775,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
 
         if (needUpdateAdapter) {
-            updateMessagesAdapter(isLoadOld, requestedMessages.size());
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    updateMessagesAdapter(isLoadOld, requestedMessages.size());
+                }
+            });
         }
     }
 
@@ -851,7 +889,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             if (data != null) {
                 Bundle observableData = (Bundle) data;
                 int action = observableData.getInt(MessageDataManager.EXTRA_ACTION);
-                Message message = (Message) observableData.getSerializable(MessageDataManager.EXTRA_OBJECT);
+                Message message = (Message) observableData.getParcelable(MessageDataManager.EXTRA_OBJECT);
                 if (message != null) {
                     CombinationMessage combinationMessage = new CombinationMessage(message);
                     if (action == MessageDataManager.UPDATE_ACTION) {
@@ -879,7 +917,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             if (data != null) {
                 Bundle observableData = (Bundle) data;
                 int action = observableData.getInt(DialogNotificationDataManager.EXTRA_ACTION);
-                DialogNotification dialogNotification = (DialogNotification) observableData.getSerializable(DialogNotificationDataManager.EXTRA_OBJECT);
+                DialogNotification dialogNotification = (DialogNotification) observableData.getParcelable(DialogNotificationDataManager.EXTRA_OBJECT);
                 if (dialogNotification != null) {
                     CombinationMessage combinationMessage = new CombinationMessage(dialogNotification);
                     if (action == DialogNotificationDataManager.UPDATE_ACTION) {
@@ -968,29 +1006,23 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     && totalEntries != ConstsCore.ZERO_INT_VALUE
                     && dialogId.equals(currentChatDialog.getDialogId())) {
 
-                (new BaseAsyncTask<Void, Void, Boolean>() {
+                threadPool.execute(new Runnable(){
                     @Override
-                    public Boolean performInBackground(Void... params) throws Exception {
+                    public void run() {
                         loadNextPartMessagesFromDb(isLoadedOldMessages, false);
-                        return true;
-                    }
+                        mainThreadHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateMessagesAdapter(isLoadedOldMessages, totalEntries);
+                                if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+                                    updateMessagesList();
+                                }
+                                afterLoadingMessagesActions();
+                            }
+                        });
 
-                    @Override
-                    public void onResult(Boolean aBoolean) {
-                        updateMessagesAdapter(isLoadedOldMessages, totalEntries);
-                        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
-                            updateMessagesList();
-                        }
-                        afterLoadingMessagesActions();
                     }
-
-                    @Override
-                    public void onException(Exception e) {
-                        ErrorUtils.showError(BaseDialogActivity.this, e);
-                        afterLoadingMessagesActions();
-                    }
-
-                }).execute();
+                });
 
             } else {
                 afterLoadingMessagesActions();

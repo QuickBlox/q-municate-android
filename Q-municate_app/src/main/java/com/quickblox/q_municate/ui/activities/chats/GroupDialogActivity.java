@@ -86,7 +86,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                processCombinationMessages();
+               // processCombinationMessages();
                 break;
             case R.id.action_group_details:
                 GroupDialogDetailsActivity.start(this, currentChatDialog.getDialogId());
@@ -130,7 +130,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     public void onBackPressed() {
-        processCombinationMessages();
+        //processCombinationMessages();
         super.onBackPressed();
     }
 }
