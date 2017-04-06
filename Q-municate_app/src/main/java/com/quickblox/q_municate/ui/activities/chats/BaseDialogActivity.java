@@ -713,37 +713,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         currentChatDialog = null;
     }
 
-    protected List<CombinationMessage> createCombinationMessagesList() {
-        if (currentChatDialog == null) {
-            Log.d("BaseDialogActivity", "dialog = " + currentChatDialog);
-            return new ArrayList<>();
-        }
-
-        String currentDialogId = currentChatDialog.getDialogId();
-
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(currentDialogId);
-        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogId(currentDialogId);
-
-        List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-        return combinationMessages;
-    }
-
-    protected List<CombinationMessage> buildCombinationMessagesListByDate(long createDate, boolean moreDate) {
-        if (currentChatDialog == null) {
-            return new ArrayList<>();
-        }
-
-        String currentDialogId = currentChatDialog.getDialogId();
-
-        List<Message> messagesList = dataManager.getMessageDataManager()
-                .getMessagesByDialogIdAndDate(currentDialogId, createDate, moreDate);
-        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogIdAndDate(currentDialogId, createDate, moreDate);
-        List<CombinationMessage> combinationMessages = ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-        return combinationMessages;
-    }
-
     protected List<CombinationMessage> buildLimitedCombinationMessagesListByDate(long createDate, boolean moreDate, long limit){
         if (currentChatDialog == null || currentChatDialog.getDialogId() == null) {
             return new ArrayList<>();
@@ -860,28 +829,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void checkMessageSendingPossibility();
 
-    public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
-
-        private String dialogId;
-
-        public CombinationMessageLoader(Context context, DataManager dataManager, String dialogId) {
-            super(context, dataManager);
-            this.dialogId = dialogId;
-        }
-
-        @Override
-        protected List<CombinationMessage> getItems() {
-            return createCombinationMessagesList();
-        }
-
-        private List<CombinationMessage> createCombinationMessagesList() {
-            List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
-            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                    .getDialogNotificationsByDialogId(dialogId);
-            return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-        }
-    }
-
     private class MessageObserver implements Observer {
 
         @Override
@@ -890,7 +837,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             if (data != null) {
                 Bundle observableData = (Bundle) data;
                 int action = observableData.getInt(MessageDataManager.EXTRA_ACTION);
-                Message message = (Message) observableData.getParcelable(MessageDataManager.EXTRA_OBJECT);
+                Message message = (Message) observableData.getSerializable(MessageDataManager.EXTRA_OBJECT);
                 if (message != null) {
                     CombinationMessage combinationMessage = new CombinationMessage(message);
                     if (action == MessageDataManager.UPDATE_ACTION) {
@@ -918,7 +865,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             if (data != null) {
                 Bundle observableData = (Bundle) data;
                 int action = observableData.getInt(DialogNotificationDataManager.EXTRA_ACTION);
-                DialogNotification dialogNotification = (DialogNotification) observableData.getParcelable(DialogNotificationDataManager.EXTRA_OBJECT);
+                DialogNotification dialogNotification = (DialogNotification) observableData.getSerializable(DialogNotificationDataManager.EXTRA_OBJECT);
                 if (dialogNotification != null) {
                     CombinationMessage combinationMessage = new CombinationMessage(dialogNotification);
                     if (action == DialogNotificationDataManager.UPDATE_ACTION) {
