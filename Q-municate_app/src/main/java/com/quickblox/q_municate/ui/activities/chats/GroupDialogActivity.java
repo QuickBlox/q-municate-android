@@ -39,7 +39,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new GroupChatMessagesAdapter(this, combinationMessagesList);
+        messagesAdapter = new GroupChatMessagesAdapter(this, currentChatDialog, combinationMessagesList);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
@@ -74,7 +74,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        processCombinationMessages();
+
     }
 
     @Override
@@ -85,9 +85,6 @@ public class GroupDialogActivity extends BaseDialogActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-               // processCombinationMessages();
-                break;
             case R.id.action_group_details:
                 GroupDialogDetailsActivity.start(this, currentChatDialog.getDialogId());
                 break;
@@ -113,24 +110,8 @@ public class GroupDialogActivity extends BaseDialogActivity {
         }
     }
 
-    private void processCombinationMessages(){
-        //TODO VT need rewrite logic of marking messages as read in messagesAdapter (as in PRIVATE chat)
-        if(combinationMessagesList == null){
-            return;
-        }
-
-        if (isNetworkAvailable()) {
-            QBUpdateStatusMessageCommand.start(GroupDialogActivity.this, currentChatDialog, combinationMessagesList);
-        }
-    }
-
     public void sendMessage(View view) {
         sendMessage();
     }
 
-    @Override
-    public void onBackPressed() {
-        //processCombinationMessages();
-        super.onBackPressed();
-    }
 }

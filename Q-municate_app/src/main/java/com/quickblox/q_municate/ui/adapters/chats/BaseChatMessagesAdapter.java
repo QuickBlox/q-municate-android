@@ -12,12 +12,15 @@ import android.widget.TextView;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
+import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
@@ -117,6 +120,14 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     @Override
     protected boolean isIncoming(CombinationMessage chatMessage) {
         return chatMessage.isIncoming(currentUser.getId());
+    }
+
+    protected void updateMessageState(CombinationMessage chatMessage, QBChatDialog dialog) {
+        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
+            Log.d(TAG, "updateMessageState");
+            chatMessage.setState(State.READ);
+            QBUpdateStatusMessageCommand.start(baseActivity, dialog, chatMessage, true);
+        }
     }
 
     public void addAllInBegin(List<CombinationMessage> collection) {
