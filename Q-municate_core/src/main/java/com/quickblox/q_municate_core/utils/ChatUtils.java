@@ -235,6 +235,9 @@ ChatUtils {
     public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBChatDialog qbDialog, boolean onlyNewOccupant) {
         List<DialogOccupant> dialogOccupantsList = new ArrayList<>(qbDialog.getOccupants().size());
 
+        List<Integer> userIdsForSave = new ArrayList<>();
+        List<QMUser> qmUsers = new ArrayList<>();
+
         for (Integer userId : qbDialog.getOccupants()) {
             DialogOccupant dialogOccupant;
             if (onlyNewOccupant) {
@@ -250,12 +253,19 @@ ChatUtils {
                 if (dialogOccupant == null) {
                     QMUser user = QMUserService.getInstance().getUserCache().get((long) userId);
                     if (user == null) {
-                        user = QBRestHelper.loadAndSaveUser(userId);
+                        userIdsForSave.add(userId);
+                    } else {
+                        qmUsers.add(user);
                     }
-                    dialogOccupant = createDialogOccupant(dataManager, qbDialog.getDialogId(), user);
-                    dialogOccupantsList.add(dialogOccupant);
                 }
             }
+        }
+
+        if (!userIdsForSave.isEmpty()) {
+            qmUsers.addAll(QBRestHelper.loadAndSaveUserByIds(userIdsForSave));
+        }
+        for (QMUser qmUser : qmUsers) {
+            dialogOccupantsList.add(createDialogOccupant(dataManager, qbDialog.getDialogId(), qmUser));
         }
 
         return dialogOccupantsList;
