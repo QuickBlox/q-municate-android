@@ -461,7 +461,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     //Update message status
 
     public void updateStatusNotificationMessageRead(QBChatDialog chatDialog, CombinationMessage combinationMessage) throws Exception {
-        updateStatusMessageReadServer(chatDialog, combinationMessage, false);
+        updateStatusMessageReadServer(chatDialog, combinationMessage, true);
         DbUtils.updateStatusNotificationMessageLocal(dataManager, combinationMessage.toDialogNotification());
     }
 

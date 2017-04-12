@@ -13,6 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -20,10 +21,15 @@ import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate_core.utils.DbUtils;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.List;
 
@@ -38,11 +44,15 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     protected final BaseActivity baseActivity;
     protected FileUtils fileUtils;
 
+    private QBChatMessage poolMessage;
+    private DataManager dataManager;
+
     BaseChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
         super(baseActivity.getBaseContext(), chatMessages);
         this.baseActivity = baseActivity;
         currentUser = AppSession.getSession().getUser();
         fileUtils = new FileUtils();
+        dataManager = DataManager.getInstance();
     }
 
     @Override
@@ -122,12 +132,37 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         return chatMessage.isIncoming(currentUser.getId());
     }
 
-    protected void updateMessageState(CombinationMessage chatMessage, QBChatDialog dialog) {
-        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
+    protected void updateMessageState(CombinationMessage message, QBChatDialog dialog) {
+        if (!State.READ.equals(message.getState()) && baseActivity.isNetworkAvailable()) {
+            message.setState(State.READ);
             Log.d(TAG, "updateMessageState");
-            chatMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, dialog, chatMessage, true);
+
+            message.setState(State.READ);
+            QBUpdateStatusMessageCommand.start(baseActivity, dialog, message, true);
+
+            /*if (poolMessage == null) {
+                poolMessage = getChatMessage(message, dialog);
+            }
+            try {
+                poolMessage.setId(message.getMessageId());
+                poolMessage.setSenderId(message.getDialogOccupant().getUser().getId());
+                dialog.readMessage(poolMessage);
+            } catch (XMPPException | SmackException.NotConnectedException e) {
+                Log.d(TAG, "updateMessageState error" + e.getLocalizedMessage());
+            }
+            if (message.getNotificationType()== null) {
+                DbUtils.updateStatusMessageLocal(dataManager, message.toMessage());
+            } else {
+                DbUtils.updateStatusNotificationMessageLocal(dataManager, message.toDialogNotification());
+            }*/
         }
+    }
+
+    private QBChatMessage getChatMessage(CombinationMessage message, QBChatDialog dialog){
+        QBChatMessage qbChatMessage = new QBChatMessage();
+        qbChatMessage.setId(message.getMessageId());
+        qbChatMessage.setDialogId(dialog.getDialogId());
+        return qbChatMessage;
     }
 
     public void addAllInBegin(List<CombinationMessage> collection) {

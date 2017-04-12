@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.models;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -19,6 +20,7 @@ import java.util.List;
 
 public class DialogWrapper implements Serializable {
 
+    private static final String TAG = DialogWrapper.class.getSimpleName();
     private QBChatDialog chatDialog;
     private QMUser opponentUser;
     private long totalCount;
@@ -53,6 +55,8 @@ public class DialogWrapper implements Serializable {
         long unreadMessages = dataManager.getMessageDataManager().getCountUnreadMessages(dialogOccupantsIdsList, currentUser.getId());
         long unreadDialogNotifications = dataManager.getDialogNotificationDataManager().getCountUnreadDialogNotifications(dialogOccupantsIdsList, currentUser.getId());
 
+        Log.i(TAG, "unreadMessages = " + unreadMessages);
+        Log.i(TAG, "unreadDialogNotifications = " + unreadDialogNotifications);
         totalCount = unreadMessages + unreadDialogNotifications;
     }
 

@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
@@ -21,8 +22,10 @@ import java.util.List;
 
 public class DbUtils {
 
+    private static final String TAG = "DialogDbUtils";
+
     public static DialogOccupant saveDialogOccupantIfUserNotExists(DataManager dataManager,
-            String dialogId, int userId, DialogOccupant.Status status) {
+                                                                   String dialogId, int userId, DialogOccupant.Status status) {
         QBRestHelper.loadAndSaveUser(userId);
 
         QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
@@ -91,6 +94,7 @@ public class DbUtils {
 
     public static void updateStatusNotificationMessageLocal(DataManager dataManager,
             DialogNotification dialogNotification) {
+        Log.i(TAG, "update status msg" + dialogNotification);
         dataManager.getDialogNotificationDataManager().update(dialogNotification, false);
     }
 

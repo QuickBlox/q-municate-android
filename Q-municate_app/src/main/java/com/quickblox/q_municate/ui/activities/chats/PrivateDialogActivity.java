@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +18,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
+import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
@@ -57,6 +59,14 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
         context.startActivity(intent);
+    }
+
+    public static void startForResult(Fragment fragment, QMUser opponent, QBChatDialog chatDialog,
+                                      int requestCode) {
+        Intent intent = new Intent(fragment.getActivity(), PrivateDialogActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
+        fragment.startActivityForResult(intent, requestCode);
     }
 
     @Override

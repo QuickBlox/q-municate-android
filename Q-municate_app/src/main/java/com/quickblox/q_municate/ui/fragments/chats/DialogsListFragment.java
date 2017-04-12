@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.ui.fragments.chats;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -55,6 +56,7 @@ import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +68,8 @@ import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>> {
+
+    public static final int PICK_DIALOG = 100;
 
     private static final String TAG = DialogsListFragment.class.getSimpleName();
     private static final int LOADER_ID = DialogsListFragment.class.hashCode();
@@ -220,6 +224,33 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         deleteObservers();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult "+requestCode);
+        if (PICK_DIALOG == requestCode){
+            updateDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void updateDialog(String dialogId) {
+        QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
+
+        Log.i(TAG, "updateDialog dialogWrapper="+dialogWrapper.getTotalCount());
+        dialogsListAdapter.updateItem(dialogWrapper);
+
+        int start = dialogsListView.getFirstVisiblePosition();
+        for(int i=start, j=dialogsListView.getLastVisiblePosition();i<=j;i++) {
+            DialogWrapper result = (DialogWrapper) dialogsListView.getItemAtPosition(i);
+            if (result.getChatDialog().getDialogId().equals(dialogId)) {
+                View view = dialogsListView.getChildAt(i - start);
+                dialogsListView.getAdapter().getView(i, view, dialogsListView);
+                break;
+            }
+        }
+    }
+
     @OnItemClick(R.id.chats_listview)
     void startChat(int position) {
         QBChatDialog chatDialog = dialogsListAdapter.getItem(position).getChatDialog();
@@ -329,15 +360,16 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         QMUser opponent = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
 
         if (!TextUtils.isEmpty(chatDialog.getDialogId())) {
-            PrivateDialogActivity.start(baseActivity, opponent, chatDialog);
+            PrivateDialogActivity.startForResult(this, opponent, chatDialog, PICK_DIALOG);
         }
     }
 
     private void startGroupChatActivity(QBChatDialog chatDialog) {
-        GroupDialogActivity.start(baseActivity, chatDialog);
+        GroupDialogActivity.startForResult(this, chatDialog, PICK_DIALOG);
     }
 
     private void updateDialogsList() {
+        Log.i(TAG, "updateDialogsList =");
         onChangedData();
     }
 
@@ -378,6 +410,28 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         }
     }
 
+    private static class UpdateDialogLoader extends BaseLoader<DialogWrapper> {
+
+        public UpdateDialogLoader(Context context, DataManager dataManager) {
+            super(context, dataManager);
+        }
+
+        @Override
+        protected DialogWrapper getItems() {
+
+            /*QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+            dialogsListAdapter.updateItem(new DialogWrapper(getContext(), dataManager, qbChatDialog));
+
+            List<QBChatDialog> chatDialogs = dataManager.getQBChatDialogDataManager().getAllSorted();
+            List<DialogWrapper> dialogWrappers = new ArrayList<>(chatDialogs.size());
+            for(QBChatDialog chatDialog : chatDialogs){
+                dialogWrappers.add(new DialogWrapper(getContext(), dataManager, chatDialog));
+            }
+            return dialogWrappers;*/
+            return null;
+        }
+    }
+
     private static class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
 
         public DialogsListLoader(Context context, DataManager dataManager) {
@@ -402,6 +456,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             if (data != null) {
                 if (data instanceof Bundle) {
                     String observeKey = ((Bundle) data).getString(BaseManager.EXTRA_OBSERVE_KEY);
+                    Log.i(TAG, "CommonObserver update, key="+observeKey);
                     if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())
                             || observeKey.equals(dataManager.getMessageDataManager().getObserverKey())
                             || observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {

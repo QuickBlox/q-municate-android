@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,12 +20,15 @@ import java.util.List;
 
 public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
 
+    private static final String TAG = DialogsListAdapter.class.getSimpleName();
+
     public DialogsListAdapter(BaseActivity baseActivity, List<DialogWrapper> objectsList) {
         super(baseActivity, objectsList);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.i(TAG, "getView = position=" + position);
         ViewHolder viewHolder;
 
         DialogWrapper dialogWrapper = getItem(position);
@@ -62,6 +66,7 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
 
         long totalCount = dialogWrapper.getTotalCount();
 
+        Log.i(TAG, "getView = position=" + position + ", totalCount=" + totalCount);
         if (totalCount > ConstsCore.ZERO_INT_VALUE) {
             viewHolder.unreadMessagesTextView.setText(totalCount + ConstsCore.EMPTY_STRING);
             viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);
@@ -72,6 +77,23 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         viewHolder.lastMessageTextView.setText(dialogWrapper.getLastMessage());
 
         return convertView;
+    }
+
+    public void updateItem(DialogWrapper dlgWrapper) {
+        Log.i(TAG, "updateItem = " + dlgWrapper.getChatDialog().getUnreadMessageCount());
+        int position = -1;
+        for (int i = 0; i < objectsList.size() ; i++) {
+            DialogWrapper dialogWrapper  = objectsList.get(i);
+            if (dialogWrapper.getChatDialog().getDialogId().equals(dlgWrapper.getChatDialog().getDialogId())){
+                position = i;
+                break;
+            }
+        }
+
+        if (position != -1){
+            Log.i(TAG, "find position = " + position);
+            objectsList.set(position, dlgWrapper);
+        }
     }
 
     private static class ViewHolder {
