@@ -354,15 +354,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             }
         });
     }
-    private void readAllMessagesAsync(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                readAllMessages();
-            }
-        }).start();
-
-    }
 
     private void cancelTasks(){
         threadPool.shutdownNow();
@@ -682,24 +673,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         return !isLoadOld
                 ? combinationMessagesList.get(combinationMessagesList.size() - 1).getCreatedDate()
                 : combinationMessagesList.get(0).getCreatedDate();
-    }
-
-
-
-    private void readAllMessages() {
-        Log.v(TAG, "readAllMessages = ");
-        if (currentChatDialog != null && currentChatDialog.getDialogId() != null) {
-            String dialogId = currentChatDialog.getDialogId();
-
-            List<Message> messagesList = dataManager.getMessageDataManager()
-                    .getMessagesByDialogId(dialogId);
-            dataManager.getMessageDataManager().createOrUpdateAll(ChatUtils.readAllMessages(messagesList, AppSession.getSession().getUser()));
-
-            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                    .getDialogNotificationsByDialogId(dialogId);
-            dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils
-                    .readAllDialogNotification(dialogNotificationsList, AppSession.getSession().getUser()));
-        }
     }
 
     protected void initCurrentDialog() {

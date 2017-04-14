@@ -48,8 +48,10 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -218,16 +220,21 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        deleteObservers();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         removeActions();
-        deleteObservers();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i(TAG, "onActivityResult "+requestCode);
-        if (PICK_DIALOG == requestCode){
+        if (PICK_DIALOG == requestCode && data != null){
             updateDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -236,7 +243,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void updateDialog(String dialogId) {
         QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
-
         Log.i(TAG, "updateDialog dialogWrapper="+dialogWrapper.getTotalCount());
         dialogsListAdapter.updateItem(dialogWrapper);
 
@@ -410,28 +416,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         }
     }
 
-    private static class UpdateDialogLoader extends BaseLoader<DialogWrapper> {
-
-        public UpdateDialogLoader(Context context, DataManager dataManager) {
-            super(context, dataManager);
-        }
-
-        @Override
-        protected DialogWrapper getItems() {
-
-            /*QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
-            dialogsListAdapter.updateItem(new DialogWrapper(getContext(), dataManager, qbChatDialog));
-
-            List<QBChatDialog> chatDialogs = dataManager.getQBChatDialogDataManager().getAllSorted();
-            List<DialogWrapper> dialogWrappers = new ArrayList<>(chatDialogs.size());
-            for(QBChatDialog chatDialog : chatDialogs){
-                dialogWrappers.add(new DialogWrapper(getContext(), dataManager, chatDialog));
-            }
-            return dialogWrappers;*/
-            return null;
-        }
-    }
-
     private static class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
 
         public DialogsListLoader(Context context, DataManager dataManager) {
@@ -457,15 +441,32 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                 if (data instanceof Bundle) {
                     String observeKey = ((Bundle) data).getString(BaseManager.EXTRA_OBSERVE_KEY);
                     Log.i(TAG, "CommonObserver update, key="+observeKey);
-                    if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())
-                            || observeKey.equals(dataManager.getMessageDataManager().getObserverKey())
-                            || observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
-                        updateDialogsList();
+                    if (observeKey.equals(dataManager.getMessageDataManager().getObserverKey())
+                            && (((Bundle) data).getSerializable(BaseManager.EXTRA_OBJECT) instanceof Message)){
+                        Message message = getObjFromBundle((Bundle) data);
+                        if (message.getDialogOccupant() != null && message.getDialogOccupant().getDialog() != null) {
+                            updateDialog(message.getDialogOccupant().getDialog().getDialogId());
+                        }
+                    }
+                    else if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
+                        Dialog dialog = getObjFromBundle((Bundle) data);
+                        if (dialog != null) {
+                            updateDialog(dialog.getDialogId());
+                        }
+                    } else if (observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
+                        DialogOccupant dialogOccupant = getObjFromBundle((Bundle) data);
+                        if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
+                            updateDialog(dialogOccupant.getDialog().getDialogId());
+                        }
                     }
                 } else if (data.equals(QMUserCacheImpl.OBSERVE_KEY)) {
                     updateDialogsList();
                 }
             }
         }
+    }
+
+    private <T> T getObjFromBundle(Bundle data){
+        return (T)(data).getSerializable(BaseManager.EXTRA_OBJECT);
     }
 }

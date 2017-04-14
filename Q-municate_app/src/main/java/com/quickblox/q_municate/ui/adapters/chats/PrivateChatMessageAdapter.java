@@ -176,7 +176,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected QBMessageViewHolder onCreateCustomViewHolder(ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateCustomViewHolder viewType= " + viewType);
         return viewType == TYPE_REQUEST_MESSAGE ? new FriendsViewHolder(inflater.inflate(R.layout.item_friends_notification_message, parent, false)) : null;
     }
 

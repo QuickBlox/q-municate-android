@@ -197,11 +197,11 @@ ChatUtils {
             Message message = createTempLocalMessage(tempMessageId, dialogOccupant, qbDialog.getLastMessage(), qbDialog.getLastMessageDateSent(), State.TEMP_LOCAL);
             messagesList.add(message);
 
-            if (qbDialog.getUnreadMessageCount() != null && qbDialog.getUnreadMessageCount() > 0) {
+            /*if (qbDialog.getUnreadMessageCount() != null && qbDialog.getUnreadMessageCount() > 0) {
                 for (int i = 0; i < qbDialog.getUnreadMessageCount(); i++) {
                     messagesList.add(createTempLocalMessage(--tempMessageId, dialogOccupant, null, State.TEMP_LOCAL_UNREAD));
                 }
-            }
+            }*/
         }
 
         return messagesList;

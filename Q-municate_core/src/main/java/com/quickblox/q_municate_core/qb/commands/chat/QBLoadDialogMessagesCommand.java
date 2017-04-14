@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.quickblox.chat.Consts;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.request.QBMessageGetBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
@@ -42,22 +43,24 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         boolean isLoadOldMessages = extras.getBoolean(QBServiceConsts.EXTRA_LOAD_MORE);
 
         Bundle returnedBundle = new Bundle();
-        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+        QBMessageGetBuilder messageGetBuilder = new QBMessageGetBuilder();
+        messageGetBuilder.setLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
 
         if (isLoadOldMessages) {
-            customObjectRequestBuilder.lt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
-            customObjectRequestBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
+            messageGetBuilder.lt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+            messageGetBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
         } else {
-            customObjectRequestBuilder.gt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+            messageGetBuilder.gt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
             if (lastDateLoad > 0) {
-                customObjectRequestBuilder.sortAsc(QBServiceConsts.EXTRA_DATE_SENT);
+                messageGetBuilder.sortAsc(QBServiceConsts.EXTRA_DATE_SENT);
             } else {
-                customObjectRequestBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
+                messageGetBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
             }
         }
 
-        List<QBChatMessage> dialogMessagesList = chatHelper.getDialogMessages(customObjectRequestBuilder,
+        messageGetBuilder.markAsRead(false);
+
+        List<QBChatMessage> dialogMessagesList = chatHelper.getDialogMessages(messageGetBuilder,
                 returnedBundle, dialog, lastDateLoad);
 
         Bundle bundleResult = new Bundle();

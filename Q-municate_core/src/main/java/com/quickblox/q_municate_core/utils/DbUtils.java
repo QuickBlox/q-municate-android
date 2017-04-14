@@ -6,6 +6,7 @@ import android.util.Log;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -115,7 +116,16 @@ public class DbUtils {
             List<QBChatMessage> qbMessagesList, String dialogId) {
         for (int i = 0; i < qbMessagesList.size(); i++) {
             QBChatMessage qbChatMessage = qbMessagesList.get(i);
-            saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, State.SYNC, false);
+
+
+            State msgState = State.SYNC;
+            if (!CollectionsUtil.isEmpty(qbChatMessage.getReadIds())){
+
+                msgState = qbChatMessage.getReadIds().contains
+                        (AppSession.getSession().getUser().getId()) ? State.READ : State.SYNC;
+            }
+
+            saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, msgState, false);
         }
 
         updateDialogModifiedDate(dataManager, dialogId, true);

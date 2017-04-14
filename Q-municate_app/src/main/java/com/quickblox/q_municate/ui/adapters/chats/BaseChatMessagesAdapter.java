@@ -139,30 +139,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
 
             message.setState(State.READ);
             QBUpdateStatusMessageCommand.start(baseActivity, dialog, message, true);
-
-            /*if (poolMessage == null) {
-                poolMessage = getChatMessage(message, dialog);
-            }
-            try {
-                poolMessage.setId(message.getMessageId());
-                poolMessage.setSenderId(message.getDialogOccupant().getUser().getId());
-                dialog.readMessage(poolMessage);
-            } catch (XMPPException | SmackException.NotConnectedException e) {
-                Log.d(TAG, "updateMessageState error" + e.getLocalizedMessage());
-            }
-            if (message.getNotificationType()== null) {
-                DbUtils.updateStatusMessageLocal(dataManager, message.toMessage());
-            } else {
-                DbUtils.updateStatusNotificationMessageLocal(dataManager, message.toDialogNotification());
-            }*/
         }
-    }
-
-    private QBChatMessage getChatMessage(CombinationMessage message, QBChatDialog dialog){
-        QBChatMessage qbChatMessage = new QBChatMessage();
-        qbChatMessage.setId(message.getMessageId());
-        qbChatMessage.setDialogId(dialog.getDialogId());
-        return qbChatMessage;
     }
 
     public void addAllInBegin(List<CombinationMessage> collection) {

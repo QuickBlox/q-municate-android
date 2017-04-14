@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
@@ -54,9 +55,30 @@ public class DialogWrapper implements Serializable {
     private void fillTotalCount(Context context, DataManager dataManager,  List<Long> dialogOccupantsIdsList,  QBUser currentUser){
         long unreadMessages = dataManager.getMessageDataManager().getCountUnreadMessages(dialogOccupantsIdsList, currentUser.getId());
         long unreadDialogNotifications = dataManager.getDialogNotificationDataManager().getCountUnreadDialogNotifications(dialogOccupantsIdsList, currentUser.getId());
+        if (unreadMessages > 0) {
+            Log.i(TAG, "chat Dlg:" + chatDialog.getName() + ", unreadMessages = " + unreadMessages);
 
-        Log.i(TAG, "unreadMessages = " + unreadMessages);
-        Log.i(TAG, "unreadDialogNotifications = " + unreadDialogNotifications);
+            List<Message> messageList =
+                    dataManager.getMessageDataManager().getUnreadMessages(dialogOccupantsIdsList, currentUser.getId());
+            if (!CollectionsUtil.isEmpty(messageList)) {
+                for (Message message : messageList) {
+                    Log.i(TAG, "unreadMessage = " + message);
+                }
+            }
+        }
+
+        if (unreadDialogNotifications > 0) {
+            Log.i(TAG, "unreadDialogNotifications = " + unreadDialogNotifications);
+            List<DialogNotification> notificationList =
+                    dataManager.getDialogNotificationDataManager().getUnreadDialogNotifications(
+                            dialogOccupantsIdsList, currentUser.getId());
+            if (!CollectionsUtil.isEmpty(notificationList)) {
+                for (DialogNotification dialogNotification : notificationList) {
+                    Log.i(TAG, "unreadDialogNotification = " + dialogNotification);
+                }
+            }
+        }
+
         totalCount = unreadMessages + unreadDialogNotifications;
     }
 
