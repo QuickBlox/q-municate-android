@@ -35,6 +35,8 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.fragments.chats.DialogListFragmentListener;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
@@ -82,7 +84,7 @@ import java.util.Set;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
+public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge, DialogListFragmentListener {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
 
@@ -116,6 +118,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean isDialogLoading = false;
     private ConnectionListener chatConnectionListener;
     private ViewGroup root;
+    private LoadChatsSuccessActionCallback loadChatsSuccessActionCallback;
 
     protected abstract int getContentResId();
 
@@ -763,9 +766,28 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         ButterKnife.bind(this);
     }
 
+    @Override
+    public void setLoadChatsSuccessActionCallback(LoadChatsSuccessActionCallback loadChatsSuccessActionCallback){
+
+        this.loadChatsSuccessActionCallback = loadChatsSuccessActionCallback;
+    }
+
+    @Override
+    public void removeLoadChatsSuccessActionCallback(LoadChatsSuccessActionCallback loadChatsSuccessActionCallback){
+        this.loadChatsSuccessActionCallback = null;
+    }
+
     private void performLoadChatsSuccessAction(Bundle bundle) {
        // hideSnackBar();
         isDialogLoading = false;
+        Log.d(TAG, "LoadChatsSuccessAction performLoadChatsSuccessAction isDialogLoading = false bundle= " + bundle);
+        if(bundle.get(ConstsCore.PAGE_NUMBER) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null){
+            loadChatsSuccessActionCallback.performLoadChatsSuccessAction((int) bundle.get(ConstsCore.PAGE_NUMBER), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE));
+        }
+    }
+
+    public interface LoadChatsSuccessActionCallback {
+        void performLoadChatsSuccessAction(int pageNumber, int perPage);
     }
 
     public class LoadChatsSuccessAction implements Command {
@@ -791,6 +813,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
+            Log.d(TAG, "SuccessAction hideProgress");
             hideProgress();
             onSuccessAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }

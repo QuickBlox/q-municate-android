@@ -90,7 +90,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         threadPool.allowCoreThreadTimeOut(true);
     }
 
-    private boolean loadAllDialogsByType(QBDialogType dialogsType,  Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, List<QBChatDialog> allDialogsList, int pageNumber) throws QBResponseException {
+    private int loadAllDialogsByType(QBDialogType dialogsType,  Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, List<QBChatDialog> allDialogsList, int pageNumber) throws QBResponseException {
         boolean needToLoadMore = false;
 
         qbRequestGetBuilder.setSkip(allDialogsList.size());
@@ -102,7 +102,6 @@ public class QBLoadDialogsCommand extends ServiceCommand {
             dialogsListPrivate = newDialogsList;
         }
         allDialogsList.addAll(newDialogsList);
-        needToLoadMore = newDialogsList.size() == ConstsCore.CHATS_DIALOGS_PER_PAGE;
         Log.d("QBLoadDialogsCommand", "needToLoadMore = " + needToLoadMore + "newDialogsList.size() = " + newDialogsList.size());
 
         if (dialogsType == QBDialogType.GROUP) {
@@ -110,7 +109,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
             tryJoinRoomChatsPage(newDialogsList, needClean);
         }
 
-        return needToLoadMore;
+        return newDialogsList.size();
     }
 
     private List<QBChatDialog> loadAllDialogs(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
@@ -134,25 +133,31 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         qbRequestGetBuilderGroup.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, QBDialogType.GROUP.getCode());
 
         do {
+            int privateDialogsSize = 0;
+            int groupDialogsSize = 0;
             if(needToLoadMorePrivate) {
-                needToLoadMorePrivate = loadAllDialogsByType(QBDialogType.PRIVATE, returnedBundle, qbRequestGetBuilderPrivate, allDialogsListPrivate, pageNumber);
+                privateDialogsSize = loadAllDialogsByType(QBDialogType.PRIVATE, returnedBundle, qbRequestGetBuilderPrivate, allDialogsListPrivate, pageNumber);
+                needToLoadMorePrivate = privateDialogsSize == ConstsCore.CHATS_DIALOGS_PER_PAGE;
             }
 
             if(needToLoadMoreGroup) {
-                needToLoadMoreGroup = loadAllDialogsByType(QBDialogType.GROUP, returnedBundle, qbRequestGetBuilderGroup, allDialogsListGroup, pageNumber);
+                groupDialogsSize = loadAllDialogsByType(QBDialogType.GROUP, returnedBundle, qbRequestGetBuilderGroup, allDialogsListGroup, pageNumber);
+                needToLoadMoreGroup = groupDialogsSize == ConstsCore.CHATS_DIALOGS_PER_PAGE;
             }
 
             chatHelper.saveDialogsToCache(dialogsListPrivate);
             chatHelper.saveDialogsToCache(dialogsListGroup);
-
             dialogsListPrivate = null;
             dialogsListGroup = null;
 
             pageNumber++;
 
-            if (pageNumber == FIRST_PAGE_NUMBER) {
-                sendLoadPageSuccess(new Bundle());
-            }
+            int perPage = privateDialogsSize + groupDialogsSize;
+            Log.d("QBLoadDialogsCommand", "sendLoadPageSuccess perPage= " + perPage);
+            Bundle bundle = new Bundle();
+            bundle.putInt(ConstsCore.PAGE_NUMBER, pageNumber);
+            bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
+            sendLoadPageSuccess(bundle);
 
         } while (needToLoadMorePrivate || needToLoadMoreGroup);
 
