@@ -383,7 +383,9 @@ ChatUtils {
     }
 
 
-    public static DialogNotification createLocalDialogNotification(Context context, DataManager dataManager, QBChatMessage qbChatMessage, DialogOccupant dialogOccupant) {
+    public static DialogNotification createLocalDialogNotification(Context context, DataManager dataManager,
+                                                                   QBChatMessage qbChatMessage,
+                                                                   DialogOccupant dialogOccupant) {
         DialogNotification dialogNotification = new DialogNotification();
         dialogNotification.setDialogNotificationId(qbChatMessage.getId());
         dialogNotification.setDialogOccupant(dialogOccupant);
@@ -419,7 +421,14 @@ ChatUtils {
 
         long dateSent = getMessageDateSent(qbChatMessage);
         dialogNotification.setCreatedDate(dateSent);
-        dialogNotification.setState(messageIsRead(qbChatMessage) ? State.READ : State.DELIVERED);
+
+        State msgState = State.DELIVERED;
+        if (!CollectionsUtil.isEmpty(qbChatMessage.getReadIds())){
+            msgState = qbChatMessage.getReadIds().contains
+                    (AppSession.getSession().getUser().getId()) ? State.READ : State.DELIVERED;
+        }
+
+        dialogNotification.setState(msgState);
 
         return dialogNotification;
     }

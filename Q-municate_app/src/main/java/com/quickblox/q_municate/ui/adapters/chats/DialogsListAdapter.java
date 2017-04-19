@@ -28,7 +28,6 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.i(TAG, "getView = position=" + position);
         ViewHolder viewHolder;
 
         DialogWrapper dialogWrapper = getItem(position);
@@ -66,7 +65,6 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
 
         long totalCount = dialogWrapper.getTotalCount();
 
-        Log.i(TAG, "getView = position=" + position + ", totalCount=" + totalCount);
         if (totalCount > ConstsCore.ZERO_INT_VALUE) {
             viewHolder.unreadMessagesTextView.setText(totalCount + ConstsCore.EMPTY_STRING);
             viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);

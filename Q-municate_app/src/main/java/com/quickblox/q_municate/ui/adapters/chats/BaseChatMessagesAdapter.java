@@ -44,12 +44,13 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     protected final BaseActivity baseActivity;
     protected FileUtils fileUtils;
 
-    private QBChatMessage poolMessage;
     private DataManager dataManager;
+    protected QBChatDialog chatDialog;
 
-    BaseChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
+    BaseChatMessagesAdapter(BaseActivity baseActivity, QBChatDialog dialog, List<CombinationMessage> chatMessages) {
         super(baseActivity.getBaseContext(), chatMessages);
         this.baseActivity = baseActivity;
+        chatDialog = dialog;
         currentUser = AppSession.getSession().getUser();
         fileUtils = new FileUtils();
         dataManager = DataManager.getInstance();
@@ -77,11 +78,11 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
     }
 
+
     @Override
     public int getItemViewType(int position) {
         CombinationMessage combinationMessage = getItem(position);
         if (combinationMessage.getNotificationType() != null) {
-            Log.d(TAG, "getItemViewType TYPE_REQUEST_MESSAGE combinationMessage.getNotificationType()" + combinationMessage.getNotificationType());
             return TYPE_REQUEST_MESSAGE;
         }
         return super.getItemViewType(position);
@@ -140,6 +141,12 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
             message.setState(State.READ);
             QBUpdateStatusMessageCommand.start(baseActivity, dialog, message, true);
         }
+    }
+
+    @Override
+    protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
+        updateMessageState(chatMessage, chatDialog);
+        super.onBindViewAttachLeftHolder(holder, chatMessage, position);
     }
 
     public void addAllInBegin(List<CombinationMessage> collection) {

@@ -19,12 +19,10 @@ import java.util.List;
 public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     private static final String TAG = GroupChatMessagesAdapter.class.getSimpleName();
     private ColorUtils colorUtils;
-    private QBChatDialog chatDialog;
 
     public GroupChatMessagesAdapter(BaseActivity baseActivity, QBChatDialog chatDialog,
                                     List<CombinationMessage> chatMessages) {
-        super(baseActivity, chatMessages);
-        this.chatDialog = chatDialog;
+        super(baseActivity, chatDialog, chatMessages);
         colorUtils = new ColorUtils();
     }
 
