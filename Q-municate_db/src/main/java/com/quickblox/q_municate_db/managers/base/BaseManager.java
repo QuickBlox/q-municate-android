@@ -146,13 +146,13 @@ public abstract class BaseManager<T> extends Observable implements Manager {
     }
 
 
-    public List<T> getSkipSorted(String sortedColumn, boolean ascending, long startRow, long perPage) {
+    public List<T> getSkipped(long startRow, long perPage) {
         List<T> objectsList = Collections.emptyList();
 
         try {
             QueryBuilder<T, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.offset(startRow).limit(perPage);
-            queryBuilder.orderBy(sortedColumn, ascending);
+
             PreparedQuery<T> preparedQuery = queryBuilder.prepare();
             objectsList = dao.query(preparedQuery);
         } catch (SQLException e) {

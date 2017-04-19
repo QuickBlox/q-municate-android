@@ -10,16 +10,12 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.DbUtils;
-import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
-import com.quickblox.q_municate_db.managers.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,6 +128,8 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         qbRequestGetBuilderGroup.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
         qbRequestGetBuilderGroup.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, QBDialogType.GROUP.getCode());
 
+        int skipRow = 0;
+
         do {
             int privateDialogsSize = 0;
             int groupDialogsSize = 0;
@@ -155,9 +153,11 @@ public class QBLoadDialogsCommand extends ServiceCommand {
             int perPage = privateDialogsSize + groupDialogsSize;
             Log.d("QBLoadDialogsCommand", "sendLoadPageSuccess perPage= " + perPage);
             Bundle bundle = new Bundle();
-            bundle.putInt(ConstsCore.PAGE_NUMBER, pageNumber);
+            bundle.putInt(ConstsCore.DIALOGS_START_ROW, skipRow);
             bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
             sendLoadPageSuccess(bundle);
+
+            skipRow = perPage;
 
         } while (needToLoadMorePrivate || needToLoadMoreGroup);
 

@@ -21,11 +21,9 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -71,11 +69,8 @@ import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -781,13 +776,13 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
        // hideSnackBar();
         isDialogLoading = false;
         Log.d(TAG, "LoadChatsSuccessAction performLoadChatsSuccessAction isDialogLoading = false bundle= " + bundle);
-        if(bundle.get(ConstsCore.PAGE_NUMBER) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null){
-            loadChatsSuccessActionCallback.performLoadChatsSuccessAction((int) bundle.get(ConstsCore.PAGE_NUMBER), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE));
+        if(bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null){
+            loadChatsSuccessActionCallback.performLoadChatsSuccessAction((int) bundle.get(ConstsCore.DIALOGS_START_ROW), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE));
         }
     }
 
     public interface LoadChatsSuccessActionCallback {
-        void performLoadChatsSuccessAction(int pageNumber, int perPage);
+        void performLoadChatsSuccessAction(int startRow, int perPage);
     }
 
     public class LoadChatsSuccessAction implements Command {

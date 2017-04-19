@@ -67,7 +67,7 @@ public class DialogDataManager extends BaseManager<Dialog> {
         return super.getAllSorted(Dialog.Column.MODIFIED_DATE_LOCAL, false);
     }
 
-    public List<Dialog> getSkipSorted(int startRow, int perPage) {
-        return super.getSkipSorted(Dialog.Column.MODIFIED_DATE_LOCAL, false, startRow, perPage);
+    public List<Dialog> getSkipped(int startRow, int perPage) {
+        return super.getSkipped(startRow, perPage);
     }
 }
