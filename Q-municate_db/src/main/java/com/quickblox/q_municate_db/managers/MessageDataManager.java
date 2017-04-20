@@ -112,6 +112,34 @@ public class MessageDataManager extends BaseManager<Message> {
         return count;
     }
 
+    public List<Message> getUnreadMessages(List<Long> dialogOccupantsIdsList, int currentUserId) {
+
+        try {
+            QueryBuilder<Message, Long> queryBuilder = dao.queryBuilder();
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+            dialogOccupantQueryBuilder.where().ne(QMUserColumns.ID, currentUserId);
+
+            queryBuilder.join(dialogOccupantQueryBuilder);
+
+            Where<Message, Long> where = queryBuilder.where();
+            where.and(
+                    where.in(DialogOccupant.Column.ID, dialogOccupantsIdsList),
+                    where.or(
+                            where.eq(Message.Column.STATE, State.DELIVERED),
+                            where.eq(Message.Column.STATE, State.TEMP_LOCAL_UNREAD)
+                    )
+            );
+
+            PreparedQuery<Message> preparedQuery = queryBuilder.prepare();
+            return dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return null;
+    }
+
     public Message getLastMessageByDialogId(List<Long> dialogOccupantsList) {
         Message message = null;
 
@@ -289,4 +317,5 @@ public class MessageDataManager extends BaseManager<Message> {
 
         return messagesList;
     }
+
 }

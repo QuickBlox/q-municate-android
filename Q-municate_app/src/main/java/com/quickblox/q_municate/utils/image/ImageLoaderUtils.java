@@ -45,7 +45,7 @@ public class ImageLoaderUtils {
         ImageLoaderConfiguration imageLoaderConfiguration = new ImageLoaderConfiguration.Builder(context)
                 .threadPoolSize(THREAD_POOL_SIZE).threadPriority(Thread.NORM_PRIORITY)
                 .denyCacheImageMultipleSizesInMemory()
-                .memoryCache(new UsingFreqLimitedMemoryCache(MEMORY_CACHE_LIMIT)).writeDebugLogs()
+                .memoryCache(new UsingFreqLimitedMemoryCache(MEMORY_CACHE_LIMIT))
                 .defaultDisplayImageOptions(ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS)
                 .imageDecoder(new SmartUriDecoder(context, new BaseImageDecoder(false)))
                 .denyCacheImageMultipleSizesInMemory()

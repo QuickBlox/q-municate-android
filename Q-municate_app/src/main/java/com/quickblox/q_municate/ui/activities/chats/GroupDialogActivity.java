@@ -3,6 +3,8 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,9 +12,9 @@ import android.view.View;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
-import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -34,6 +36,12 @@ public class GroupDialogActivity extends BaseDialogActivity {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
         context.startActivity(intent);
+    }
+
+    public static void startForResult(Fragment context, QBChatDialog chatDialog, int requestCode) {
+        Intent intent = new Intent(context.getActivity(), GroupDialogActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
+        context.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -89,7 +97,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
                 GroupDialogDetailsActivity.start(this, currentChatDialog.getDialogId());
                 break;
             default:
-                super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
         return super.onOptionsItemSelected(item);
     }

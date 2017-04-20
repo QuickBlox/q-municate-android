@@ -19,12 +19,10 @@ import java.util.List;
 public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
     private static final String TAG = GroupChatMessagesAdapter.class.getSimpleName();
     private ColorUtils colorUtils;
-    private QBChatDialog chatDialog;
 
     public GroupChatMessagesAdapter(BaseActivity baseActivity, QBChatDialog chatDialog,
                                     List<CombinationMessage> chatMessages) {
-        super(baseActivity, chatMessages);
-        this.chatDialog = chatDialog;
+        super(baseActivity, chatDialog, chatMessages);
         colorUtils = new ColorUtils();
     }
 
@@ -34,7 +32,6 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         boolean notificationMessage = chatMessage.getNotificationType() != null;
 
         if (notificationMessage) {
-            Log.d(TAG, "onBindViewCustomHolder notificationMessage= " + (chatMessage.getBody()));
             viewHolder.messageTextView.setText(chatMessage.getBody());
             viewHolder.timeTextMessageTextView.setText(getDate(chatMessage.getCreatedDate()));
         } else {
@@ -48,7 +45,6 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
 
     @Override
     protected QBMessageViewHolder onCreateCustomViewHolder(ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateCustomViewHolder viewType= " + viewType);
         return viewType == TYPE_REQUEST_MESSAGE ? new RequestsViewHolder(inflater.inflate(R.layout.item_notification_message, parent, false)) : null;
     }
 

@@ -13,6 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -20,10 +21,15 @@ import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate_core.utils.DbUtils;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.ui.kit.chatmessage.adapter.QBMessagesAdapter;
 import com.quickblox.users.model.QBUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.List;
 
@@ -38,11 +44,16 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     protected final BaseActivity baseActivity;
     protected FileUtils fileUtils;
 
-    BaseChatMessagesAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages) {
+    private DataManager dataManager;
+    protected QBChatDialog chatDialog;
+
+    BaseChatMessagesAdapter(BaseActivity baseActivity, QBChatDialog dialog, List<CombinationMessage> chatMessages) {
         super(baseActivity.getBaseContext(), chatMessages);
         this.baseActivity = baseActivity;
+        chatDialog = dialog;
         currentUser = AppSession.getSession().getUser();
         fileUtils = new FileUtils();
+        dataManager = DataManager.getInstance();
     }
 
     @Override
@@ -67,11 +78,11 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
     }
 
+
     @Override
     public int getItemViewType(int position) {
         CombinationMessage combinationMessage = getItem(position);
         if (combinationMessage.getNotificationType() != null) {
-            Log.d(TAG, "getItemViewType TYPE_REQUEST_MESSAGE combinationMessage.getNotificationType()" + combinationMessage.getNotificationType());
             return TYPE_REQUEST_MESSAGE;
         }
         return super.getItemViewType(position);
@@ -122,12 +133,20 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         return chatMessage.isIncoming(currentUser.getId());
     }
 
-    protected void updateMessageState(CombinationMessage chatMessage, QBChatDialog dialog) {
-        if (!State.READ.equals(chatMessage.getState()) && baseActivity.isNetworkAvailable()) {
+    protected void updateMessageState(CombinationMessage message, QBChatDialog dialog) {
+        if (!State.READ.equals(message.getState()) && baseActivity.isNetworkAvailable()) {
+            message.setState(State.READ);
             Log.d(TAG, "updateMessageState");
-            chatMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(baseActivity, dialog, chatMessage, true);
+
+            message.setState(State.READ);
+            QBUpdateStatusMessageCommand.start(baseActivity, dialog, message, true);
         }
+    }
+
+    @Override
+    protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
+        updateMessageState(chatMessage, chatDialog);
+        super.onBindViewAttachLeftHolder(holder, chatMessage, position);
     }
 
     public void addAllInBegin(List<CombinationMessage> collection) {

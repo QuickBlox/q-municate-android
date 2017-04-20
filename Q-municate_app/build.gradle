@@ -34,12 +34,12 @@ android {
     }
 
     signingConfigs {
-        debug {
+        /*debug {
             storeFile file(property('prodStoreFile'))
             storePassword property('prodStorePassword')
             keyAlias property('prodKeyAlias')
             keyPassword property('prodKeyPassword')
-        }
+        }*/
         release {
             storeFile file(property('prodStoreFile'))
             storePassword property('prodStorePassword')

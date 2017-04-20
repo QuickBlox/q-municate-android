@@ -111,6 +111,7 @@ public class DialogNotification implements Serializable {
                 + "', dialogOccupant='" + dialogOccupant
                 + "', body='" + body
                 + "', createdDate='" + createdDate
+                + "', state='" + state
                 + "', type='" + type + "']";
     }
 

@@ -776,7 +776,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
        // hideSnackBar();
         isDialogLoading = false;
         Log.d(TAG, "LoadChatsSuccessAction performLoadChatsSuccessAction isDialogLoading = false bundle= " + bundle);
-        if(bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null){
+        if(loadChatsSuccessActionCallback != null && bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null){
             loadChatsSuccessActionCallback.performLoadChatsSuccessAction((int) bundle.get(ConstsCore.DIALOGS_START_ROW), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE));
         }
     }

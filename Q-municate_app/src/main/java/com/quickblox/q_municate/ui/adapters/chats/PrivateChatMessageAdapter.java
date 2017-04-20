@@ -32,7 +32,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     private static final int SECOND_IN_MILLIS = 1000;
 
     private static int EMPTY_POSITION = -1;
-    private final QBChatDialog chatDialog;
     private int lastRequestPosition = EMPTY_POSITION;
     private int lastInfoRequestPosition = EMPTY_POSITION;
     private FriendOperationListener friendOperationListener;
@@ -40,7 +39,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     protected DataManager dataManager;
 
     public PrivateChatMessageAdapter(BaseActivity baseActivity, List<CombinationMessage> chatMessages, FriendOperationListener friendOperationListener, QBChatDialog chatDialog) {
-        super(baseActivity, chatMessages);
+        super(baseActivity, chatDialog, chatMessages);
         this.friendOperationListener = friendOperationListener;
         dataManager = DataManager.getInstance();
         this.chatDialog = chatDialog;
@@ -136,8 +135,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     @Override
     protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
         setViewVisibility(holder.avatar, View.GONE);
-
-        updateMessageState(chatMessage, chatDialog);
         super.onBindViewAttachLeftHolder(holder, chatMessage, position);
     }
 
@@ -176,7 +173,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected QBMessageViewHolder onCreateCustomViewHolder(ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateCustomViewHolder viewType= " + viewType);
         return viewType == TYPE_REQUEST_MESSAGE ? new FriendsViewHolder(inflater.inflate(R.layout.item_friends_notification_message, parent, false)) : null;
     }
 
