@@ -162,6 +162,16 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         return objectsList;
     }
 
+    public long getAllSize() {
+        long numRows = 0;
+        try {
+            numRows = dao.countOf();
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+        return numRows;
+    }
+
     @Override
     public void update(Object object) {
         update(object, true);

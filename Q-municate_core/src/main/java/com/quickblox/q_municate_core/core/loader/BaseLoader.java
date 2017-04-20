@@ -12,7 +12,7 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<T> {
 
     private T objectsList;
     protected DataManager dataManager;
-    public boolean isLoading;
+    public volatile boolean isLoading;
     public boolean isAfterForceLoad;
 
     public BaseLoader(Context context, DataManager dataManager) {
