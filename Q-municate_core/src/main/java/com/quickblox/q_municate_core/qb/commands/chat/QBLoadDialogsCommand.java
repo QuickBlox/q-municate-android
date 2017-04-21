@@ -16,7 +16,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_db.managers.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +72,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         qbRequestGetBuilder.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
 
         parcelableQBDialog.addAll(ChatUtils.qBDialogsToParcelableQBDialogs(
-                loadDialogs(returnedBundle, qbRequestGetBuilder)));
+                loadAllDialogsByPages(returnedBundle, qbRequestGetBuilder)));
 
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
@@ -109,53 +108,6 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return newDialogsList.size();
     }
 
-    private boolean getAllDialogsFromCacheByPages() {
-        boolean needToLoadMore;
-
-        int skipRow = 0;
-        int perPage = ConstsCore.CHATS_DIALOGS_PER_PAGE;
-
-        long dialogSize = DataManager.getInstance().getQBChatDialogDataManager().getAllSize();
-        boolean isCacheEmpty = dialogSize <= 0;
-        Log.d("MEMENTO", "getAllDialogsFromCacheByPages dialogSize = " + dialogSize);
-
-        if(isCacheEmpty) {
-            return true;
-        }
-
-        do {
-            needToLoadMore = dialogSize > ConstsCore.CHATS_DIALOGS_PER_PAGE;
-
-            if(!needToLoadMore){
-                perPage = (int) dialogSize;
-            }
-
-            Bundle bundle = new Bundle();
-            bundle.putInt(ConstsCore.DIALOGS_START_ROW, skipRow);
-            bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
-            sendLoadPageSuccess(bundle);
-            dialogSize -= perPage;
-
-            skipRow += perPage;
-        } while (needToLoadMore);
-            return false;
-    }
-
-    private List<QBChatDialog> loadDialogs(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
-        List<QBChatDialog> allDialogsList = null;
-        boolean isCacheEmpty = getAllDialogsFromCacheByPages();
-
-        if(isCacheEmpty){
-            Log.d("MEMENTO", "loadByPages");
-            allDialogsList = loadAllDialogsByPages(returnedBundle, qbRequestGetBuilder);
-        } else {
-            Log.d("MEMENTO", "loadAllDialog or by big chunks");
-            allDialogsList = loadAllDialogsByPages(returnedBundle, qbRequestGetBuilder);
-        }
-
-        return allDialogsList;
-    }
-
     private List<QBChatDialog> loadAllDialogsByPages(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
         List<QBChatDialog> allDialogsList = null;
         List<QBChatDialog> allDialogsListPrivate = new ArrayList<>();
@@ -177,6 +129,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         qbRequestGetBuilderGroup.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, QBDialogType.GROUP.getCode());
 
         int skipRow = 0;
+        boolean update = true;
 
         do {
             int privateDialogsSize = 0;
@@ -203,6 +156,8 @@ public class QBLoadDialogsCommand extends ServiceCommand {
             Bundle bundle = new Bundle();
             bundle.putInt(ConstsCore.DIALOGS_START_ROW, skipRow);
             bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
+            bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, update);
+            update = false;
             sendLoadPageSuccess(bundle);
 
             skipRow = perPage;

@@ -57,7 +57,6 @@ import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
@@ -695,7 +694,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     protected void loadDialogs() {
-        QBLoadDialogsCommand.start(this);
+//        TODO remove after checked new logic RP
+//        QBLoadDialogsCommand.start(this);
     }
 
     private void initChatConnectionListener() {
@@ -776,13 +776,15 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
        // hideSnackBar();
         isDialogLoading = false;
         Log.d(TAG, "LoadChatsSuccessAction performLoadChatsSuccessAction isDialogLoading = false bundle= " + bundle);
-        if(loadChatsSuccessActionCallback != null && bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null){
-            loadChatsSuccessActionCallback.performLoadChatsSuccessAction((int) bundle.get(ConstsCore.DIALOGS_START_ROW), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE));
+        if(loadChatsSuccessActionCallback != null && bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null
+                && bundle.get(ConstsCore.DIALOGS_NEED_UPDATE) != null){
+            loadChatsSuccessActionCallback.performLoadChatsSuccessAction((int) bundle.get(ConstsCore.DIALOGS_START_ROW), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE),
+                    bundle.getBoolean(ConstsCore.DIALOGS_NEED_UPDATE));
         }
     }
 
     public interface LoadChatsSuccessActionCallback {
-        void performLoadChatsSuccessAction(int startRow, int perPage);
+        void performLoadChatsSuccessAction(int startRow, int perPage, boolean update);
     }
 
     public class LoadChatsSuccessAction implements Command {

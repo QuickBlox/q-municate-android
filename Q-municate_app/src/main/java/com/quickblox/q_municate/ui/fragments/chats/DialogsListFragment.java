@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -41,6 +42,7 @@ import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -321,18 +323,20 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @Override
     public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
+        if(dialogsList == null) {
+            Log.d("TAG", "onLoadFinished dialogsList = null return!");
+            return;
+        }
         updateDialogsListFromQueue();
-
+//TODO CHECK THIS isAfterResumed RP
         if(isAfterResumed){
             Log.d(TAG, "onLoadFinished isAfterResumed");
-//            set new dialogList after resuming
             isAfterResumed = false;
-            dialogsListAdapter.setNewData(dialogsList);
+            dialogsListLoader.loadCacheFinished = false;
 
-        } else if(dialogsListLoader.isAfterForceLoad) {
-//            set new dialogList after ForceLoading
-            Log.d(TAG, "onLoadFinished isAfterForceLoad");
-            dialogsListLoader.isAfterForceLoad = false;
+        }
+            if(dialogsListLoader.needUpdate()) {
+            dialogsListLoader.update = false;
             dialogsListAdapter.setNewData(dialogsList);
         }
         else {
@@ -343,6 +347,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if(!baseActivity.isDialogLoading()) {
             Log.d(TAG, "onLoadFinished baseActivity.hideSnackBar()");
             baseActivity.hideSnackBar();
+        }
+        if(dialogsListLoader.isLoadCacheFinished()) {
+            dialogsListLoader.loadCacheFinished = false;
+            Log.d(TAG, "onLoadFinished QBLoadDialogsCommand.start");
+            QBLoadDialogsCommand.start(getContext());
         }
     }
 
@@ -416,7 +425,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         GroupDialogActivity.startForResult(this, chatDialog, PICK_DIALOG);
     }
 
-    private void updateDialogsList(int startRow, int perPage) {
+    private void updateDialogsList(int startRow, int perPage, boolean update) {
         if(!loaderConsumerQueue.isEmpty()){
             Log.d(TAG, "updateDialogsList loaderConsumerQueue.add");
             loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
@@ -428,7 +437,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
         } else {
             Log.d(TAG, "updateDialogsList onChangedData");
-            dialogsListLoader.setPagination(startRow, perPage);
+            dialogsListLoader.setPagination(startRow, perPage, update);
             onChangedData();
         }
     }
@@ -441,6 +450,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private class LoaderConsumer implements Runnable {
+        boolean update;
         int startRow;
         int perPage;
 
@@ -452,7 +462,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         @Override
         public void run() {
             Log.d(TAG, "LoaderConsumer onChangedData");
-            dialogsListLoader.setPagination(startRow, perPage);
+            dialogsListLoader.setPagination(startRow, perPage, update);
             onChangedData();
         }
     }
@@ -479,8 +489,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     @Override
-    public void performLoadChatsSuccessAction(int startRow, int perPage) {
-        updateDialogsList(startRow, perPage);
+    public void performLoadChatsSuccessAction(int startRow, int perPage, boolean update) {
+        updateDialogsList(startRow, perPage, update);
     }
 
     private class DeleteDialogSuccessAction implements Command {
@@ -500,21 +510,41 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private static class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
+        boolean update;
+
+        boolean loadCacheFinished;
+        boolean fromCache;
 
         int startRow = 0;
-        int perPage = ConstsCore.CHATS_DIALOGS_PER_PAGE;
+        int perPage = 0;
 
         public DialogsListLoader(Context context, DataManager dataManager) {
             super(context, dataManager);
         }
 
-        void setPagination(int startRow, int perPage) {
+        public boolean needUpdate() {
+            return update;
+        }
+
+        public boolean isLoadCacheFinished() {
+            return loadCacheFinished;
+        }
+
+        void setPagination(int startRow, int perPage, boolean update) {
+            this.update = update;
             this.startRow = startRow;
             this.perPage = perPage;
         }
 
         @Override
         protected List<DialogWrapper> getItems() {
+            if(forceLoad) {
+                forceLoad = false;
+                Log.d(TAG, "LOADTIME START forceLoad! loadAllDialogsFromCacheByPages...");
+                loadAllDialogsFromCacheByPages();
+                return null;
+            }
+
             long timeBegin = System.currentTimeMillis();
             Log.d(TAG, "LOADTIME START get dialogs from base and wrap!");
 
@@ -535,9 +565,62 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             int seconds = (int) (dif / 1000) % 60;
             Log.d(TAG, "LOADTIME END wrap dialogs! seconds= " + seconds);
 
+            checkLoadFinishedFromCache(chatDialogs.size());
+
             return dialogWrappers;
         }
+
+        private void checkLoadFinishedFromCache(int size) {
+            if(size < ConstsCore.CHATS_DIALOGS_PER_PAGE && fromCache) {
+                fromCache = false;
+                loadCacheFinished = true;
+            }
+        }
+
+        private void loadAllDialogsFromCacheByPages() {
+            boolean needToLoadMore;
+            boolean update = true;
+
+            int startRow = 0;
+            int perPage = ConstsCore.CHATS_DIALOGS_PER_PAGE;
+
+            long dialogSize = DataManager.getInstance().getQBChatDialogDataManager().getAllSize();
+            boolean isCacheEmpty = dialogSize <= 0;
+            Log.d(TAG, "loadAllDialogsFromCacheByPages dialogSize = " + dialogSize);
+            fromCache = true;
+            if(isCacheEmpty) {
+                return;
+            }
+
+            do {
+                needToLoadMore = dialogSize > ConstsCore.CHATS_DIALOGS_PER_PAGE;
+
+                if(!needToLoadMore){
+                    perPage = (int) dialogSize;
+                }
+
+                Bundle bundle = new Bundle();
+                bundle.putInt(ConstsCore.DIALOGS_START_ROW, startRow);
+                bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
+                bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, update);
+                update = false;
+                Log.d(TAG, "loadAllDialogsFromCacheByPages sendLoadPageSuccess startRow= " + startRow + " perPage= " + perPage);
+                sendLoadPageSuccess(bundle);
+                dialogSize -= perPage;
+
+                startRow += perPage;
+            } while (needToLoadMore);
+        }
+
+        private void sendLoadPageSuccess(Bundle result) {
+            Intent intent = new Intent(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
+            if (null != result) {
+                intent.putExtras(result);
+            }
+            LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+        }
     }
+
 
     private class CommonObserver implements Observer {
 
