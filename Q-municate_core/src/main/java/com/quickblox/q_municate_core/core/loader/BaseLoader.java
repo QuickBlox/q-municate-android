@@ -13,8 +13,6 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<T> {
     private T objectsList;
     protected DataManager dataManager;
     public volatile boolean isLoading;
-    public boolean isAfterForceLoad;
-    public boolean forceLoad;
 
     public BaseLoader(Context context, DataManager dataManager) {
         // Loaders may be used across multiple Activitys (assuming they aren't
@@ -59,10 +57,12 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<T> {
         } else if (objectsList == null) {
             // If the current data is null... then we should make it non-null! :)
             Log.i(TAG, "+++ The current data is data is null... so force load! +++");
-            isAfterForceLoad = true;
-            forceLoad = true;
-            forceLoad();
+            loadData();
         }
+    }
+
+    public void loadData(){
+        forceLoad();
     }
 
     @Override

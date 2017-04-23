@@ -56,13 +56,18 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         initThreads();
     }
 
-    public static void start(Context context) {
+    public static void start(Context context, boolean updateAll) {
         Intent intent = new Intent(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, null, context, QBService.class);
+        Bundle result = new Bundle();
+        result.putBoolean(ConstsCore.DIALOGS_UPDATE_ALL, updateAll);
+        intent.putExtras(result);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
+        final boolean updateAll = extras.getBoolean(ConstsCore.DIALOGS_UPDATE_ALL);
+        Log.d("QBLoadDialogsCommand", "perform updateAll= " + updateAll);
         final ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
 
         final Bundle returnedBundle = new Bundle();
@@ -72,10 +77,11 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         qbRequestGetBuilder.sortDesc(QBServiceConsts.EXTRA_LAST_MESSAGE_DATE_SENT);
 
         parcelableQBDialog.addAll(ChatUtils.qBDialogsToParcelableQBDialogs(
-                loadAllDialogsByPages(returnedBundle, qbRequestGetBuilder)));
+                loadAllDialogsByPages(returnedBundle, qbRequestGetBuilder, updateAll)));
 
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
+        bundle.putBoolean(ConstsCore.DIALOGS_UPDATE_ALL, updateAll);
 
         return bundle;
     }
@@ -108,7 +114,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         return newDialogsList.size();
     }
 
-    private List<QBChatDialog> loadAllDialogsByPages(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder) throws QBResponseException {
+    private List<QBChatDialog> loadAllDialogsByPages(Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, boolean updateAll) throws QBResponseException {
         List<QBChatDialog> allDialogsList = null;
         List<QBChatDialog> allDialogsListPrivate = new ArrayList<>();
         List<QBChatDialog> allDialogsListGroup = new ArrayList<>();
@@ -153,13 +159,14 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
             int perPage = privateDialogsSize + groupDialogsSize;
             Log.d("QBLoadDialogsCommand", "sendLoadPageSuccess perPage= " + perPage);
-            Bundle bundle = new Bundle();
-            bundle.putInt(ConstsCore.DIALOGS_START_ROW, skipRow);
-            bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
-            bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, update);
-            update = false;
-            sendLoadPageSuccess(bundle);
-
+            if(!updateAll) {
+                Bundle bundle = new Bundle();
+                bundle.putInt(ConstsCore.DIALOGS_START_ROW, skipRow);
+                bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
+                bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, update);
+                update = false;
+                sendLoadPageSuccess(bundle);
+            }
             skipRow = perPage;
 
         } while (needToLoadMorePrivate || needToLoadMoreGroup);

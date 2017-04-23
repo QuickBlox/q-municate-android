@@ -147,7 +147,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "onViewCreated");
         baseActivity.showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
-        initDataLoader(LOADER_ID);
     }
 
     @Override
@@ -219,6 +218,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
         addActions();
+        initDataLoader(LOADER_ID);
     }
 
     @Override
@@ -323,10 +323,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @Override
     public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
-        if(dialogsList == null) {
-            Log.d("TAG", "onLoadFinished dialogsList = null return!");
-            return;
-        }
         updateDialogsListFromQueue();
 //TODO CHECK THIS isAfterResumed RP
         if(isAfterResumed){
@@ -335,8 +331,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             dialogsListLoader.loadCacheFinished = false;
 
         }
-            if(dialogsListLoader.needUpdate()) {
-            dialogsListLoader.update = false;
+            if(dialogsListLoader.isNeedUpdate()) {
+            dialogsListLoader.needUpdate = false;
             dialogsListAdapter.setNewData(dialogsList);
         }
         else {
@@ -349,9 +345,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             baseActivity.hideSnackBar();
         }
         if(dialogsListLoader.isLoadCacheFinished()) {
-            dialogsListLoader.loadCacheFinished = false;
-            Log.d(TAG, "onLoadFinished QBLoadDialogsCommand.start");
-            QBLoadDialogsCommand.start(getContext());
+            dialogsListLoader.setLoadCacheFinished(false);
+            loadDialogsFromREST(getContext(), true);
         }
     }
 
@@ -401,6 +396,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void addActions() {
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new DeleteDialogSuccessAction());
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, new DeleteDialogFailAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, baseActivity.new LoadChatsSuccessAction());
 
         baseActivity.updateBroadcastActionList();
     }
@@ -428,16 +424,33 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void updateDialogsList(int startRow, int perPage, boolean update) {
         if(!loaderConsumerQueue.isEmpty()){
             Log.d(TAG, "updateDialogsList loaderConsumerQueue.add");
-            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
+            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage, update));
             return;
         }
 
         if(dialogsListLoader.isLoading) {
             Log.d(TAG, "updateDialogsList dialogsListLoader.isLoading");
-            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
+            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage, update));
         } else {
             Log.d(TAG, "updateDialogsList onChangedData");
+            dialogsListLoader.isLoading = true;
             dialogsListLoader.setPagination(startRow, perPage, update);
+            onChangedData();
+        }
+    }
+
+    private void updateDialogsList(){
+        if(!loaderConsumerQueue.isEmpty()){
+            Log.d(TAG, "updateDialogsList loaderConsumerQueue.add");
+            loaderConsumerQueue.offer(new LoaderConsumer(true));
+            return;
+        }
+
+        if(dialogsListLoader.isLoading) {
+            Log.d(TAG, "updateDialogsList dialogsListLoader.isLoading");
+            loaderConsumerQueue.offer(new LoaderConsumer(true));
+        } else {
+            dialogsListLoader.setLoadAll(true);
             onChangedData();
         }
     }
@@ -450,18 +463,25 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private class LoaderConsumer implements Runnable {
+        boolean loadAll;
         boolean update;
         int startRow;
         int perPage;
 
-        LoaderConsumer(int startRow, int perPage) {
+        LoaderConsumer(boolean loadAll) {
+            this.loadAll = loadAll;
+        }
+
+        LoaderConsumer(int startRow, int perPage, boolean update) {
             this.startRow = startRow;
             this.perPage = perPage;
+            this.update = update;
         }
 
         @Override
         public void run() {
             Log.d(TAG, "LoaderConsumer onChangedData");
+            dialogsListLoader.setLoadAll(loadAll);
             dialogsListLoader.setPagination(startRow, perPage, update);
             onChangedData();
         }
@@ -489,8 +509,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     @Override
-    public void performLoadChatsSuccessAction(int startRow, int perPage, boolean update) {
+    public void performLoadChatsSuccessActionPerPage(int startRow, int perPage, boolean update) {
         updateDialogsList(startRow, perPage, update);
+    }
+
+    @Override
+    public void performLoadChatsSuccessActionUpdateAll() {
+        updateDialogsList();
     }
 
     private class DeleteDialogSuccessAction implements Command {
@@ -510,47 +535,54 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private static class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
-        boolean update;
+        boolean loadAll;
+        boolean needUpdate;
 
         boolean loadCacheFinished;
-        boolean fromCache;
+        boolean loadFromCache;
 
         int startRow = 0;
         int perPage = 0;
 
-        public DialogsListLoader(Context context, DataManager dataManager) {
+        DialogsListLoader(Context context, DataManager dataManager) {
             super(context, dataManager);
         }
 
-        public boolean needUpdate() {
-            return update;
+        boolean isNeedUpdate() {
+            return needUpdate;
         }
 
-        public boolean isLoadCacheFinished() {
+        boolean isLoadCacheFinished() {
             return loadCacheFinished;
         }
 
+        void setLoadAll(boolean loadAll) {
+            this.loadAll = loadAll;
+            if(loadAll) {
+                needUpdate = true;
+            }
+        }
+
+        void setLoadCacheFinished(boolean loadCacheFinished) {
+            this.loadCacheFinished = loadCacheFinished;
+        }
+
         void setPagination(int startRow, int perPage, boolean update) {
-            this.update = update;
+            this.needUpdate = update;
             this.startRow = startRow;
             this.perPage = perPage;
         }
 
         @Override
         protected List<DialogWrapper> getItems() {
-            if(forceLoad) {
-                forceLoad = false;
-                Log.d(TAG, "LOADTIME START forceLoad! loadAllDialogsFromCacheByPages...");
-                loadAllDialogsFromCacheByPages();
-                return null;
-            }
-
             long timeBegin = System.currentTimeMillis();
             Log.d(TAG, "LOADTIME START get dialogs from base and wrap!");
 
-            Log.d(TAG, "get dialogs startRow= " + startRow + ", perPage= " + perPage);
+            Log.d(TAG, "get dialogs startRow= " + startRow + ", perPage= " + perPage + ", loadAll= " + loadAll);
 
-            List<QBChatDialog> chatDialogs = dataManager.getQBChatDialogDataManager().getSkippedSorted(startRow, perPage);
+            List<QBChatDialog> chatDialogs = loadAll ? dataManager.getQBChatDialogDataManager().getAllSorted() :
+                    dataManager.getQBChatDialogDataManager().getSkippedSorted(startRow, perPage);
+
             Log.d(TAG, "List<DialogWrapper> getItems() getSkippedSorted!!! chatDialogs size= " + chatDialogs.size());
 
             List<DialogWrapper> dialogWrappers = new ArrayList<>(chatDialogs.size());
@@ -571,9 +603,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         }
 
         private void checkLoadFinishedFromCache(int size) {
-            if(size < ConstsCore.CHATS_DIALOGS_PER_PAGE && fromCache) {
-                fromCache = false;
-                loadCacheFinished = true;
+            if(size < ConstsCore.CHATS_DIALOGS_PER_PAGE && loadFromCache) {
+                loadFromCache = false;
+                setLoadCacheFinished(true);
             }
         }
 
@@ -587,10 +619,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             long dialogSize = DataManager.getInstance().getQBChatDialogDataManager().getAllSize();
             boolean isCacheEmpty = dialogSize <= 0;
             Log.d(TAG, "loadAllDialogsFromCacheByPages dialogSize = " + dialogSize);
-            fromCache = true;
             if(isCacheEmpty) {
+                loadDialogsFromREST(getContext(), false);
                 return;
             }
+            loadFromCache = true;
 
             do {
                 needToLoadMore = dialogSize > ConstsCore.CHATS_DIALOGS_PER_PAGE;
@@ -605,6 +638,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                 bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, update);
                 update = false;
                 Log.d(TAG, "loadAllDialogsFromCacheByPages sendLoadPageSuccess startRow= " + startRow + " perPage= " + perPage);
+
                 sendLoadPageSuccess(bundle);
                 dialogSize -= perPage;
 
@@ -619,6 +653,16 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             }
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
         }
+
+        @Override
+        public void loadData(){
+            loadAllDialogsFromCacheByPages();
+        }
+    }
+
+    private static void loadDialogsFromREST(Context context, boolean updateAll) {
+        Log.d(TAG, "QBLoadDialogsCommand.start");
+        QBLoadDialogsCommand.start(context, updateAll);
     }
 
 

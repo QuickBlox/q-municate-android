@@ -569,12 +569,16 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void addAction(String action, Command command) {
-        Set<Command> commandSet = broadcastCommandMap.get(action);
-        if (commandSet == null) {
-            commandSet = new HashSet<Command>();
-            broadcastCommandMap.put(action, commandSet);
+        if(!hasAction(action)){
+            Set<Command> commandSet = broadcastCommandMap.get(action);
+            if (commandSet == null) {
+                commandSet = new HashSet<Command>();
+                broadcastCommandMap.put(action, commandSet);
+            }
+            commandSet.add(command);
+        } else {
+            Log.d(TAG, "addAction hasAction action= " + action);
         }
-        commandSet.add(command);
     }
 
     public boolean hasAction(String action) {
@@ -775,16 +779,21 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private void performLoadChatsSuccessAction(Bundle bundle) {
        // hideSnackBar();
         isDialogLoading = false;
-        Log.d(TAG, "LoadChatsSuccessAction performLoadChatsSuccessAction isDialogLoading = false bundle= " + bundle);
-        if(loadChatsSuccessActionCallback != null && bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null
-                && bundle.get(ConstsCore.DIALOGS_NEED_UPDATE) != null){
-            loadChatsSuccessActionCallback.performLoadChatsSuccessAction((int) bundle.get(ConstsCore.DIALOGS_START_ROW), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE),
-                    bundle.getBoolean(ConstsCore.DIALOGS_NEED_UPDATE));
+        Log.d(TAG, "LoadChatsSuccessAction performLoadChatsSuccessActionPerPage isDialogLoading = false bundle= " + bundle);
+        if(loadChatsSuccessActionCallback != null && bundle != null) {
+            if (bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null
+                    && bundle.get(ConstsCore.DIALOGS_NEED_UPDATE) != null) {
+                loadChatsSuccessActionCallback.performLoadChatsSuccessActionPerPage((int) bundle.get(ConstsCore.DIALOGS_START_ROW), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE),
+                        bundle.getBoolean(ConstsCore.DIALOGS_NEED_UPDATE));
+            } else if(bundle.getBoolean(ConstsCore.DIALOGS_UPDATE_ALL)) {
+                loadChatsSuccessActionCallback.performLoadChatsSuccessActionUpdateAll();
+            }
         }
     }
 
     public interface LoadChatsSuccessActionCallback {
-        void performLoadChatsSuccessAction(int startRow, int perPage, boolean update);
+        void performLoadChatsSuccessActionPerPage(int startRow, int perPage, boolean update);
+        void performLoadChatsSuccessActionUpdateAll();
     }
 
     public class LoadChatsSuccessAction implements Command {
