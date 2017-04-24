@@ -33,8 +33,6 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.fragments.chats.DialogListFragmentListener;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
@@ -78,7 +76,7 @@ import java.util.Set;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge, DialogListFragmentListener {
+public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
 
@@ -112,7 +110,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean isDialogLoading = false;
     private ConnectionListener chatConnectionListener;
     private ViewGroup root;
-    private LoadChatsSuccessActionCallback loadChatsSuccessActionCallback;
 
     protected abstract int getContentResId();
 
@@ -569,16 +566,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void addAction(String action, Command command) {
-        if(!hasAction(action)){
             Set<Command> commandSet = broadcastCommandMap.get(action);
             if (commandSet == null) {
                 commandSet = new HashSet<Command>();
                 broadcastCommandMap.put(action, commandSet);
             }
             commandSet.add(command);
-        } else {
-            Log.d(TAG, "addAction hasAction action= " + action);
-        }
     }
 
     public boolean hasAction(String action) {
@@ -683,23 +676,13 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     protected void performLoginChatSuccessAction(Bundle bundle) {
         QBInitCallChatCommand.start(this, CallActivity.class);
-        showSnackbarUpdatingDialogs();
         hideProgress();
-    }
-
-    private void showSnackbarUpdatingDialogs() {
-        loadDialogs();
     }
 
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
         Log.d("BaseActivity", "onAttachFragment");
-    }
-
-    protected void loadDialogs() {
-//        TODO remove after checked new logic RP
-//        QBLoadDialogsCommand.start(this);
     }
 
     private void initChatConnectionListener() {
@@ -765,35 +748,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         ButterKnife.bind(this);
     }
 
-    @Override
-    public void setLoadChatsSuccessActionCallback(LoadChatsSuccessActionCallback loadChatsSuccessActionCallback){
-
-        this.loadChatsSuccessActionCallback = loadChatsSuccessActionCallback;
-    }
-
-    @Override
-    public void removeLoadChatsSuccessActionCallback(LoadChatsSuccessActionCallback loadChatsSuccessActionCallback){
-        this.loadChatsSuccessActionCallback = null;
-    }
-
-    private void performLoadChatsSuccessAction(Bundle bundle) {
+    protected void performLoadChatsSuccessAction(Bundle bundle) {
        // hideSnackBar();
         isDialogLoading = false;
-        Log.d(TAG, "LoadChatsSuccessAction performLoadChatsSuccessActionPerPage isDialogLoading = false bundle= " + bundle);
-        if(loadChatsSuccessActionCallback != null && bundle != null) {
-            if (bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null
-                    && bundle.get(ConstsCore.DIALOGS_NEED_UPDATE) != null) {
-                loadChatsSuccessActionCallback.performLoadChatsSuccessActionPerPage((int) bundle.get(ConstsCore.DIALOGS_START_ROW), (int) bundle.get(ConstsCore.DIALOGS_PER_PAGE),
-                        bundle.getBoolean(ConstsCore.DIALOGS_NEED_UPDATE));
-            } else if(bundle.getBoolean(ConstsCore.DIALOGS_UPDATE_ALL)) {
-                loadChatsSuccessActionCallback.performLoadChatsSuccessActionUpdateAll();
-            }
-        }
-    }
-
-    public interface LoadChatsSuccessActionCallback {
-        void performLoadChatsSuccessActionPerPage(int startRow, int perPage, boolean update);
-        void performLoadChatsSuccessActionUpdateAll();
     }
 
     public class LoadChatsSuccessAction implements Command {

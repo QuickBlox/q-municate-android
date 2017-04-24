@@ -42,8 +42,6 @@ public class App extends MultiDexApplication {
 
         super.onCreate();
         Log.i(TAG, "onCreate with update");
-        System.setProperty("log.tag.ORMLite", "INFO");
-        System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY, "ERROR");
         initFabric();
         initApplication();
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());

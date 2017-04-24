@@ -18,7 +18,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateChatMessageAdapter;
-import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;

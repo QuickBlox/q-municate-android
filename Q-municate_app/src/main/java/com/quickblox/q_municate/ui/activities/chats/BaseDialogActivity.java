@@ -321,12 +321,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    protected void loadDialogs() {
-        super.loadDialogs();
-        checkMessageSendingPossibility();
-    }
-
-    @Override
     protected void checkShowingConnectionError() {
         if (!isNetworkAvailable()) {
             setActionBarTitle(getString(R.string.dlg_internet_connection_is_missing));
@@ -389,6 +383,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
 
+        checkMessageSendingPossibility();
         startLoadDialogMessages(false);
     }
 
