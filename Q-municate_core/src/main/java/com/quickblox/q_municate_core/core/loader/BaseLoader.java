@@ -91,7 +91,7 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<T> {
     @Override
     public void onCanceled(T objectsList) {
         Log.i(TAG, "+++ onCanceled() called! +++");
-
+        this.objectsList = objectsList;
         // Attempt to cancel the current asynchronous load.
         super.onCanceled(objectsList);
     }
