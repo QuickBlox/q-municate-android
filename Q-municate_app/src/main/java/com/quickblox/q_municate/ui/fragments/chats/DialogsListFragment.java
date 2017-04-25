@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -34,6 +33,7 @@ import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.fragments.search.SearchFragment;
+import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
@@ -572,27 +572,17 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
         @Override
         protected List<DialogWrapper> getItems() {
-            long timeBegin = System.currentTimeMillis();
-            Log.d(TAG, "LOADTIME START get dialogs from base and wrap!");
-
-            Log.d(TAG, "get dialogs startRow= " + startRow + ", perPage= " + perPage + ", loadAll= " + loadAll);
+            Log.d(TAG, "getItems() chatDialogs startRow= " + startRow + ", perPage= " + perPage + ", loadAll= " + loadAll);
 
             List<QBChatDialog> chatDialogs = loadAll ? dataManager.getQBChatDialogDataManager().getAllSorted() :
                     dataManager.getQBChatDialogDataManager().getSkippedSorted(startRow, perPage);
 
-            Log.d(TAG, "List<DialogWrapper> getItems() getSkippedSorted!!! chatDialogs size= " + chatDialogs.size());
+            Log.d(TAG, "getItems() chatDialogs size= " + chatDialogs.size());
 
             List<DialogWrapper> dialogWrappers = new ArrayList<>(chatDialogs.size());
-
             for (QBChatDialog chatDialog : chatDialogs) {
                 dialogWrappers.add(new DialogWrapper(getContext(), dataManager, chatDialog));
             }
-
-
-            long timeEnd = System.currentTimeMillis();
-            long dif = timeEnd - timeBegin;
-            int seconds = (int) (dif / 1000) % 60;
-            Log.d(TAG, "LOADTIME END wrap dialogs! seconds= " + seconds);
 
             checkLoadFinishedFromCache(chatDialogs.size());
 
@@ -607,48 +597,15 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         }
 
         private void loadAllDialogsFromCacheByPages() {
-            boolean needToLoadMore;
-            boolean update = true;
+            long dialogsSize = DataManager.getInstance().getQBChatDialogDataManager().getAllSize();
+            boolean isCacheEmpty = dialogsSize <= 0;
 
-            int startRow = 0;
-            int perPage = ConstsCore.CHATS_DIALOGS_PER_PAGE;
-
-            long dialogSize = DataManager.getInstance().getQBChatDialogDataManager().getAllSize();
-            boolean isCacheEmpty = dialogSize <= 0;
-            Log.d(TAG, "loadAllDialogsFromCacheByPages dialogSize = " + dialogSize);
             if(isCacheEmpty) {
                 loadDialogsFromREST(getContext(), false);
                 return;
             }
             loadFromCache = true;
-
-            do {
-                needToLoadMore = dialogSize > ConstsCore.CHATS_DIALOGS_PER_PAGE;
-
-                if(!needToLoadMore){
-                    perPage = (int) dialogSize;
-                }
-
-                Bundle bundle = new Bundle();
-                bundle.putInt(ConstsCore.DIALOGS_START_ROW, startRow);
-                bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
-                bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, update);
-                update = false;
-                Log.d(TAG, "loadAllDialogsFromCacheByPages sendLoadPageSuccess startRow= " + startRow + " perPage= " + perPage);
-
-                sendLoadPageSuccess(bundle);
-                dialogSize -= perPage;
-
-                startRow += perPage;
-            } while (needToLoadMore);
-        }
-
-        private void sendLoadPageSuccess(Bundle result) {
-            Intent intent = new Intent(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
-            if (null != result) {
-                intent.putExtras(result);
-            }
-            LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+            DialogsUtils.loadAllDialogsFromCacheByPages(getContext(), dialogsSize);
         }
 
         @Override
