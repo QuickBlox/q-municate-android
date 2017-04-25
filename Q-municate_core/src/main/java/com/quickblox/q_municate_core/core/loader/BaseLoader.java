@@ -67,6 +67,7 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<T> {
 
     @Override
     public void forceLoad() {
+        isLoading = true;
         Log.i(TAG, "+++ forceLoad() called! +++");
         super.forceLoad();
     }

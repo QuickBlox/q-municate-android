@@ -44,34 +44,38 @@ public class DialogsUtils {
                 OPEN_APP_SETTINGS_DIALOG_DELAY);
     }
 
-    public static void loadAllDialogsFromCacheByPages(Context context, long dialogsSize) {
+    /**    logic for loading dialogs page by page from cache
+     *     return result perPage, startRow and needUpdate params by sendBroadcast
+     *     @param dialogsCount Amount of all dialogs.
+     */
+    public static void loadAllDialogsFromCacheByPagesTask(Context context, long dialogsCount) {
         boolean needToLoadMore;
-        boolean update = true;
+        boolean needUpdate = true;
 
         int startRow = 0;
         int perPage = ConstsCore.CHATS_DIALOGS_PER_PAGE;
 
         do {
-            needToLoadMore = dialogsSize > ConstsCore.CHATS_DIALOGS_PER_PAGE;
+            needToLoadMore = dialogsCount > ConstsCore.CHATS_DIALOGS_PER_PAGE;
 
-            if(!needToLoadMore){
-                perPage = (int) dialogsSize;
+            if (!needToLoadMore) {
+                perPage = (int) dialogsCount;
             }
 
             Bundle bundle = new Bundle();
             bundle.putInt(ConstsCore.DIALOGS_START_ROW, startRow);
             bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
-            bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, update);
-            update = false;
+            bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, needUpdate);
+            needUpdate = false;
 
             sendLoadPageSuccess(context, bundle);
-            dialogsSize -= perPage;
+            dialogsCount -= perPage;
 
             startRow += perPage;
         } while (needToLoadMore);
     }
 
-    public static void sendLoadPageSuccess(Context context, Bundle result) {
+    private static void sendLoadPageSuccess(Context context, Bundle result) {
         Intent intent = new Intent(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
         if (null != result) {
             intent.putExtras(result);

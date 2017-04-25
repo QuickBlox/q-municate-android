@@ -162,7 +162,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         return objectsList;
     }
 
-    public long getAllSize() {
+    public long getAllCount() {
         long numRows = 0;
         try {
             numRows = dao.countOf();
