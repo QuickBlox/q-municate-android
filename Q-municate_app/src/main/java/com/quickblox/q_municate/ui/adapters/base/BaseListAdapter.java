@@ -13,6 +13,7 @@ import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.users.model.QBUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseListAdapter<T> extends BaseAdapter {
@@ -50,6 +51,11 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
 
     public void setNewData(List<T> newData) {
         objectsList = newData;
+        notifyDataSetChanged();
+    }
+
+    public void addNewData(ArrayList<T> newData) {
+        objectsList.addAll(newData);
         notifyDataSetChanged();
     }
 

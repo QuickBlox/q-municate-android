@@ -15,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -34,8 +35,6 @@ import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
 import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
-import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
-import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.KeyboardUtils;
@@ -185,8 +184,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     void messageEditTextChanged(CharSequence charSequence) {
         setActionButtonVisibility(charSequence);
 
-        // TODO: now it is possible only for Private chats
-        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+        if (currentChatDialog != null) {
             if (!isTypingNow) {
                 isTypingNow = true;
                 sendTypingStatus();
@@ -218,6 +216,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (isSmilesLayoutShowing()) {
             hideSmileLayout();
         } else {
+            returnResult();
             super.onBackPressed();
         }
     }
@@ -234,11 +233,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onResume();
         restoreDefaultCanPerformLogout();
 
-        loadNextPartMessagesFromDbAsync();
-
-        if (isNetworkAvailable()) {
-            startLoadDialogMessages(false);
-        }
+        loadNextPartMessagesAsync();
 
         checkMessageSendingPossibility();
     }
@@ -254,7 +249,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onStop() {
         super.onStop();
         removeChatMessagesAdapterListeners();
-        readAllMessagesAsync();
     }
 
     @Override
@@ -265,6 +259,24 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         removeActions();
         deleteObservers();
         unregisterBroadcastReceivers();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void returnResult(){
+        if (getCallingActivity() != null) {
+            Intent intent = new Intent();
+            intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, currentChatDialog.getDialogId());
+            setResult(RESULT_OK, intent);
+        }
     }
 
     @Override
@@ -309,12 +321,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    protected void loadDialogs() {
-        super.loadDialogs();
-        checkMessageSendingPossibility();
-    }
-
-    @Override
     protected void checkShowingConnectionError() {
         if (!isNetworkAvailable()) {
             setActionBarTitle(getString(R.string.dlg_internet_connection_is_missing));
@@ -334,22 +340,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         });
     }
 
-    private void loadNextPartMessagesFromDbAsync(){
+    private void loadNextPartMessagesAsync(){
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
                 loadNextPartMessagesFromDb(false, true);
             }
         });
-    }
-    private void readAllMessagesAsync(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                readAllMessages();
-            }
-        }).start();
-
     }
 
     private void cancelTasks(){
@@ -386,6 +383,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
 
+        checkMessageSendingPossibility();
         startLoadDialogMessages(false);
     }
 
@@ -577,8 +575,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void checkStartTyping() {
-        // TODO: now it is possible only for Private chats
-        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+        if (currentChatDialog != null) {
             if (isTypingNow) {
                 isTypingNow = false;
                 sendTypingStatus();
@@ -673,23 +670,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 : combinationMessagesList.get(0).getCreatedDate();
     }
 
-
-
-    private void readAllMessages() {
-        if (currentChatDialog != null && currentChatDialog.getDialogId() != null) {
-            String dialogId = currentChatDialog.getDialogId();
-
-            List<Message> messagesList = dataManager.getMessageDataManager()
-                    .getMessagesByDialogId(dialogId);
-            dataManager.getMessageDataManager().createOrUpdateAll(ChatUtils.readAllMessages(messagesList, AppSession.getSession().getUser()));
-
-            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                    .getDialogNotificationsByDialogId(dialogId);
-            dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils
-                    .readAllDialogNotification(dialogNotificationsList, AppSession.getSession().getUser()));
-        }
-    }
-
     protected void initCurrentDialog() {
         if (service != null) {
             Log.v(TAG, "chatHelper = " + chatHelper + "\n dialog = " + currentChatDialog);
@@ -749,6 +729,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 @Override
                 public void run() {
                     updateMessagesAdapter(isLoadOld, requestedMessages.size());
+                    startLoadDialogMessages(false);
                 }
             });
         }

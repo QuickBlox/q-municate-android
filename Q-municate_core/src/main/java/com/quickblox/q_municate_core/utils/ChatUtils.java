@@ -197,11 +197,11 @@ ChatUtils {
             Message message = createTempLocalMessage(tempMessageId, dialogOccupant, qbDialog.getLastMessage(), qbDialog.getLastMessageDateSent(), State.TEMP_LOCAL);
             messagesList.add(message);
 
-            if (qbDialog.getUnreadMessageCount() != null && qbDialog.getUnreadMessageCount() > 0) {
+            /*if (qbDialog.getUnreadMessageCount() != null && qbDialog.getUnreadMessageCount() > 0) {
                 for (int i = 0; i < qbDialog.getUnreadMessageCount(); i++) {
                     messagesList.add(createTempLocalMessage(--tempMessageId, dialogOccupant, null, State.TEMP_LOCAL_UNREAD));
                 }
-            }
+            }*/
         }
 
         return messagesList;
@@ -235,6 +235,9 @@ ChatUtils {
     public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBChatDialog qbDialog, boolean onlyNewOccupant) {
         List<DialogOccupant> dialogOccupantsList = new ArrayList<>(qbDialog.getOccupants().size());
 
+        List<Integer> userIdsForSave = new ArrayList<>();
+        List<QMUser> qmUsers = new ArrayList<>();
+
         for (Integer userId : qbDialog.getOccupants()) {
             DialogOccupant dialogOccupant;
             if (onlyNewOccupant) {
@@ -250,12 +253,19 @@ ChatUtils {
                 if (dialogOccupant == null) {
                     QMUser user = QMUserService.getInstance().getUserCache().get((long) userId);
                     if (user == null) {
-                        user = QBRestHelper.loadAndSaveUser(userId);
+                        userIdsForSave.add(userId);
+                    } else {
+                        qmUsers.add(user);
                     }
-                    dialogOccupant = createDialogOccupant(dataManager, qbDialog.getDialogId(), user);
-                    dialogOccupantsList.add(dialogOccupant);
                 }
             }
+        }
+
+        if (!userIdsForSave.isEmpty()) {
+            qmUsers.addAll(QBRestHelper.loadAndSaveUserByIds(userIdsForSave));
+        }
+        for (QMUser qmUser : qmUsers) {
+            dialogOccupantsList.add(createDialogOccupant(dataManager, qbDialog.getDialogId(), qmUser));
         }
 
         return dialogOccupantsList;
@@ -373,7 +383,9 @@ ChatUtils {
     }
 
 
-    public static DialogNotification createLocalDialogNotification(Context context, DataManager dataManager, QBChatMessage qbChatMessage, DialogOccupant dialogOccupant) {
+    public static DialogNotification createLocalDialogNotification(Context context, DataManager dataManager,
+                                                                   QBChatMessage qbChatMessage,
+                                                                   DialogOccupant dialogOccupant) {
         DialogNotification dialogNotification = new DialogNotification();
         dialogNotification.setDialogNotificationId(qbChatMessage.getId());
         dialogNotification.setDialogOccupant(dialogOccupant);
@@ -409,7 +421,14 @@ ChatUtils {
 
         long dateSent = getMessageDateSent(qbChatMessage);
         dialogNotification.setCreatedDate(dateSent);
-        dialogNotification.setState(messageIsRead(qbChatMessage) ? State.READ : State.DELIVERED);
+
+        State msgState = State.DELIVERED;
+        if (!CollectionsUtil.isEmpty(qbChatMessage.getReadIds())){
+            msgState = qbChatMessage.getReadIds().contains
+                    (AppSession.getSession().getUser().getId()) ? State.READ : State.DELIVERED;
+        }
+
+        dialogNotification.setState(msgState);
 
         return dialogNotification;
     }

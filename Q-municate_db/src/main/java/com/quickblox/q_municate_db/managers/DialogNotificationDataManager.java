@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.util.Log;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -213,5 +215,37 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         }
 
         return count;
+    }
+
+    public List<DialogNotification> getUnreadDialogNotifications(List<Long> dialogOccupantsIdsList, int currentUserId) {
+        long count = 0;
+
+        List<DialogNotification> dialogNotificationsList = null;
+
+        try {
+            QueryBuilder<DialogNotification, Long> queryBuilder = dao.queryBuilder();
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+            dialogOccupantQueryBuilder.where().ne(QMUserColumns.ID, currentUserId);
+
+            queryBuilder.join(dialogOccupantQueryBuilder);
+
+            Where<DialogNotification, Long> where = queryBuilder.where();
+            where.and(
+                    where.in(DialogOccupant.Column.ID, dialogOccupantsIdsList),
+                    where.or(
+                            where.eq(DialogNotification.Column.STATE, State.DELIVERED),
+                            where.eq(DialogNotification.Column.STATE, State.TEMP_LOCAL_UNREAD)
+                    )
+            );
+
+            PreparedQuery<DialogNotification> preparedQuery = queryBuilder.prepare();
+            Log.i(TAG, "query=" + preparedQuery.getStatement());
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
     }
 }

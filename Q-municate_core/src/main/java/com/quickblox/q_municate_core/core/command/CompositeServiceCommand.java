@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.core.command;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class CompositeServiceCommand extends ServiceCommand {
         Bundle params = extras;
         for (ServiceCommand command : commandList) {
             if (command != null) {
+                Log.d("CompositeServiceCommand", "perform CompositeServiceCommand command = " + command);
                 params = command.perform(params);
             }
         }

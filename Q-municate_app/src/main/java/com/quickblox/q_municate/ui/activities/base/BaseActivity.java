@@ -21,11 +21,9 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -57,7 +55,6 @@ import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
@@ -69,11 +66,8 @@ import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -572,12 +566,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void addAction(String action, Command command) {
-        Set<Command> commandSet = broadcastCommandMap.get(action);
-        if (commandSet == null) {
-            commandSet = new HashSet<Command>();
-            broadcastCommandMap.put(action, commandSet);
-        }
-        commandSet.add(command);
+            Set<Command> commandSet = broadcastCommandMap.get(action);
+            if (commandSet == null) {
+                commandSet = new HashSet<Command>();
+                broadcastCommandMap.put(action, commandSet);
+            }
+            commandSet.add(command);
     }
 
     public boolean hasAction(String action) {
@@ -682,22 +676,13 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     protected void performLoginChatSuccessAction(Bundle bundle) {
         QBInitCallChatCommand.start(this, CallActivity.class);
-        showSnackbarUpdatingDialogs();
         hideProgress();
-    }
-
-    private void showSnackbarUpdatingDialogs() {
-        loadDialogs();
     }
 
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
         Log.d("BaseActivity", "onAttachFragment");
-    }
-
-    protected void loadDialogs() {
-        QBLoadDialogsCommand.start(this);
     }
 
     private void initChatConnectionListener() {
@@ -763,7 +748,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         ButterKnife.bind(this);
     }
 
-    private void performLoadChatsSuccessAction(Bundle bundle) {
+    protected void performLoadChatsSuccessAction(Bundle bundle) {
        // hideSnackBar();
         isDialogLoading = false;
     }
@@ -791,6 +776,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
+            Log.d(TAG, "SuccessAction hideProgress");
             hideProgress();
             onSuccessAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }

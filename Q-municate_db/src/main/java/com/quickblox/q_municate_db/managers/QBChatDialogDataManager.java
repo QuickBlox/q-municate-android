@@ -115,6 +115,14 @@ public class QBChatDialogDataManager implements Manager<QBChatDialog> {
         return DialogTransformUtils.getListQBDialogsFromLocalDialogs(dialogDataManager.getAllSorted());
     }
 
+    public List<QBChatDialog> getSkippedSorted(int startRow, int perPage) {
+        return DialogTransformUtils.getListQBDialogsFromLocalDialogs(dialogDataManager.getSkippedSorted(startRow, perPage));
+    }
+
+    public long getAllCount() {
+        return dialogDataManager.getAllCount();
+    }
+
     public List<QBChatDialog> getAll() {
         return DialogTransformUtils.getListQBDialogsFromLocalDialogs(dialogDataManager.getAll());
     }

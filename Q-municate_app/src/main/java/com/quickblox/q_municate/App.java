@@ -2,10 +2,12 @@ package com.quickblox.q_municate;
 
 import android.content.Context;
 import android.support.multidex.MultiDexApplication;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.digits.sdk.android.Digits;
+import com.j256.ormlite.logger.LocalLog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
@@ -23,8 +25,11 @@ import com.twitter.sdk.android.core.TwitterCore;
 
 import io.fabric.sdk.android.Fabric;
 
+import static com.j256.ormlite.logger.LoggerFactory.LOG_TYPE_SYSTEM_PROPERTY;
+
 public class App extends MultiDexApplication {
 
+    private static final String TAG = App.class.getSimpleName();
     private static App instance;
     private SharedHelper appSharedHelper;
 
@@ -34,8 +39,9 @@ public class App extends MultiDexApplication {
 
     @Override
     public void onCreate() {
-        super.onCreate();
 
+        super.onCreate();
+        Log.i(TAG, "onCreate with update");
         initFabric();
         initApplication();
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());

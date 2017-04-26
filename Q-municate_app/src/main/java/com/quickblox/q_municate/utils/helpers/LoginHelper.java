@@ -169,7 +169,7 @@ public class LoginHelper {
     }
 
     private void loadDialogs() {
-        QBLoadDialogsCommand.start(context);
+        QBLoadDialogsCommand.start(context, true);
     }
 
     public void makeGeneralLogin(GlobalLoginListener globalLoginListener) {

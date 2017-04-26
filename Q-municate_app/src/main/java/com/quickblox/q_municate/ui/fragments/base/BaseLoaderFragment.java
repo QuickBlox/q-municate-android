@@ -6,7 +6,7 @@ import android.support.v4.content.Loader;
 
 public abstract class BaseLoaderFragment<T> extends BaseFragment implements LoaderManager.LoaderCallbacks<T> {
 
-    private Loader<T> loader;
+    protected Loader<T> loader;
 
     protected void initDataLoader(int id) {
         getLoaderManager().initLoader(id, null, this);

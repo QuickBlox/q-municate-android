@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,6 +58,14 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
         context.startActivity(intent);
+    }
+
+    public static void startForResult(Fragment fragment, QMUser opponent, QBChatDialog chatDialog,
+                                      int requestCode) {
+        Intent intent = new Intent(fragment.getActivity(), PrivateDialogActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
+        fragment.startActivityForResult(intent, requestCode);
     }
 
     @Override
