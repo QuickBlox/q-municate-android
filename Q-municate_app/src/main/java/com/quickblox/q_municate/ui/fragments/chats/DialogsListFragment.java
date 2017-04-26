@@ -312,7 +312,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void updateDialogsAdapter(List<DialogWrapper> dialogsList) {
-        if (dialogsListLoader.isNeedUpdate()) {
+        if (dialogsListLoader.isLoadAll()) {
             dialogsListAdapter.setNewData(dialogsList);
         } else {
             dialogsListAdapter.addNewData((ArrayList<DialogWrapper>) dialogsList);
@@ -390,23 +390,23 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         GroupDialogActivity.startForResult(this, chatDialog, PICK_DIALOG);
     }
 
-    private void updateDialogsList(int startRow, int perPage, boolean update) {
+    private void updateDialogsList(int startRow, int perPage) {
 //        logic for correct behavior of pagination loading dialogs
 //        we can't fire onChangedData until we have incomplete loader task in queue
         if (!loaderConsumerQueue.isEmpty()) {
             Log.d(TAG, "updateDialogsList loaderConsumerQueue.add");
-            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage, update));
+            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
             return;
         }
 
 //        if Loader is in loading process, we don't fire onChangedData, cause we do not want interrupt current load task
         if (dialogsListLoader.isLoading) {
             Log.d(TAG, "updateDialogsList dialogsListLoader.isLoading");
-            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage, update));
+            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
         } else {
 //        we don't have tasks in queue, so load dialogs by pages
             Log.d(TAG, "updateDialogsList onChangedData");
-            dialogsListLoader.setPagination(startRow, perPage, update);
+            dialogsListLoader.setPagination(startRow, perPage);
             onChangedData();
         }
     }
@@ -437,7 +437,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     private class LoaderConsumer implements Runnable {
         boolean loadAll;
-        boolean update;
         int startRow;
         int perPage;
 
@@ -445,17 +444,16 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             this.loadAll = loadAll;
         }
 
-        LoaderConsumer(int startRow, int perPage, boolean update) {
+        LoaderConsumer(int startRow, int perPage) {
             this.startRow = startRow;
             this.perPage = perPage;
-            this.update = update;
         }
 
         @Override
         public void run() {
             Log.d(TAG, "LoaderConsumer onChangedData");
             dialogsListLoader.setLoadAll(loadAll);
-            dialogsListLoader.setPagination(startRow, perPage, update);
+            dialogsListLoader.setPagination(startRow, perPage);
             onChangedData();
         }
     }
@@ -504,8 +502,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             Log.d(TAG, "LoadChatsSuccessAction bundle= " + bundle);
             if(bundle != null) {
                 if (isLoadPerPage(bundle)) {
-                    updateDialogsList(bundle.getInt(ConstsCore.DIALOGS_START_ROW), bundle.getInt(ConstsCore.DIALOGS_PER_PAGE),
-                            bundle.getBoolean(ConstsCore.DIALOGS_NEED_UPDATE));
+                    updateDialogsList(bundle.getInt(ConstsCore.DIALOGS_START_ROW), bundle.getInt(ConstsCore.DIALOGS_PER_PAGE));
                 } else if(bundle.getBoolean(ConstsCore.DIALOGS_UPDATE_ALL)) {
                     updateDialogsList();
                 }
@@ -513,8 +510,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         }
 
         private boolean isLoadPerPage(Bundle bundle) {
-            return bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null
-                    && bundle.get(ConstsCore.DIALOGS_NEED_UPDATE) != null;
+            return bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null;
         }
     }
 

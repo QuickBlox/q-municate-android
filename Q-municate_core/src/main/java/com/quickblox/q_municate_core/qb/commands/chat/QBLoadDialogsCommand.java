@@ -135,7 +135,6 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         qbRequestGetBuilderGroup.addRule(FIELD_DIALOG_TYPE, OPERATOR_EQ, QBDialogType.GROUP.getCode());
 
         int skipRow = 0;
-        boolean update = true;
 
         do {
             int privateDialogsSize = 0;
@@ -163,8 +162,6 @@ public class QBLoadDialogsCommand extends ServiceCommand {
                 Bundle bundle = new Bundle();
                 bundle.putInt(ConstsCore.DIALOGS_START_ROW, skipRow);
                 bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
-                bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, update);
-                update = false;
                 sendLoadPageSuccess(bundle);
             }
             skipRow = perPage;

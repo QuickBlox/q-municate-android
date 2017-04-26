@@ -50,7 +50,6 @@ public class DialogsUtils {
      */
     public static void loadAllDialogsFromCacheByPagesTask(Context context, long dialogsCount) {
         boolean needToLoadMore;
-        boolean needUpdate = true;
 
         int startRow = 0;
         int perPage = ConstsCore.CHATS_DIALOGS_PER_PAGE;
@@ -65,8 +64,6 @@ public class DialogsUtils {
             Bundle bundle = new Bundle();
             bundle.putInt(ConstsCore.DIALOGS_START_ROW, startRow);
             bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
-            bundle.putBoolean(ConstsCore.DIALOGS_NEED_UPDATE, needUpdate);
-            needUpdate = false;
 
             sendLoadPageSuccess(context, bundle);
             dialogsCount -= perPage;

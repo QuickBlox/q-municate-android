@@ -22,7 +22,6 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
     private static final String TAG = DialogsListLoader.class.getSimpleName();
 
     private boolean loadAll;
-    private boolean needUpdate;
 
     private boolean loadCacheFinished;
     private boolean loadFromCache;
@@ -34,8 +33,8 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
         super(context, dataManager);
     }
 
-    public boolean isNeedUpdate() {
-        return needUpdate;
+    public boolean isLoadAll() {
+        return loadAll;
     }
 
     public boolean isLoadCacheFinished() {
@@ -44,13 +43,9 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
 
     public void setLoadAll(boolean loadAll) {
         this.loadAll = loadAll;
-        if(loadAll) {
-            needUpdate = true;
-        }
     }
 
-    public void setPagination(int startRow, int perPage, boolean update) {
-        this.needUpdate = update;
+    public void setPagination(int startRow, int perPage) {
         this.startRow = startRow;
         this.perPage = perPage;
     }

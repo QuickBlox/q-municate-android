@@ -14,7 +14,6 @@ public class ConstsCore {
     public static final int DIALOG_MESSAGES_PER_PAGE = 50;
     public static final String DIALOGS_START_ROW = "dialogs_start_row";
     public static final String DIALOGS_PER_PAGE = "dialogs_per_page";
-    public static final String DIALOGS_NEED_UPDATE = "dialogs_need_update";
     public static final String DIALOGS_UPDATE_ALL = "dialogs_update_all";
 
     public static final int ZERO_INT_VALUE = 0;
