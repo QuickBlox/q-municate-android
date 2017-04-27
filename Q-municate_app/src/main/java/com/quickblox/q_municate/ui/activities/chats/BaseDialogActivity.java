@@ -926,7 +926,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
             String dialogId = bundle.getString(QBServiceConsts.EXTRA_DIALOG_ID);
 
-            Log.d("BaseDialogActivity", "Laoding messages finished" + " totalEntries = " + totalEntries
+            Log.d("BaseDialogActivity", "Loading messages finished" + " totalEntries = " + totalEntries
                     + " lastMessageDate = " + lastMessageDate
                     + " isLoadedOldMessages = " + isLoadedOldMessages
                     + " dialogId = " + dialogId);

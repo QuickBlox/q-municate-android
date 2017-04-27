@@ -36,6 +36,7 @@ public class MainActivity extends BaseLoggableActivity {
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
     }
 
@@ -66,6 +67,7 @@ public class MainActivity extends BaseLoggableActivity {
             loginChat();
         }
 
+        addDialogsAction();
         launchDialogsListFragment();
     }
 
@@ -120,6 +122,12 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeDialogsAction();
+    }
+
+    @Override
     protected void checkShowingConnectionError() {
         if (!isNetworkAvailable()) {
             setActionBarTitle(getString(R.string.dlg_internet_connection_is_missing));
@@ -134,6 +142,14 @@ public class MainActivity extends BaseLoggableActivity {
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         actualizeCurrentTitle();
+    }
+
+    private void addDialogsAction() {
+        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
+    }
+
+    private void removeDialogsAction() {
+        removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
     }
 
     private void addActions() {

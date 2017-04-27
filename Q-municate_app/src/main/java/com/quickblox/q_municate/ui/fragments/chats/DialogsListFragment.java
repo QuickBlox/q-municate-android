@@ -88,6 +88,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private Queue<LoaderConsumer> loaderConsumerQueue = new ConcurrentLinkedQueue<>();
 
     protected Handler handler = new Handler();
+    private State updateDialogsProcess;
+
+    enum State {started, stopped}
 
     public static DialogsListFragment newInstance() {
         return new DialogsListFragment();
@@ -204,6 +207,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume");
         addObservers();
         if (dialogsListAdapter != null) {
             checkVisibilityEmptyLabel();
@@ -211,11 +215,21 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if (dialogsListAdapter != null) {
             dialogsListAdapter.notifyDataSetChanged();
         }
+        checkLoaderConsumerQueue();
+    }
+
+    private void checkLoaderConsumerQueue() {
+//        check if the update process can be proceeded
+        if(State.stopped == updateDialogsProcess) {
+            Log.d(TAG, "checkLoaderConsumerQueue proceeded updateDialogsListFromQueue");
+            updateDialogsListFromQueue();
+        }
     }
 
     @Override
     public void onStop(){
         super.onStop();
+        updateDialogsProcess = State.stopped;
         deleteObservers();
     }
 
@@ -294,6 +308,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @Override
     public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
+        updateDialogsProcess = State.started;
         Log.d(TAG, "onLoadFinished!!! dialogsListLoader.isLoadCacheFinished() " + dialogsListLoader.isLoadCacheFinished());
         updateDialogsListFromQueue();
 
@@ -405,9 +420,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
         } else {
 //        we don't have tasks in queue, so load dialogs by pages
-            Log.d(TAG, "updateDialogsList onChangedData");
-            dialogsListLoader.setPagination(startRow, perPage);
-            onChangedData();
+            if(!isResumed()) {
+                loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
+            } else {
+                Log.d(TAG, "updateDialogsList onChangedData");
+                dialogsListLoader.setPagination(startRow, perPage);
+                onChangedData();
+            }
         }
     }
 
@@ -423,8 +442,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             loaderConsumerQueue.offer(new LoaderConsumer(true));
         } else {
 //        load All dialogs
-            dialogsListLoader.setLoadAll(true);
-            onChangedData();
+            if(!isResumed()) {
+                Log.d(TAG, "updateDialogsList !isResumed() offer");
+                loaderConsumerQueue.offer(new LoaderConsumer(true));
+            } else {
+                dialogsListLoader.setLoadAll(true);
+                onChangedData();
+            }
         }
     }
 

@@ -461,7 +461,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, new LoginChatCompositeFailAction());
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
 
         updateBroadcastActionList();
     }
@@ -469,7 +468,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private void removeActions() {
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
-        removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
 
