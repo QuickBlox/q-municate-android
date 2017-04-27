@@ -36,6 +36,7 @@ public class MainActivity extends BaseLoggableActivity {
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
     }
 

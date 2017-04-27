@@ -90,7 +90,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     protected Handler handler = new Handler();
     private State updateDialogsProcess;
 
-    enum State {unavailable, available}
+    enum State {started, stopped}
 
     public static DialogsListFragment newInstance() {
         return new DialogsListFragment();
@@ -123,7 +123,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         dataManager = DataManager.getInstance();
         commonObserver = new CommonObserver();
         qbUser = AppSession.getSession().getUser();
-        updateDialogsProcess = State.available;
     }
 
     @Override
@@ -221,8 +220,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     private void checkLoaderConsumerQueue() {
 //        check if the update process can be proceeded
-        if(State.available == updateDialogsProcess) {
-            Log.d(TAG, "checkLoaderConsumerQueue updateDialogsListFromQueue State.available");
+        if(State.stopped == updateDialogsProcess) {
+            Log.d(TAG, "checkLoaderConsumerQueue proceeded updateDialogsListFromQueue");
             updateDialogsListFromQueue();
         }
     }
@@ -230,7 +229,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onStop(){
         super.onStop();
-        updateDialogsProcess = State.available;
+        updateDialogsProcess = State.stopped;
         deleteObservers();
     }
 
@@ -309,7 +308,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @Override
     public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
-        updateDialogsProcess = State.unavailable;
+        updateDialogsProcess = State.started;
         Log.d(TAG, "onLoadFinished!!! dialogsListLoader.isLoadCacheFinished() " + dialogsListLoader.isLoadCacheFinished());
         updateDialogsListFromQueue();
 
