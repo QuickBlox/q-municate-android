@@ -199,8 +199,10 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     }
 
     private void startCropActivity(Uri originalUri) {
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
+
         canPerformLogout.set(false);
-        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        imageUri = Uri.fromFile(new File(getCacheDir(), extensionOriginalUri));
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
