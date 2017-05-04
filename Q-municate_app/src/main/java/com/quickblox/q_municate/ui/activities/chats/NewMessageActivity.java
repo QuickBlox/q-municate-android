@@ -4,9 +4,11 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,9 +43,9 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     private FriendsAdapter friendsAdapter;
     private QMUser selectedUser;
 
-    public static void start(Context context) {
-        Intent intent = new Intent(context, NewMessageActivity.class);
-        context.startActivity(intent);
+    public static void startForResult(Fragment fragment, int requestCode) {
+        Intent intent = new Intent(fragment.getActivity(), NewMessageActivity.class);
+        fragment.startActivityForResult(intent, requestCode);
     }
 
     @Override

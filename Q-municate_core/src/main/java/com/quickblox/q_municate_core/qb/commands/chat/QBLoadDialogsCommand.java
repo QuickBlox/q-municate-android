@@ -164,7 +164,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
                 bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
                 sendLoadPageSuccess(bundle);
             }
-            skipRow = perPage;
+            skipRow += perPage;
 
         } while (needToLoadMorePrivate || needToLoadMoreGroup);
 

@@ -70,6 +70,7 @@ import butterknife.OnItemClick;
 public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>> {
 
     public static final int PICK_DIALOG = 100;
+    public static final int CREATE_DIALOG = 200;
 
     private static final String TAG = DialogsListFragment.class.getSimpleName();
     private static final int LOADER_ID = DialogsListFragment.class.hashCode();
@@ -243,9 +244,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivityResult "+requestCode);
-        if (PICK_DIALOG == requestCode && data != null){
+        Log.i(TAG, "onActivityResult " + requestCode + ", data= " + data);
+        if (PICK_DIALOG == requestCode && data != null) {
             updateDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
+        } else if (CREATE_DIALOG == requestCode && data != null) {
+            updateDialogsAdapter(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -335,14 +338,14 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         Log.d(TAG, "onLoadFinished dialogsListAdapter.getCount() " + dialogsListAdapter.getCount());
     }
 
-    private void addChat(){
+    private void addChat() {
         boolean hasFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
-        if (isFriendsLoading()){
+        if (isFriendsLoading()) {
             ToastUtils.longToast(R.string.chat_service_is_initializing);
-        } else if (!hasFriends){
+        } else if (!hasFriends) {
             ToastUtils.longToast(R.string.new_message_no_friends_for_new_message);
         } else {
-            NewMessageActivity.start(getActivity());
+            NewMessageActivity.startForResult(this, CREATE_DIALOG);
         }
     }
 
@@ -383,6 +386,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
 
         baseActivity.updateBroadcastActionList();
+    }
+
+    private void updateDialogsAdapter(String dialogId) {
+        QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
+
+        dialogsListAdapter.addNewItem(dialogWrapper);
     }
 
     private void initChatsDialogs() {

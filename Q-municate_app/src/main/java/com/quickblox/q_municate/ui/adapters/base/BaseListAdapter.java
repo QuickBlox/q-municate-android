@@ -59,6 +59,11 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void addNewItem(T item) {
+        objectsList.add(0, item);
+        notifyDataSetChanged();
+    }
+
     protected void displayAvatarImage(String uri, ImageView imageView) {
         if(ValidationUtils.isNull(uri)) {
             imageView.setImageResource(R.drawable.placeholder_user);
