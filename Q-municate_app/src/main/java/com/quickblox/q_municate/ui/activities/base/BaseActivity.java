@@ -23,6 +23,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,6 +97,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private View snackBarView;
     private ActionBar actionBar;
     private Snackbar snackbar;
+    private SparseArray<Priority> snackbarClientPriority;
+
     private Map<String, Set<Command>> broadcastCommandMap;
     private Set<UserStatusChangingListener> fragmentsStatusChangingSet;
     private Set<ServiceConnectionListener> fragmentsServiceConnectionSet;
@@ -110,6 +113,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean isDialogLoading = false;
     private ConnectionListener chatConnectionListener;
     private ViewGroup root;
+    private boolean isUIDisabled;
 
     protected abstract int getContentResId();
 
@@ -248,6 +252,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void showSnackbar(int titleResId, int duration) {
+        Log.i(TAG, "showSnackbar for:" + getString(titleResId));
         if (snackBarView != null) {
             createSnackBar(titleResId, duration);
             snackbar.show();
@@ -255,10 +260,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     @Override
-    public void showSnackbar(int titleResId, int duration, int buttonTitleResId, View.OnClickListener onClickListener) {
+    public void showSnackbar(int titleResId, int duration, Priority priority) {
+        Log.i(TAG, "showSnackbar for:" + getString(titleResId));
+        snackbarClientPriority.put(titleResId, priority);
         if (snackBarView != null) {
             createSnackBar(titleResId, duration);
-            snackbar.setAction(buttonTitleResId, onClickListener);
             snackbar.show();
         }
     }
@@ -274,9 +280,17 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void hideSnackBar() {
-        if (snackbar != null) {
+        Log.i(TAG, "hideSnackBar for:" );
+        if (snackbar != null && !isSnackBarHasMaxPriority()) {
             snackbar.dismiss();
         }
+    }
+
+    @Override
+    public void hideSnackBar(int titleResId) {
+        Log.i(TAG, "hideSnackBar for:" +getString(titleResId) );
+        snackbarClientPriority.remove(titleResId);
+        hideSnackBar();
     }
 
     @Override
@@ -352,6 +366,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         fragmentsServiceConnectionSet = new HashSet<>();
         serviceConnection = new QBChatServiceConnection();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
+
+        snackbarClientPriority = new SparseArray<>();
     }
 
     protected void setUpActionBarWithUpButton() {
@@ -692,7 +708,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
             @Override
             public void authenticated(XMPPConnection xmppConnection, boolean b) {
-
+                hideSnackBar(R.string.error_login_to_chat);
+                blockUI(false);
             }
 
             @Override
@@ -708,7 +725,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
             @Override
             public void reconnectionSuccessful() {
-                hideSnackBar();
+                hideSnackBar(R.string.error_login_to_chat);
                 blockUI(false);
             }
 
@@ -725,6 +742,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void blockUI(boolean stopUserInteractions){
+        if (isUIDisabled == stopUserInteractions) {
+            return;
+        }
+        isUIDisabled = stopUserInteractions;
         disableEnableControls(!stopUserInteractions, root);
     }
 
@@ -744,6 +765,18 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void activateButterKnife() {
         ButterKnife.bind(this);
+    }
+
+    private boolean isSnackBarHasMaxPriority(){
+        if (snackbarClientPriority.size() == 0){
+            return false;
+        }
+        for (int i = 0; i < snackbarClientPriority.size(); i++) {
+            if (Priority.MAX == snackbarClientPriority.valueAt(i)){
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void performLoadChatsSuccessAction(Bundle bundle) {
@@ -795,7 +828,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         public void execute(Bundle bundle) {
             QBLoginChatCompositeCommand.setIsRunning(false);
             blockUI(true);
-            showSnackbar(R.string.error_login_to_chat, Snackbar.LENGTH_INDEFINITE);
+            showSnackbar(R.string.error_login_to_chat, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
         }
     }
 

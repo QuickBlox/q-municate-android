@@ -145,13 +145,20 @@ public class QBService extends Service {
 
 
     private void registerLoginChatCommand() {
-        CompositeServiceCommand loginChatCommand = new QBLoginChatCompositeCommand(this,
+        CompositeServiceCommand loginChatCompositeCommand = new QBLoginChatCompositeCommand(this,
                 QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION,
                 QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
 
-        addLoginChatAndInitCommands(loginChatCommand);
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, chatRestHelper,
+                QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION,
+                QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
 
-        serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_COMPOSITE_ACTION, loginChatCommand);
+        addLoginChatAndInitCommands(loginChatCompositeCommand, loginChatCommand);
+
+
+        serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_ACTION, loginChatCommand);
+        serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_COMPOSITE_ACTION, loginChatCompositeCommand);
     }
 
 
@@ -395,17 +402,15 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.LOGOUT_ACTION, logoutCommand);
     }
 
-    private void addLoginChatAndInitCommands(CompositeServiceCommand loginCommand) {
+    private void addLoginChatAndInitCommands(CompositeServiceCommand loginCommand, ServiceCommand loginChatCommand) {
         QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
         QBChatHelper chatHelper = (QBChatHelper) getHelper(CHAT_HELPER);
         QBFriendListHelper friendListHelper = (QBFriendListHelper) getHelper(FRIEND_LIST_HELPER);
 
-        QBInitChatServiceCommand initChatServiceCommand = new QBInitChatServiceCommand(this, chatRestHelper,
+        QBInitChatServiceCommand initChatServiceCommand = new QBInitChatServiceCommand(this, chatHelper,
+                chatRestHelper,
                 QBServiceConsts.INIT_CHAT_SERVICE_SUCCESS_ACTION,
                 QBServiceConsts.INIT_CHAT_SERVICE_FAIL_ACTION);
-        QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, chatRestHelper,
-                QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION,
-                QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
         QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, chatHelper,
                 QBServiceConsts.INIT_CHATS_SUCCESS_ACTION,
                 QBServiceConsts.INIT_CHATS_FAIL_ACTION);

@@ -30,7 +30,7 @@ android {
 
         //have to remove before merge to master branch
         ext.betaDistrubutionGroupAliases=property('testers_group_name')
-        ext.betaDistributionEmails=property('testers_notification_e-mails')
+        ext.betaDistributionEmails=property('testers_emails')
     }
 
     signingConfigs {
@@ -95,6 +95,17 @@ android {
 
     applicationVariants.all { variant ->
         changeApkFileName(variant)
+    }
+
+    productFlavors {
+
+        prod {
+
+        }
+
+        stage {
+            applicationId "com.quickblox.q_municate.stage"
+        }
     }
 }
 

@@ -5,4 +5,7 @@
 
     <string name="app_policy_link">http://q-municate.com/agreement/</string>
 
+    <string name="api_domain"></string>
+    <string name="chat_domain"></string>
+
 </resources>

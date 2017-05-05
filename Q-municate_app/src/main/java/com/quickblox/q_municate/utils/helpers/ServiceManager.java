@@ -7,7 +7,9 @@ import android.util.Log;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSession;
+import com.quickblox.auth.session.QBSessionListenerImpl;
 import com.quickblox.auth.session.QBSessionManager;
+import com.quickblox.auth.session.QBSessionParameters;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
@@ -48,7 +50,7 @@ import rx.schedulers.Schedulers;
 
 public class ServiceManager {
 
-    public static final String TAG = "ServiceManager";
+    public static final String TAG = ServiceManager.class.getSimpleName();
     private static final String TAG_ANDROID = "android";
 
     private static ServiceManager instance;
@@ -57,6 +59,7 @@ public class ServiceManager {
 
     private QMAuthService authService;
     private QMUserService userService;
+    private QBSessionListener sessionListener;
 
     public static ServiceManager getInstance(){
         if(instance == null){
@@ -69,6 +72,9 @@ public class ServiceManager {
         this.context = App.getInstance();
         authService = QMAuthService.getInstance();
         userService = QMUserService.getInstance();
+
+        sessionListener = new QBSessionListener();
+        QBSessionManager.getInstance().addListener(sessionListener);
     }
 
     public Observable<QBUser> login(QBUser user) {
@@ -263,95 +269,6 @@ public class ServiceManager {
         return result;
     }
 
-    public QBUser loginSync(QBUser inputUser) throws QBResponseException, BaseServiceException {
-        QBUser qbUser;
-        String password = inputUser.getPassword();
-        qbUser = QMAuthService.getInstance().loginSync(inputUser);
-
-        if (!hasUserCustomData(qbUser)) {
-            qbUser.setOldPassword(password);
-            updateUserSync(qbUser);
-        }
-
-        qbUser.setPassword(password);
-
-        saveOwnerUser(qbUser);
-
-        AppSession.startSession(qbUser);
-
-        return qbUser;
-    }
-
-    public QBUser loginSync(String socialProvider, String accessToken,
-                        String accessTokenSecret) throws QBResponseException, BaseServiceException {
-        QBUser qbUser;
-        qbUser = QMAuthService.getInstance().loginSync(socialProvider, accessToken, accessTokenSecret);
-
-        if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
-            CoreSharedHelper.getInstance().saveTDServiceProvider(accessToken);
-            CoreSharedHelper.getInstance().saveTDCredentials(accessTokenSecret);
-        } else {
-            CoreSharedHelper.getInstance().saveFBToken(accessToken);
-        }
-
-        QBSession session = QBSessionManager.getInstance().getActiveSession();
-
-        qbUser.setPassword(session.getToken());
-
-        if (!hasUserCustomData(qbUser)) {
-            qbUser.setOldPassword(session.getToken());
-            qbUser = updateUserSync(qbUser);
-        }
-
-        qbUser.setPassword(session.getToken());
-        String qbToken = QBAuth.getBaseService().getToken();
-
-        saveOwnerUser(qbUser);
-
-        AppSession.startSession(qbUser);
-
-        return qbUser;
-    }
-
-    public QBUser signupSync(QBUser inputUser, File file) throws QBResponseException, BaseServiceException {
-        QBUser qbUser;
-        UserCustomData userCustomData = new UserCustomData();
-
-        String password = inputUser.getPassword();
-        inputUser.setOldPassword(password);
-        inputUser.setCustomData(Utils.customDataToString(userCustomData));
-
-        StringifyArrayList<String> stringifyArrayList = new StringifyArrayList<String>();
-        stringifyArrayList.add(TAG_ANDROID);
-        inputUser.setTags(stringifyArrayList);
-
-        qbUser = QMAuthService.getInstance().signUpLoginSync(inputUser);
-
-        if (file != null) {
-            QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null).perform();
-            userCustomData.setAvatarUrl(qbFile.getPublicUrl());
-            inputUser.setCustomData(Utils.customDataToString(userCustomData));
-            qbUser = QBUsers.updateUser(inputUser).perform();
-        }
-
-        qbUser.setCustomDataClass(UserCustomData.class);
-        qbUser.setPassword(password);
-
-        saveOwnerUser(qbUser);
-
-        AppSession.startSession(qbUser);
-
-        return qbUser;
-    }
-
-    public void logoutSync() throws QBResponseException {
-        if(QBPushManager.getInstance().isSubscribedToPushes()) {
-            SubscribeService.unSubscribeFromPushes(context);
-        }
-        QMAuthService.getInstance().logoutSync();
-        clearDataAfterLogOut();
-    }
-
     public QBUser updateUserSync(QBUser inputUser) throws QBResponseException {
         QBUser user;
 
@@ -371,37 +288,6 @@ public class ServiceManager {
         } else {
             user.setPassword(QBSessionManager.getInstance().getToken());
         }
-
-        return user;
-    }
-
-    public QBUser updateUserSync(QBUser user, File file) throws QBResponseException {
-        QBUser newUser = new QBUser();
-
-        QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null).perform();
-        newUser.setId(user.getId());
-        newUser.setPassword(user.getPassword());
-        newUser.setFileId(qbFile.getId());
-        newUser.setFullName(user.getFullName());
-
-        UserCustomData userCustomData = getUserCustomData(user);
-        userCustomData.setAvatarUrl(qbFile.getPublicUrl());
-        newUser.setCustomData(Utils.customDataToString(userCustomData));
-
-        return updateUserSync(newUser);
-    }
-
-
-    public void resetPasswordSync(String email) throws QBResponseException {
-        QMAuthService.getInstance().resetPasswordSync(email);
-    }
-
-    public QBUser changePasswordUserSync(QBUser inputUser) throws QBResponseException {
-        QBUser user;
-        String password = inputUser.getPassword();
-        QMUser qmUser = QMUser.convert(inputUser);
-        user = QMUserService.getInstance().updateUserSync(qmUser);
-        user.setPassword(password);
 
         return user;
     }
@@ -459,4 +345,19 @@ public class ServiceManager {
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
 
+    private static class QBSessionListener extends QBSessionListenerImpl {
+
+        @Override
+        public void onSessionUpdated(QBSessionParameters sessionParameters) {
+            Log.d(TAG, "onSessionUpdated pswd:" + sessionParameters.getUserPassword()
+                    + ", iserId : " + sessionParameters.getUserId());
+            QBUser qbUser = AppSession.getSession().getUser();
+            if (sessionParameters.getSocialProvider() != null) {
+                qbUser.setPassword(QBSessionManager.getInstance().getToken());
+            } else {
+                qbUser.setPassword(sessionParameters.getUserPassword());
+            }
+            AppSession.getSession().updateUser(qbUser);
+        }
+    }
 }

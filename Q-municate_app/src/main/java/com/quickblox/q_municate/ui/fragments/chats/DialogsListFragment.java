@@ -508,6 +508,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         @Override
         public void execute(Bundle bundle) {
             baseActivity.hideProgress();
+            dialogsListAdapter.removeItem(bundle.getString(QBServiceConsts.EXTRA_DIALOG_ID));
         }
     }
 
@@ -555,6 +556,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                         }
                     }
                     else if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
+                        int action = ((Bundle) data).getInt(BaseManager.EXTRA_ACTION);
+                        if (action == BaseManager.DELETE_ACTION) {
+                            return;
+                        }
                         Dialog dialog = getObjFromBundle((Bundle) data);
                         if (dialog != null) {
                             updateDialog(dialog.getDialogId());

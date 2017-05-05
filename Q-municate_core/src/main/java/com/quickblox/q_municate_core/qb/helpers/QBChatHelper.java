@@ -130,9 +130,13 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
+    public void initChatService() {
+        Log.v(TAG, "initChatService()");
+        this.chatService = QBChatService.getInstance();
+    }
+
     public void init(QBUser chatCreator) {
         Log.v(TAG, "init()");
-        this.chatService = QBChatService.getInstance();
         this.chatCreator = chatCreator;
 
         initCurrentDialogForChatIfPossible();
