@@ -91,6 +91,8 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         if (position != -1){
             Log.i(TAG, "find position = " + position);
             objectsList.set(position, dlgWrapper);
+        } else {
+            addNewItem(dlgWrapper);
         }
     }
 
