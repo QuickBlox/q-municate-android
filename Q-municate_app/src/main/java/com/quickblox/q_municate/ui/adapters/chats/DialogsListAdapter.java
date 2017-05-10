@@ -11,7 +11,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -77,7 +76,7 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         return convertView;
     }
 
-    public void updateItem(DialogWrapper dlgWrapper) {
+    public void updateItem(DialogWrapper dlgWrapper, boolean updatePosition) {
         Log.i(TAG, "updateItem = " + dlgWrapper.getChatDialog().getUnreadMessageCount());
         int position = -1;
         for (int i = 0; i < objectsList.size() ; i++) {
@@ -88,12 +87,22 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
             }
         }
 
-        if (position != -1){
+        if (position != -1) {
             Log.i(TAG, "find position = " + position);
-            objectsList.set(position, dlgWrapper);
+            moveToFirstPosition(position, dlgWrapper, updatePosition);
         } else {
             addNewItem(dlgWrapper);
         }
+    }
+
+    private void moveToFirstPosition(int position, DialogWrapper dlgWrapper, boolean updatePosition) {
+        if (position > 0 && updatePosition) {
+            objectsList.remove(position);
+            objectsList.add(0, dlgWrapper);
+        } else {
+            objectsList.set(position, dlgWrapper);
+        }
+        notifyDataSetChanged();
     }
 
     private static class ViewHolder {
