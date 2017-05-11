@@ -189,7 +189,7 @@ ChatUtils {
             if (dialogOccupant == null && onlyMeInDialog) {
                 QMUser user = QMUserService.getInstance().getUserCache().get((long) AppSession.getSession().getUser().getId());
                 DbUtils.saveDialogOccupant(dataManager,
-                        createDialogOccupant(dataManager, qbDialog.getDialogId(), user));
+                        createDialogOccupant(dataManager, qbDialog.getDialogId(), user), false);
                 dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), AppSession.getSession().getUser().getId());
             }
 

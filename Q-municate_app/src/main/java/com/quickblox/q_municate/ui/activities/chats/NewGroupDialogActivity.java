@@ -27,6 +27,7 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
 
     public static void start(Context context) {
         Intent intent = new Intent(context, NewGroupDialogActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         context.startActivity(intent);
     }
 

@@ -728,7 +728,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         if (chatDialog == null) {
             chatDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, QBDialogType.PRIVATE);
             ChatUtils.addOccupantsToQBDialog(chatDialog, chatMessage);
-            DbUtils.saveDialogToCache(dataManager, chatDialog);
+            DbUtils.saveDialogToCache(dataManager, chatDialog, false);
         }
 
         boolean isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());

@@ -70,6 +70,7 @@ import butterknife.OnItemClick;
 public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>> {
 
     public static final int PICK_DIALOG = 100;
+    public static final int CREATE_DIALOG = 200;
 
     private static final String TAG = DialogsListFragment.class.getSimpleName();
     private static final int LOADER_ID = DialogsListFragment.class.hashCode();
@@ -243,21 +244,23 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivityResult "+requestCode);
-        if (PICK_DIALOG == requestCode && data != null){
-            updateDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
+        Log.i(TAG, "onActivityResult " + requestCode + ", data= " + data);
+        if (PICK_DIALOG == requestCode && data != null) {
+            updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
+        } else if (CREATE_DIALOG == requestCode && data != null) {
+            addDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void updateDialog(String dialogId) {
+    private void updateOrAddDialog(String dialogId) {
         QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
-        Log.i(TAG, "updateDialog dialogWrapper="+dialogWrapper.getTotalCount());
+        Log.i(TAG, "updateOrAddDialog dialogWrapper=" + dialogWrapper.getTotalCount());
         dialogsListAdapter.updateItem(dialogWrapper);
 
         int start = dialogsListView.getFirstVisiblePosition();
-        for(int i=start, j=dialogsListView.getLastVisiblePosition();i<=j;i++) {
+        for (int i = start, j = dialogsListView.getLastVisiblePosition(); i <= j; i++) {
             DialogWrapper result = (DialogWrapper) dialogsListView.getItemAtPosition(i);
             if (result.getChatDialog().getDialogId().equals(dialogId)) {
                 View view = dialogsListView.getChildAt(i - start);
@@ -335,14 +338,14 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         Log.d(TAG, "onLoadFinished dialogsListAdapter.getCount() " + dialogsListAdapter.getCount());
     }
 
-    private void addChat(){
+    private void addChat() {
         boolean hasFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
-        if (isFriendsLoading()){
+        if (isFriendsLoading()) {
             ToastUtils.longToast(R.string.chat_service_is_initializing);
-        } else if (!hasFriends){
+        } else if (!hasFriends) {
             ToastUtils.longToast(R.string.new_message_no_friends_for_new_message);
         } else {
-            NewMessageActivity.start(getActivity());
+            NewMessageActivity.startForResult(this, CREATE_DIALOG);
         }
     }
 
@@ -383,6 +386,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
 
         baseActivity.updateBroadcastActionList();
+    }
+
+    private void addDialog(String dialogId) {
+        QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
+
+        dialogsListAdapter.addNewItem(dialogWrapper);
     }
 
     private void initChatsDialogs() {
@@ -551,18 +561,18 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                             && (((Bundle) data).getSerializable(BaseManager.EXTRA_OBJECT) instanceof Message)){
                         Message message = getObjFromBundle((Bundle) data);
                         if (message.getDialogOccupant() != null && message.getDialogOccupant().getDialog() != null) {
-                            updateDialog(message.getDialogOccupant().getDialog().getDialogId());
+                            updateOrAddDialog(message.getDialogOccupant().getDialog().getDialogId());
                         }
                     }
                     else if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
                         Dialog dialog = getObjFromBundle((Bundle) data);
                         if (dialog != null) {
-                            updateDialog(dialog.getDialogId());
+                            updateOrAddDialog(dialog.getDialogId());
                         }
                     } else if (observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
                         DialogOccupant dialogOccupant = getObjFromBundle((Bundle) data);
                         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
-                            updateDialog(dialogOccupant.getDialog().getDialogId());
+                            updateOrAddDialog(dialogOccupant.getDialog().getDialogId());
                         }
                     }
                 } else if (data.equals(QMUserCacheImpl.OBSERVE_KEY)) {

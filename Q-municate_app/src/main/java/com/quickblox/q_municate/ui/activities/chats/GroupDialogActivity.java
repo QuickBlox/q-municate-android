@@ -33,6 +33,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
     public static void start(Context context, QBChatDialog chatDialog) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         context.startActivity(intent);
     }
 
