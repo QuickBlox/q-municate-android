@@ -45,7 +45,6 @@ import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogMessagesCommand;
@@ -145,6 +144,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private BlockingQueue<Runnable> threadQueue;
     private ThreadPoolExecutor threadPool;
+    private boolean needUpdatePosition;
 
     @Override
     protected int getContentResId() {
@@ -275,6 +275,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (getCallingActivity() != null) {
             Intent intent = new Intent();
             intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, currentChatDialog.getDialogId());
+            intent.putExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, needUpdatePosition);
             setResult(RESULT_OK, intent);
         }
     }
@@ -820,6 +821,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 int action = observableData.getInt(MessageDataManager.EXTRA_ACTION);
                 Message message = (Message) observableData.getSerializable(MessageDataManager.EXTRA_OBJECT);
                 if (message != null) {
+                    needUpdatePosition = true;
                     CombinationMessage combinationMessage = new CombinationMessage(message);
                     if (action == MessageDataManager.UPDATE_ACTION) {
                         Log.d(TAG, "updated message = " + message);
