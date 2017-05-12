@@ -76,7 +76,7 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         return convertView;
     }
 
-    public void updateItem(DialogWrapper dlgWrapper, boolean updatePosition) {
+    public void updateItem(DialogWrapper dlgWrapper) {
         Log.i(TAG, "updateItem = " + dlgWrapper.getChatDialog().getUnreadMessageCount());
         int position = -1;
         for (int i = 0; i < objectsList.size() ; i++) {
@@ -89,20 +89,18 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
 
         if (position != -1) {
             Log.i(TAG, "find position = " + position);
-            moveToFirstPosition(position, dlgWrapper, updatePosition);
+            objectsList.set(position, dlgWrapper);
         } else {
             addNewItem(dlgWrapper);
         }
     }
 
-    private void moveToFirstPosition(int position, DialogWrapper dlgWrapper, boolean updatePosition) {
-        if (position > 0 && updatePosition) {
-            objectsList.remove(position);
+    public void updateItemPosition(DialogWrapper dlgWrapper) {
+        if (!objectsList.get(0).equals(dlgWrapper)) {
+            objectsList.remove(dlgWrapper);
             objectsList.add(0, dlgWrapper);
-        } else {
-            objectsList.set(position, dlgWrapper);
+            notifyDataSetChanged();
         }
-        notifyDataSetChanged();
     }
 
     private static class ViewHolder {

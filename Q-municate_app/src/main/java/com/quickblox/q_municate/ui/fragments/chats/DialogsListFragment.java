@@ -263,7 +263,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
         Log.i(TAG, "updateOrAddDialog dialogWrapper=" + dialogWrapper.getTotalCount());
-        dialogsListAdapter.updateItem(dialogWrapper, updatePosition);
+        dialogsListAdapter.updateItem(dialogWrapper);
+
+        if(updatePosition) {
+            dialogsListAdapter.updateItemPosition(dialogWrapper);
+        }
 
         int start = dialogsListView.getFirstVisiblePosition();
         for (int i = start, j = dialogsListView.getLastVisiblePosition(); i <= j; i++) {
