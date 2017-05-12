@@ -11,7 +11,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -89,9 +88,19 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
             }
         }
 
-        if (position != -1){
+        if (position != -1) {
             Log.i(TAG, "find position = " + position);
             objectsList.set(position, dlgWrapper);
+        } else {
+            addNewItem(dlgWrapper);
+        }
+    }
+
+    public void updateItemPosition(DialogWrapper dlgWrapper) {
+        if (!objectsList.get(0).equals(dlgWrapper)) {
+            objectsList.remove(dlgWrapper);
+            objectsList.add(0, dlgWrapper);
+            notifyDataSetChanged();
         }
     }
 

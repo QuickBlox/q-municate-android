@@ -40,7 +40,15 @@ public class DbUtils {
 
     public static void saveDialogToCache(DataManager dataManager, QBChatDialog qbDialog) {
         dataManager.getQBChatDialogDataManager().createOrUpdate(qbDialog);
+        saveDialogsOccupants(dataManager, qbDialog);
+    }
 
+    public static void saveDialogToCache(DataManager dataManager, QBChatDialog qbDialog, boolean notify) {
+        dataManager.getQBChatDialogDataManager().createOrUpdate(qbDialog, notify);
+        saveDialogsOccupants(dataManager, qbDialog);
+    }
+
+    private static void saveDialogsOccupants(DataManager dataManager, QBChatDialog qbDialog) {
         if (qbDialog.getOccupants() != null && !qbDialog.getOccupants().isEmpty()) {
             saveDialogsOccupants(dataManager, qbDialog, false);
         }
@@ -77,6 +85,10 @@ public class DbUtils {
 
     public static void saveDialogOccupant(DataManager dataManager, DialogOccupant dialogOccupant) {
         dataManager.getDialogOccupantDataManager().createOrUpdate(dialogOccupant);
+    }
+
+    public static void saveDialogOccupant(DataManager dataManager, DialogOccupant dialogOccupant, boolean notify) {
+        dataManager.getDialogOccupantDataManager().createOrUpdate(dialogOccupant, notify);
     }
 
     public static void saveDialogsOccupants(DataManager dataManager, List<QBChatDialog> qbDialogsList) {

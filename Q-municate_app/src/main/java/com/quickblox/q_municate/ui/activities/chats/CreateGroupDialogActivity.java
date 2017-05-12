@@ -59,6 +59,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     public static void start(Context context, List<QMUser> selectedFriendsList) {
         Intent intent = new Intent(context, CreateGroupDialogActivity.class);
         intent.putExtra(EXTRA_FRIENDS_LIST, (Serializable) selectedFriendsList);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         context.startActivity(intent);
     }
 
