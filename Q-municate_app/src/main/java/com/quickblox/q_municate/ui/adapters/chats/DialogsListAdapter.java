@@ -15,6 +15,7 @@ import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
@@ -101,6 +102,20 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
             objectsList.add(0, dlgWrapper);
             notifyDataSetChanged();
         }
+    }
+
+    public void removeItem(String dialogId) {
+        Iterator<DialogWrapper> iterator = objectsList.iterator();
+
+        while (iterator.hasNext()){
+            DialogWrapper dialogWrapper = iterator.next();
+            if (dialogWrapper.getChatDialog().getDialogId().equals(dialogId)){
+                iterator.remove();
+                notifyDataSetChanged();
+                break;
+            }
+        }
+
     }
 
     private static class ViewHolder {
