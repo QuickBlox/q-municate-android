@@ -744,7 +744,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
                 !ownMessage
                         ? State.DELIVERED
                         : State.SYNC,
-                needNotifyObserver);
+                true);
 
         checkForSendingNotification(ownMessage, chatMessage, user, isPrivateChatMessage);
     }

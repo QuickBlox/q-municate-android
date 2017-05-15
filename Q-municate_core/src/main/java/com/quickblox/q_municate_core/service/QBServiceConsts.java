@@ -187,8 +187,8 @@ public class QBServiceConsts {
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
     public static final String EXTRA_DIALOG_ID = "dialog_id";
-    public static final String EXTRA_DIALOG_TYPE = "dialog_type";
     public static final String EXTRA_DIALOG_UPDATE_POSITION = "dialog_update_position";
+    public static final String EXTRA_DIALOG_TYPE = "dialog_type";
     public static final String EXTRA_IS_OWN_MESSAGE = "is_own_message";
     public static final String EXTRA_GROUP_DIALOG = "group_dialog";
     public static final String EXTRA_GROUP_DIALOGS = "group_dialogs";
