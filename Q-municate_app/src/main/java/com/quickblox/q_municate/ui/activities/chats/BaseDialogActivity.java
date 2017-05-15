@@ -820,7 +820,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 Bundle observableData = (Bundle) data;
                 int action = observableData.getInt(MessageDataManager.EXTRA_ACTION);
                 Message message = (Message) observableData.getSerializable(MessageDataManager.EXTRA_OBJECT);
-                if (message != null) {
+
+                if (message != null && message.getDialogOccupant() != null && message.getDialogOccupant().getDialog() != null
+                        && currentChatDialog.getDialogId().equals(message.getDialogOccupant().getDialog().getDialogId())) {
                     needUpdatePosition = true;
                     CombinationMessage combinationMessage = new CombinationMessage(message);
                     if (action == MessageDataManager.UPDATE_ACTION) {
@@ -850,6 +852,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 int action = observableData.getInt(DialogNotificationDataManager.EXTRA_ACTION);
                 DialogNotification dialogNotification = (DialogNotification) observableData.getSerializable(DialogNotificationDataManager.EXTRA_OBJECT);
                 if (dialogNotification != null) {
+                    needUpdatePosition = true;
                     CombinationMessage combinationMessage = new CombinationMessage(dialogNotification);
                     if (action == DialogNotificationDataManager.UPDATE_ACTION) {
                         Log.d(TAG, "updated dialogNotification = " + dialogNotification);

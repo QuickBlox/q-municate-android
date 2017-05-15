@@ -202,6 +202,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
         addActions();
+        addMessageObserver();
         initDataLoader(LOADER_ID);
     }
 
@@ -246,6 +247,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
         Log.d(TAG, "onDestroy() removeActions");
         removeActions();
+        removeMessageObserver();
     }
 
     @Override
@@ -367,9 +369,16 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         emptyListTextView.setVisibility(dialogsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
+    private void addMessageObserver() {
+        dataManager.getMessageDataManager().addObserver(commonObserver);
+    }
+
+    private void removeMessageObserver() {
+        dataManager.getMessageDataManager().deleteObserver(commonObserver);
+    }
+
     private void addObservers() {
         dataManager.getQBChatDialogDataManager().addObserver(commonObserver);
-        dataManager.getMessageDataManager().addObserver(commonObserver);
         ((Observable)QMUserService.getInstance().getUserCache()).addObserver(commonObserver);
         dataManager.getDialogOccupantDataManager().addObserver(commonObserver);
     }
@@ -377,7 +386,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void deleteObservers() {
         if (dataManager != null) {
             dataManager.getQBChatDialogDataManager().deleteObserver(commonObserver);
-            dataManager.getMessageDataManager().deleteObserver(commonObserver);
             ((Observable)QMUserService.getInstance().getUserCache()).deleteObserver(commonObserver);
             dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
         }
@@ -572,7 +580,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                             && (((Bundle) data).getSerializable(BaseManager.EXTRA_OBJECT) instanceof Message)){
                         Message message = getObjFromBundle((Bundle) data);
                         if (message.getDialogOccupant() != null && message.getDialogOccupant().getDialog() != null) {
-                            updateOrAddDialog(message.getDialogOccupant().getDialog().getDialogId(), true);
+                            boolean updatePosition = message.isIncoming(AppSession.getSession().getUser().getId());
+                            Log.i(TAG, "CommonObserver getMessageDataManager updatePosition= " + updatePosition);
+
+                            updateOrAddDialog(message.getDialogOccupant().getDialog().getDialogId(), updatePosition);
                         }
                     }
                     else if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
@@ -582,11 +593,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                         }
                         Dialog dialog = getObjFromBundle((Bundle) data);
                         if (dialog != null) {
+                            Log.i(TAG, "CommonObserver getQBChatDialogDataManager");
                             updateOrAddDialog(dialog.getDialogId(), true);
                         }
                     } else if (observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
                         DialogOccupant dialogOccupant = getObjFromBundle((Bundle) data);
                         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
+                            Log.i(TAG, "CommonObserver getDialogOccupantDataManager");
                             updateOrAddDialog(dialogOccupant.getDialog().getDialogId(), false);
                         }
                     }
