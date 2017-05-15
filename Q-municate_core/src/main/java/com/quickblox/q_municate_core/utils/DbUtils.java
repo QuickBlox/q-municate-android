@@ -139,8 +139,7 @@ public class DbUtils {
 
             saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, msgState, false);
         }
-
-        updateDialogModifiedDate(dataManager, dialogId, true);
+        updateDialogModifiedDate(dataManager, dialogId, false);
     }
 
     public static void saveMessageOrNotificationToCache(Context context, DataManager dataManager,

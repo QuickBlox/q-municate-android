@@ -357,7 +357,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         QBChatDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(dataManager, userId);
         if (existingPrivateDialog == null) {
             existingPrivateDialog = createPrivateChatOnRest(userId);
-            DbUtils.saveDialogToCache(dataManager, existingPrivateDialog);
+            DbUtils.saveDialogToCache(dataManager, existingPrivateDialog, false);
         }
         return existingPrivateDialog;
     }
@@ -777,7 +777,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             QBChatDialog newChatDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
             ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(chatCreator.getId(), qbChatMessage.getSenderId());
             newChatDialog.setOccupantsIds(occupantsIdsList);
-            DbUtils.saveDialogToCache(dataManager, newChatDialog);
+            DbUtils.saveDialogToCache(dataManager, newChatDialog, false);
         }
 
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());

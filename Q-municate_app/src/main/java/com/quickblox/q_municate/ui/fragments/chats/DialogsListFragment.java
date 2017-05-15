@@ -47,8 +47,10 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
@@ -100,17 +102,23 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
+        initFields();
+        initChatsDialogs();
+        addActions();
+        addObservers();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_dialogs_list, container, false);
-
         activateButterKnife(view);
-
-        initFields();
-        initChatsDialogs();
-
         registerForContextMenu(dialogsListView);
 
+        dialogsListView.setAdapter(dialogsListAdapter);
         return view;
     }
 
@@ -193,18 +201,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
-    }
-
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
-        addActions();
-        addMessageObserver();
         initDataLoader(LOADER_ID);
     }
 
@@ -212,7 +211,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        addObservers();
         if (dialogsListAdapter != null) {
             checkVisibilityEmptyLabel();
         }
@@ -233,8 +231,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause() deleteObservers");
-        deleteObservers();
+        Log.d(TAG, "onPause()");
     }
 
     @Override
@@ -244,12 +241,18 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView()");
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
 
-        Log.d(TAG, "onDestroy() removeActions");
+        Log.d(TAG, "onDestroy() removeActions and deleteObservers");
         removeActions();
-        removeMessageObserver();
+        deleteObservers();
     }
 
     @Override
@@ -258,7 +261,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if (PICK_DIALOG == requestCode && data != null) {
             updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), data.getBooleanExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, false));
         } else if (CREATE_DIALOG == requestCode && data != null) {
-            addDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
+            updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), true);
         } else if (SettingsActivity.REQUEST_CODE_LOGOUT  == requestCode && RESULT_OK == resultCode){
             getActivity().finish();
         }
@@ -268,7 +271,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void updateOrAddDialog(String dialogId, boolean updatePosition) {
         QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
-        Log.i(TAG, "updateOrAddDialog dialogWrapper=" + dialogWrapper.getTotalCount());
+        Log.i(TAG, "updateOrAddDialog dialogWrapper= " + dialogWrapper.getTotalCount());
         dialogsListAdapter.updateItem(dialogWrapper);
 
         if(updatePosition) {
@@ -373,25 +376,21 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         emptyListTextView.setVisibility(dialogsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
-    private void addMessageObserver() {
-        dataManager.getMessageDataManager().addObserver(commonObserver);
-    }
-
-    private void removeMessageObserver() {
-        dataManager.getMessageDataManager().deleteObserver(commonObserver);
-    }
-
     private void addObservers() {
         dataManager.getQBChatDialogDataManager().addObserver(commonObserver);
-        ((Observable)QMUserService.getInstance().getUserCache()).addObserver(commonObserver);
+        dataManager.getMessageDataManager().addObserver(commonObserver);
         dataManager.getDialogOccupantDataManager().addObserver(commonObserver);
+        dataManager.getDialogNotificationDataManager().addObserver(commonObserver);
+        ((Observable)QMUserService.getInstance().getUserCache()).addObserver(commonObserver);
     }
 
     private void deleteObservers() {
         if (dataManager != null) {
             dataManager.getQBChatDialogDataManager().deleteObserver(commonObserver);
-            ((Observable)QMUserService.getInstance().getUserCache()).deleteObserver(commonObserver);
+            dataManager.getMessageDataManager().deleteObserver(commonObserver);
             dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
+            dataManager.getDialogNotificationDataManager().deleteObserver(commonObserver);
+            ((Observable)QMUserService.getInstance().getUserCache()).deleteObserver(commonObserver);
         }
     }
 
@@ -410,17 +409,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         baseActivity.updateBroadcastActionList();
     }
 
-    private void addDialog(String dialogId) {
-        QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
-        DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
-
-        dialogsListAdapter.addNewItem(dialogWrapper);
-    }
-
     private void initChatsDialogs() {
         List<DialogWrapper> dialogsList = new ArrayList<>();
         dialogsListAdapter = new DialogsListAdapter(baseActivity, dialogsList);
-        dialogsListView.setAdapter(dialogsListAdapter);
     }
 
     private void startPrivateChatActivity(QBChatDialog chatDialog) {
@@ -597,14 +588,18 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                         }
                         Dialog dialog = getObjFromBundle((Bundle) data);
                         if (dialog != null) {
-                            Log.i(TAG, "CommonObserver getQBChatDialogDataManager");
                             updateOrAddDialog(dialog.getDialogId(), true);
                         }
                     } else if (observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
                         DialogOccupant dialogOccupant = getObjFromBundle((Bundle) data);
                         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
-                            Log.i(TAG, "CommonObserver getDialogOccupantDataManager");
                             updateOrAddDialog(dialogOccupant.getDialog().getDialogId(), false);
+                        }
+                    } else if(observeKey.equals(dataManager.getDialogNotificationDataManager().getObserverKey())) {
+                        Bundle observableData = (Bundle) data;
+                        DialogNotification dialogNotification = (DialogNotification) observableData.getSerializable(DialogNotificationDataManager.EXTRA_OBJECT);
+                        if(dialogNotification != null) {
+                            updateOrAddDialog(dialogNotification.getDialogOccupant().getDialog().getDialogId(), true);
                         }
                     }
                 } else if (data.equals(QMUserCacheImpl.OBSERVE_KEY)) {
