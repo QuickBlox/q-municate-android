@@ -308,10 +308,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         registerBroadcastReceivers();
 
         addActions();
-
         NotificationManagerHelper.clearNotificationEvent(this);
-
-        checkOpeningDialog();
 
         checkShowingConnectionError();
     }
@@ -638,26 +635,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return isDialogLoading;
     }
 
-    private void checkOpeningDialog() {
-        if (appSharedHelper.needToOpenDialog()) {
-            QBChatDialog chatDialog = DataManager.getInstance().getQBChatDialogDataManager()
-                    .getByDialogId(appSharedHelper.getPushDialogId());
-            QMUser user = QMUserService.getInstance().getUserCache().get((long)appSharedHelper.getPushUserId());
-
-            Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog + " user: " + user);
-
-            if (chatDialog != null && user != null) {
-                Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog);
-                if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
-                    startPrivateChatActivity(user, chatDialog);
-                } else {
-                    startGroupChatActivity(chatDialog);
-                }
-
-                appSharedHelper.saveNeedToOpenDialog(false);
-            }
-        }
-    }
 
     protected void loginChat() {
         isDialogLoading = true;

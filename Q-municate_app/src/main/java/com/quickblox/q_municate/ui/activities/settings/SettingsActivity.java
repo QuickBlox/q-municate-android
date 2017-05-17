@@ -1,8 +1,9 @@
 package com.quickblox.q_municate.ui.activities.settings;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -24,7 +25,6 @@ import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -38,6 +38,8 @@ import butterknife.OnClick;
 import rx.Subscriber;
 
 public class SettingsActivity extends BaseLoggableActivity {
+
+    public static final int REQUEST_CODE_LOGOUT = 100;
 
     @Bind(R.id.avatar_imageview)
     RoundedImageView avatarImageView;
@@ -55,9 +57,9 @@ public class SettingsActivity extends BaseLoggableActivity {
     private FacebookHelper facebookHelper;
     private TwitterDigitsHelper twitterDigitsHelper;
 
-    public static void start(Context context) {
-        Intent intent = new Intent(context, SettingsActivity.class);
-        context.startActivity(intent);
+    public static void startForResult(Fragment fragment) {
+        Intent intent = new Intent(fragment.getActivity(), SettingsActivity.class);
+        fragment.startActivityForResult(intent, REQUEST_CODE_LOGOUT);
     }
 
     @Override
@@ -144,6 +146,7 @@ public class SettingsActivity extends BaseLoggableActivity {
 
                                         @Override
                                         public void onNext(Void aVoid) {
+                                            setResult(RESULT_OK);
                                             hideProgress();
                                             startLandingScreen();
                                         }
@@ -184,41 +187,15 @@ public class SettingsActivity extends BaseLoggableActivity {
     }
 
     private void addActions() {
-        addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
         addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
 
         updateBroadcastActionList();
     }
 
     private void removeActions() {
-        removeAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOGOUT_FAIL_ACTION);
 
         updateBroadcastActionList();
     }
 
-    private class LogoutSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            ServiceManager.getInstance().logout(new Subscriber<Void>() {
-                @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    hideProgress();
-                    ErrorUtils.showError(SettingsActivity.this, e);
-                }
-
-                @Override
-                public void onNext(Void aVoid) {
-                    hideProgress();
-                    startLandingScreen();
-                }
-            });
-        }
-    }
 }

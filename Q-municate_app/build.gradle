@@ -35,10 +35,7 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file(property('prodStoreFile'))
-            storePassword property('prodStorePassword')
-            keyAlias property('prodKeyAlias')
-            keyPassword property('prodKeyPassword')
+
         }
         release {
             storeFile file(property('prodStoreFile'))
@@ -68,9 +65,6 @@ android {
         debug {
             debuggable true
             versionNameSuffix ' (debug)'
-            buildConfigField "String", "APP_ID", property('devAppID')
-            buildConfigField "String", "AUTH_KEY", property('devAuthKey')
-            buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
             buildConfigField "String", "ACCOUNT_KEY", property('devAccountKey')
             buildConfigField "String", "TWITTER_KEY", property('devTwitterDigitsConsumerKey')
             buildConfigField "String", "TWITTER_SECRET", property('devTwitterDigitsConsumerSecret')
@@ -100,11 +94,17 @@ android {
     productFlavors {
 
         prod {
-
+            buildConfigField "String", "APP_ID", property('devAppID')
+            buildConfigField "String", "AUTH_KEY", property('devAuthKey')
+            buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
         }
 
         stage {
             applicationId "com.quickblox.q_municate.stage"
+
+            buildConfigField "String", "APP_ID", "\"51092\""
+            buildConfigField "String", "AUTH_KEY", "\"f9pjsfBgXFtGw9D\""
+            buildConfigField "String", "AUTH_SECRET", "\"54djY7yK8DeNHJA\""
         }
     }
 }

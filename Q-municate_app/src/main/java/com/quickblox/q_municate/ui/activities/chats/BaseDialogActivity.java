@@ -61,6 +61,7 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
@@ -145,6 +146,22 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BlockingQueue<Runnable> threadQueue;
     private ThreadPoolExecutor threadPool;
     private boolean needUpdatePosition;
+
+    public static Intent makePrivateDialogIntent(Context context, QMUser user, QBChatDialog dialog){
+        Intent intent = new Intent(context, PrivateDialogActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, user);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+        return intent;
+    }
+
+    public static Intent makePGroupDialogIntent(Context context, QBChatDialog dialog){
+        Intent intent = new Intent(context, GroupDialogActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+        return intent;
+    }
+
 
     @Override
     protected int getContentResId() {
