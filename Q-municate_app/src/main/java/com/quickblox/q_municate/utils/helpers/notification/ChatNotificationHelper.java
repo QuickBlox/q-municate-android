@@ -50,19 +50,30 @@ public class ChatNotificationHelper {
 
         if (chatPush) {
             saveOpeningDialogData(userId, dialogId);
+            saveOpeningDialog(true);
+            sendChatNotification(message, userId, dialogId);
+        } else {
+            sendCommonNotification(message);
         }
 
-        saveOpeningDialog(true);
-        sendNotification(message);
     }
 
-    public void sendNotification(String message) {
+    public void sendChatNotification(String message, int userId, String dialogId) {
         NotificationEvent notificationEvent = new NotificationEvent();
         notificationEvent.setTitle(context.getString(R.string.app_name));
         notificationEvent.setSubject(message);
         notificationEvent.setBody(message);
 
-        NotificationManagerHelper.sendNotificationEvent(context, notificationEvent);
+        NotificationManagerHelper.sendChatNotificationEvent(context, userId, dialogId, notificationEvent);
+    }
+
+    private void sendCommonNotification(String message) {
+        NotificationEvent notificationEvent = new NotificationEvent();
+        notificationEvent.setTitle(context.getString(R.string.app_name));
+        notificationEvent.setSubject(message);
+        notificationEvent.setBody(message);
+
+        NotificationManagerHelper.sendCommonNotificationEvent(context, notificationEvent);
     }
 
     public void saveOpeningDialogData(int userId, String dialogId) {

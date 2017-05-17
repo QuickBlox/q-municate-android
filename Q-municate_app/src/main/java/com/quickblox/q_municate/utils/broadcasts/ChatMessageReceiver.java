@@ -31,7 +31,7 @@ public class ChatMessageReceiver extends BroadcastReceiver {
 
             chatNotificationHelper.saveOpeningDialogData(user.getId(), dialogId);
             chatNotificationHelper.saveOpeningDialog(true);
-            chatNotificationHelper.sendNotification(message);
+            chatNotificationHelper.sendChatNotification(message, user.getId(), dialogId);
         }
     }
 }

@@ -43,19 +43,6 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     @SuppressLint("LongLogTag")
     public void onActivityResumed(Activity activity) {
         Log.d("ActivityLifecycleHandler", "onActivityResumed " + activity.getClass().getSimpleName() + " count of activities = " +  numberOfActivitiesInForeground);
-        //Count only our app logeable activity
-//        boolean activityLogeable = isActivityLogeable(activity);
-//        chatDestroyed = chatDestroyed && !isLoggedIn();
-//        if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
-//            boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
-//            if (canLogin && ((BaseActivity) activity).isNetworkAvailable()) {
-//                QBLoginChatCompositeCommand.start(activity);
-//            }
-//        }
-//        if (activityLogeable) {
-//            Log.d("ActivityLifecycle", "++numberOfActivitiesInForeground");
-//            ++numberOfActivitiesInForeground;
-//        }
     }
 
     public boolean isActivityLogeable(Activity activity) {

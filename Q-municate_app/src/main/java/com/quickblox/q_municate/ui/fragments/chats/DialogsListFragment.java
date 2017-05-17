@@ -67,6 +67,8 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 
+import static android.app.Activity.RESULT_OK;
+
 public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>> {
 
     public static final int PICK_DIALOG = 100;
@@ -152,7 +154,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                 FeedbackActivity.start(getActivity());
                 break;
             case R.id.action_start_settings:
-                SettingsActivity.start(getActivity());
+                SettingsActivity.startForResult(this);
                 break;
             case R.id.action_start_about:
                 AboutActivity.start(getActivity());
@@ -257,6 +259,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), data.getBooleanExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, false));
         } else if (CREATE_DIALOG == requestCode && data != null) {
             addDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID));
+        } else if (SettingsActivity.REQUEST_CODE_LOGOUT  == requestCode && RESULT_OK == resultCode){
+            getActivity().finish();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -335,7 +339,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             baseActivity.hideSnackBar();
         }
 
-//        start load dialogs from REST when finished loading from cache
+//        startForResult load dialogs from REST when finished loading from cache
         if (dialogsListLoader.isLoadCacheFinished()) {
             QBLoadDialogsCommand.start(getContext(), true);
         }
