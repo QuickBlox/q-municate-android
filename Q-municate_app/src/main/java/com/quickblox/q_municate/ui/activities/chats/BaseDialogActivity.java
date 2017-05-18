@@ -56,7 +56,9 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
 import com.quickblox.q_municate_db.managers.MessageDataManager;
+import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Attachment;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
@@ -868,7 +870,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 Bundle observableData = (Bundle) data;
                 int action = observableData.getInt(DialogNotificationDataManager.EXTRA_ACTION);
                 DialogNotification dialogNotification = (DialogNotification) observableData.getSerializable(DialogNotificationDataManager.EXTRA_OBJECT);
-                if (dialogNotification != null) {
+
+                Log.i(TAG, "==== DialogNotificationObserver  'update' ====observableData= " + observableData);
+                if(dialogNotification != null && dialogNotification.getDialogOccupant().getDialog().getDialogId().equals(currentChatDialog.getDialogId())) {
                     needUpdatePosition = true;
                     CombinationMessage combinationMessage = new CombinationMessage(dialogNotification);
                     if (action == DialogNotificationDataManager.UPDATE_ACTION) {
@@ -883,11 +887,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                             scrollMessagesToBottom();
                         }
                     }
-                }
 
-                if (action == DialogNotificationDataManager.DELETE_ACTION) {
-                    combinationMessagesList.clear();
-                    loadNextPartMessagesFromDb(false, true);
+                    if (action == DialogNotificationDataManager.DELETE_ACTION) {
+                        combinationMessagesList.clear();
+                        loadNextPartMessagesFromDb(false, true);
+                    }
                 }
             }
         }
@@ -901,11 +905,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             if (data != null) {
                 String observerKey = ((Bundle) data).getString(DialogDataManager.EXTRA_OBSERVE_KEY);
                 if (observerKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey()) && currentChatDialog != null) {
+                    Dialog dialog = (Dialog)((Bundle)data).getSerializable(BaseManager.EXTRA_OBJECT);
                     currentChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
-                    if (currentChatDialog != null) {
-                        // need init current dialog after getting from DB
-                        initCurrentDialog();
-                        updateActionBar();
+                    if(currentChatDialog != null) {
+                        if (dialog != null && dialog.getDialogId().equals(currentChatDialog.getDialogId())) {
+                            // need init current dialog after getting from DB
+                            initCurrentDialog();
+                            updateActionBar();
+                        }
                     } else {
                         finish();
                     }
