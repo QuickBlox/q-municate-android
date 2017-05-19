@@ -558,12 +558,12 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
-    public void joinRoomChat(QBChatDialog dialog) throws Exception {
+    public void joinRoomChat(QBChatDialog dialog) {
         dialog.initForChat(chatService);
         if (!dialog.isJoined()) {
             DiscussionHistory history = new DiscussionHistory();
             history.setMaxStanzas(0); // without getting messages
-            dialog.join(history);
+            dialog.join(history, null); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
         }
     }
 

@@ -100,7 +100,6 @@ android {
         }
 
         stage {
-            applicationId "com.quickblox.q_municate.stage"
 
             buildConfigField "String", "APP_ID", "\"51092\""
             buildConfigField "String", "AUTH_KEY", "\"f9pjsfBgXFtGw9D\""

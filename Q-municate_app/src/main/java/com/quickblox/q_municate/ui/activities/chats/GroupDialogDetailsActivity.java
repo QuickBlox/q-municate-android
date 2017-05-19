@@ -401,7 +401,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void startCropActivity(Uri originalUri) {
-        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
+        imageUri = Uri.fromFile(new File(getCacheDir(), extensionOriginalUri));
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
@@ -615,7 +616,6 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            resetGroupData();
             actionMode = null;
         }
     }
