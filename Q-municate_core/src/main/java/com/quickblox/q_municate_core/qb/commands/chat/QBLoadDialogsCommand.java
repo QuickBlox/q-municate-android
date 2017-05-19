@@ -39,12 +39,6 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     // it is 200 Dialogs
     private final static int DIALOGS_PARTS = 10; // TODO: need to fix in the second release.
 
-    private static final int KEEP_ALIVE_TIME = 1;
-    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
-    private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
-
-    private BlockingQueue<Runnable> threadQueue;
-    private ThreadPoolExecutor threadPool;
 
     private List<QBChatDialog> dialogsListPrivate;
     private List<QBChatDialog> dialogsListGroup;
@@ -53,7 +47,6 @@ public class QBLoadDialogsCommand extends ServiceCommand {
                                 String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = chatHelper;
-        initThreads();
     }
 
     public static void start(Context context, boolean updateAll) {
@@ -84,12 +77,6 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         bundle.putBoolean(ConstsCore.DIALOGS_UPDATE_ALL, updateAll);
 
         return bundle;
-    }
-
-    private void initThreads() {
-        threadQueue = new LinkedBlockingQueue<>();
-        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, threadQueue);
-        threadPool.allowCoreThreadTimeOut(true);
     }
 
     private int loadAllDialogsByType(QBDialogType dialogsType,  Bundle returnedBundle, QBRequestGetBuilder qbRequestGetBuilder, List<QBChatDialog> allDialogsList, int pageNumber) throws QBResponseException {
@@ -180,13 +167,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     }
 
     private void tryJoinRoomChatsPage(final List<QBChatDialog> dialogsList, final boolean needClean) {
-        threadPool.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                chatHelper.tryJoinRoomChatsPage(dialogsList, needClean);
-            }
-        });
+        chatHelper.tryJoinRoomChatsPage(dialogsList, needClean);
     }
 
     private void sendLoadPageSuccess(Bundle result){
