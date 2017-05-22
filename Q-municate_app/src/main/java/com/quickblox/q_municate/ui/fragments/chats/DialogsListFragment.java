@@ -339,7 +339,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         checkEmptyList(dialogsListAdapter.getCount());
 
         if (!baseActivity.isDialogLoading()) {
-            baseActivity.hideSnackBar();
+            baseActivity.hideSnackBar(R.string.dialog_loading_dialogs);
         }
 
 //        startForResult load dialogs from REST when finished loading from cache

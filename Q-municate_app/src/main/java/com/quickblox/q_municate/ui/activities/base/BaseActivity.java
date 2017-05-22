@@ -638,7 +638,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     protected void loginChat() {
         isDialogLoading = true;
-        showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
+        showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
         QBLoginChatCompositeCommand.start(this);
     }
 
