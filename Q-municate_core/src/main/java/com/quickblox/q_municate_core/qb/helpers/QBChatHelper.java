@@ -26,6 +26,7 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.core.helper.StringifyArrayList;
@@ -551,20 +552,27 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     }
 
     public void tryJoinRoomChat(QBChatDialog dialog) {
-        try {
-            joinRoomChat(dialog);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
+        joinRoomChat(dialog, null);
+    }
+
+    public void joinRoomChat(QBChatDialog dialog, QBEntityCallback<Void> callback) {
+        dialog.initForChat(chatService);
+        if (!dialog.isJoined()) {
+            dialog.join(history(), callback); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
         }
     }
 
-    public void joinRoomChat(QBChatDialog dialog) {
+    public void joinRoomChat(QBChatDialog dialog) throws XMPPException, SmackException {
         dialog.initForChat(chatService);
         if (!dialog.isJoined()) {
-            DiscussionHistory history = new DiscussionHistory();
-            history.setMaxStanzas(0); // without getting messages
-            dialog.join(history, null); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
+            dialog.join(history());
         }
+    }
+
+    private DiscussionHistory history() {
+        DiscussionHistory history = new DiscussionHistory();
+        history.setMaxStanzas(0);
+        return history;
     }
 
     public void leaveDialogs() throws XMPPException, SmackException.NotConnectedException {
