@@ -26,6 +26,7 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.core.helper.StringifyArrayList;
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 
 public class QBChatHelper extends BaseThreadPoolHelper{
 
@@ -529,7 +531,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             for (QBChatDialog dialog : qbDialogsList) {
                 if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
                     groupDialogsList.add(dialog);
-                    tryJoinRoomChat(dialog);
+                    tryJoinRoomChat(dialog, null);
                 }
             }
         }
@@ -558,13 +560,28 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
-    public void joinRoomChat(QBChatDialog dialog) {
+    public void tryJoinRoomChat(QBChatDialog dialog, QBEntityCallback<Void> callback) {
+        joinRoomChat(dialog, callback);
+    }
+
+    public void joinRoomChat(QBChatDialog dialog, QBEntityCallback<Void> callback) {
         dialog.initForChat(chatService);
         if (!dialog.isJoined()) {
-            DiscussionHistory history = new DiscussionHistory();
-            history.setMaxStanzas(0); // without getting messages
-            dialog.join(history, null); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
+            dialog.join(history(), callback); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
         }
+    }
+
+    public void joinRoomChat(QBChatDialog dialog) throws XMPPException, SmackException {
+        dialog.initForChat(chatService);
+        if (!dialog.isJoined()) {
+            dialog.join(history());
+        }
+    }
+
+    private DiscussionHistory history() {
+        DiscussionHistory history = new DiscussionHistory();
+        history.setMaxStanzas(0); // without getting messages
+        return history;
     }
 
     public void leaveDialogs() throws XMPPException, SmackException.NotConnectedException {
@@ -736,15 +753,20 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
 
         boolean isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());
-        boolean needNotifyObserver = (currentDialog != null && currentDialog.getDialogId().equals(chatMessage.getDialogId()))
-                || currentDialog == null;
+        boolean needNotifyObserver = true;
 
+        if(isNotificationDeletedGroupChat(chatMessage)) {
+//            not notify if currentUser deleted groupDialog
+            Integer currentUserId = AppSession.getSession().getUser().getId();
+            String deletedOccupantsIdsString = (String) chatMessage.getProperty(ChatNotificationUtils.PROPERTY_ROOM_DELETED_OCCUPANTS_IDS);
+            needNotifyObserver = !TextUtils.equals(deletedOccupantsIdsString, currentUserId.toString());
+        }
         DbUtils.updateDialogModifiedDate(dataManager, chatDialog, ChatUtils.getMessageDateSent(chatMessage), false);
         DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage,
                 !ownMessage
                         ? State.DELIVERED
                         : State.SYNC,
-                true);
+                needNotifyObserver);
 
         checkForSendingNotification(ownMessage, chatMessage, user, isPrivateChatMessage);
     }
@@ -752,6 +774,11 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     private boolean isNotificationToGroupChat(QBChatMessage chatMessage) {
         String updatedInfo = (String) chatMessage.getProperty(ChatNotificationUtils.PROPERTY_ROOM_UPDATE_INFO);
         return updatedInfo != null;
+    }
+
+    private boolean isNotificationDeletedGroupChat(QBChatMessage chatMessage) {
+        String deletedOccupantsIdsString = (String) chatMessage.getProperty(ChatNotificationUtils.PROPERTY_ROOM_DELETED_OCCUPANTS_IDS);
+        return deletedOccupantsIdsString != null;
     }
 
     protected void notifyUpdatingDialogDetails(int userId, boolean online) {
