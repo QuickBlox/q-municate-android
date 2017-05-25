@@ -554,7 +554,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         if (chatHelper != null) {
-            chatHelper.tryJoinRoomChat(qbDialog);
+            chatHelper.tryJoinRoomChat(qbDialog, null);
         }
     }
 
