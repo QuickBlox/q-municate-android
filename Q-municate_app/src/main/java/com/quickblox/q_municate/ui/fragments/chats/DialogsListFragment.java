@@ -262,8 +262,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), data.getBooleanExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, false));
         } else if (CREATE_DIALOG == requestCode && data != null) {
             updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), true);
-        } else if (SettingsActivity.REQUEST_CODE_LOGOUT  == requestCode && RESULT_OK == resultCode){
-            getActivity().finish();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

@@ -39,7 +39,7 @@ import rx.Subscriber;
 
 public class SettingsActivity extends BaseLoggableActivity {
 
-    public static final int REQUEST_CODE_LOGOUT = 100;
+    public static final int REQUEST_CODE_LOGOUT = 300;
 
     @Bind(R.id.avatar_imageview)
     RoundedImageView avatarImageView;
@@ -59,7 +59,7 @@ public class SettingsActivity extends BaseLoggableActivity {
 
     public static void startForResult(Fragment fragment) {
         Intent intent = new Intent(fragment.getActivity(), SettingsActivity.class);
-        fragment.startActivityForResult(intent, REQUEST_CODE_LOGOUT);
+        fragment.getActivity().startActivityForResult(intent, REQUEST_CODE_LOGOUT);
     }
 
     @Override
@@ -148,7 +148,7 @@ public class SettingsActivity extends BaseLoggableActivity {
                                         public void onNext(Void aVoid) {
                                             setResult(RESULT_OK);
                                             hideProgress();
-                                            startLandingScreen();
+                                            finish();
                                         }
                                     });
                                 }
