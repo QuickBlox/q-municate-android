@@ -19,10 +19,6 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class QBLoadDialogsCommand extends ServiceCommand {
 

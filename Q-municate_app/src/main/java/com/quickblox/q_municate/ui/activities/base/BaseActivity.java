@@ -127,8 +127,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         initFields();
         activateButterKnife();
-        initChatConnectionListener();
-        QBChatService.getInstance().addConnectionListener(chatConnectionListener);
     }
 
     @Override
@@ -136,12 +134,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         super.onStop();
         Log.d("BaseActivity", "onStop");
         unbindService();
-    }
-
-    @Override
-    protected void onDestroy() {
-        QBChatService.getInstance().removeConnectionListener(chatConnectionListener);
-        super.onDestroy();
     }
 
     @Override
@@ -299,6 +291,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         Log.d("BaseActivity", "onPause");
         unregisterBroadcastReceivers();
         removeActions();
+        unregisterConnectionListtener();
+        hideSnackBar(R.string.error_login_to_chat);
+    }
+
+    private void unregisterConnectionListtener() {
+        QBChatService.getInstance().removeConnectionListener(chatConnectionListener);
     }
 
     @Override
@@ -306,11 +304,18 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         super.onResume();
         Log.d("BaseActivity", "onResume");
         registerBroadcastReceivers();
-
+        registerConnectionListener();
         addActions();
         NotificationManagerHelper.clearNotificationEvent(this);
 
         checkShowingConnectionError();
+    }
+
+    private void registerConnectionListener() {
+        if (chatConnectionListener == null) {
+            initChatConnectionListener();
+        }
+        QBChatService.getInstance().addConnectionListener(chatConnectionListener);
     }
 
     @Override
@@ -685,6 +690,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
             @Override
             public void authenticated(XMPPConnection xmppConnection, boolean b) {
+                Log.d(TAG, "chatConnectionListener authenticated");
                 hideSnackBar(R.string.error_login_to_chat);
                 blockUI(false);
             }
@@ -702,6 +708,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
             @Override
             public void reconnectionSuccessful() {
+                Log.d(TAG, "chatConnectionListener reconnectionSuccessful");
                 hideSnackBar(R.string.error_login_to_chat);
                 blockUI(false);
             }
@@ -749,6 +756,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             return false;
         }
         for (int i = 0; i < snackbarClientPriority.size(); i++) {
+            Log.i(TAG, "snackbar["+i+")="+snackbarClientPriority.valueAt(i));
             if (Priority.MAX == snackbarClientPriority.valueAt(i)){
                 return true;
             }
@@ -805,6 +813,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         public void execute(Bundle bundle) {
             QBLoginChatCompositeCommand.setIsRunning(false);
             blockUI(true);
+            hideSnackBar(R.string.dialog_loading_dialogs);
             showSnackbar(R.string.error_login_to_chat, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
         }
     }

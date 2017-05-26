@@ -28,10 +28,13 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         Log.d("ActivityLifecycleHandler", "onActivityStarted " + activity.getClass().getSimpleName());
         boolean activityLogeable = isActivityLogeable(activity);
         chatDestroyed = chatDestroyed && !isLoggedIn();
-        if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
-            boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
-            if (canLogin && ((BaseActivity) activity).isNetworkAvailable()) {
-                QBLoginChatCompositeCommand.start(activity);
+        if (numberOfActivitiesInForeground == 0 && activityLogeable) {
+            AppSession.getSession().updateState(AppSession.ChatState.FOREGROUND);
+            if (chatDestroyed) {
+                boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
+                if (canLogin && ((BaseActivity) activity).isNetworkAvailable()) {
+                    QBLoginChatCompositeCommand.start(activity);
+                }
             }
         }
         if (activityLogeable) {
@@ -61,6 +64,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         Lo.g("onActivityStopped" + numberOfActivitiesInForeground);
 
         if (numberOfActivitiesInForeground == 0 && activity instanceof Loggable) {
+            AppSession.getSession().updateState(AppSession.ChatState.BACKGROUND);
             boolean isLogedIn = isLoggedIn();
             if (!isLogedIn) {
                 return;

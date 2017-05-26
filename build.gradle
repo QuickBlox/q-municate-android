@@ -15,7 +15,11 @@ allprojects {
         jcenter()
 
         maven {
-            url = "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
+            url = qbRepository
+            credentials {
+                username qbUser
+                password qbPassword
+            }
         }
 
         maven { url 'https://maven.fabric.io/public' }
@@ -27,8 +31,8 @@ ext {
     buildToolsVersion = '23.0.2'
     minSdkVersion = 15
     targetSdkVersion = 23
-    versionName = '2.1.22'
-    versionCode = 224
+    versionName = '2.1.23'
+    versionCode = 223
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
@@ -37,7 +41,7 @@ ext {
     lintAbortOnError = false
 
 //    QuickBlox SDK version
-    qbSdkVersion = '3.3.1'
+    qbSdkVersion = '3.3.3-alpha2'
     qbMessageAdapterVersion = '1.1.0'
 
     testRunnerVersion = "0.4.1"
@@ -73,4 +77,5 @@ ext {
     stickersVersion = '0.7.3'
     crashlyticsVersion = '2.2.2'
     firebaseVersion = '10.2.1'
+    firebaseDispatcherVersion = '0.6.0'
 }

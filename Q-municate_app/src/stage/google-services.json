@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:265299067289:android:6d064b5bcaa0dba1",
         "android_client_info": {
-          "package_name": "com.quickblox.q_municate.stage"
+          "package_name": "com.quickblox.q_municate"
         }
       },
       "oauth_client": [
