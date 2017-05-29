@@ -122,6 +122,8 @@ dependencies {
     compile "com.google.android.gms:play-services-location:${rootProject.googlePlayServicesVersion}"
     compile "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
 
+    compile "com.firebase:firebase-jobdispatcher-with-gcm-dep:${rootProject.firebaseDispatcherVersion}"
+
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile 'com.flurry.android:analytics:6.2.0'
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"

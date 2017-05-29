@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.fragments.call;
 
+import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.graphics.Rect;
@@ -36,6 +37,7 @@ import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.AppRTCAudioManager;
+import com.quickblox.videochat.webrtc.BaseSession;
 import com.quickblox.videochat.webrtc.QBMediaStreamManager;
 import com.quickblox.videochat.webrtc.exception.QBRTCException;
 import com.quickblox.videochat.webrtc.QBRTCSession;
@@ -46,6 +48,7 @@ import com.quickblox.videochat.webrtc.view.QBRTCSurfaceView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 
 import org.webrtc.CameraVideoCapturer;
+import org.webrtc.EglRenderer;
 import org.webrtc.RendererCommon;
 import org.webrtc.VideoRenderer;
 
@@ -58,7 +61,7 @@ import java.util.Map;
 /**
  * QuickBlox team
  */
-public class ConversationCallFragment extends Fragment implements Serializable, QBRTCClientVideoTracksCallbacks,
+public class ConversationCallFragment extends Fragment implements Serializable, QBRTCClientVideoTracksCallbacks<QBRTCSession>,
         QBRTCSessionConnectionCallbacks, CallActivity.QBRTCSessionUserCallback {
 
     private static final long TOGGLE_CAMERA_DELAY = 1000;
@@ -588,6 +591,11 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     }
 
     @Override
+    public void onStateChanged(QBRTCSession qbrtcSession, BaseSession.QBRTCSessionState qbrtcSessionState) {
+
+    }
+
+    @Override
     public void onConnectedToUser(QBRTCSession qbrtcSession,final Integer userId) {
         actionsByConnectedToUser();
     }
@@ -611,11 +619,6 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     @Override
     public void onConnectionFailedWithUser(QBRTCSession qbrtcSession, Integer integer) {
 //        setStatusForOpponent(integer, getString(R.string.failed));
-    }
-
-    @Override
-    public void onError(QBRTCSession qbrtcSession, QBRTCException e) {
-
     }
 
     @Override

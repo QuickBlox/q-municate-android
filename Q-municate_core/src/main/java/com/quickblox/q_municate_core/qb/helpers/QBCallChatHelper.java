@@ -94,8 +94,6 @@ public class QBCallChatHelper extends BaseHelper {
     private void setUpCallClient() {
         Log.d(TAG, "setUpCallClient()");
 
-        qbRtcClient.setCameraErrorHendler(new CameraErrorHandler());
-
         QBRTCConfig.setMaxOpponentsCount(MAX_OPPONENTS_COUNT);
         QBRTCConfig.setDisconnectTime(DISCONNECT_TIME);
         QBRTCConfig.setAnswerTimeInterval(ANSWER_TIME_INTERVAL);

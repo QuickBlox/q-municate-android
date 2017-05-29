@@ -4,6 +4,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.digits.sdk.android.Digits;
+import com.digits.sdk.android.DigitsOAuthSigning;
+import com.digits.sdk.android.DigitsSession;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSession;
@@ -24,6 +27,7 @@ import com.quickblox.q_municate_auth_service.QMAuthService;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
+import com.quickblox.q_municate_core.network.NetworkGCMTaskService;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -33,8 +37,12 @@ import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterAuthToken;
+import com.twitter.sdk.android.core.TwitterCore;
 
 import java.io.File;
+import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -59,22 +67,19 @@ public class ServiceManager {
 
     private QMAuthService authService;
     private QMUserService userService;
-    private QBSessionListener sessionListener;
 
-    public static ServiceManager getInstance(){
-        if(instance == null){
+    public static ServiceManager getInstance() {
+        if (instance == null) {
             instance = new ServiceManager();
         }
         return instance;
     }
 
-    private ServiceManager(){
+    private ServiceManager() {
         this.context = App.getInstance();
         authService = QMAuthService.getInstance();
         userService = QMUserService.getInstance();
 
-        sessionListener = new QBSessionListener();
-        QBSessionManager.getInstance().addListener(sessionListener);
     }
 
     public Observable<QBUser> login(QBUser user) {
@@ -82,7 +87,7 @@ public class ServiceManager {
 
         Observable<QBUser> result = authService.login(user)
                 .subscribeOn(Schedulers.io())
-                .map(new Func1<QBUser,QBUser>() {
+                .map(new Func1<QBUser, QBUser>() {
                     @Override
                     public QBUser call(QBUser qbUser) {
                         CoreSharedHelper.getInstance().saveUsersImportInitialized(true);
@@ -113,11 +118,12 @@ public class ServiceManager {
         return result;
     }
 
-    public  Observable<QBUser>  login(final String socialProvider, final String accessToken, final String accessTokenSecret) {
+    public Observable<QBUser> login(final String socialProvider, final String accessToken, final String accessTokenSecret) {
         Observable<QBUser> result = authService.login(socialProvider, accessToken, accessTokenSecret).subscribeOn(Schedulers.io())
                 .map(new Func1<QBUser, QBUser>() {
                     @Override
                     public QBUser call(QBUser qbUser) {
+                        Log.d(TAG, "login observer call " + qbUser);
                         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
                         if (QBProvider.FACEBOOK.equals(socialProvider) && TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
                             //Actions for first login via Facebook
@@ -150,13 +156,15 @@ public class ServiceManager {
     }
 
     public void logout(final Subscriber<Void> subscriber) {
-        if(QBPushManager.getInstance().isSubscribedToPushes()) {
+        if (QBPushManager.getInstance().isSubscribedToPushes()) {
             QBPushManager.getInstance().addListener(new QBPushManager.QBSubscribeListener() {
                 @Override
-                public void onSubscriptionCreated() { }
+                public void onSubscriptionCreated() {
+                }
 
                 @Override
-                public void onSubscriptionError(Exception e, int i) { }
+                public void onSubscriptionError(Exception e, int i) {
+                }
 
                 @Override
                 public void onSubscriptionDeleted(boolean b) {
@@ -164,12 +172,12 @@ public class ServiceManager {
                 }
             });
             SubscribeService.unSubscribeFromPushes(context);
-        } else{
-           logoutInternal(subscriber);
+        } else {
+            logoutInternal(subscriber);
         }
     }
 
-    private void logoutInternal(final Subscriber<Void> subscriber){
+    private void logoutInternal(final Subscriber<Void> subscriber) {
         QMAuthService.getInstance().logout()
                 .subscribeOn(Schedulers.io())
                 .map(new Func1<Void, Void>() {
@@ -183,19 +191,19 @@ public class ServiceManager {
                 .subscribe(subscriber);
     }
 
-    public  Observable<Void> resetPassword(String email) {
-       return QMAuthService.getInstance().resetPassword(email)
-               .subscribeOn(Schedulers.io())
-               .observeOn(AndroidSchedulers.mainThread());
+    public Observable<Void> resetPassword(String email) {
+        return QMAuthService.getInstance().resetPassword(email)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 
-    public Observable<QMUser> changePasswordUser(QBUser inputUser)  {
+    public Observable<QMUser> changePasswordUser(QBUser inputUser) {
         final String password = inputUser.getPassword();
         QMUser qmUser = QMUser.convert(inputUser);
-        Observable<QMUser> result  =   QMUserService.getInstance().updateUser(qmUser)
+        Observable<QMUser> result = QMUserService.getInstance().updateUser(qmUser)
                 .subscribeOn(Schedulers.io())
-                .map(new Func1<QBUser,QMUser>() {
+                .map(new Func1<QBUser, QMUser>() {
                     @Override
                     public QMUser call(QBUser qbUser) {
                         QMUser user = QMUser.convert(qbUser);
@@ -209,7 +217,7 @@ public class ServiceManager {
     }
 
 
-    public Observable<QMUser>  updateUser(QBUser inputUser)  {
+    public Observable<QMUser> updateUser(QBUser inputUser) {
         Observable<QMUser> result = null;
         final String password = inputUser.getPassword();
 
@@ -219,7 +227,7 @@ public class ServiceManager {
         inputUser.setPassword(null);
         inputUser.setOldPassword(null);
         QMUser qmUser = QMUser.convert(inputUser);
-        result =  QMUserService.getInstance().updateUser(qmUser)
+        result = QMUserService.getInstance().updateUser(qmUser)
                 .subscribeOn(Schedulers.io())
                 .map(new Func1<QMUser, QMUser>() {
                     @Override
@@ -237,7 +245,7 @@ public class ServiceManager {
         return result;
     }
 
-    public  Observable<QMUser>  updateUser(final QBUser user, final File file) {
+    public Observable<QMUser> updateUser(final QBUser user, final File file) {
 
         Observable<QMUser> result = null;
 
@@ -334,7 +342,7 @@ public class ServiceManager {
         return user;
     }
 
-    private QBUser getTDUserWithFullName(QBUser user){
+    private QBUser getTDUserWithFullName(QBUser user) {
         user.setFullName(user.getPhone());
         user.setCustomData(Utils.customDataToString(getUserCustomData(ConstsCore.EMPTY_STRING)));
         return user;
@@ -345,19 +353,4 @@ public class ServiceManager {
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
 
-    private static class QBSessionListener extends QBSessionListenerImpl {
-
-        @Override
-        public void onSessionUpdated(QBSessionParameters sessionParameters) {
-            Log.d(TAG, "onSessionUpdated pswd:" + sessionParameters.getUserPassword()
-                    + ", iserId : " + sessionParameters.getUserId());
-            QBUser qbUser = AppSession.getSession().getUser();
-            if (sessionParameters.getSocialProvider() != null) {
-                qbUser.setPassword(QBSessionManager.getInstance().getToken());
-            } else {
-                qbUser.setPassword(sessionParameters.getUserPassword());
-            }
-            AppSession.getSession().updateUser(qbUser);
-        }
-    }
 }

@@ -33,6 +33,7 @@ public class App extends MultiDexApplication {
 
     private static App instance;
     private SharedHelper appSharedHelper;
+    private SessionListener sessionListener;
 
 
     public static App getInstance() {
@@ -67,7 +68,8 @@ public class App extends MultiDexApplication {
     private void initApplication() {
         instance = this;
 
-
+        sessionListener = new SessionListener();
+        getAppSharedHelper();
         initQb();
         initDb();
         initImageLoader(this);

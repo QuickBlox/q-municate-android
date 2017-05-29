@@ -26,11 +26,21 @@ public class AppSession implements Serializable {
     private LoginType loginType;
     private QBUser qbUser;
 
+    private ChatState chatState = ChatState.FOREGROUND;
+
     private AppSession(QBUser qbUser) {
         coreSharedHelper = CoreSharedHelper.getInstance();
         this.qbUser = qbUser;
         this.loginType = getLoginTypeBySessionParameters(QBSessionManager.getInstance().getSessionParameters());
         save();
+    }
+
+    public void updateState(ChatState state){
+        chatState = state;
+    }
+
+    public ChatState getChatState() {
+        return chatState;
     }
 
     public static void startSession(QBUser user) {
@@ -141,5 +151,8 @@ public class AppSession implements Serializable {
         return result;
     }
 
+    public enum ChatState {
+        BACKGROUND, FOREGROUND
+    }
 
 }

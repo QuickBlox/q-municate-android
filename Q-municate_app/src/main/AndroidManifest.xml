@@ -209,6 +209,13 @@
             </intent-filter>
         </service>
 
+        <service android:name="com.quickblox.q_municate.service.SessionJobService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
