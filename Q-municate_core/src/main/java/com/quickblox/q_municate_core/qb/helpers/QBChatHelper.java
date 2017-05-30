@@ -594,6 +594,15 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
+    public void leaveDialogForce(QBChatDialog chatDialog) {
+        try {
+            chatDialog.leave();
+        } catch (SmackException.NotConnectedException|XMPPException e) {
+            ErrorUtils.logError(e);
+        }
+
+    }
+
     public void leaveRoomChat(QBChatDialog chatDialog) throws Exception {
         chatDialog.initForChat(chatService);
         chatDialog.leave();
