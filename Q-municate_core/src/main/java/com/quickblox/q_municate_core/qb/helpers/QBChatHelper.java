@@ -64,6 +64,7 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -270,11 +271,15 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         DbUtils.deleteDialogLocal(dataManager, dialogId);
     }
 
-    public void saveDialogsToCache(List<QBChatDialog> qbDialogsList){
+    public void saveDialogsToCache(List<QBChatDialog> qbDialogsList, boolean allDialogs){
         if (qbDialogsList != null && !qbDialogsList.isEmpty()) {
             FinderUnknownUsers finderUnknownUsers = new FinderUnknownUsers(context, AppSession.getSession().getUser(), qbDialogsList);
             finderUnknownUsers.find();
-            DbUtils.saveDialogsToCache(DataManager.getInstance(), qbDialogsList, currentDialog);
+            if(allDialogs) {
+                DbUtils.saveDialogsToCacheAll(DataManager.getInstance(), qbDialogsList, currentDialog);
+            } else {
+                DbUtils.saveDialogsToCacheByIds(DataManager.getInstance(), qbDialogsList, currentDialog);
+            }
             DbUtils.updateDialogsOccupantsStatusesIfNeeded(DataManager.getInstance(), qbDialogsList);
         }
     }

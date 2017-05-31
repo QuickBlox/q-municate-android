@@ -19,6 +19,7 @@ import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DbUtils {
@@ -54,7 +55,7 @@ public class DbUtils {
         }
     }
 
-    public static void saveDialogsToCache(DataManager dataManager, List<QBChatDialog > qbChatDialogsList,
+    public static void saveDialogsToCacheAll(DataManager dataManager, List<QBChatDialog > qbChatDialogsList,
             QBChatDialog  currentDialog) {
         dataManager.getQBChatDialogDataManager().createOrUpdateAll(qbChatDialogsList);
 
@@ -63,10 +64,26 @@ public class DbUtils {
         saveTempMessages(dataManager, qbChatDialogsList, currentDialog);
     }
 
+    public static void saveDialogsToCacheByIds(DataManager dataManager, List<QBChatDialog > qbChatDialogsList, QBChatDialog  currentDialog) {
+        saveDialogsOccupants(dataManager, qbChatDialogsList);
+        saveTempMessagesUnread(dataManager, qbChatDialogsList, currentDialog);
+
+        for (QBChatDialog qbDialog : qbChatDialogsList) {
+            dataManager.getQBChatDialogDataManager().createOrUpdate(qbDialog);
+        }
+    }
+
     public static void saveTempMessages(DataManager dataManager, List<QBChatDialog > qbChatDialogsList,
             QBChatDialog  currentDialog) {
         dataManager.getMessageDataManager()
                 .createOrUpdateAll(ChatUtils.createTempLocalMessagesList(dataManager, qbChatDialogsList, currentDialog));
+    }
+
+    public static void saveTempMessagesUnread(DataManager dataManager, List<QBChatDialog > qbChatDialogsList,
+                                              QBChatDialog  currentDialog) {
+        List<Message> messageList = ChatUtils.createTempUnreadMessagesList(dataManager, qbChatDialogsList, currentDialog);
+        dataManager.getMessageDataManager()
+                .createOrUpdateAll(messageList);
     }
 
     public static void saveTempMessage(DataManager dataManager, Message message) {

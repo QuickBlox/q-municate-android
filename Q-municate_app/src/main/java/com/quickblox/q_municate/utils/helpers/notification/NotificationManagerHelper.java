@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.quickblox.chat.model.QBChatDialog;
@@ -15,6 +16,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.chats.BaseDialogActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate_core.models.NotificationEvent;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
@@ -47,7 +49,13 @@ public class NotificationManagerHelper {
             intent = new Intent(context, MainActivity.class);
         }
         sendChatNotificationEvent(context, intent, notificationEvent);
+        sendNotifyIncomingMessage(context, dialogId);
+    }
 
+    private static void sendNotifyIncomingMessage(Context context, String dialogId) {
+        Intent intent = new Intent(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     public static void sendCommonNotificationEvent(Context context,

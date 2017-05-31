@@ -15,6 +15,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogByIdsCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBAddFriendsToGroupCommand;
@@ -122,6 +123,7 @@ public class QBService extends Service {
         registerLeaveGroupDialogCommand();
         registerLoadAttachFileCommand();
         registerLoadChatsDialogsCommand();
+        registerLoadDialogByIdsCommandCommand();
         registerLoadDialogMessagesCommand();
         registerJoinGroupChatsCommand();
         registerLoginChatCommand();
@@ -279,6 +281,16 @@ public class QBService extends Service {
                 QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
 
         serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);
+    }
+
+    private void registerLoadDialogByIdsCommandCommand() {
+        QBChatHelper chatHelper = (QBChatHelper) getHelper(CHAT_HELPER);
+
+        QBLoadDialogByIdsCommand chatsDialogsCommand = new QBLoadDialogByIdsCommand(this, chatHelper,
+                QBServiceConsts.LOAD_CHATS_DIALOGS_BY_IDS_SUCCESS_ACTION,
+                QBServiceConsts.LOAD_CHATS_DIALOGS_BY_IDS_FAIL_ACTION);
+
+        serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_BY_IDS_ACTION, chatsDialogsCommand);
     }
 
     private void registerLoadDialogMessagesCommand() {
