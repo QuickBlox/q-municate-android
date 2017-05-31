@@ -55,6 +55,8 @@ import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.AbstractConnectionListener;
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
@@ -70,6 +72,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     private static final String TAG = QBChatHelper.class.getSimpleName();
 
+
     private QBChatService chatService;
     private QBUser chatCreator;
     private QBChatDialog currentDialog;
@@ -81,6 +84,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     private QBSystemMessagesManager systemMessagesManager;
     private List<QBChatDialog> groupDialogsList;
     private QBChatDialogParticipantListener participantListener;
+    private final ConnectionListener chatConnectionListener;
 
 
     public QBChatHelper(Context context) {
@@ -90,6 +94,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         typingListener = new TypingListener();
         privateChatMessagesStatusListener = new PrivateChatMessagesStatusListener();
 
+        chatConnectionListener = new ChatConnectionListener();
         QBNotificationChatListener notificationChatListener = new PrivateChatNotificationListener();
         addNotificationChatListener(notificationChatListener);
 
@@ -146,6 +151,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         chatService.getMessageStatusesManager().addMessageStatusListener(privateChatMessagesStatusListener);
         chatService.getIncomingMessagesManager().addDialogMessageListener(allChatMessagesListener);
 
+        chatService.addConnectionListener(chatConnectionListener);
         systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
         addSystemMessageListener(new SystemMessageListener());
     }
@@ -566,16 +572,12 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     public void joinRoomChat(QBChatDialog dialog, QBEntityCallback<Void> callback) {
         dialog.initForChat(chatService);
-        if (!dialog.isJoined()) {
-            dialog.join(history(), callback); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
-        }
+        dialog.join(history(), callback); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
     }
 
     public void joinRoomChat(QBChatDialog dialog) throws XMPPException, SmackException {
         dialog.initForChat(chatService);
-        if (!dialog.isJoined()) {
-            dialog.join(history());
-        }
+        dialog.join(history());
     }
 
     private DiscussionHistory history() {
@@ -592,15 +594,6 @@ public class QBChatHelper extends BaseThreadPoolHelper{
                 }
             }
         }
-    }
-
-    public void leaveDialogForce(QBChatDialog chatDialog) {
-        try {
-            chatDialog.leave();
-        } catch (SmackException.NotConnectedException|XMPPException e) {
-            ErrorUtils.logError(e);
-        }
-
     }
 
     public void leaveRoomChat(QBChatDialog chatDialog) throws Exception {
@@ -824,9 +817,19 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
+
     interface QBNotificationChatListener {
 
         void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
+    }
+
+    private class ChatConnectionListener extends AbstractConnectionListener{
+        @Override
+        public void reconnectionSuccessful() {
+            if (currentDialog != null && QBDialogType.GROUP == currentDialog.getType()) {
+                tryJoinRoomChat(currentDialog);
+            }
+        }
     }
 
     private class AllChatMessagesListener implements QBChatDialogMessageListener {
