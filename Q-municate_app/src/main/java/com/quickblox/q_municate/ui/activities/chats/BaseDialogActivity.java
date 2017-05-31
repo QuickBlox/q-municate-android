@@ -281,6 +281,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
+    protected void onChatReconnected() {
+        loadNextPartMessagesAsync();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:

@@ -566,6 +566,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void onFailAction(String action) {
     }
 
+    protected void onChatReconnected(){
+
+    }
+
+    protected void onChatDisconnected(Exception e){
+
+    }
+
     protected void onReceivedChatMessageNotification(Bundle extras) {
         activityUIHelper.showChatMessageNotification(extras);
     }
@@ -702,12 +710,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
             @Override
             public void connectionClosedOnError(Exception e) {
+                onChatDisconnected(e);
                 blockUI(true);
                 showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE);
             }
 
             @Override
             public void reconnectionSuccessful() {
+                onChatReconnected();
                 Log.d(TAG, "chatConnectionListener reconnectionSuccessful");
                 hideSnackBar(R.string.error_login_to_chat);
                 blockUI(false);
