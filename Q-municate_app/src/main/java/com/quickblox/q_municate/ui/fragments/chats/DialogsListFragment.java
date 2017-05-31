@@ -69,8 +69,6 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 
-import static android.app.Activity.RESULT_OK;
-
 public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>> {
 
     public static final int PICK_DIALOG = 100;
@@ -95,7 +93,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     protected Handler handler = new Handler();
     private State updateDialogsProcess;
 
-    enum State {started, stopped}
+    enum State {started, stopped, finished}
 
     public static DialogsListFragment newInstance() {
         return new DialogsListFragment();
@@ -191,7 +189,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.action_delete:
-                if (baseActivity.checkNetworkAvailableWithError()) {
+                if (baseActivity.checkNetworkAvailableWithError() && checkDialogsLoadFinished()) {
                     QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position).getChatDialog();
                     deleteDialog(chatDialog);
                 }
@@ -237,7 +235,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     @Override
     public void onStop(){
         super.onStop();
-        updateDialogsProcess = State.stopped;
+        setStopStateUpdateDialogsProcess();
     }
 
     @Override
@@ -264,6 +262,20 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), true);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void setStopStateUpdateDialogsProcess() {
+        if(updateDialogsProcess != State.finished) {
+            updateDialogsProcess = State.stopped;
+        }
+    }
+
+    private boolean checkDialogsLoadFinished() {
+        if (updateDialogsProcess != State.finished) {
+            ToastUtils.shortToast(R.string.chat_service_is_initializing);
+            return false;
+        }
+        return true;
     }
 
     private void updateOrAddDialog(String dialogId, boolean updatePosition) {
@@ -352,6 +364,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         } else {
             dialogsListAdapter.addNewData((ArrayList<DialogWrapper>) dialogsList);
         }
+
+        if(dialogsListLoader.isLoadRestFinished()) {
+            updateDialogsProcess = State.finished;
+            Log.d(TAG, "onLoadFinished isLoadRestFinished updateDialogsProcess= " + updateDialogsProcess);
+        }
         Log.d(TAG, "onLoadFinished dialogsListAdapter.getCount() " + dialogsListAdapter.getCount());
     }
 
@@ -395,6 +412,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void removeActions() {
         baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
+        baseActivity.removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
 
         baseActivity.updateBroadcastActionList();
     }
@@ -403,6 +421,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new DeleteDialogSuccessAction());
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, new DeleteDialogFailAction());
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, new LoadChatsFailedAction());
 
         baseActivity.updateBroadcastActionList();
     }
@@ -557,6 +576,15 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
         private boolean isLoadPerPage(Bundle bundle) {
             return bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null;
+        }
+    }
+
+    private class LoadChatsFailedAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) throws Exception {
+            Log.d(TAG, "LoadChatsFailedAction bundle= " + bundle);
+            updateDialogsProcess = State.finished;
         }
     }
 

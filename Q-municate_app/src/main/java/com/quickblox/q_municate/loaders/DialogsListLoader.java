@@ -23,8 +23,9 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
 
     private boolean loadAll;
 
-    private boolean loadCacheFinished;
     private boolean loadFromCache;
+    private boolean loadCacheFinished;
+    private boolean loadRestFinished;
 
     private int startRow = 0;
     private int perPage = 0;
@@ -39,6 +40,10 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
 
     public boolean isLoadCacheFinished() {
         return loadCacheFinished;
+    }
+
+    public boolean isLoadRestFinished() {
+        return loadRestFinished;
     }
 
     public void setLoadAll(boolean loadAll) {
@@ -64,6 +69,7 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
             dialogWrappers.add(new DialogWrapper(getContext(), dataManager, chatDialog));
         }
 
+        checkLoadFinishedFromREST(chatDialogs.size());
         checkLoadFinishedFromCache(chatDialogs.size());
 
         return dialogWrappers;
@@ -75,6 +81,15 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
             loadCacheFinished = true;
         } else {
             loadCacheFinished = false;
+        }
+    }
+
+    private void checkLoadFinishedFromREST(int size) {
+        if((loadAll && !loadFromCache) || (size < ConstsCore.CHATS_DIALOGS_PER_PAGE && !loadFromCache)) {
+            loadRestFinished = true;
+            Log.d(TAG, "checkLoadFinishedFromREST loadRestFinished= " + loadRestFinished);
+        } else {
+            loadRestFinished = false;
         }
     }
 
