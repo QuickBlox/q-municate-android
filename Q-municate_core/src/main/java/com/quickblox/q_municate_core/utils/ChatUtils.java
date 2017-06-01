@@ -29,10 +29,11 @@ import com.quickblox.users.model.QBUser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
-public class
-ChatUtils {
+public class ChatUtils {
+    private static final String TAG = ChatUtils.class.getSimpleName();
 
     public static final String OCCUPANT_IDS_DIVIDER = ",";
 
@@ -174,37 +175,63 @@ ChatUtils {
 
         for (QBChatDialog qbDialog : qbDialogsList) {
             // dialog is opened
-            Log.d("Fix double message", "currentDialog = " + currentDialog);
+            Log.d(TAG, "Fix double message currentDialog = " + currentDialog);
             if (currentDialog != null && qbDialog.getDialogId().equals(currentDialog.getDialogId())) {
-                Log.d("Fix double message", "currentDialog = " + currentDialog + " currentDialogID = " + currentDialog.getDialogId());
+                Log.d(TAG, "Fix double message currentDialog = " + currentDialog + " currentDialogID = " + currentDialog.getDialogId());
                 continue;
             }
 
-            int randomUserId = getRandomUserFromOccupantsList(qbDialog.getOccupants());
-            DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager()
-                    .getDialogOccupant(qbDialog.getDialogId(), randomUserId);
-
-            boolean onlyMeInDialog = qbDialog.getOccupants().size() == 1;
-
-            if (dialogOccupant == null && onlyMeInDialog) {
-                QMUser user = QMUserService.getInstance().getUserCache().get((long) AppSession.getSession().getUser().getId());
-                DbUtils.saveDialogOccupant(dataManager,
-                        createDialogOccupant(dataManager, qbDialog.getDialogId(), user), false);
-                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), AppSession.getSession().getUser().getId());
-            }
+            DialogOccupant dialogOccupant = getDialogOccupant(dataManager, qbDialog);
 
             long tempMessageId = qbDialog.getDialogId().hashCode();
             Message message = createTempLocalMessage(tempMessageId, dialogOccupant, qbDialog.getLastMessage(), qbDialog.getLastMessageDateSent(), State.TEMP_LOCAL);
             messagesList.add(message);
-
-            /*if (qbDialog.getUnreadMessageCount() != null && qbDialog.getUnreadMessageCount() > 0) {
-                for (int i = 0; i < qbDialog.getUnreadMessageCount(); i++) {
-                    messagesList.add(createTempLocalMessage(--tempMessageId, dialogOccupant, null, State.TEMP_LOCAL_UNREAD));
-                }
-            }*/
         }
 
         return messagesList;
+    }
+
+    public static List<Message> createTempUnreadMessagesList(DataManager dataManager,
+                                                             List<QBChatDialog> qbDialogsList, QBChatDialog currentDialog) {
+        List<Message> messagesList = new ArrayList<>();
+
+        for (QBChatDialog qbDialog : qbDialogsList) {
+            if (currentDialog != null && qbDialog.getDialogId().equals(currentDialog.getDialogId())) {
+                Log.d(TAG, "currentDialog = " + currentDialog + " currentDialogID = " + currentDialog.getDialogId());
+                continue;
+            }
+
+            Log.d(TAG, "qbDialog.getUnreadMessageCount= " + qbDialog.getUnreadMessageCount());
+
+            DialogOccupant dialogOccupant = getDialogOccupant(dataManager, qbDialog);
+
+            int unreadCount = qbDialog.getUnreadMessageCount();
+            long tempMessageId = qbDialog.getDialogId().hashCode();
+            long createdData = qbDialog.getLastMessageDateSent();
+
+            for (int i = 0; i < unreadCount; i++) {
+                Message message = createTempLocalMessage(tempMessageId++, dialogOccupant, qbDialog.getLastMessage(), createdData++, State.TEMP_LOCAL_UNREAD);
+                messagesList.add(message);
+            }
+        }
+
+        return messagesList;
+    }
+
+    private static DialogOccupant getDialogOccupant(DataManager dataManager, QBChatDialog qbDialog) {
+        int randomUserId = getRandomUserFromOccupantsList(qbDialog.getOccupants());
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager()
+                .getDialogOccupant(qbDialog.getDialogId(), randomUserId);
+
+        boolean onlyMeInDialog = qbDialog.getOccupants().size() == 1;
+
+        if (dialogOccupant == null && onlyMeInDialog) {
+            QMUser user = QMUserService.getInstance().getUserCache().get((long) AppSession.getSession().getUser().getId());
+            DbUtils.saveDialogOccupant(dataManager,
+                    createDialogOccupant(dataManager, qbDialog.getDialogId(), user), false);
+            dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), AppSession.getSession().getUser().getId());
+        }
+        return dialogOccupant;
     }
 
     public static Message createTempLocalMessage(long messageId, DialogOccupant dialogOccupant, String body, State state) {

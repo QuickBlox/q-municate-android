@@ -132,8 +132,8 @@ public class QBLoadDialogsCommand extends ServiceCommand {
                 needToLoadMoreGroup = groupDialogsSize == ConstsCore.CHATS_DIALOGS_PER_PAGE;
             }
 
-            chatHelper.saveDialogsToCache(dialogsListPrivate);
-            chatHelper.saveDialogsToCache(dialogsListGroup);
+            chatHelper.saveDialogsToCache(dialogsListPrivate, true);
+            chatHelper.saveDialogsToCache(dialogsListGroup, true);
             dialogsListPrivate = null;
             dialogsListGroup = null;
 

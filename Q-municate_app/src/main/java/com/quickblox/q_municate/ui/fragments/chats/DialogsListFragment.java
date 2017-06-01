@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.loaders.DialogsListLoader;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
@@ -38,6 +39,7 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogByIdsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
@@ -59,15 +61,18 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
+
 
 public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>> {
 
@@ -89,6 +94,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private Observer commonObserver;
     private DialogsListLoader dialogsListLoader;
     private Queue<LoaderConsumer> loaderConsumerQueue = new ConcurrentLinkedQueue<>();
+
+    Set<String> dialogsIdsToUpdate;
 
     protected Handler handler = new Handler();
     private State updateDialogsProcess;
@@ -216,6 +223,15 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             dialogsListAdapter.notifyDataSetChanged();
         }
         checkLoaderConsumerQueue();
+        checkUpdateDialogs();
+    }
+
+    private void checkUpdateDialogs() {
+//        check if needs update dialog list
+        if(!CollectionsUtil.isEmpty(dialogsIdsToUpdate)) {
+            QBLoadDialogByIdsCommand.start(getContext(), new ArrayList<>(dialogsIdsToUpdate));
+            dialogsIdsToUpdate.clear();
+        }
     }
 
     private void checkLoaderConsumerQueue() {
@@ -257,7 +273,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i(TAG, "onActivityResult " + requestCode + ", data= " + data);
         if (PICK_DIALOG == requestCode && data != null) {
-            updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), data.getBooleanExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, false));
+            String dialogId = data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID);
+            checkDialogsIds(dialogId);
+            updateOrAddDialog(dialogId, data.getBooleanExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, false));
         } else if (CREATE_DIALOG == requestCode && data != null) {
             updateOrAddDialog(data.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID), true);
         }
@@ -276,6 +294,18 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             return false;
         }
         return true;
+    }
+
+    private void checkDialogsIds(String dialogId) {
+//       no need update dialog cause it's already updated
+        if (dialogsIdsToUpdate != null) {
+            for(String dialogIdToUpdate : dialogsIdsToUpdate){
+                if(dialogIdToUpdate.equals(dialogId)){
+                    dialogsIdsToUpdate.remove(dialogId);
+                    break;
+                }
+            }
+        }
     }
 
     private void updateOrAddDialog(String dialogId, boolean updatePosition) {
@@ -412,6 +442,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void removeActions() {
         baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
+        baseActivity.removeAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION);
         baseActivity.removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
 
         baseActivity.updateBroadcastActionList();
@@ -422,6 +453,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, new DeleteDialogFailAction());
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, new LoadChatsFailedAction());
+        baseActivity.addAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, new UpdateDialogSuccessAction());
 
         baseActivity.updateBroadcastActionList();
     }
@@ -543,6 +575,13 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         baseActivity.setCurrentFragment(SearchFragment.newInstance(), true);
     }
 
+    private void updateDialogIds(String dialogId) {
+        if(dialogsIdsToUpdate == null){
+            dialogsIdsToUpdate = new HashSet<>();
+        }
+        dialogsIdsToUpdate.add(dialogId);
+    }
+
     private class DeleteDialogSuccessAction implements Command {
 
         @Override
@@ -585,6 +624,18 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         public void execute(Bundle bundle) throws Exception {
             Log.d(TAG, "LoadChatsFailedAction bundle= " + bundle);
             updateDialogsProcess = State.finished;
+        }
+    }
+
+    private class UpdateDialogSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            baseActivity.hideProgress();
+            Log.d(TAG, "UpdateDialogSuccessAction action UpdateDialogSuccessAction bundle= " + bundle);
+            if(bundle != null) {
+                updateDialogIds((String) bundle.get(QBServiceConsts.EXTRA_DIALOG_ID));
+            }
         }
     }
 

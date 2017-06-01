@@ -51,6 +51,7 @@ public class QBServiceConsts {
     public static final String CREATE_GROUP_CHAT_ACTION = "create_group_chat_action";
     public static final String CREATE_PRIVATE_CHAT_ACTION = "create_private_chat_action";
     public static final String LOAD_CHATS_DIALOGS_ACTION = "chats_dialogs_load_action";
+    public static final String LOAD_CHATS_DIALOGS_BY_IDS_ACTION = "chats_dialogs_load_by_ids_action";
     public static final String UPDATE_CHAT_DIALOG_ACTION = "update_chat_dialog_action";
     public static final String JOIN_GROUP_CHAT_ACTION = "join_group_chat_action";
     public static final String LOAD_DIALOG_MESSAGES_ACTION = "load_dialog_messages_action";
@@ -128,6 +129,8 @@ public class QBServiceConsts {
     public static final String CREATE_PRIVATE_CHAT_FAIL_ACTION = "create_private_chat_fail_action";
     public static final String LOAD_CHATS_DIALOGS_SUCCESS_ACTION = "chats_dialogs_success_action";
     public static final String LOAD_CHATS_DIALOGS_FAIL_ACTION = "chats_dialogs_fail_action";
+    public static final String LOAD_CHATS_DIALOGS_BY_IDS_SUCCESS_ACTION = "chats_dialogs_by_idssuccess_action";
+    public static final String LOAD_CHATS_DIALOGS_BY_IDS_FAIL_ACTION = "chats_dialogs_by_ids_fail_action";
     public static final String JOIN_GROUP_CHAT_SUCCESS_ACTION = "join_group_chat_success_action";
     public static final String JOIN_GROUP_CHAT_FAIL_ACTION = "join_group_chat_fail_action";
     public static final String UPDATE_CHAT_DIALOG_SUCCESS_ACTION = "update_chat_dialog_success_action";
@@ -179,6 +182,7 @@ public class QBServiceConsts {
     public static final String EXTRA_TOTAL_ENTRIES = "total_entries";
     public static final String EXTRA_STATUS = "status";
     public static final String EXTRA_CHATS_DIALOGS = "chats_dialogs";
+    public static final String EXTRA_CHATS_DIALOGS_IDS = "chats_dialogs_ids";
     public static final String EXTRA_ROOM_NAME = "room_name";
     public static final String EXTRA_ROOM_PHOTO_URL = "photo_url";
     public static final String EXTRA_ROOM_JID_LIST = "room_jid_list";

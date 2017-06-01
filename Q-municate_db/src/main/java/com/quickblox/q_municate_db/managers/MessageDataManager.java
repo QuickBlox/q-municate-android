@@ -318,4 +318,31 @@ public class MessageDataManager extends BaseManager<Message> {
         return messagesList;
     }
 
+    public Message getLastTempMessagesByDialogId(String dialogId){
+        Message message = null;
+        try {
+            QueryBuilder<Message, Long> messageQueryBuilder = dao.queryBuilder();
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            Where<Message, Long> where = messageQueryBuilder.where();
+            where.or(where.eq(Message.Column.STATE, State.TEMP_LOCAL),
+                    where.eq(Message.Column.STATE, State.TEMP_LOCAL_UNREAD));
+            messageQueryBuilder.orderBy(Message.Column.CREATED_DATE, false);
+
+            PreparedQuery<Message> preparedQuery = messageQueryBuilder.prepare();
+            message = dao.queryForFirst(preparedQuery);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return message;
+    }
+
 }
