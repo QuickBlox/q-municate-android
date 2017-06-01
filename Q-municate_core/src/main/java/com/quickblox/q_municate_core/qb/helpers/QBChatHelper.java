@@ -532,10 +532,6 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         checkForSendingNotification(ownMessage, qbChatMessage, user, false);
     }
 
-    public void tryJoinRoomChats(List<QBChatDialog> qbDialogsList) {
-        tryJoinRoomChatsPage(qbDialogsList, true);
-    }
-
     public synchronized void tryJoinRoomChatsPage(List<QBChatDialog> qbDialogsList, boolean needClean) {
         if (!qbDialogsList.isEmpty()) {
             initGroupDialogsList(needClean);
@@ -550,7 +546,14 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     public void tryJoinRoomChats() {
         List<QBChatDialog> qbDialogsList = dataManager.getQBChatDialogDataManager().getAll();
-        tryJoinRoomChats(qbDialogsList);
+        if (CollectionsUtil.isEmpty(qbDialogsList)) {
+            return;
+        }
+        for (QBChatDialog dialog : qbDialogsList) {
+            if (QBDialogType.PRIVATE != dialog.getType()) {
+                tryJoinRoomChat(dialog, null);
+            }
+        }
     }
 
     private void initGroupDialogsList(boolean needClean) {
@@ -831,9 +834,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     private class ChatConnectionListener extends AbstractConnectionListener{
         @Override
         public void reconnectionSuccessful() {
-            if (currentDialog != null && QBDialogType.GROUP == currentDialog.getType()) {
-                tryJoinRoomChat(currentDialog);
-            }
+            tryJoinRoomChats();
         }
     }
 

@@ -8,7 +8,7 @@ import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 
 
 public class NetworkGCMTaskService extends GcmTaskService {
@@ -18,7 +18,7 @@ public class NetworkGCMTaskService extends GcmTaskService {
 
     @Override
     public int onRunTask(TaskParams taskParams) {
-        QBLoginChatCommand.start(this);
+        QBLoginChatCompositeCommand.start(this);
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 
