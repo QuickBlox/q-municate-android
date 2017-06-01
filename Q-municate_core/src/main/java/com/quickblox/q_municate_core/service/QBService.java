@@ -158,7 +158,6 @@ public class QBService extends Service {
 
         addLoginChatAndInitCommands(loginChatCompositeCommand, loginChatCommand);
 
-
         serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_ACTION, loginChatCommand);
         serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_COMPOSITE_ACTION, loginChatCompositeCommand);
     }
@@ -434,9 +433,12 @@ public class QBService extends Service {
                 QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
         QBInitCallChatCommand initVideoChatCommand = (QBInitCallChatCommand) serviceCommandMap.get(QBServiceConsts.INIT_CALL_CHAT_ACTION);
 
+        ServiceCommand joinCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
+
         loginCommand.addCommand(initChatServiceCommand);
         loginCommand.addCommand(loginChatCommand);
         loginCommand.addCommand(initChatsCommand);
+        loginCommand.addCommand(joinCommand);
         loginCommand.addCommand(initFriendListCommand);
         loginCommand.addCommand(loadFriendListCommand);
         loginCommand.addCommand(initVideoChatCommand);
