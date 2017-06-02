@@ -595,6 +595,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
         @Override
         public void execute(Bundle bundle) {
+            ToastUtils.longToast(R.string.dlg_internet_connection_error);
             baseActivity.hideProgress();
         }
     }

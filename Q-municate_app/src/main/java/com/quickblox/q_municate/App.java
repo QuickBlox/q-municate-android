@@ -11,6 +11,7 @@ import com.digits.sdk.android.Digits;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.core.QBHttpConnectionConfig;
 import com.quickblox.core.ServiceZone;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.StringObfuscator;
@@ -18,6 +19,7 @@ import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_auth_service.QMAuthService;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
 import com.quickblox.q_municate_user_service.QMUserService;
@@ -84,6 +86,7 @@ public class App extends MultiDexApplication {
         QBSettings.getInstance().setAccountKey(StringObfuscator.getAccountKey());
 
         initDomains();
+        initHTTPConfig();
 
         QBChatService.ConfigurationBuilder configurationBuilder = new QBChatService.ConfigurationBuilder();
         configurationBuilder.setAutojoinEnabled(true);
@@ -97,6 +100,11 @@ public class App extends MultiDexApplication {
             QBSettings.getInstance().setEndpoints(getString(R.string.api_domain), getString(R.string.chat_domain), ServiceZone.PRODUCTION);
             QBSettings.getInstance().setZone(ServiceZone.PRODUCTION);
         }
+    }
+
+    private void initHTTPConfig(){
+        QBHttpConnectionConfig.setConnectTimeout(ConstsCore.HTTP_TIMEOUT_IN_SECONDS);
+        QBHttpConnectionConfig.setReadTimeout(ConstsCore.HTTP_TIMEOUT_IN_SECONDS);
     }
 
     private void initDb() {
