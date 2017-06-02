@@ -232,6 +232,7 @@
 
     <!-- Others -->
     <string name="chat_service_is_initializing">Please, wait, connection is setting up…</string>
+    <string name="dlg_internet_connection_error">Something went wrong. Please, verify your internet connection and try again</string>
     <string name="dlg_internet_connection_is_missing">Waiting for connection</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_ok">OK</string>
