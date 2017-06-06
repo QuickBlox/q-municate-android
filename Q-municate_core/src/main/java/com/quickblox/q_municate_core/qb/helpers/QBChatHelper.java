@@ -216,8 +216,10 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         message.setMarkable(true);
         chatDialog.initForChat(chatService);
 
-        if (QBDialogType.GROUP.equals(chatDialog.getType())){
-            tryJoinRoomChat(chatDialog);
+        if (QBDialogType.GROUP.equals(chatDialog.getType())) {
+            if (!chatDialog.isJoined()) {
+                tryJoinRoomChat(chatDialog);
+            }
         }
 
         String error = null;
@@ -743,6 +745,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             if (isNotificationToGroupChat(chatMessage)) {
                 if (!ownMessage) {
                     updateGroupDialogByNotification(chatMessage);
+                } else if(isNotificationDeletedGroupChat(chatMessage)) {
+//                    not notify and return if currentUser deleted groupDialog
+                    return;
                 }
             } else {
                 for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
@@ -765,12 +770,6 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         boolean isPrivateChatMessage = QBDialogType.PRIVATE.equals(chatDialog.getType());
         boolean needNotifyObserver = true;
 
-        if(isNotificationDeletedGroupChat(chatMessage)) {
-//            not notify if currentUser deleted groupDialog
-            Integer currentUserId = AppSession.getSession().getUser().getId();
-            String deletedOccupantsIdsString = (String) chatMessage.getProperty(ChatNotificationUtils.PROPERTY_ROOM_DELETED_OCCUPANTS_IDS);
-            needNotifyObserver = !TextUtils.equals(deletedOccupantsIdsString, currentUserId.toString());
-        }
         DbUtils.updateDialogModifiedDate(dataManager, chatDialog, ChatUtils.getMessageDateSent(chatMessage), false);
         DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, chatMessage,
                 !ownMessage
