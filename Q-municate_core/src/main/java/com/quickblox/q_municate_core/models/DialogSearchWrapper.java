@@ -33,7 +33,6 @@ public class DialogSearchWrapper implements Serializable {
         transform(context, dataManager);
     }
 
-
     private void transform(Context context, DataManager dataManager){
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(chatDialog.getDialogId());
 
