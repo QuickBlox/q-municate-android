@@ -15,6 +15,8 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBLogoutAndDestroyChatComm
 
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
 
+    private static final String TAG = ActivityLifecycleHandler.class.getSimpleName();
+
     private int numberOfActivitiesInForeground;
     private boolean chatDestroyed = false;
 
@@ -28,19 +30,26 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         Log.d("ActivityLifecycleHandler", "onActivityStarted " + activity.getClass().getSimpleName());
         boolean activityLogeable = isActivityLogeable(activity);
         chatDestroyed = chatDestroyed && !isLoggedIn();
+        Log.d(TAG, "onActivityStarted , chatDestroyed=" + chatDestroyed + ", numberOfActivitiesInForeground= "+numberOfActivitiesInForeground);
         if (numberOfActivitiesInForeground == 0 && activityLogeable) {
             AppSession.getSession().updateState(AppSession.ChatState.FOREGROUND);
             if (chatDestroyed) {
-                boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
-                if (canLogin && ((BaseActivity) activity).isNetworkAvailable()) {
+                boolean isLoggedIn = AppSession.getSession().isLoggedIn();
+                Log.d(TAG, "isSessionExist()" + isLoggedIn);
+                boolean canLogin = chatDestroyed && isLoggedIn;
+                boolean networkAvailable = ((BaseActivity) activity).isNetworkAvailable();
+                Log.d(TAG, "networkAvailable" + networkAvailable);
+                if (canLogin) {
                     QBLoginChatCompositeCommand.start(activity);
                 }
             }
         }
+
         if (activityLogeable) {
             Log.d("ActivityLifecycle", "++numberOfActivitiesInForeground");
             ++numberOfActivitiesInForeground;
         }
+
     }
 
     @SuppressLint("LongLogTag")
