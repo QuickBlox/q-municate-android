@@ -57,26 +57,10 @@ public class DialogWrapper implements Serializable {
         long unreadDialogNotifications = dataManager.getDialogNotificationDataManager().getCountUnreadDialogNotifications(dialogOccupantsIdsList, currentUser.getId());
         if (unreadMessages > 0) {
             Log.i(TAG, "chat Dlg:" + chatDialog.getName() + ", unreadMessages = " + unreadMessages);
-
-            List<Message> messageList =
-                    dataManager.getMessageDataManager().getUnreadMessages(dialogOccupantsIdsList, currentUser.getId());
-            if (!CollectionsUtil.isEmpty(messageList)) {
-                for (Message message : messageList) {
-                    Log.i(TAG, "unreadMessage = " + message);
-                }
-            }
         }
 
         if (unreadDialogNotifications > 0) {
             Log.i(TAG, "unreadDialogNotifications = " + unreadDialogNotifications);
-            List<DialogNotification> notificationList =
-                    dataManager.getDialogNotificationDataManager().getUnreadDialogNotifications(
-                            dialogOccupantsIdsList, currentUser.getId());
-            if (!CollectionsUtil.isEmpty(notificationList)) {
-                for (DialogNotification dialogNotification : notificationList) {
-                    Log.i(TAG, "unreadDialogNotification = " + dialogNotification);
-                }
-            }
         }
 
         totalCount = unreadMessages + unreadDialogNotifications;
