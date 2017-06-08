@@ -28,9 +28,6 @@ android {
         versionName rootProject.versionName
         multiDexEnabled = true
 
-        //have to remove before merge to master branch
-        ext.betaDistrubutionGroupAliases=property('testers_group_name')
-        ext.betaDistributionEmails=property('testers_emails')
     }
 
     signingConfigs {
@@ -51,26 +48,26 @@ android {
             debuggable false
             ext.enableCrashlytics = true
             signingConfig signingConfigs.release
-            buildConfigField "String", "APP_ID", property('prodAppID')
-            buildConfigField "String", "AUTH_KEY", property('prodAuthKey')
-            buildConfigField "String", "AUTH_SECRET", property('prodAuthSecret')
-            buildConfigField "String", "ACCOUNT_KEY", property('prodAccountKey')
-            buildConfigField "String", "TWITTER_KEY", property('prodTwitterDigitsConsumerKey')
-            buildConfigField "String", "TWITTER_SECRET", property('prodTwitterDigitsConsumerSecret')
-            resValue "string", "twitterDigitsApiKey", property('prodTwittedDigitsApiKey')
-            resValue "string", "facebookAppId", property('prodFacebookAppID')
-            resValue "string", "sender_id", property('prodPushRegistrationAppID')
+            buildConfigField "String", "APP_ID", prodAppID
+            buildConfigField "String", "AUTH_KEY", prodAuthKey
+            buildConfigField "String", "AUTH_SECRET", prodAuthSecret
+            buildConfigField "String", "ACCOUNT_KEY", prodAccountKey
+            buildConfigField "String", "TWITTER_KEY", prodTwitterDigitsConsumerKey
+            buildConfigField "String", "TWITTER_SECRET", prodTwitterDigitsConsumerSecret
+            resValue "string", "twitterDigitsApiKey", prodTwittedDigitsApiKey
+            resValue "string", "facebookAppId", prodFacebookAppID
+            resValue "string", "sender_id", prodPushRegistrationAppID
         }
 
         debug {
             debuggable true
             versionNameSuffix ' (debug)'
-            buildConfigField "String", "ACCOUNT_KEY", property('devAccountKey')
-            buildConfigField "String", "TWITTER_KEY", property('devTwitterDigitsConsumerKey')
-            buildConfigField "String", "TWITTER_SECRET", property('devTwitterDigitsConsumerSecret')
-            resValue "string", "twitterDigitsApiKey", property('devTwittedDigitsApiKey')
-            resValue "string", "facebookAppId", property('devFacebookAppID')
-            resValue "string", "sender_id", property('devPushRegistrationAppID')
+            buildConfigField "String", "ACCOUNT_KEY", devAccountKey
+            buildConfigField "String", "TWITTER_KEY", devTwitterDigitsConsumerKey
+            buildConfigField "String", "TWITTER_SECRET", devTwitterDigitsConsumerSecret
+            resValue "string", "twitterDigitsApiKey", devTwittedDigitsApiKey
+            resValue "string", "facebookAppId", devFacebookAppID
+            resValue "string", "sender_id", devPushRegistrationAppID
         }
     }
 
@@ -93,17 +90,17 @@ android {
 
     productFlavors {
 
-        prod {
-            buildConfigField "String", "APP_ID", property('devAppID')
-            buildConfigField "String", "AUTH_KEY", property('devAuthKey')
-            buildConfigField "String", "AUTH_SECRET", property('devAuthSecret')
+        dev {
+            buildConfigField "String", "APP_ID", devAppID
+            buildConfigField "String", "AUTH_KEY", devAuthKey
+            buildConfigField "String", "AUTH_SECRET", devAuthSecret
         }
 
         stage {
 
-            buildConfigField "String", "APP_ID", "\"51092\""
-            buildConfigField "String", "AUTH_KEY", "\"f9pjsfBgXFtGw9D\""
-            buildConfigField "String", "AUTH_SECRET", "\"54djY7yK8DeNHJA\""
+            buildConfigField "String", "APP_ID", stageAppID
+            buildConfigField "String", "AUTH_KEY", stageAuthKey
+            buildConfigField "String", "AUTH_SECRET", stageAuthSecret
         }
     }
 }
