@@ -28,7 +28,7 @@
                 android:layout_margin="@dimen/padding_large">
 
                 <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
-                    style="@style/AvatarImageViewStyle"
+                    style="@style/AvatarImageViewStyle.Common"
                     android:id="@+id/avatar_imageview"
                     android:layout_alignParentLeft="true"
                     app:border_color="@color/dark_gray"
@@ -141,19 +141,22 @@
                 android:layout_height="@dimen/divider_height"
                 android:layout_below="@id/logout_button" />
 
+            <!--hide button until next releases-->
             <Button
                 style="@style/SettingsButtonStyle"
                 android:id="@+id/delete_my_account_button"
                 android:layout_below="@id/divider4"
                 android:text="@string/settings_delete_my_account"
-                android:textColor="@color/text_red" />
+                android:textColor="@color/text_red"
+                android:visibility="gone"/>
 
             <include
                 android:id="@+id/divider5"
                 layout="@layout/view_horizontal_divider_gray"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
-                android:layout_below="@id/delete_my_account_button" />
+                android:layout_below="@id/delete_my_account_button"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 

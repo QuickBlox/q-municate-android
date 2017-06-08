@@ -5,7 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
@@ -18,7 +19,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,10 +31,10 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     public static final int RESULT_ADDED_FRIENDS = 9123;
 
-    private QBDialog qbDialog;
+    private QBChatDialog qbDialog;
     private List<Integer> friendIdsList;
 
-    public static void start(Activity activity, QBDialog qbDialog) {
+    public static void start(Activity activity, QBChatDialog qbDialog) {
         Intent intent = new Intent(activity, AddFriendsToGroupActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, qbDialog);
         activity.startActivityForResult(intent, RESULT_ADDED_FRIENDS);
@@ -65,8 +66,9 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     }
 
     @Override
-    protected List<User> getFriendsList() {
-        qbDialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+    protected List<QMUser> getFriendsList() {
+        qbDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        qbDialog.initForChat(QBChatService.getInstance());
         List<Friend> friendsList = dataManager.getFriendDataManager().getAllForGroupDetails(qbDialog.getOccupants());
         if (!friendsList.isEmpty()) {
             List<Integer> actualFriendIdsList = UserFriendUtils.getFriendIdsListFromList(friendsList);
@@ -89,14 +91,18 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     @Override
     protected void performDone() {
-        List<User> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
+        List<QMUser> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
         if (!selectedFriendsList.isEmpty()) {
-            boolean joined = groupChatHelper != null && groupChatHelper.isDialogJoined(qbDialog);
-            if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError() && joined) {
-                showProgress();
-                friendIdsList = UserFriendUtils.getFriendIds(selectedFriendsList);
-                QBAddFriendsToGroupCommand.start(this, qbDialog.getDialogId(),
-                        (ArrayList<Integer>) friendIdsList);
+            if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError()) {
+                boolean joined = chatHelper != null && qbDialog != null && chatHelper.isDialogJoined(qbDialog);
+                if(joined) {
+                    showProgress();
+                    friendIdsList = UserFriendUtils.getFriendIds(selectedFriendsList);
+                    QBAddFriendsToGroupCommand.start(this, qbDialog.getDialogId(),
+                            (ArrayList<Integer>) friendIdsList);
+                } else{
+                    ToastUtils.longToast(R.string.chat_service_is_initializing);
+                }
             } else {
                 ToastUtils.longToast(R.string.chat_service_is_initializing);
             }
@@ -110,10 +116,10 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     }
 
     private void initCustomListeners() {
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QMUser>() {
 
             @Override
-            public void onItemClicked(View view, User entity, int position) {
+            public void onItemClicked(View view, QMUser entity, int position) {
                 ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
             }
         });

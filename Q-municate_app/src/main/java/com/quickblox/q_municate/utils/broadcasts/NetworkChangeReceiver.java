@@ -25,10 +25,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
 
         if (activeNetworkInfo != null) {
-            int type = activeNetworkInfo.getType();
-            if (type == ConnectivityManager.TYPE_WIFI || type == ConnectivityManager.TYPE_MOBILE) {
-                return activeNetworkInfo.isConnected();
-            }
+            return activeNetworkInfo.isConnected();
         }
 
         return false;

@@ -17,6 +17,7 @@ public class TwoButtonsDialogFragment extends DialogFragment {
 
     private static final String ARG_TITLE = "title";
     private static final String ARG_CONTENT = "content";
+    private static final String ARG_DISMISS = "outSideDismiss";
     private static final String ARG_POSITIVE_TEXT = "positiveText";
     private static final String ARG_NEGATIVE_TEXT = "negativeText";
 
@@ -24,12 +25,14 @@ public class TwoButtonsDialogFragment extends DialogFragment {
     private String content;
     private String positiveText;
     private String negativeText;
+    private boolean outSideDismiss = true;
     private MaterialDialog.ButtonCallback buttonsCallback;
 
-    public static void show(FragmentManager fm, String title, String message, String positiveText, String negativeText, MaterialDialog.ButtonCallback callback) {
+    public static void show(FragmentManager fm, String title, String message, boolean dismiss, String positiveText, String negativeText, MaterialDialog.ButtonCallback callback) {
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
         args.putString(ARG_CONTENT, message);
+        args.putBoolean(ARG_DISMISS, dismiss);
         args.putString(ARG_POSITIVE_TEXT, positiveText);
         args.putString(ARG_NEGATIVE_TEXT, negativeText);
 
@@ -40,25 +43,29 @@ public class TwoButtonsDialogFragment extends DialogFragment {
         twoButtonsDialog.show(fm, TAG);
     }
 
+    public static void show(FragmentManager fm, String message, boolean dismiss, MaterialDialog.ButtonCallback callback) {
+        show(fm, null, message, dismiss, null, null, callback);
+    }
+
     public static void show(FragmentManager fm, String message, MaterialDialog.ButtonCallback callback) {
-        show(fm, null, message, null, null, callback);
+        show(fm, null, message, true, null, null, callback);
     }
 
     public static void show(FragmentManager fm, int message, MaterialDialog.ButtonCallback callback) {
-        show(fm, null, App.getInstance().getString(message), null, null, callback);
+        show(fm, null, App.getInstance().getString(message), true, null, null, callback);
     }
 
     public static void show(FragmentManager fm, int message) {
-        show(fm, null, App.getInstance().getString(message), null, null, null);
+        show(fm, null, App.getInstance().getString(message), true, null, null, null);
     }
 
     public static void show(FragmentManager fm, int title, int message, MaterialDialog.ButtonCallback callback) {
-        show(fm, App.getInstance().getString(title), App.getInstance().getString(message), null, null, callback);
+        show(fm, App.getInstance().getString(title), App.getInstance().getString(message), true, null, null, callback);
     }
 
     public static void show(FragmentManager fm, int title, int message,
                             int positiveText, int negativeText, MaterialDialog.ButtonCallback callback) {
-        show(fm, App.getInstance().getString(title), App.getInstance().getString(message),
+        show(fm, App.getInstance().getString(title), App.getInstance().getString(message), true,
                 App.getInstance().getString(positiveText), App.getInstance().getString(negativeText), callback);
     }
 
@@ -70,6 +77,7 @@ public class TwoButtonsDialogFragment extends DialogFragment {
                 show(fm,
                         title,
                         message,
+                        true,
                         positiveText,
                         negativeText,
                         callback);
@@ -78,11 +86,11 @@ public class TwoButtonsDialogFragment extends DialogFragment {
     }
 
 
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         title = getArguments().getString(ARG_TITLE);
         content = getArguments().getString(ARG_CONTENT);
+        outSideDismiss = getArguments().getBoolean(ARG_DISMISS);
         positiveText = getArguments().getString(ARG_POSITIVE_TEXT);
         negativeText = getArguments().getString(ARG_NEGATIVE_TEXT);
         return createDialog();
@@ -112,6 +120,7 @@ public class TwoButtonsDialogFragment extends DialogFragment {
             builder.content(content);
         }
 
+        builder.canceledOnTouchOutside(outSideDismiss);
         return builder.build();
     }
 

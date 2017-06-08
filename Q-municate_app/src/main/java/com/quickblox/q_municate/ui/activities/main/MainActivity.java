@@ -13,8 +13,8 @@ import android.view.View;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
+import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
@@ -31,19 +31,28 @@ public class MainActivity extends BaseLoggableActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private FacebookHelper facebookHelper;
-    private GSMHelper gsmHelper;
 
     private ImportFriendsSuccessAction importFriendsSuccessAction;
     private ImportFriendsFailAction importFriendsFailAction;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
     }
 
     @Override
     protected int getContentResId() {
         return R.layout.activity_main;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if( getSupportFragmentManager().getBackStackEntryCount() == 1){
+           finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -54,20 +63,18 @@ public class MainActivity extends BaseLoggableActivity {
         initFields();
         setUpActionBarWithUpButton();
 
-        checkGCMRegistration();
-
         if (!isChatInitializedAndUserLoggedIn()) {
             Log.d("MainActivity", "onCreate. !isChatInitializedAndUserLoggedIn()");
             loginChat();
         }
 
+        addDialogsAction();
         launchDialogsListFragment();
     }
 
     private void initFields() {
         Log.d("MainActivity", "initFields()");
         title = " " + AppSession.getSession().getUser().getFullName();
-        gsmHelper = new GSMHelper(this);
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
         facebookHelper = new FacebookHelper(MainActivity.this);
@@ -77,6 +84,9 @@ public class MainActivity extends BaseLoggableActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         facebookHelper.onActivityResult(requestCode, resultCode, data);
+        if (SettingsActivity.REQUEST_CODE_LOGOUT == requestCode && RESULT_OK == resultCode) {
+            startLandingScreen();
+        }
     }
 
     @Override
@@ -101,7 +111,6 @@ public class MainActivity extends BaseLoggableActivity {
         actualizeCurrentTitle();
         super.onResume();
         addActions();
-        checkGCMRegistration();
     }
 
     private void actualizeCurrentTitle() {
@@ -114,6 +123,12 @@ public class MainActivity extends BaseLoggableActivity {
     protected void onPause() {
         super.onPause();
         removeActions();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeDialogsAction();
     }
 
     @Override
@@ -131,6 +146,14 @@ public class MainActivity extends BaseLoggableActivity {
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
         actualizeCurrentTitle();
+    }
+
+    private void addDialogsAction() {
+        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
+    }
+
+    private void removeDialogsAction() {
+        removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
     }
 
     private void addActions() {
@@ -173,23 +196,13 @@ public class MainActivity extends BaseLoggableActivity {
         hideProgress();
     }
 
-    private void checkGCMRegistration() {
-        if (gsmHelper.checkPlayServices()) {
-            if (!gsmHelper.isDeviceRegisteredWithUser()) {
-                gsmHelper.registerInBackground();
-            }
-        } else {
-            Log.i(TAG, "No valid Google Play Services APK found.");
-        }
-    }
-
     private void performImportFriendsFailAction(Bundle bundle) {
         performImportFriendsSuccessAction();
     }
 
     private void launchDialogsListFragment() {
         Log.d("MainActivity", "launchDialogsListFragment()");
-        setCurrentFragment(DialogsListFragment.newInstance());
+        setCurrentFragment(DialogsListFragment.newInstance(),true);
     }
 
     private void startImportFriends(){

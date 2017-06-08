@@ -21,7 +21,8 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
@@ -39,23 +40,28 @@ import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.DialogNotification;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
@@ -63,7 +69,7 @@ import butterknife.OnTextChanged;
 public class GroupDialogDetailsActivity extends BaseLoggableActivity implements AdapterView.OnItemClickListener, OnImagePickedListener {
 
     public static final int UPDATE_DIALOG_REQUEST_CODE = 100;
-    public static final int RESULT_LEAVE_GROUP = 2;
+    public static final int RESULT_DELETE_GROUP = 2;
 
     @Bind(R.id.name_textview)
     EditText groupNameEditText;
@@ -83,7 +89,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private Object actionMode;
     private boolean isNeedUpdateImage;
     private Uri imageUri;
-    private QBDialog qbDialog;
+    private QBChatDialog qbDialog;
     private String groupNameCurrent;
     private String photoUrlOld;
     private String groupNameOld;
@@ -93,7 +99,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private ArrayList<Integer> newFriendIdsList;
     private UserOperationAction friendOperationAction;
     private BroadcastReceiver updatingDialogDetailsBroadcastReceiver;
-    private List<User> occupantsList;
+    private List<QMUser> occupantsList;
     private int countOnlineFriends;
     private DataManager dataManager;
     private String dialogId;
@@ -158,9 +164,13 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                 startAddFriendsActivity();
                 break;
             case R.id.action_leave:
-                boolean joined = groupChatHelper != null && groupChatHelper.isDialogJoined(qbDialog);
-                if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError() && joined) {
-                    showLeaveGroupDialog();
+                if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError()) {
+                    boolean joined = chatHelper != null && chatHelper.isDialogJoined(qbDialog);
+                    if(joined) {
+                        showLeaveGroupDialog();
+                    } else{
+                        ToastUtils.longToast(R.string.dialog_details_service_is_initializing);
+                    }
                 } else {
                     ToastUtils.longToast(R.string.dialog_details_service_is_initializing);
                 }
@@ -213,15 +223,17 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
     @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-        User selectedFriend = groupDialogOccupantsAdapter.getItem(position);
+        QMUser selectedFriend = groupDialogOccupantsAdapter.getItem(position);
         if (selectedFriend != null) {
             startFriendProfile(selectedFriend);
         }
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
-        startCropActivity(Uri.fromFile(file));
+    public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
+        if (Attachment.Type.IMAGE.equals(attachmentType)) {
+            startCropActivity(Uri.fromFile((File) attachment));
+        }
     }
 
     @Override
@@ -264,9 +276,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateDialog() {
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
-                dataManager.getDialogDataManager().getByDialogId(dialogId));
-        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
+        qbDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        qbDialog.initForChat(QBChatService.getInstance());
+        occupantsList = getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
         qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
         groupDialogOccupantsAdapter.setNewData(occupantsList);
     }
@@ -281,8 +293,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void addActions() {
-        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION, new LeaveGroupDialogSuccessAction());
-        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new DeleteGroupDialogSuccessAction());
+        addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, failAction);
 
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION, new UpdateGroupDialogSuccessAction());
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION, new UpdateGroupFailAction());
@@ -294,8 +306,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void removeActions() {
-        removeAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION);
+        removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
 
         removeAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION);
         removeAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION);
@@ -341,19 +353,18 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        leaveGroup();
+                        deleteDialog(qbDialog);
                     }
                 });
     }
 
-    private void leaveGroup() {
-        showProgress();
-        currentNotificationTypeList.add(DialogNotification.Type.OCCUPANTS_DIALOG);
-        newFriendIdsList = new ArrayList<>();
-        newFriendIdsList.add(AppSession.getSession().getUser().getId());
-        sendNotificationToGroup(true);
-        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this,
-                ChatUtils.createLocalDialog(qbDialog));
+    private void deleteDialog(QBChatDialog chatDialog) {
+        if(chatDialog == null || chatDialog.getDialogId() == null){
+            return;
+        }
+
+        this.showProgress();
+        QBDeleteChatCommand.start(this, chatDialog.getDialogId(), chatDialog.getType().getCode());
     }
 
     private void handleAddedFriends(Intent data) {
@@ -364,7 +375,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
             updateOccupantsList();
 
             try {
-                groupChatHelper.sendSystemMessageAboutCreatingGroupChat(qbDialog, newFriendIdsList);
+                chatHelper.sendSystemMessageAboutCreatingGroupChat(qbDialog, newFriendIdsList);
             } catch (Exception e) {
                 ErrorUtils.logError(e);
             }
@@ -390,7 +401,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void startCropActivity(Uri originalUri) {
-        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
+        imageUri = Uri.fromFile(new File(getCacheDir(), extensionOriginalUri));
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
@@ -402,9 +414,8 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateCurrentData() {
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
-                dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
-        occupantsList = dataManager.getUserDataManager().getAllByIds(qbDialog.getOccupants());
+        QBChatDialog  qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(qbDialog.getDialogId());
+        occupantsList = QMUserService.getInstance().getUserCache().getUsersByIDs(qbChatDialog.getOccupants());
         groupNameCurrent = groupNameEditText.getText().toString();
     }
 
@@ -444,12 +455,11 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void sendNotificationToGroup(boolean leavedFromDialog) {
         for (DialogNotification.Type messagesNotificationType : currentNotificationTypeList) {
             try {
-                QBDialog localDialog = qbDialog;
+                QBChatDialog localDialog = qbDialog;
                 if (qbDialog != null) {
-                    localDialog = ChatUtils.createQBDialogFromLocalDialogWithoutLeaved(dataManager,
-                            dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
+                    localDialog = dataManager.getQBChatDialogDataManager().getByDialogId(qbDialog.getDialogId());
                 }
-                groupChatHelper.sendGroupMessageToFriends(localDialog, messagesNotificationType,
+                chatHelper.sendGroupMessageToFriends(localDialog, messagesNotificationType,
                         newFriendIdsList, leavedFromDialog);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
@@ -468,12 +478,12 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         photoUrlOld = qbDialog.getPhoto();
     }
 
-    private void startFriendProfile(User selectedFriend) {
+    private void startFriendProfile(QMUser selectedFriend) {
         QBUser currentUser = AppSession.getSession().getUser();
-        if (currentUser.getId() == selectedFriend.getUserId()) {
+        if (currentUser.getId().intValue() == selectedFriend.getId().intValue()) {
             MyProfileActivity.start(GroupDialogDetailsActivity.this);
         } else {
-            UserProfileActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getUserId());
+            UserProfileActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getId());
         }
     }
 
@@ -497,7 +507,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     public void updateUserStatus(int userId, boolean status) {
-        User user = findUserById(userId);
+        QMUser user = findUserById(userId);
         if (user != null) {
             groupDialogOccupantsAdapter.notifyDataSetChanged();
 
@@ -511,20 +521,40 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         }
     }
 
-    public User findUserById(int userId) {
-        for (User user : occupantsList) {
-            if (userId == user.getUserId()) {
+    public QMUser findUserById(int userId) {
+        for (QMUser user : occupantsList) {
+            if (userId == user.getId()) {
                 return user;
             }
         }
         return null;
     }
 
+
+    public List<QMUser> getUsersForGroupChat(String dialogId, List<Integer> idsList) {
+        List<QMUser> usersList  = new ArrayList<>();
+
+        List<QMUser> qmUsers =QMUserService.getInstance().getUserCache().getUsersByIDs(idsList);
+
+        List<DialogOccupant> dialogOccupants = dataManager.getDialogOccupantDataManager().getActualDialogOccupantsByDialog(dialogId);
+        Set<Integer> dialogOccupantIdsSet = new HashSet<>();
+        for(DialogOccupant dialogOccupant : dialogOccupants){
+            dialogOccupantIdsSet.add(dialogOccupant.getUser().getId());
+        }
+
+        for(QMUser qmUser: qmUsers){
+            if( dialogOccupantIdsSet.contains(qmUser.getId())) {
+                usersList.add(qmUser);
+            }
+        }
+        return usersList;
+    }
+
     @Override
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
-        if (groupChatHelper != null) {
-            groupChatHelper.tryJoinRoomChat(qbDialog);
+        if (chatHelper != null) {
+            chatHelper.tryJoinRoomChat(qbDialog, null);
         }
     }
 
@@ -586,17 +616,16 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            resetGroupData();
             actionMode = null;
         }
     }
 
-    private class LeaveGroupDialogSuccessAction implements Command {
+    private class DeleteGroupDialogSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            setResult(RESULT_LEAVE_GROUP, getIntent());
+            setResult(RESULT_DELETE_GROUP, getIntent());
             finish();
         }
     }
@@ -605,7 +634,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         @Override
         public void execute(Bundle bundle) {
-            qbDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            qbDialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
             updateCurrentData();
             updateOldGroupData();

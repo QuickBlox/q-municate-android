@@ -2,12 +2,17 @@ package com.quickblox.q_municate.utils;
 
 import android.content.Context;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.users.model.QBUser;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +21,7 @@ public class ValidationUtils {
     private static final int FULL_NAME_MIN_LENGTH = 3;
     private static final int FULL_NAME_MAX_LENGTH = 50;
     private static final int PASSWORD_MIN_LENGTH = 8;
+    private final static String NULL = "null";
 
     private Context context;
     private QBUser qbUser;
@@ -129,21 +135,24 @@ public class ValidationUtils {
         return false;
     }
 
-    public boolean isFullNameValid(TextInputLayout fullNameTextInputLayout, String oldFullName,
-            String newFullName) {
+    public boolean isFullNameValid(TextInputLayout fullNameTextInputLayout, String newFullName) {
         boolean fullNameEntered = !TextUtils.isEmpty(newFullName.trim());
+        boolean valid = true;
 
         if (fullNameEntered) {
-            if (newFullName.equals(oldFullName)) {
-                fullNameTextInputLayout.setError(context.getString(R.string.profile_full_name_not_changed));
-            } else {
-                return true;
+            if (newFullName.length() < FULL_NAME_MIN_LENGTH) {
+                valid = false;
+                fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_field_is_too_short));
+            } else if (newFullName.length() > FULL_NAME_MAX_LENGTH) {
+                valid = false;
+                fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_field_is_too_long));
             }
         } else {
+            valid = false;
             fullNameTextInputLayout.setError(context.getString(R.string.profile_full_name_not_entered));
         }
 
-        return false;
+        return valid;
     }
 
     public boolean isForgotPasswordDataValid(TextInputLayout emailTextInputLayout, String email) {
@@ -162,10 +171,61 @@ public class ValidationUtils {
         return false;
     }
 
+    public static boolean isNull(String value){
+        return value == null || value.equals(NULL);
+    }
+
+    public static boolean validateAttachment(FragmentManager fragmentManager, String[] supportedAttachmentTypes, Attachment.Type type, Object attachment) {
+
+        if (!isSupportAttachmentType(supportedAttachmentTypes, type)){
+            OneButtonDialogFragment.show(fragmentManager, R.string.dlg_unsupported_file, false);
+            return false;
+        }
+
+        if(attachment instanceof File){
+            File file = (File)attachment;
+            if(file.getName().length() > ConstsCore.MAX_FILENAME_LENGTH){
+                OneButtonDialogFragment.show(fragmentManager, R.string.dlg_filename_long, false);
+                return false;
+            }
+        }
+
+        if(type.equals(Attachment.Type.IMAGE)){
+            File file = (File)attachment;
+            if(file.length() > ConstsCore.MAX_IMAGE_SIZE){
+                OneButtonDialogFragment.show(fragmentManager, R.string.dlg_image_big, false);
+                return false;
+            }
+        } else if (type.equals(Attachment.Type.AUDIO) || type.equals(Attachment.Type.VIDEO)) {
+            File file = (File)attachment;
+            if(file.length() > ConstsCore.MAX_AUDIO_VIDEO_SIZE){
+                OneButtonDialogFragment.show(fragmentManager, R.string.dlg_audio_video_big, false);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean isSupportAttachmentType(String[] supportedAttachmentTypes, Attachment.Type type){
+        boolean supported = false;
+        for(String supportedTypeSrt : supportedAttachmentTypes){
+            Attachment.Type supportedType =  Attachment.Type.valueOf(supportedTypeSrt);
+            if(type.equals(supportedType)){
+                supported  = true;
+                break;
+            }
+        }
+
+        return supported;
+    }
+
+
     private boolean isEmailValid(String email) {
         String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
         Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
     }
+
 }

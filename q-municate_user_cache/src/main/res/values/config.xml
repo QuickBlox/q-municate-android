@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="db_name">user_cache.db</string>
+    <integer name="db_version">1</integer>
+
+</resources>

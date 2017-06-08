@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.CombinationMessage;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -16,15 +16,15 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
     private static String TAG = QBUpdateStatusMessageCommand.class.getName();
 
-    private QBBaseChatHelper baseChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBUpdateStatusMessageCommand(Context context, QBBaseChatHelper baseChatHelper, String successAction,
-            String failAction) {
+    public QBUpdateStatusMessageCommand(Context context, QBChatHelper chatHelper, String successAction,
+                                        String failAction) {
         super(context, successAction, failAction);
-        this.baseChatHelper = baseChatHelper;
+        this.chatHelper = chatHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, CombinationMessage combinationMessage, boolean forPrivate) {
+    public static void start(Context context, QBChatDialog dialog, CombinationMessage combinationMessage, boolean forPrivate) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, combinationMessage);
@@ -34,20 +34,23 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        QBChatDialog chatDialog = (QBChatDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         CombinationMessage combinationMessage = (CombinationMessage) extras.getSerializable(QBServiceConsts.EXTRA_MESSAGE);
-        boolean forPrivate = extras.getBoolean(QBServiceConsts.EXTRA_IS_FOR_PRIVATE);
-
         try {
             if (combinationMessage.getNotificationType() != null) {
-                baseChatHelper.updateStatusNotificationMessageRead(dialog.getDialogId(), combinationMessage);
+                chatHelper.updateStatusNotificationMessageRead(chatDialog, combinationMessage);
             } else {
-                baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), combinationMessage, forPrivate);
+                chatHelper.updateStatusMessageRead(chatDialog, combinationMessage, true);
             }
         } catch (Exception e) {
-            ErrorUtils.logError(TAG,
-                    e + " --- dialogId = " + dialog.getDialogId() + ", messageId = " + combinationMessage
-                            .getMessageId());
+            String errorText = " --- dialogId = " + chatDialog == null
+                    ? "null"
+                    : chatDialog.getDialogId()
+                    + ", messageId = "
+                    + combinationMessage == null
+                    ? "null"
+                    : combinationMessage.getMessageId();
+            ErrorUtils.logError(TAG, e + errorText);
         }
 
         return null;

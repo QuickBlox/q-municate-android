@@ -109,7 +109,7 @@ public class Message implements Serializable {
     }
 
     public boolean isIncoming(int currentUserId) {
-        return dialogOccupant != null && currentUserId != dialogOccupant.getUser().getUserId();
+        return dialogOccupant != null &&  dialogOccupant.getUser() != null && currentUserId != dialogOccupant.getUser().getId();
     }
 
     @Override
@@ -117,7 +117,8 @@ public class Message implements Serializable {
         return "Message [messageId='" + messageId
                 + "', dialogOccupant='" + dialogOccupant
                 + "', body='" + body
-                + "', createdDate='" + createdDate + "']";
+                + "', createdDate='" + createdDate
+                + "', state='" + state + "']";
     }
 
     public interface Column {

@@ -3,9 +3,14 @@ package com.quickblox.q_municate_core.models;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.quickblox.auth.model.QBProvider;
+import com.quickblox.auth.session.BaseService;
+import com.quickblox.auth.session.QBSession;
+import com.quickblox.auth.session.QBSessionManager;
+import com.quickblox.auth.session.QBSessionParameters;
 import com.quickblox.core.exception.BaseServiceException;
-import com.quickblox.core.server.BaseService;
 import com.quickblox.auth.QBAuth;
+import com.quickblox.q_municate_base_service.QMServiceManagerListener;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
 
@@ -18,20 +23,28 @@ public class AppSession implements Serializable {
     private static AppSession activeSession;
 
     private CoreSharedHelper coreSharedHelper;
-    private final LoginType loginType;
+    private LoginType loginType;
     private QBUser qbUser;
-    private String qbToken;
 
-    private AppSession(LoginType loginType, QBUser qbUser, String qbToken) {
+    private ChatState chatState = ChatState.FOREGROUND;
+
+    private AppSession(QBUser qbUser) {
         coreSharedHelper = CoreSharedHelper.getInstance();
-        this.loginType = loginType;
         this.qbUser = qbUser;
-        this.qbToken = qbToken;
+        this.loginType = getLoginTypeBySessionParameters(QBSessionManager.getInstance().getSessionParameters());
         save();
     }
 
-    public static void startSession(LoginType loginType, QBUser user, String qbToken) {
-        activeSession = new AppSession(loginType, user, qbToken);
+    public void updateState(ChatState state){
+        chatState = state;
+    }
+
+    public ChatState getChatState() {
+        return chatState;
+    }
+
+    public static void startSession(QBUser user) {
+        activeSession = new AppSession(user);
     }
 
     private static AppSession getActiveSession() {
@@ -41,8 +54,6 @@ public class AppSession implements Serializable {
     }
 
     public static AppSession load() {
-        String loginTypeRaw = CoreSharedHelper.getInstance().getLoginType();
-        String qbToken = CoreSharedHelper.getInstance().getQBToken();
 
         int userId = CoreSharedHelper.getInstance().getUserId();
         String userFullName = CoreSharedHelper.getInstance().getUserFullName();
@@ -55,28 +66,23 @@ public class AppSession implements Serializable {
         qbUser.setFacebookId(CoreSharedHelper.getInstance().getFBId());
         qbUser.setTwitterId(CoreSharedHelper.getInstance().getTwitterId());
         qbUser.setTwitterDigitsId(CoreSharedHelper.getInstance().getTwitterDigitsId());
+        qbUser.setCustomData(CoreSharedHelper.getInstance().getUserCustomData());
 
-        LoginType loginType = LoginType.valueOf(loginTypeRaw);
+        activeSession = new AppSession(qbUser);
 
-        return new AppSession(loginType, qbUser, qbToken);
+        return activeSession;
     }
 
     public static boolean isSessionExistOrNotExpired(long expirationTime) {
-        try {
-            BaseService baseService = QBAuth.getBaseService();
-            String token = baseService.getToken();
+            QBSessionManager qbSessionManager = QBSessionManager.getInstance();
+            String token = qbSessionManager.getToken();
             if (token == null) {
                 Log.d("AppSession", "token == null");
                 return false;
             }
-            Date tokenExpirationDate = baseService.getTokenExpirationDate();
+            Date tokenExpirationDate = qbSessionManager.getTokenExpirationDate();
             long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
             return tokenLiveOffset > expirationTime;
-        } catch (BaseServiceException e) {
-            Log.d("AppSession", "BaseServiceException: " + e.getMessage());
-            // nothing by default
-        }
-        return false;
     }
 
     public static AppSession getSession() {
@@ -88,9 +94,6 @@ public class AppSession implements Serializable {
     }
 
     public void closeAndClear() {
-        coreSharedHelper.saveQBToken(null);
-        coreSharedHelper.saveLoginType(null);
-
         coreSharedHelper.clearUserData();
 
         activeSession = null;
@@ -101,9 +104,6 @@ public class AppSession implements Serializable {
     }
 
     public void save() {
-        coreSharedHelper.saveQBToken(qbToken);
-        coreSharedHelper.saveLoginType(loginType.toString());
-
         saveUser(qbUser);
     }
 
@@ -120,17 +120,39 @@ public class AppSession implements Serializable {
         coreSharedHelper.saveFBId(user.getFacebookId());
         coreSharedHelper.saveTwitterId(user.getTwitterId());
         coreSharedHelper.saveTwitterDigitsId(user.getTwitterDigitsId());
+        coreSharedHelper.saveUserCustomData(user.getCustomData());
     }
 
     public boolean isLoggedIn() {
-        return qbUser != null && !TextUtils.isEmpty(qbToken);
+        return QBSessionManager.getInstance().getSessionParameters() != null;
     }
 
     public boolean isSessionExist() {
-        return loginType != null && !TextUtils.isEmpty(qbToken);
+        return !TextUtils.isEmpty(QBSessionManager.getInstance().getToken());
     }
 
     public LoginType getLoginType() {
         return loginType;
     }
+
+    private LoginType getLoginTypeBySessionParameters(QBSessionParameters sessionParameters){
+        LoginType result = null;
+        if(sessionParameters == null){
+            return null;
+        }
+        String socialProvider = sessionParameters.getSocialProvider();
+        if(socialProvider == null){
+            loginType = LoginType.EMAIL;
+        } else if (socialProvider.equals(QBProvider.FACEBOOK)){
+            loginType = LoginType.FACEBOOK;
+        } else if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
+            loginType = LoginType.TWITTER_DIGITS;
+        }
+        return result;
+    }
+
+    public enum ChatState {
+        BACKGROUND, FOREGROUND
+    }
+
 }

@@ -3,20 +3,21 @@ package com.quickblox.q_municate_core.qb.commands.chat;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
-import com.quickblox.chat.errors.QBChatErrorsConstants;
+import com.quickblox.auth.session.QBSessionManager;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ConnectivityUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
-import java.util.Date;
+import java.io.IOException;
 
 public class QBLoginChatCommand extends ServiceCommand {
 
@@ -25,7 +26,7 @@ public class QBLoginChatCommand extends ServiceCommand {
     private QBChatRestHelper chatRestHelper;
 
     public QBLoginChatCommand(Context context, QBChatRestHelper chatRestHelper, String successAction,
-            String failAction) {
+                              String failAction) {
         super(context, successAction, failAction);
         this.chatRestHelper = chatRestHelper;
     }
@@ -39,28 +40,29 @@ public class QBLoginChatCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         final QBUser currentUser = AppSession.getSession().getUser();
 
-        tryLogin(currentUser);
+        Log.i(TAG, "login with user login:" + currentUser.getLogin()
+                + ", user id:" + currentUser.getId()
+                + ", pswd=" + currentUser.getPassword() + ", fb id:" + currentUser.getFacebookId()
+                + ", tw dg id:" + currentUser.getTwitterDigitsId());
 
-        if (!chatRestHelper.isLoggedIn()) {
-            throw new Exception(QBChatErrorsConstants.AUTHENTICATION_FAILED);
+        Log.i(TAG, "session token:" + QBSessionManager.getInstance().getToken()
+                + "\n, token exp date: " + QBSessionManager.getInstance().getTokenExpirationDate()
+                + "\n, is valid token:" + QBSessionManager.getInstance().isValidActiveSession());
+
+
+        // We don't make login if QB session was deleted by one of expiration cases :
+        // for ex when social provider token is no more valid
+        if (QBSessionManager.getInstance().getSessionParameters() == null) {
+            throw new QBResponseException("invalid session");
         }
+
+        login(currentUser);
 
         return extras;
     }
 
-    private void tryLogin(QBUser currentUser) throws Exception {
-        long startTime = new Date().getTime();
-        long currentTime = startTime;
-
-        while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT) {
-            currentTime = new Date().getTime();
-            try {
-                if (ConnectivityUtils.isNetworkAvailable(context)) {
-                    chatRestHelper.login(currentUser);
-                }
-            } catch (SmackException ignore) {
-                ignore.printStackTrace();
-            }
-        }
+    private void login(QBUser currentUser) throws XMPPException, IOException, SmackException {
+        chatRestHelper.login(currentUser);
     }
+
 }

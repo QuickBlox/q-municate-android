@@ -37,20 +37,10 @@
 
     <style name="ToolbarTheme">
         <item name="colorControlNormal">@color/dark_gray</item>
-        <item name="android:colorControlNormal" tools:ignore="NewApi">@color/dark_gray</item>
-
-        <!-- Hack! -->
-        <item name="homeAsUpIndicator">@drawable/abc_ic_ab_back_mtrl_am_alpha</item>
-        <!-- ! -->
     </style>
 
     <style name="ToolbarThemeCall" parent="Theme.AppCompat">
         <item name="colorControlNormal">@color/light_gray</item>
-        <item name="android:colorControlNormal" tools:ignore="NewApi">@color/light_gray</item>
-
-        <!-- Hack! -->
-        <item name="homeAsUpIndicator">@drawable/abc_ic_ab_back_mtrl_am_alpha</item>
-        <!-- ! -->
     </style>
 
     <style name="Theme.MyTheme" parent="Theme.AppCompat">

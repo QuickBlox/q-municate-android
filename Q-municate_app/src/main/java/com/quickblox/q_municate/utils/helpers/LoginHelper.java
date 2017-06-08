@@ -17,13 +17,13 @@ import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 
 import java.util.concurrent.TimeUnit;
+
+import rx.Subscriber;
 
 public class LoginHelper {
 
@@ -52,12 +52,6 @@ public class LoginHelper {
     }
 
     public void checkStartExistSession() {
-        if (needToClearAllData()) {
-            if (existingQbSessionListener != null) {
-                existingQbSessionListener.onStartSessionFail();
-            }
-            return;
-        }
 
         if (appSharedHelper.isSavedRememberMe()) {
             startExistSession();
@@ -121,15 +115,53 @@ public class LoginHelper {
 
     public void loginFB() {
         String fbToken = appSharedHelper.getFBToken();
-        AppSession.getSession().closeAndClear();
-        QBSocialLoginCommand.start(context, QBProvider.FACEBOOK, fbToken, null);
+        ServiceManager.getInstance().login(QBProvider.FACEBOOK, fbToken, null)
+                .subscribe(new Subscriber<QBUser>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        unregisterBroadcastReceiver();
+                        if (globalLoginListener != null) {
+                            globalLoginListener.onCompleteWithError("Login was finished with error!");
+                        }
+                    }
+
+                    @Override
+                    public void onNext(QBUser qbUser) {
+                        AppSession.getSession().updateUser(qbUser);
+                        loginChat();
+                    }
+                });
     }
 
     private void loginTD() {
         String tdServiceProvider = appSharedHelper.getTDServiceProvider();
         String tdCredentials = appSharedHelper.getTDCredentials();
-        AppSession.getSession().closeAndClear();
-        QBSocialLoginCommand.start(context, QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials);
+        ServiceManager.getInstance().login(QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials)
+                .subscribe(new Subscriber<QBUser>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        unregisterBroadcastReceiver();
+                        if (globalLoginListener != null) {
+                            globalLoginListener.onCompleteWithError("Login was finished with error!");
+                        }
+                    }
+
+                    @Override
+                    public void onNext(QBUser qbUser) {
+                        AppSession.getSession().updateUser(qbUser);
+                        loginChat();
+                    }
+                });
     }
 
     public void loginChat() {
@@ -137,17 +169,7 @@ public class LoginHelper {
     }
 
     private void loadDialogs() {
-        QBLoadDialogsCommand.start(context);
-    }
-
-    private boolean needToClearAllData() {
-        if (DataManager.getInstance().getUserDataManager().getAll().isEmpty()) {
-            App.getInstance().getAppSharedHelper().clearAll();
-            AppSession.getSession().closeAndClear();
-            return true;
-        } else {
-            return false;
-        }
+        QBLoadDialogsCommand.start(context, true);
     }
 
     public void makeGeneralLogin(GlobalLoginListener globalLoginListener) {

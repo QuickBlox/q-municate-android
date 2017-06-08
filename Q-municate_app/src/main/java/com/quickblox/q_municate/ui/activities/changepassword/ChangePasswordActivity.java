@@ -10,20 +10,22 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.commands.QBChangePasswordCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
+import rx.Subscriber;
 
 public class ChangePasswordActivity extends BaseLoggableActivity {
 
@@ -113,9 +115,6 @@ public class ChangePasswordActivity extends BaseLoggableActivity {
     }
 
     private void addActions() {
-        addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
-        addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new ChangePasswordFailAction());
-
         addAction(QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, new LogoutChatSuccessAction());
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatSuccessAction());
 
@@ -126,8 +125,6 @@ public class ChangePasswordActivity extends BaseLoggableActivity {
     }
 
     private void removeActions() {
-        removeAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION);
 
         removeAction(QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
@@ -146,7 +143,31 @@ public class ChangePasswordActivity extends BaseLoggableActivity {
                         oldPasswordText, newPasswordText)) {
             updatePasswords(oldPasswordText, newPasswordText);
             showProgress();
-            QBChangePasswordCommand.start(this, qbUser);
+            ServiceManager.getInstance().changePasswordUser(qbUser).subscribe(new Subscriber<QMUser>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    if (e != null) {
+                        ToastUtils.longToast(e.getMessage());
+                    }
+
+                    updatePasswords(oldPasswordText, oldPasswordText);
+                    clearFieldNewPassword();
+
+                    hideProgress();
+                }
+
+                @Override
+                public void onNext(QMUser qmUser) {
+                    saveUserCredentials(qmUser);
+                    ToastUtils.longToast(R.string.dlg_password_changed);
+                    logoutChat();
+                }
+            });
         }
     }
 
@@ -188,33 +209,6 @@ public class ChangePasswordActivity extends BaseLoggableActivity {
         public void execute(Bundle bundle) {
             hideProgress();
             finish();
-        }
-    }
-
-    private class ChangePasswordSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            saveUserCredentials(user);
-            ToastUtils.longToast(R.string.dlg_password_changed);
-            logoutChat();
-        }
-    }
-
-    private class ChangePasswordFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            if (exception != null) {
-                ToastUtils.longToast(exception.getMessage());
-            }
-
-            updatePasswords(oldPasswordText, oldPasswordText);
-            clearFieldNewPassword();
-
-            hideProgress();
         }
     }
 }

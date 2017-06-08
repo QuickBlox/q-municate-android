@@ -1,18 +1,27 @@
 package com.quickblox.q_municate.ui.fragments.search;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Handler;
 import android.support.v4.content.Loader;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.listeners.SearchListener;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.adapters.search.LocalSearchAdapter;
@@ -22,27 +31,31 @@ import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoratio
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.DialogSearchWrapper;
 import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.managers.FriendDataManager;
-import com.quickblox.q_municate_db.managers.UserRequestDataManager;
-import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import butterknife.Bind;
 import butterknife.OnTouch;
 
-public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implements SearchListener {
+public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWrapper>> implements SearchListener {
 
     private final static int LOADER_ID = LocalSearchFragment.class.hashCode();
+    private static final String TAG = LocalSearchFragment.class.getSimpleName();
 
     @Bind(R.id.dialogs_recyclerview)
     RecyclerView dialogsRecyclerView;
@@ -51,7 +64,12 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     private Observer commonObserver;
     private LocalSearchAdapter localSearchAdapter;
     private String searchQuery;
-    private List<Dialog> dialogsList;
+    private List<DialogSearchWrapper> dialogsList;
+    private DialogsListLoader dialogsListLoader;
+
+    private Queue<LoaderConsumer> loaderConsumerQueue = new ConcurrentLinkedQueue<>();
+    protected Handler handler = new Handler();
+    private LoadDialogsBroadcastReceiver loadDialogsBroadcastReceiver;
 
     public static LocalSearchFragment newInstance() {
         return new LocalSearchFragment();
@@ -66,6 +84,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         initFields();
         initDialogsList();
         initCustomListeners();
+        registerLoadDialogsReceiver();
         initDataLoader(LOADER_ID);
 
         addObservers();
@@ -77,12 +96,14 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     public void onResume() {
         super.onResume();
         localSearchAdapter.notifyDataSetChanged();
+        updateDialogsListFromQueue();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         deleteObservers();
+        unregisterLoadDialogsReceiver();
     }
 
     @OnTouch(R.id.dialogs_recyclerview)
@@ -115,13 +136,33 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     }
 
     @Override
-    protected Loader<List<Dialog>> createDataLoader() {
-        return new DialogsListLoader(getActivity(), dataManager);
+    protected Loader<List<DialogSearchWrapper>> createDataLoader() {
+        dialogsListLoader = new DialogsListLoader(getActivity(), dataManager);
+        return dialogsListLoader;
+
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Dialog>> loader, List<Dialog> dialogsList) {
-        this.dialogsList = dialogsList;
+    public void onLoadFinished(Loader<List<DialogSearchWrapper>> loader, List<DialogSearchWrapper> dialogsList) {
+        updateDialogsListFromQueue();
+
+        updateDialogsAdapter(dialogsList);
+    }
+
+    private void updateDialogsListFromQueue() {
+        if(!loaderConsumerQueue.isEmpty()) {
+            LoaderConsumer consumer = loaderConsumerQueue.poll();
+            handler.post(consumer);
+        }
+    }
+
+    private void updateDialogsAdapter(List<DialogSearchWrapper> dialogsList) {
+        if (dialogsListLoader.isLoadAll()) {
+            this.dialogsList = dialogsList;
+        } else {
+            this.dialogsList.addAll(dialogsList);
+        }
+
         updateLocal();
     }
 
@@ -142,7 +183,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     private void initFields() {
         dataManager = DataManager.getInstance();
         commonObserver = new CommonObserver();
-        dialogsList = Collections.emptyList();
+        dialogsList = new ArrayList<>();
     }
 
     private void initDialogsList() {
@@ -154,26 +195,26 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
     }
 
     private void initCustomListeners() {
-        localSearchAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<Dialog>() {
+        localSearchAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<DialogSearchWrapper>() {
 
             @Override
-            public void onItemClicked(View view, Dialog dialog, int position) {
-                if (dialog.getType() == Dialog.Type.PRIVATE) {
-                    startPrivateChatActivity(dialog);
+            public void onItemClicked(View view, DialogSearchWrapper dialogSearchWrapper, int position) {
+                if (QBDialogType.PRIVATE.equals(dialogSearchWrapper.getChatDialog().getType())) {
+                    startPrivateChatActivity(dialogSearchWrapper.getChatDialog());
                 } else {
-                    startGroupChatActivity(dialog);
+                    startGroupChatActivity(dialogSearchWrapper.getChatDialog());
                 }
             }
         });
     }
 
-    private void startPrivateChatActivity(Dialog dialog) {
+    private void startPrivateChatActivity(QBChatDialog chatDialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        User occupant = ChatUtils.getOpponentFromPrivateDialog(
+                .getDialogOccupantsListByDialogId(chatDialog.getDialogId());
+        QMUser occupant = ChatUtils.getOpponentFromPrivateDialog(
                 UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
-        if (!TextUtils.isEmpty(dialog.getDialogId())) {
-            PrivateDialogActivity.start(baseActivity, occupant, dialog);
+        if (!TextUtils.isEmpty(chatDialog.getDialogId())) {
+            PrivateDialogActivity.start(baseActivity, occupant, chatDialog);
         }
     }
 
@@ -189,6 +230,20 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         }
     }
 
+    private void registerLoadDialogsReceiver() {
+        if (loadDialogsBroadcastReceiver == null){
+            loadDialogsBroadcastReceiver = new  LoadDialogsBroadcastReceiver();
+        }
+
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(loadDialogsBroadcastReceiver, new IntentFilter(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION));
+    }
+
+    private void unregisterLoadDialogsReceiver(){
+        if (loadDialogsBroadcastReceiver != null) {
+            LocalBroadcastManager.getInstance(baseActivity).unregisterReceiver(loadDialogsBroadcastReceiver);
+        }
+    }
+
     private void updateList() {
         onChangedData();
     }
@@ -201,20 +256,107 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         }
     }
 
-    private void startGroupChatActivity(Dialog dialog) {
-        GroupDialogActivity.start(baseActivity, dialog);
+    private void startGroupChatActivity(QBChatDialog chatDialog) {
+        GroupDialogActivity.start(baseActivity, chatDialog);
     }
 
-    private static class DialogsListLoader extends BaseLoader<List<Dialog>> {
+    private void updateDialogsList(int startRow, int perPage) {
+//        logic for correct behavior of pagination loading dialogs
+//        we can't fire onChangedData until we have incomplete loader task in queue
+        if (!loaderConsumerQueue.isEmpty()) {
+            Log.d(TAG, "updateDialogsList loaderConsumerQueue.add");
+            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
+            return;
+        }
+
+//        if Loader is in loading process, we don't fire onChangedData, cause we do not want interrupt current load task
+        if (dialogsListLoader.isLoading) {
+            Log.d(TAG, "updateDialogsList dialogsListLoader.isLoading");
+            loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
+        } else {
+//        we don't have tasks in queue, so load dialogs by pages
+            if(!isResumed()) {
+                loaderConsumerQueue.offer(new LoaderConsumer(startRow, perPage));
+            } else {
+                Log.d(TAG, "updateDialogsList onChangedData");
+                dialogsListLoader.setPagination(startRow, perPage);
+                onChangedData();
+            }
+        }
+    }
+
+    private static class DialogsListLoader extends BaseLoader<List<DialogSearchWrapper>> {
+
+        private static final String TAG = DialogsListLoader.class.getSimpleName();
+        private boolean loadAll;
+        private int startRow = 0;
+        private int perPage = 0;
 
         public DialogsListLoader(Context context, DataManager dataManager) {
             super(context, dataManager);
         }
 
+        public boolean isLoadAll() {
+            return loadAll;
+        }
+
+        public void setLoadAll(boolean loadAll) {
+            this.loadAll = loadAll;
+        }
+
+        public void setPagination(int startRow, int perPage) {
+            this.startRow = startRow;
+            this.perPage = perPage;
+        }
+
         @Override
-        protected List<Dialog> getItems() {
-            return ChatUtils.fillTitleForPrivateDialogsList(getContext().getResources().getString(R.string.deleted_user),
-                    dataManager, dataManager.getDialogDataManager().getAllSorted());
+        protected List<DialogSearchWrapper> getItems() {
+            Log.d(TAG, "getItems() chatDialogs startRow= " + startRow + ", perPage= " + perPage + ", loadAll= " + loadAll);
+
+            List<QBChatDialog> dialogsList = loadAll ? dataManager.getQBChatDialogDataManager().getAllSorted() :
+                    dataManager.getQBChatDialogDataManager().getSkippedSorted(startRow, perPage);
+
+            List<DialogSearchWrapper> wrappedList = new ArrayList<>(dialogsList.size());
+            for (QBChatDialog dialog : dialogsList){
+                wrappedList.add(new DialogSearchWrapper(getContext(), dataManager, dialog));
+            }
+
+            return wrappedList;
+        }
+
+        private void retrieveAllDialogsFromCacheByPages() {
+            long dialogsCount = DataManager.getInstance().getQBChatDialogDataManager().getAllCount();
+            boolean isCacheEmpty = dialogsCount <= 0;
+
+            if(isCacheEmpty) {
+                return;
+            }
+
+            DialogsUtils.loadAllDialogsFromCacheByPagesTask(getContext(), dialogsCount);
+        }
+
+        @Override
+        public void loadData(){
+            retrieveAllDialogsFromCacheByPages();
+        }
+    }
+
+    private class LoaderConsumer implements Runnable {
+        boolean loadAll;
+        int startRow;
+        int perPage;
+
+        LoaderConsumer(int startRow, int perPage) {
+            this.startRow = startRow;
+            this.perPage = perPage;
+        }
+
+        @Override
+        public void run() {
+            Log.d(TAG, "LoaderConsumer onChangedData");
+            dialogsListLoader.setLoadAll(loadAll);
+            dialogsListLoader.setPagination(startRow, perPage);
+            onChangedData();
         }
     }
 
@@ -223,10 +365,31 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         @Override
         public void update(Observable observable, Object data) {
             if (data != null) {
-                if (data.equals(UserRequestDataManager.OBSERVE_KEY) || data.equals(FriendDataManager.OBSERVE_KEY)) {
+                String observerKey = ((Bundle) data).getString(BaseManager.EXTRA_OBSERVE_KEY);
+                if (observerKey.equals(dataManager.getUserRequestDataManager().getObserverKey()) || observerKey.equals(dataManager.getFriendDataManager().getObserverKey())) {
                     updateList();
                 }
             }
+        }
+    }
+
+    private class LoadDialogsBroadcastReceiver extends BroadcastReceiver{
+        private final String TAG = LoadDialogsBroadcastReceiver.class.getSimpleName();
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+
+            Log.d(TAG, "bundle= " + bundle);
+            if(bundle != null) {
+                if (isLoadPerPage(bundle)) {
+                    updateDialogsList(bundle.getInt(ConstsCore.DIALOGS_START_ROW), bundle.getInt(ConstsCore.DIALOGS_PER_PAGE));
+                }
+            }
+        }
+
+        private boolean isLoadPerPage(Bundle bundle) {
+            return bundle.get(ConstsCore.DIALOGS_START_ROW) != null && bundle.get(ConstsCore.DIALOGS_PER_PAGE) != null;
         }
     }
 }

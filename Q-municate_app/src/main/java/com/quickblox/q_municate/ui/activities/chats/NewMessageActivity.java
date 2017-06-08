@@ -4,14 +4,16 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
@@ -21,13 +23,12 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.utils.DialogTransformUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.List;
 
@@ -40,11 +41,11 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
 
     private DataManager dataManager;
     private FriendsAdapter friendsAdapter;
-    private User selectedUser;
+    private QMUser selectedUser;
 
-    public static void start(Context context) {
-        Intent intent = new Intent(context, NewMessageActivity.class);
-        context.startActivity(intent);
+    public static void startForResult(Fragment fragment, int requestCode) {
+        Intent intent = new Intent(fragment.getActivity(), NewMessageActivity.class);
+        fragment.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -150,10 +151,10 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
     }
 
     private void initCustomListeners() {
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QMUser>() {
 
             @Override
-            public void onItemClicked(View view, User user, int position) {
+            public void onItemClicked(View view, QMUser user, int position) {
                 super.onItemClicked(view, user, position);
                 selectedUser = user;
                 checkForOpenChat(user);
@@ -175,10 +176,11 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
         updateBroadcastActionList();
     }
 
-    private void checkForOpenChat(User user) {
-        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
+    private void checkForOpenChat(QMUser user) {
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getId());
         if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
-            startPrivateChat(dialogOccupant.getDialog());
+            QBChatDialog chatDialog = DialogTransformUtils.createQBDialogFromLocalDialog(dataManager, dialogOccupant.getDialog());
+            startPrivateChat(chatDialog);
         } else {
             if (checkNetworkAvailableWithError()) {
                 showProgress();
@@ -187,7 +189,7 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
         }
     }
 
-    private void startPrivateChat(Dialog dialog) {
+    private void startPrivateChat(QBChatDialog dialog) {
         PrivateDialogActivity.start(this, selectedUser, dialog);
         finish();
     }
@@ -209,8 +211,8 @@ public class NewMessageActivity extends BaseLoggableActivity implements SearchVi
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            QBDialog qbDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            startPrivateChat(ChatUtils.createLocalDialog(qbDialog));
+            QBChatDialog qbDialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            startPrivateChat(qbDialog);
         }
     }
 }

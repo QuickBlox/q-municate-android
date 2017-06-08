@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.util.Log;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -9,8 +11,8 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,6 +47,99 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
 
             dialogOccupantQueryBuilder.join(dialogQueryBuilder);
             messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
+    }
+
+    public List<DialogNotification> getDialogNotificationsByDialogId(String dialogId, long limit) {
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>();
+
+        try {
+            QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao
+                    .queryBuilder();
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
+                    .queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder
+                    .join(dialogOccupantQueryBuilder)
+                    .orderBy(DialogNotification.Column.CREATED_DATE, false)
+                    .limit(limit);
+
+            PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
+    }
+
+    public List<DialogNotification> getDialogNotificationsByDialogIdAndDate(String dialogId, long createdDate, boolean moreDate) {
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>();
+
+        try {
+            QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao.queryBuilder();
+
+            Where<DialogNotification, Long> where = messageQueryBuilder.where();
+            where.and(where.ne(DialogNotification.Column.STATE, State.TEMP_LOCAL),
+                    where.ne(DialogNotification.Column.STATE, State.TEMP_LOCAL_UNREAD),
+                    moreDate
+                            ? where.gt(DialogNotification.Column.CREATED_DATE, createdDate)
+                            : where.lt(DialogNotification.Column.CREATED_DATE, createdDate));
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
+                    .queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
+    }
+
+    public List<DialogNotification> getDialogNotificationsByDialogIdAndDate(String dialogId, long createdDate, boolean moreDate, long limit) {
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>();
+
+        try {
+            QueryBuilder<DialogNotification, Long> messageQueryBuilder = dao.queryBuilder();
+
+            Where<DialogNotification, Long> where = messageQueryBuilder.where();
+            where.and(where.ne(DialogNotification.Column.STATE, State.TEMP_LOCAL),
+                    where.ne(DialogNotification.Column.STATE, State.TEMP_LOCAL_UNREAD),
+                    moreDate
+                            ? where.gt(DialogNotification.Column.CREATED_DATE, createdDate)
+                            : where.lt(DialogNotification.Column.CREATED_DATE, createdDate));
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao
+                    .queryBuilder();
+
+            QueryBuilder<Dialog, Long> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder
+                    .join(dialogOccupantQueryBuilder)
+                    .orderBy(DialogNotification.Column.CREATED_DATE, false)
+                    .limit(limit);
 
             PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
             dialogNotificationsList = dao.query(preparedQuery);
@@ -100,7 +195,7 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
             queryBuilder.setCountOf(true);
 
             QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
-            dialogOccupantQueryBuilder.where().ne(User.Column.ID, currentUserId);
+            dialogOccupantQueryBuilder.where().ne(QMUserColumns.ID, currentUserId);
 
             queryBuilder.join(dialogOccupantQueryBuilder);
 
@@ -120,5 +215,37 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         }
 
         return count;
+    }
+
+    public List<DialogNotification> getUnreadDialogNotifications(List<Long> dialogOccupantsIdsList, int currentUserId) {
+        long count = 0;
+
+        List<DialogNotification> dialogNotificationsList = null;
+
+        try {
+            QueryBuilder<DialogNotification, Long> queryBuilder = dao.queryBuilder();
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+            dialogOccupantQueryBuilder.where().ne(QMUserColumns.ID, currentUserId);
+
+            queryBuilder.join(dialogOccupantQueryBuilder);
+
+            Where<DialogNotification, Long> where = queryBuilder.where();
+            where.and(
+                    where.in(DialogOccupant.Column.ID, dialogOccupantsIdsList),
+                    where.or(
+                            where.eq(DialogNotification.Column.STATE, State.DELIVERED),
+                            where.eq(DialogNotification.Column.STATE, State.TEMP_LOCAL_UNREAD)
+                    )
+            );
+
+            PreparedQuery<DialogNotification> preparedQuery = queryBuilder.prepare();
+            Log.i(TAG, "query=" + preparedQuery.getStatement());
+            dialogNotificationsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotificationsList;
     }
 }

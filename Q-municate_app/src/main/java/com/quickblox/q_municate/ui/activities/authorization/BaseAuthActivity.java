@@ -22,18 +22,14 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
+import com.quickblox.q_municate.utils.AuthUtils;
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
-import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.users.model.QBUser;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterAuthToken;
@@ -43,6 +39,7 @@ import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
+import rx.Observer;
 
 public abstract class BaseAuthActivity extends BaseActivity {
 
@@ -71,10 +68,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected LoginType loginType = LoginType.EMAIL;
     protected Resources resources;
 
-    protected LoginSuccessAction loginSuccessAction;
-    protected SocialLoginSuccessAction socialLoginSuccessAction;
-    protected FailAction failAction;
     private TwitterDigitsAuthCallback twitterDigitsAuthCallback;
+    private ServiceManager serviceManager;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, BaseAuthActivity.class);
@@ -93,17 +88,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
         facebookHelper.onActivityStart();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        addActions();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        removeActions();
-    }
 
     @Override
     public void onStop() {
@@ -143,22 +127,21 @@ public abstract class BaseAuthActivity extends BaseActivity {
         facebookHelper = new FacebookHelper(this);
         twitterDigitsHelper = new TwitterDigitsHelper();
         twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
-        loginSuccessAction = new LoginSuccessAction();
-        socialLoginSuccessAction = new SocialLoginSuccessAction();
         failAction = new FailAction();
+        serviceManager = ServiceManager.getInstance();
     }
 
     protected void startSocialLogin() {
         if (!appSharedHelper.isShownUserAgreement()) {
             UserAgreementDialogFragment
                     .show(getSupportFragmentManager(), new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    super.onPositive(dialog);
-                                    appSharedHelper.saveShownUserAgreement(true);
-                                    loginWithSocial();
-                                }
-                            });
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            appSharedHelper.saveShownUserAgreement(true);
+                            loginWithSocial();
+                        }
+                    });
         } else {
             loginWithSocial();
         }
@@ -167,9 +150,9 @@ public abstract class BaseAuthActivity extends BaseActivity {
     private void loginWithSocial() {
         appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
-        if (loginType.equals(LoginType.FACEBOOK)){
+        if (loginType.equals(LoginType.FACEBOOK)) {
             facebookHelper.login(new FacebookLoginCallback());
-        } else if (loginType.equals(LoginType.TWITTER_DIGITS)){
+        } else if (loginType.equals(LoginType.TWITTER_DIGITS)) {
             twitterDigitsHelper.login(twitterDigitsAuthCallback);
         }
     }
@@ -179,87 +162,35 @@ public abstract class BaseAuthActivity extends BaseActivity {
         startMainActivity();
     }
 
-    protected void startMainActivity(boolean importInitialized) {
-        appSharedHelper.saveUsersImportInitialized(importInitialized);
-        startMainActivity();
-    }
-
     protected void startMainActivity() {
         MainActivity.start(BaseAuthActivity.this);
         finish();
     }
 
-    protected void parseExceptionMessage(Exception exception) {
-        hideProgress();
-
-        String errorMessage = exception.getMessage();
-
-        if (errorMessage != null) {
-            if (errorMessage.equals(getString(R.string.error_bad_timestamp))) {
-                errorMessage = getString(R.string.error_bad_timestamp_from_app);
-            } else if (errorMessage.equals(getString(R.string.error_login_or_email_required))) {
-                errorMessage = getString(R.string.error_login_or_email_required_from_app);
-            } else if (errorMessage.equals(getString(R.string.error_email_already_taken))
-                    && loginType.equals(LoginType.FACEBOOK)) {
-                errorMessage = getString(R.string.error_email_already_taken_from_app);
-            } else if (errorMessage.equals(getString(R.string.error_unauthorized))) {
-                errorMessage = getString(R.string.error_unauthorized_from_app);
-            }
-
-            ErrorUtils.showError(this, errorMessage);
-        }
-    }
-
-    protected void parseFailException(Bundle bundle) {
-        Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-        int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
-        parseExceptionMessage(exception);
-    }
-
-    protected void login(String userEmail, String userPassword) {
+    protected void login(String userEmail, final String userPassword) {
         appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
         appSharedHelper.saveUsersImportInitialized(true);
         QBUser user = new QBUser(null, userPassword, userEmail);
-        AppSession.getSession().closeAndClear();
-        QBLoginCompositeCommand.start(this, user);
-    }
 
-    protected void performLoginSuccessAction(Bundle bundle) {
-        QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-        startMainActivity(user);
+        serviceManager.login(user).subscribe(new Observer<QBUser>() {
+            @Override
+            public void onCompleted() {
 
-        // send analytics data
-        GoogleAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
-        FlurryAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this);
-    }
+            }
 
-    protected boolean isLoggedInToServer() {
-        return AppSession.getSession().isLoggedIn();
-    }
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG, "onError" + e.getMessage());
+                hideProgress();
+                AuthUtils.parseExceptionMessage(BaseAuthActivity.this, e.getMessage());
+            }
 
-    private void addActions() {
-        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, loginSuccessAction);
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
-
-        addAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION, socialLoginSuccessAction);
-        addAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION, failAction);
-
-        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, failAction);
-
-        updateBroadcastActionList();
-    }
-
-    private void removeActions() {
-        removeAction(QBServiceConsts.LOGIN_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOGIN_FAIL_ACTION);
-
-        removeAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION);
-
-        removeAction(QBServiceConsts.SIGNUP_FAIL_ACTION);
-
-        updateBroadcastActionList();
+            @Override
+            public void onNext(QBUser qbUser) {
+                performLoginSuccessAction(qbUser);
+            }
+        });
     }
 
     protected void startLandingScreen() {
@@ -267,41 +198,42 @@ public abstract class BaseAuthActivity extends BaseActivity {
         finish();
     }
 
-    private class LoginSuccessAction implements Command {
+    private void performLoginSuccessAction(QBUser user) {
+        startMainActivity(user);
 
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            performLoginSuccessAction(bundle);
-        }
+        // send analytics data
+        GoogleAnalyticsHelper.pushAnalyticsData(this, user, "User Sign In");
+        FlurryAnalyticsHelper.pushAnalyticsData(this);
     }
 
-    private class SocialLoginSuccessAction implements Command {
+
+    private Observer<QBUser> socialLoginObserver = new Observer<QBUser>() {
+        @Override
+        public void onCompleted() {
+
+        }
 
         @Override
-        public void execute(Bundle bundle) throws Exception {
-            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            QBUpdateUserCommand.start(BaseAuthActivity.this, user, null);
-
-            performLoginSuccessAction(bundle);
+        public void onError(Throwable e) {
+            Log.d(TAG, "onError " + e.getMessage());
+            hideProgress();
+            AuthUtils.parseExceptionMessage(BaseAuthActivity.this, e.getMessage());
         }
-    }
-
-    private class FailAction implements Command {
 
         @Override
-        public void execute(Bundle bundle) throws Exception {
-            parseFailException(bundle);
+        public void onNext(QBUser qbUser) {
+            performLoginSuccessAction(qbUser);
         }
-    }
+    };
 
     private class FacebookLoginCallback implements FacebookCallback<LoginResult> {
 
         @Override
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "+++ FacebookCallback call onSuccess from BaseAuthActivity +++");
-                showProgress();
-
-                QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null);
+            showProgress();
+            serviceManager.login(QBProvider.FACEBOOK, loginResult.getAccessToken().getToken(), null)
+                          .subscribe(socialLoginObserver);
         }
 
         @Override
@@ -330,9 +262,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
             DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
             Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
-            QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.TWITTER_DIGITS,
-                    authHeaders.get(TwitterDigitsHelper.PROVIDER),
-                    authHeaders.get(TwitterDigitsHelper.CREDENTIALS));
+            serviceManager.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS))
+                          .subscribe(socialLoginObserver);
         }
 
         @Override
@@ -341,4 +272,5 @@ public abstract class BaseAuthActivity extends BaseActivity {
             hideProgress();
         }
     }
+
 }

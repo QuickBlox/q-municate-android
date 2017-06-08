@@ -1,10 +1,10 @@
 package com.quickblox.q_municate.utils.listeners;
 
-import java.io.File;
+import com.quickblox.q_municate_db.models.Attachment;
 
 public interface OnImagePickedListener {
 
-    void onImagePicked(int requestCode, File file);
+    void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment);
 
     void onImagePickError(int requestCode, Exception e);
 

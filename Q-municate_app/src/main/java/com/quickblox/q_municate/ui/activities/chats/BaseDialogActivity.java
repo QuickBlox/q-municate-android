@@ -10,13 +10,12 @@ import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,54 +23,66 @@ import android.widget.ImageButton;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.DialogsUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
-import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
-import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
-import com.quickblox.q_municate_core.core.loader.BaseLoader;
+import com.quickblox.q_municate.ui.activities.location.MapsActivity;
+import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
+import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
+import com.quickblox.q_municate.utils.StringUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
+import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogMessagesCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
 import com.quickblox.q_municate_db.managers.MessageDataManager;
+import com.quickblox.q_municate_db.managers.base.BaseManager;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -82,9 +93,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener,
         ChatUIHelperListener, OnImagePickedListener {
 
+    private static final String TAG = BaseDialogActivity.class.getSimpleName();
     private static final int TYPING_DELAY = 1000;
     private static final int DELAY_SCROLLING_LIST = 300;
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
+    private static final int MESSAGES_PAGE_SIZE = ConstsCore.DIALOG_MESSAGES_PER_PAGE;
+    private static final int KEEP_ALIVE_TIME = 1;
+    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
+    private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
     @Bind(R.id.messages_swiperefreshlayout)
     SwipeRefreshLayout messageSwipeRefreshLayout;
@@ -104,17 +120,17 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Bind(R.id.smile_panel_imagebutton)
     ImageButton smilePanelImageButton;
 
-    protected Dialog dialog;
+    protected QBChatDialog currentChatDialog;
     protected Resources resources;
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
-    protected BaseRecyclerViewAdapter messagesAdapter;
-    protected User opponentUser;
-    protected QBBaseChatHelper baseChatHelper;
+    protected BaseChatMessagesAdapter messagesAdapter;
     protected List<CombinationMessage> combinationMessagesList;
-    protected int chatHelperIdentifier;
     protected ImagePickHelper imagePickHelper;
 
+    private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
+    private LocationAttachClickListener locationAttachClickListener;
+    private ImageAttachClickListener imageAttachClickListener;
     private Handler mainThreadHandler;
     private View emojiconsFragment;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
@@ -125,10 +141,29 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private Observer dialogObserver;
     private Observer messageObserver;
     private Observer dialogNotificationObserver;
-    private BroadcastReceiver typingMessageBroadcastReceiver;
     private BroadcastReceiver updatingDialogBroadcastReceiver;
-    private boolean loadMore;
     private SystemPermissionHelper systemPermissionHelper;
+    private boolean isLoadingMessages;
+
+    private BlockingQueue<Runnable> threadQueue;
+    private ThreadPoolExecutor threadPool;
+    private boolean needUpdatePosition;
+
+    public static Intent makePrivateDialogIntent(Context context, QMUser user, QBChatDialog dialog){
+        Intent intent = new Intent(context, PrivateDialogActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, user);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+        return intent;
+    }
+
+    public static Intent makePGroupDialogIntent(Context context, QBChatDialog dialog){
+        Intent intent = new Intent(context, GroupDialogActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+        return intent;
+    }
+
 
     @Override
     protected int getContentResId() {
@@ -140,22 +175,35 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onCreate(savedInstanceState);
         initFields();
 
+        if (currentChatDialog == null) {
+            finish();
+        }
+
+        setUpActionBarWithUpButton();
+
         initCustomUI();
         initCustomListeners();
+        initThreads();
 
         addActions();
         addObservers();
         registerBroadcastReceivers();
 
+        initMessagesRecyclerView();
+
         hideSmileLayout();
+
+        if (isNetworkAvailable()) {
+            deleteTempMessagesAsync();
+        }
+
     }
 
     @OnTextChanged(R.id.message_edittext)
     void messageEditTextChanged(CharSequence charSequence) {
         setActionButtonVisibility(charSequence);
 
-        // TODO: now it is possible only for Private chats
-        if (dialog != null && Dialog.Type.PRIVATE.equals(dialog.getType())) {
+        if (currentChatDialog != null) {
             if (!isTypingNow) {
                 isTypingNow = true;
                 sendTypingStatus();
@@ -179,11 +227,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
-            imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
-        } else {
-            showPermissionSettingsDialog();
-        }
+        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_LOCATION_REQUEST_CODE);
     }
 
     @Override
@@ -191,6 +235,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (isSmilesLayoutShowing()) {
             hideSmileLayout();
         } else {
+            returnResult();
             super.onBackPressed();
         }
     }
@@ -198,14 +243,23 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        createChatLocally();
+        addChatMessagesAdapterListeners();
         checkPermissionSaveFiles();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        restoreDefaultCanPerformLogout();
+
+        loadNextPartMessagesAsync();
+
+        checkMessageSendingPossibility();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         hideSmileLayout();
         checkStartTyping();
     }
@@ -213,22 +267,48 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onStop() {
         super.onStop();
-        readAllMessages();
+        removeChatMessagesAdapterListeners();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        closeChatLocally();
+        cancelTasks();
+        closeCurrentChat();
         removeActions();
         deleteObservers();
         unregisterBroadcastReceivers();
     }
 
     @Override
+    protected void onChatReconnected() {
+        loadNextPartMessagesAsync();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void returnResult(){
+        if (getCallingActivity() != null) {
+            Intent intent = new Intent();
+            intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, currentChatDialog.getDialogId());
+            intent.putExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, needUpdatePosition);
+            setResult(RESULT_OK, intent);
+        }
+    }
+
+    @Override
     public void onConnectedToService(QBService service) {
         super.onConnectedToService(service);
         onConnectServiceLocally(service);
+        initCurrentDialog();
     }
 
     @Override
@@ -242,9 +322,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
+    public void onImagePicked(int requestCode, Attachment.Type type, Object attachment) {
         canPerformLogout.set(true);
-        startLoadAttachFile(file, dialog.getDialogId());
+        if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), type, attachment)){
+            startLoadAttachFile(type, attachment, currentChatDialog.getDialogId());
+        }
     }
 
     @Override
@@ -264,13 +346,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    protected void loadDialogs() {
-        super.loadDialogs();
-        createChatLocally();
-        checkMessageSendingPossibility();
-    }
-
-    @Override
     protected void checkShowingConnectionError() {
         if (!isNetworkAvailable()) {
             setActionBarTitle(getString(R.string.dlg_internet_connection_is_missing));
@@ -281,18 +356,63 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
+    private void deleteTempMessagesAsync(){
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                deleteTempMessages();
+            }
+        });
+    }
+
+    private void loadNextPartMessagesAsync(){
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                loadNextPartMessagesFromDb(false, true);
+            }
+        });
+    }
+
+    private void cancelTasks(){
+        threadPool.shutdownNow();
+    }
+
+    private void initThreads() {
+        threadQueue = new LinkedBlockingQueue<>();
+        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, threadQueue);
+        threadPool.allowCoreThreadTimeOut(true);
+    }
+
+    private void restoreDefaultCanPerformLogout() {
+        if (!canPerformLogout.get()) {
+            canPerformLogout.set(true);
+        }
+    }
+
+    private void addChatMessagesAdapterListeners() {
+        messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
+        messagesAdapter.setAttachLocationClickListener(locationAttachClickListener);
+        messagesAdapter.setAttachImageClickListener(imageAttachClickListener);
+    }
+
+    private void removeChatMessagesAdapterListeners() {
+        if (messagesAdapter != null) {
+            messagesAdapter.removeMessageTextViewLinkClickListener();
+            messagesAdapter.removeLocationImageClickListener(locationAttachClickListener);
+            messagesAdapter.removeAttachImageClickListener(imageAttachClickListener);
+        }
+    }
+
     @Override
     protected void performLoginChatSuccessAction(Bundle bundle) {
         super.performLoginChatSuccessAction(bundle);
-        if (groupChatHelper != null) {
-            QBDialog qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog);
-            groupChatHelper.tryJoinRoomChat(qbDialog);
-        }
 
-        startLoadDialogMessages();
+        checkMessageSendingPossibility();
+        startLoadDialogMessages(false);
     }
 
-    private void initFields() {
+    protected void initFields() {
         mainThreadHandler = new Handler(Looper.getMainLooper());
         resources = getResources();
         dataManager = DataManager.getInstance();
@@ -304,11 +424,15 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         dialogObserver = new DialogObserver();
         messageObserver = new MessageObserver();
         dialogNotificationObserver = new DialogNotificationObserver();
-        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
         updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
         appSharedHelper.saveNeedToOpenDialog(false);
         imagePickHelper = new ImagePickHelper();
         systemPermissionHelper = new SystemPermissionHelper(this);
+        messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
+        locationAttachClickListener = new LocationAttachClickListener();
+        imageAttachClickListener = new ImageAttachClickListener();
+        currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        combinationMessagesList = new ArrayList<>();
     }
 
     private void initCustomUI() {
@@ -320,7 +444,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void initMessagesRecyclerView() {
-        messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        messagesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(this));
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
@@ -350,53 +474,38 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         updateBroadcastActionList();
     }
 
-    private void registerBroadcastReceivers() {
-        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
+    protected void registerBroadcastReceivers() {
         localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
 
-    private void unregisterBroadcastReceivers() {
+    protected void unregisterBroadcastReceivers() {
         localBroadcastManager.unregisterReceiver(updatingDialogBroadcastReceiver);
-        localBroadcastManager.unregisterReceiver(typingMessageBroadcastReceiver);
     }
 
-    private void addObservers() {
-        dataManager.getDialogDataManager().addObserver(dialogObserver);
+    protected void addObservers() {
+        dataManager.getQBChatDialogDataManager().addObserver(dialogObserver);
         dataManager.getMessageDataManager().addObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().addObserver(dialogNotificationObserver);
     }
 
-    private void deleteObservers() {
-        dataManager.getDialogDataManager().deleteObserver(dialogObserver);
+    protected void deleteObservers() {
+        dataManager.getQBChatDialogDataManager().deleteObserver(dialogObserver);
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
     }
 
     protected void updateData() {
-        dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
-        if (dialog != null) {
-            updateActionBar();
-        }
+        updateActionBar();
         updateMessagesList();
     }
 
     protected void onConnectServiceLocally() {
-        createChatLocally();
-    }
-
-    private void showTypingStatus() {
-        setActionBarSubtitle(R.string.dialog_now_typing);
-    }
-
-    private void hideTypingStatus() {
-        setActionBarSubtitle(null);
     }
 
     protected void deleteTempMessages() {
         List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(dialog.getDialogId());
+                .getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
         List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
         dataManager.getMessageDataManager().deleteTempMessages(dialogOccupantsIdsList);
     }
@@ -426,7 +535,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void checkPermissionSaveFiles() {
         boolean permissionSaveFileWasRequested = appSharedHelper.isPermissionsSaveFileWasRequested();
-        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested){
+        if (!systemPermissionHelper.isAllPermissionsGrantedForSaveFile() && !permissionSaveFileWasRequested) {
             systemPermissionHelper.requestPermissionsForSaveFile();
             appSharedHelper.savePermissionsSaveFileWasRequested(true);
         }
@@ -449,21 +558,29 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
-    protected void startLoadAttachFile(final File file, final String dialogId) {
-        TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
+    protected void startLoadAttachFile(final Attachment.Type type, final Object attachment, final String dialogId) {
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(), getString(R.string.dialog_confirm_sending_attach,
+                StringUtils.getAttachmentNameByType(this, type)), false,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        showProgress();
-                        QBLoadAttachFileCommand.start(BaseDialogActivity.this, file, dialogId);
+                        switch (type){
+                            case LOCATION:
+                                sendMessageWithAttachment(dialogId, Attachment.Type.LOCATION, attachment, null);
+                                break;
+                            case IMAGE:
+                                showProgress();
+                                QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
+                                break;
+                        }
                     }
                 });
     }
 
-    protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
-                lastDateLoad, loadMore);
+    protected void startLoadDialogMessages(QBChatDialog chatDialog, long lastDateLoad, boolean isLoadOldMessages) {
+        isLoadingMessages = true;
+        QBLoadDialogMessagesCommand.start(this, chatDialog, lastDateLoad, isLoadOldMessages);
     }
 
     private void setActionButtonVisibility(CharSequence charSequence) {
@@ -483,8 +600,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void checkStartTyping() {
-        // TODO: now it is possible only for Private chats
-        if (dialog != null && Dialog.Type.PRIVATE.equals(dialog.getType())) {
+        if (currentChatDialog != null) {
             if (isTypingNow) {
                 isTypingNow = false;
                 sendTypingStatus();
@@ -493,7 +609,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void sendTypingStatus() {
-        baseChatHelper.sendTypingStatusToServer(opponentUser.getUserId(), isTypingNow);
+        chatHelper.sendTypingStatusToServer(isTypingNow);
     }
 
     private void setSmilePanelIcon(int resourceId) {
@@ -505,15 +621,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void checkForScrolling(int oldMessagesCount) {
-        if (oldMessagesCount != messagesAdapter.getAllItems().size()) {
+        if (oldMessagesCount != messagesAdapter.getItemCount()) {
             scrollMessagesToBottom();
         }
     }
 
     protected void scrollMessagesToBottom() {
-        if (!loadMore) {
-            scrollMessagesWithDelay();
-        }
+        scrollMessagesWithDelay();
     }
 
     private void scrollMessagesWithDelay() {
@@ -525,16 +639,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }, DELAY_SCROLLING_LIST);
     }
 
-    protected void sendMessage(boolean privateMessage) {
+    protected void sendMessage() {
         boolean error = false;
         try {
-            if (privateMessage) {
-                ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(
-                        messageEditText.getText().toString(), opponentUser.getUserId());
-            } else {
-                ((QBGroupChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
-                        messageEditText.getText().toString());
-            }
+            chatHelper.sendChatMessage(messageEditText.getText().toString());
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
             error = true;
@@ -549,90 +657,117 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         if (!error) {
             messageEditText.setText(ConstsCore.EMPTY_STRING);
-            scrollMessagesToBottom();
         }
     }
 
-    protected void startLoadDialogMessages() {
-        if (dialog == null) {
+    protected void startLoadDialogMessages(final boolean isLoadOldMessages) {
+        if (currentChatDialog == null || isLoadingMessages) {
             return;
         }
-
         showActionBarProgress();
+        long messageDateSent = getMessageDateForLoadByCurrentList(isLoadOldMessages);
+        startLoadDialogMessages(currentChatDialog, messageDateSent, isLoadOldMessages);
 
-        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(dialog.getDialogId());
+    }
+
+    protected long getMessageDateForLoad(boolean isLoadOldMessages){
+        long messageDateSent;
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(currentChatDialog.getDialogId());
         List<Long> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
 
         Message message;
         DialogNotification dialogNotification;
 
-        long messageDateSent = 0;
+        message = dataManager.getMessageDataManager().getMessageByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+        dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(isLoadOldMessages, dialogOccupantsIdsList);
+        messageDateSent =  ChatUtils.getDialogMessageCreatedDate(!isLoadOldMessages, message, dialogNotification);
 
-        if (loadMore) {
-            message = dataManager.getMessageDataManager().getMessageByDialogId(true, dialogOccupantsIdsList);
-            dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(true, dialogOccupantsIdsList);
-            messageDateSent = ChatUtils.getDialogMessageCreatedDate(false, message, dialogNotification);
-        } else {
-            message = dataManager.getMessageDataManager().getMessageByDialogId(false, dialogOccupantsIdsList);
-            dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(
-                    false, dialogOccupantsIdsList);
-            messageDateSent = ChatUtils.getDialogMessageCreatedDate(true, message, dialogNotification);
-        }
-
-        startLoadDialogMessages(dialog, messageDateSent);
+        return messageDateSent;
     }
 
-    private void readAllMessages() {
-        if (dialog != null) {
-            List<Message> messagesList = dataManager.getMessageDataManager()
-                    .getMessagesByDialogId(dialog.getDialogId());
-            dataManager.getMessageDataManager().createOrUpdateAll(ChatUtils.readAllMessages(messagesList, AppSession.getSession().getUser()));
-
-            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                    .getDialogNotificationsByDialogId(dialog.getDialogId());
-            dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils
-                    .readAllDialogNotification(dialogNotificationsList, AppSession.getSession().getUser()));
+    protected long getMessageDateForLoadByCurrentList(boolean isLoadOld){
+        if (combinationMessagesList.size() == 0){
+            return 0;
         }
+
+        return !isLoadOld
+                ? combinationMessagesList.get(combinationMessagesList.size() - 1).getCreatedDate()
+                : combinationMessagesList.get(0).getCreatedDate();
     }
 
-    private void createChatLocally() {
-        if (isNetworkAvailable()) {
-            if (service != null) {
-                baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
-                Log.d("Fix double message", "baseChatHelper = " + baseChatHelper + "\n dialog = " + dialog);
-                if (baseChatHelper != null && dialog != null) {
-                    try {
-                        baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
-                                generateBundleToInitDialog());
-                    } catch (QBResponseException e) {
-                        ErrorUtils.showError(this, e.getMessage());
-                        finish();
-                    }
+    protected void initCurrentDialog() {
+        if (service != null) {
+            Log.v(TAG, "chatHelper = " + chatHelper + "\n dialog = " + currentChatDialog);
+            if (chatHelper != null && currentChatDialog != null) {
+                try {
+                    chatHelper.initCurrentChatDialog(currentChatDialog, generateBundleToInitDialog());
+                } catch (QBResponseException e) {
+                    ErrorUtils.showError(this, e.getMessage());
+                    finish();
                 }
-            } else {
-                Log.d("BaseDialogActivity", "service == null");
             }
+        } else {
+            Log.v(TAG, "service == null");
         }
     }
 
-    private void closeChatLocally() {
-        if (baseChatHelper != null && dialog != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
-                    generateBundleToInitDialog());
+    private void closeCurrentChat() {
+        if (chatHelper != null && currentChatDialog != null) {
+            chatHelper.closeChat(currentChatDialog, generateBundleToInitDialog());
         }
-        dialog = null;
+        currentChatDialog = null;
     }
 
-    protected List<CombinationMessage> createCombinationMessagesList() {
-        if (dialog == null) {
-            Log.d("PrivateDialogActivity", "dialog = " + dialog);
-            return null;
+    protected List<CombinationMessage> buildLimitedCombinationMessagesListByDate(long createDate, boolean moreDate, long limit){
+        if (currentChatDialog == null || currentChatDialog.getDialogId() == null) {
+            return new ArrayList<>();
         }
 
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
+        Log.d(TAG, "selection parameters: createDate = " + createDate + " moreDate = " + moreDate + " limit = " + limit);
+
+        String currentDialogId = currentChatDialog.getDialogId();
+        List<Message> messagesList = dataManager.getMessageDataManager()
+                .getMessagesByDialogIdAndDate(currentDialogId, createDate, moreDate, limit);
+        Log.d(TAG, " messagesList.size() = " + messagesList.size());
+
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogId(dialog.getDialogId());
-        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+                .getDialogNotificationsByDialogIdAndDate(currentDialogId, createDate, moreDate, limit);
+        Log.d(TAG, " dialogNotificationsList.size() = " + dialogNotificationsList.size());
+        List<CombinationMessage> combinationMessages = ChatUtils.createLimitedCombinationMessagesList(messagesList, dialogNotificationsList, (int) limit);
+        return combinationMessages;
+    }
+
+    protected void loadNextPartMessagesFromDb(final boolean isLoadOld, final boolean needUpdateAdapter) {
+        long messageDate = getMessageDateForLoadByCurrentList(isLoadOld);
+
+        final List<CombinationMessage> requestedMessages = buildLimitedCombinationMessagesListByDate(
+                messageDate, !isLoadOld, ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+
+        if (isLoadOld) {
+            combinationMessagesList.addAll(0, requestedMessages);
+        } else {
+            combinationMessagesList.addAll(requestedMessages);
+        }
+
+        if (needUpdateAdapter) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    updateMessagesAdapter(isLoadOld, requestedMessages.size());
+                    startLoadDialogMessages(false);
+                }
+            });
+        }
+    }
+
+    private void updateMessagesAdapter(boolean isLoadOld, int partSize) {
+        messagesAdapter.setList(combinationMessagesList, !isLoadOld);
+
+        if (isLoadOld) {
+            messagesAdapter.notifyItemRangeInserted(0, partSize);
+        } else {
+            scrollMessagesToBottom();
+        }
     }
 
     private void visibleOrHideSmilePanel() {
@@ -651,22 +786,32 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         attachButton.setEnabled(enable);
     }
 
-    private void showPermissionSettingsDialog() {
-        DialogsUtils.showOpenAppSettingsDialog(
-                getSupportFragmentManager(),
-                getString(R.string.dlg_need_permission_write_storage, getString(R.string.app_name)),
-                new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                    }
+    private void replaceMessageInCurrentList(CombinationMessage combinationMessage){
+        if (combinationMessagesList.contains(combinationMessage)){
+            int positionOldMessage = combinationMessagesList.indexOf(combinationMessage);
+            combinationMessagesList.set(positionOldMessage, combinationMessage);
+        }
+    }
 
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-                        super.onNegative(dialog);
-                        SystemPermissionHelper.openSystemSettings(BaseDialogActivity.this);
-                    }
-                });
+    private void updateMessageItemInAdapter(CombinationMessage combinationMessage){
+        replaceMessageInCurrentList(combinationMessage);
+        if (combinationMessagesList.contains(combinationMessage)) {
+            messagesAdapter.notifyItemChanged(combinationMessagesList.indexOf(combinationMessage));
+        } else {
+            addMessageItemToAdapter(combinationMessage);
+        }
+    }
+
+    private void addMessageItemToAdapter(CombinationMessage combinationMessage){
+        combinationMessagesList.add(combinationMessage);
+        messagesAdapter.setList(combinationMessagesList, true);
+        scrollMessagesToBottom();
+    }
+
+    private void afterLoadingMessagesActions(){
+        messageSwipeRefreshLayout.setRefreshing(false);
+        hideActionBarProgress();
+        isLoadingMessages = false;
     }
 
     protected abstract void updateActionBar();
@@ -677,39 +822,46 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     protected abstract void updateMessagesList();
 
-    protected abstract void onFileLoaded(QBFile file, String dialogId);
-
-    protected abstract void checkMessageSendingPossibility();
-
-    public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
-
-        private String dialogId;
-
-        public CombinationMessageLoader(Context context, DataManager dataManager, String dialogId) {
-            super(context, dataManager);
-            this.dialogId = dialogId;
+    protected void sendMessageWithAttachment(String dialogId, Attachment.Type attachmentType, Object attachmentObject, String localPath){
+        if (!dialogId.equals(currentChatDialog.getDialogId())) {
+            return;
         }
-
-        @Override
-        protected List<CombinationMessage> getItems() {
-            return createCombinationMessagesList();
-        }
-
-        private List<CombinationMessage> createCombinationMessagesList() {
-            List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
-            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                    .getDialogNotificationsByDialogId(dialogId);
-            return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+        try {
+            chatHelper.sendMessageWithAttachment(attachmentType, attachmentObject, localPath);
+        } catch (QBResponseException exc) {
+            ErrorUtils.showError(this, exc);
         }
     }
+
+    protected abstract void checkMessageSendingPossibility();
 
     private class MessageObserver implements Observer {
 
         @Override
         public void update(Observable observable, Object data) {
-            Log.d("Fix double message", "MessageObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
-                updateMessagesList();
+            Log.i(TAG, "==== MessageObserver  'update' ====");
+            if (data != null) {
+                Bundle observableData = (Bundle) data;
+                int action = observableData.getInt(MessageDataManager.EXTRA_ACTION);
+                Message message = (Message) observableData.getSerializable(MessageDataManager.EXTRA_OBJECT);
+
+                if (message != null && message.getDialogOccupant() != null && message.getDialogOccupant().getDialog() != null
+                        && currentChatDialog.getDialogId().equals(message.getDialogOccupant().getDialog().getDialogId())) {
+                    needUpdatePosition = true;
+                    CombinationMessage combinationMessage = new CombinationMessage(message);
+                    if (action == MessageDataManager.UPDATE_ACTION) {
+                        Log.d(TAG, "updated message = " + message);
+                        updateMessageItemInAdapter(combinationMessage);
+                    } else if (action == MessageDataManager.CREATE_OR_UPDATE_ACTION) {
+                        Log.d(TAG, "created message = " + message);
+                        addMessageItemToAdapter(combinationMessage);
+                    }
+                }
+
+                if (action == MessageDataManager.DELETE_ACTION) {
+                    combinationMessagesList.clear();
+                    loadNextPartMessagesFromDb(false, true);
+                }
             }
         }
     }
@@ -718,9 +870,34 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
-            Log.d("Fix double message", "DialogNotificationObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            if (data != null && data.equals(DialogNotificationDataManager.OBSERVE_KEY)) {
-                updateMessagesList();
+            Log.i(TAG, "==== DialogNotificationObserver  'update' ====");
+            if (data != null) {
+                Bundle observableData = (Bundle) data;
+                int action = observableData.getInt(DialogNotificationDataManager.EXTRA_ACTION);
+                DialogNotification dialogNotification = (DialogNotification) observableData.getSerializable(DialogNotificationDataManager.EXTRA_OBJECT);
+
+                Log.i(TAG, "==== DialogNotificationObserver  'update' ====observableData= " + observableData);
+                if(dialogNotification != null && dialogNotification.getDialogOccupant().getDialog().getDialogId().equals(currentChatDialog.getDialogId())) {
+                    needUpdatePosition = true;
+                    CombinationMessage combinationMessage = new CombinationMessage(dialogNotification);
+                    if (action == DialogNotificationDataManager.UPDATE_ACTION) {
+                        Log.d(TAG, "updated dialogNotification = " + dialogNotification);
+                        updateMessageItemInAdapter(combinationMessage);
+                    } else if (action == DialogNotificationDataManager.CREATE_OR_UPDATE_ACTION) {
+                        Log.d(TAG, "created dialogNotification = " + dialogNotification);
+                        addMessageItemToAdapter(combinationMessage);
+                        if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+                            updateMessagesList();
+                            messagesAdapter.notifyDataSetChanged();
+                            scrollMessagesToBottom();
+                        }
+                    }
+
+                    if (action == DialogNotificationDataManager.DELETE_ACTION) {
+                        combinationMessagesList.clear();
+                        loadNextPartMessagesFromDb(false, true);
+                    }
+                }
             }
         }
     }
@@ -729,10 +906,22 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
-            Log.d("Fix double message", "DialogObserver update(Observable observable, Object data) from " + BaseDialogActivity.class.getSimpleName());
-            if (data != null && data.equals(DialogDataManager.OBSERVE_KEY) && dialog != null) {
-                dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
-                updateActionBar();
+            Log.i(TAG, "==== DialogObserver  'update' ====");
+            if (data != null) {
+                String observerKey = ((Bundle) data).getString(DialogDataManager.EXTRA_OBSERVE_KEY);
+                if (observerKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
+                    Dialog dialog = (Dialog)((Bundle)data).getSerializable(BaseManager.EXTRA_OBJECT);
+                    currentChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(currentChatDialog.getDialogId());
+                    if(currentChatDialog != null) {
+                        if (dialog != null && dialog.getDialogId().equals(currentChatDialog.getDialogId())) {
+                            // need init current dialog after getting from DB
+                            initCurrentDialog();
+                            updateActionBar();
+                        }
+                    } else {
+                        finish();
+                    }
+                }
             }
         }
     }
@@ -752,7 +941,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             String dialogId = (String) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-            onFileLoaded(file, dialogId);
+            String localPath = (String) bundle.getSerializable(QBServiceConsts.EXTRA_FILE_PATH);
+
+            sendMessageWithAttachment(dialogId, StringUtils.getAttachmentTypeByFileName(file.getName()), file, localPath);
             hideProgress();
         }
     }
@@ -761,17 +952,44 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            messageSwipeRefreshLayout.setRefreshing(false);
-            int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, ConstsCore.ZERO_INT_VALUE);
+            final int totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES,
+                    ConstsCore.ZERO_INT_VALUE);
+            final long lastMessageDate = bundle.getLong(QBServiceConsts.EXTRA_LAST_DATE_LOAD_MESSAGES,
+                    ConstsCore.ZERO_INT_VALUE);
+            final boolean isLoadedOldMessages = bundle.getBoolean(QBServiceConsts.EXTRA_IS_LOAD_OLD_MESSAGES);
 
+            String dialogId = bundle.getString(QBServiceConsts.EXTRA_DIALOG_ID);
 
-            if (messagesAdapter != null && !messagesAdapter.isEmpty() && totalEntries != ConstsCore.ZERO_INT_VALUE) {
-                scrollMessagesToBottom();
+            Log.d("BaseDialogActivity", "Loading messages finished" + " totalEntries = " + totalEntries
+                    + " lastMessageDate = " + lastMessageDate
+                    + " isLoadedOldMessages = " + isLoadedOldMessages
+                    + " dialogId = " + dialogId);
+
+            if (messagesAdapter != null
+                    && totalEntries != ConstsCore.ZERO_INT_VALUE
+                    && dialogId.equals(currentChatDialog.getDialogId())) {
+
+                threadPool.execute(new Runnable(){
+                    @Override
+                    public void run() {
+                        loadNextPartMessagesFromDb(isLoadedOldMessages, false);
+                        mainThreadHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateMessagesAdapter(isLoadedOldMessages, totalEntries);
+                                if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
+                                    updateMessagesList();
+                                }
+                                afterLoadingMessagesActions();
+                            }
+                        });
+
+                    }
+                });
+
+            } else {
+                afterLoadingMessagesActions();
             }
-
-            loadMore = false;
-
-            hideActionBarProgress();
         }
     }
 
@@ -779,31 +997,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            messageSwipeRefreshLayout.setRefreshing(false);
-
-            loadMore = false;
-
-            hideActionBarProgress();
-        }
-    }
-
-    private class TypingStatusBroadcastReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-            int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-            // TODO: now it is possible only for Private chats
-            if (dialog != null && opponentUser != null && userId == opponentUser.getUserId()) {
-                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-                    boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
-                    if (isTyping) {
-                        showTypingStatus();
-                    } else {
-                        hideTypingStatus();
-                    }
-                }
-            }
+            afterLoadingMessagesActions();
         }
     }
 
@@ -826,10 +1020,55 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 return;
             }
 
-            if (!loadMore) {
-                loadMore = true;
-                startLoadDialogMessages();
+            if (!isLoadingMessages) {
+                if (combinationMessagesList.size() == 0){
+                    startLoadDialogMessages(true);
+                    return;
+                }
+
+                long oldestMessageInDb = getMessageDateForLoad(true);
+                long oldestMessageInCurrentList = combinationMessagesList.get(0).getCreatedDate();
+
+                if ((oldestMessageInCurrentList - oldestMessageInDb) > 0 && oldestMessageInDb != 0){
+                    loadNextPartMessagesFromDb(true, true);
+                    messageSwipeRefreshLayout.setRefreshing(false);
+                } else {
+                    startLoadDialogMessages(true);
+                }
             }
+        }
+    }
+
+    protected class MessagesTextViewLinkClickListener implements QBChatMessageLinkClickListener {
+
+        @Override
+        public void onLinkClicked(String linkText, QBMessageTextClickMovement.QBLinkType qbLinkType, int position) {
+
+            if (!QBMessageTextClickMovement.QBLinkType.NONE.equals(qbLinkType)) {
+                canPerformLogout.set(false);
+            }
+        }
+
+        @Override
+        public void onLongClick(String text, int positionInAdapter) {
+
+        }
+
+    }
+
+    protected class LocationAttachClickListener implements QBChatAttachLocationClickListener{
+
+        @Override
+        public void onLinkClicked(QBAttachment qbAttachment, int i) {
+            MapsActivity.startMapForResult(BaseDialogActivity.this, qbAttachment.getData());
+        }
+    }
+
+    protected class ImageAttachClickListener implements QBChatAttachImageClickListener{
+
+        @Override
+        public void onLinkClicked(QBAttachment qbAttachment, int i) {
+            PreviewImageActivity.start(BaseDialogActivity.this, qbAttachment.getUrl());
         }
     }
 }

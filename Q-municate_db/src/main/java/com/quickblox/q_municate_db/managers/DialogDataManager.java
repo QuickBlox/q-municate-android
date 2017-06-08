@@ -53,15 +53,21 @@ public class DialogDataManager extends BaseManager<Dialog> {
         try {
             DeleteBuilder<Dialog, Long> deleteBuilder = dao.deleteBuilder();
             deleteBuilder.where().eq(Dialog.Column.ID, dialogId);
-            deleteBuilder.delete();
+
+            if (deleteBuilder.delete() > 0){
+                //TODO VT need to think how to send ID to observers
+                notifyObservers(null, DELETE_ACTION);
+            }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
-
-        notifyObservers(OBSERVE_KEY);
     }
 
     public List<Dialog> getAllSorted() {
         return super.getAllSorted(Dialog.Column.MODIFIED_DATE_LOCAL, false);
+    }
+
+    public List<Dialog> getSkippedSorted(int startRow, int perPage) {
+        return super.getSkippedSorted(startRow, perPage, Dialog.Column.MODIFIED_DATE_LOCAL, false);
     }
 }

@@ -1,27 +1,26 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate_core.models.DialogWrapper;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.DialogNotification;
-import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
+
+    private static final String TAG = DialogsListAdapter.class.getSimpleName();
 
     public DialogsListAdapter(BaseActivity baseActivity, List<DialogWrapper> objectsList) {
         super(baseActivity, objectsList);
@@ -32,7 +31,7 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         ViewHolder viewHolder;
 
         DialogWrapper dialogWrapper = getItem(position);
-        Dialog dialog = dialogWrapper.getDialog();
+        QBChatDialog currentDialog = dialogWrapper.getChatDialog();
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_dialog, null);
@@ -50,9 +49,8 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-
-        if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-            User opponentUser = dialogWrapper.getOpponentUser();
+        if (QBDialogType.PRIVATE.equals(currentDialog.getType())) {
+            QMUser opponentUser = dialogWrapper.getOpponentUser();
             if (opponentUser.getFullName() != null) {
                 viewHolder.nameTextView.setText(opponentUser.getFullName());
                 displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
@@ -60,9 +58,9 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
                 viewHolder.nameTextView.setText(resources.getString(R.string.deleted_user));
             }
         } else {
-            viewHolder.nameTextView.setText(dialog.getTitle());
+            viewHolder.nameTextView.setText(currentDialog.getName());
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
-            displayGroupPhotoImage(dialog.getPhoto(), viewHolder.avatarImageView);
+            displayGroupPhotoImage(currentDialog.getPhoto(), viewHolder.avatarImageView);
         }
 
         long totalCount = dialogWrapper.getTotalCount();
@@ -77,6 +75,47 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         viewHolder.lastMessageTextView.setText(dialogWrapper.getLastMessage());
 
         return convertView;
+    }
+
+    public void updateItem(DialogWrapper dlgWrapper) {
+        Log.i(TAG, "updateItem = " + dlgWrapper.getChatDialog().getUnreadMessageCount());
+        int position = -1;
+        for (int i = 0; i < objectsList.size() ; i++) {
+            DialogWrapper dialogWrapper  = objectsList.get(i);
+            if (dialogWrapper.getChatDialog().getDialogId().equals(dlgWrapper.getChatDialog().getDialogId())){
+                position = i;
+                break;
+            }
+        }
+
+        if (position != -1) {
+            Log.i(TAG, "find position = " + position);
+            objectsList.set(position, dlgWrapper);
+        } else {
+            addNewItem(dlgWrapper);
+        }
+    }
+
+    public void updateItemPosition(DialogWrapper dlgWrapper) {
+        if (!objectsList.get(0).equals(dlgWrapper)) {
+            objectsList.remove(dlgWrapper);
+            objectsList.add(0, dlgWrapper);
+            notifyDataSetChanged();
+        }
+    }
+
+    public void removeItem(String dialogId) {
+        Iterator<DialogWrapper> iterator = objectsList.iterator();
+
+        while (iterator.hasNext()){
+            DialogWrapper dialogWrapper = iterator.next();
+            if (dialogWrapper.getChatDialog().getDialogId().equals(dialogId)){
+                iterator.remove();
+                notifyDataSetChanged();
+                break;
+            }
+        }
+
     }
 
     private static class ViewHolder {

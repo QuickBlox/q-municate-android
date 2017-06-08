@@ -4,6 +4,8 @@ import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
 import java.io.Serializable;
 
@@ -34,8 +36,8 @@ public class DialogOccupant implements Serializable {
             foreignAutoRefresh = true,
             canBeNull = false,
             uniqueCombo = true,
-            columnName = User.Column.ID)
-    private User user;
+            columnName = QMUserColumns.ID)
+    private QMUser user;
 
     @ForeignCollectionField(
             eager = true)
@@ -50,7 +52,7 @@ public class DialogOccupant implements Serializable {
         status = Status.ACTUAL;
     }
 
-    public DialogOccupant(Dialog dialog, User user, ForeignCollection<Message> messageCollection) {
+    public DialogOccupant(Dialog dialog, QMUser user, ForeignCollection<Message> messageCollection) {
         this.dialog = dialog;
         this.user = user;
         this.messageCollection = messageCollection;
@@ -72,11 +74,11 @@ public class DialogOccupant implements Serializable {
         this.dialog = dialog;
     }
 
-    public User getUser() {
+    public QMUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(QMUser user) {
         this.user = user;
     }
 

@@ -51,6 +51,7 @@ public class QBServiceConsts {
     public static final String CREATE_GROUP_CHAT_ACTION = "create_group_chat_action";
     public static final String CREATE_PRIVATE_CHAT_ACTION = "create_private_chat_action";
     public static final String LOAD_CHATS_DIALOGS_ACTION = "chats_dialogs_load_action";
+    public static final String LOAD_CHATS_DIALOGS_BY_IDS_ACTION = "chats_dialogs_load_by_ids_action";
     public static final String UPDATE_CHAT_DIALOG_ACTION = "update_chat_dialog_action";
     public static final String JOIN_GROUP_CHAT_ACTION = "join_group_chat_action";
     public static final String LOAD_DIALOG_MESSAGES_ACTION = "load_dialog_messages_action";
@@ -128,6 +129,8 @@ public class QBServiceConsts {
     public static final String CREATE_PRIVATE_CHAT_FAIL_ACTION = "create_private_chat_fail_action";
     public static final String LOAD_CHATS_DIALOGS_SUCCESS_ACTION = "chats_dialogs_success_action";
     public static final String LOAD_CHATS_DIALOGS_FAIL_ACTION = "chats_dialogs_fail_action";
+    public static final String LOAD_CHATS_DIALOGS_BY_IDS_SUCCESS_ACTION = "chats_dialogs_by_idssuccess_action";
+    public static final String LOAD_CHATS_DIALOGS_BY_IDS_FAIL_ACTION = "chats_dialogs_by_ids_fail_action";
     public static final String JOIN_GROUP_CHAT_SUCCESS_ACTION = "join_group_chat_success_action";
     public static final String JOIN_GROUP_CHAT_FAIL_ACTION = "join_group_chat_fail_action";
     public static final String UPDATE_CHAT_DIALOG_SUCCESS_ACTION = "update_chat_dialog_success_action";
@@ -179,6 +182,7 @@ public class QBServiceConsts {
     public static final String EXTRA_TOTAL_ENTRIES = "total_entries";
     public static final String EXTRA_STATUS = "status";
     public static final String EXTRA_CHATS_DIALOGS = "chats_dialogs";
+    public static final String EXTRA_CHATS_DIALOGS_IDS = "chats_dialogs_ids";
     public static final String EXTRA_ROOM_NAME = "room_name";
     public static final String EXTRA_ROOM_PHOTO_URL = "photo_url";
     public static final String EXTRA_ROOM_JID_LIST = "room_jid_list";
@@ -187,6 +191,7 @@ public class QBServiceConsts {
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
     public static final String EXTRA_DIALOG_ID = "dialog_id";
+    public static final String EXTRA_DIALOG_UPDATE_POSITION = "dialog_update_position";
     public static final String EXTRA_DIALOG_TYPE = "dialog_type";
     public static final String EXTRA_IS_OWN_MESSAGE = "is_own_message";
     public static final String EXTRA_GROUP_DIALOG = "group_dialog";
@@ -194,6 +199,8 @@ public class QBServiceConsts {
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";
+    public static final String EXTRA_LAST_DATE_LOAD_MESSAGES = "last_date_load_messages";
+    public static final String EXTRA_IS_LOAD_OLD_MESSAGES = "is_load_new_messages";
     public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";
     public static final String EXTRA_GROUP_NAME = "group_name";
     public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
@@ -204,14 +211,13 @@ public class QBServiceConsts {
     public static final String EXTRA_DATE_SENT = "date_sent";
     public static final String EXTRA_EMOJIS = "emojis";
     public static final String EXTRA_MESSAGE = "message";
+    public static final String EXTRA_MESSAGES = "messages";
     public static final String EXTRA_FILE_PATH = "file_path";
     public static final String EXTRA_FRIEND_ALERT_MESSAGE = "alert_message";
     public static final String EXTRA_IS_TYPING = "is_typing";
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
     public static final String EXTRA_PAGE = "load_elements";
     public static final String EXTRA_USER_STATUS = "user_status";
-    public static final String EXTRA_REGISTRATION_ID = "registration_id";
-    public static final String EXTRA_IS_PUSH_SUBSCRIBED_ON_SERVER = "is_push_subscribed_on_server";
     public static final String EXTRA_OPPONENTS = "opponents";
     public static final String EXTRA_WIFI_DISABLED = "wifi_disabled";
     public static final String EXTRA_CONFERENCE_TYPE = "conference_type";

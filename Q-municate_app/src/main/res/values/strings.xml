@@ -63,6 +63,7 @@
     <string name="forgot_password_email_field_is_incorrect">Please enter a valid email</string>
     <string name="forgot_password_label">Enter your email and we\'ll send a link to reset your password</string>
     <string name="forgot_password_massage_email_was_sent">Mail was sent to %1$s</string>
+    <string name="forgot_password_email_not_found_error">User with this email wasn\'t found</string>
 
 
     <!-- User profile -->
@@ -107,17 +108,20 @@
 
     <!-- Dialog -->
     <string name="dialog_hint_message">Message</string>
-    <string name="dialog_no_chats">Oops…\nYou don\'t have any chats,\n tap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
+    <string name="dialog_no_chats">Oops…\nYou don\'t have any chats,\n tap \'Create\' button to create new group chat \nor go in private chat \nvia Friends Details page"</string>
     <string name="dialog_reply">Reply</string>
     <string name="dialog_user_is_not_friend">User is not your friend</string>
-    <string name="dialog_confirm_sending_attach">Do you really want to send attachment?</string>
+    <string name="dialog_confirm_sending_attach">Do you really want to send %1$s?</string>
+    <string name="dialog_attach">attachment</string>
+    <string name="dialog_location">location</string>
     <string name="dialog_now_typing">Typing…</string>
     <string name="dialog_message_reject_friend">Do you really want to reject contact request from %1$s?</string>
     <string name="dialog_ctx_menu_reply">Reply</string>
     <string name="dialog_ctx_menu_prv_message">Private Message</string>
     <string name="dialog_ctx_menu_video_call">Video Call</string>
     <string name="dialog_ctx_menu_profile">View Profile</string>
-    <string name="dialog_ctx_menu_remove">Delete dialog</string>
+    <string name="dialog_ctx_menu_remove">Leave and remove chat</string>
+    <string name="dialog_ctx_menu_delete">Delete dialog</string>
     <string name="dialog_loading_dialogs">Updating dialogs list… Please wait</string>
 
     <string-array name="dialog_attach_types_array">
@@ -185,7 +189,7 @@
     <!-- About -->
     <string name="about_title">About</string>
     <string name="about_version">Version %1$s</string>
-    <string name="about_vendor">&#169; 2016 QuickBlox</string>
+    <string name="about_vendor">&#169; 2017 QuickBlox</string>
     <string name="about_user_agreement">User Agreement</string>
 
 
@@ -228,6 +232,7 @@
 
     <!-- Others -->
     <string name="chat_service_is_initializing">Please, wait, connection is setting up…</string>
+    <string name="dlg_internet_connection_error">Something went wrong. Please, verify your internet connection and try again</string>
     <string name="dlg_internet_connection_is_missing">Waiting for connection</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_ok">OK</string>
@@ -236,7 +241,9 @@
     <string name="dlg_done">Done</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
-    <string name="dlg_need_permission_write_storage">%s needs access to your External Storage so that you can send and save files</string>
+    <string name="dlg_need_permission">%1$s needs access to your %2$s so that you can finish this action</string>
+    <string name="dlg_permission_storage">External Storage</string>
+    <string name="dlg_permission_camera">Camera</string>
     <string name="dlg_need_permission_read_contacts">To invite friends via email %s needs to have an access to Contacts</string>
     <string name="dlg_password_changed">Password changed</string>
     <string name="dlg_success_request_facebook">Request sent</string>
@@ -252,6 +259,8 @@
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogin. This email has already been taken</string>
     <string name="error_unauthorized">Unauthorized</string>
     <string name="error_unauthorized_from_app">Incorrect Email or Password</string>
+    <string name="error_login_to_chat">Not logged in to chat.</string>
+    <string name="error_disconnected">Disconnected… Please check your Internet connection!</string>
     <string name="dlg_choose_image_from">Select image from…</string>
     <string name="snackbar_new_message_title">%1$s\nMessage: %2$s</string>
     <string name="snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
@@ -281,6 +290,31 @@
     <string name="permission_unavailable">%s is not available now!</string>
     <string name="permissions_unavailable">%s are not available now!</string>
     <string name="error_cant_delete_chat">Sorry, chat can\'t be deleted. Please try later</string>
+    <string name="location_title">Location</string>
+    <string name="send_current_location">Send my location</string>
+    <string name="send_selected_location">Send selected location</string>
+    <string name="dlg_unsupported_file">This file format isn\'t supported</string>
+    <string name="dlg_filename_long">File name must be less than 100 characters</string>
+    <string name="dlg_image_big">File mustn’\t be more than 10 MB</string>
+    <string name="dlg_audio_video_big">File mustn’\t be more than 100 MB</string>
+
+    <!--   Location Permissions   -->
+    <string name="permission_rationale_location">Access to the location service is required to show your current location on the map.</string>
+    <string name="location_permission_denied">This app requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
+    <string name="permission_required_toast">Location permission is required to share location.</string>
+    <string name="geo_data_required_toast">Geo data is required to share current location.</string>
+    <string name="geo_data_send_by_tapping">Geo data is required to share current location. You can chose any location by tapping</string>
+    <string name="gps_not_enabled">GPS is currently disabled</string>
+    <string name="open_location_settings">Open Location settings</string>
+    <string name="marker_title">Marker Position</string>
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyD7UdDsB1Gv-9KOP_Phl7B_qwkXIFwuJH8
+    </string>
+
+    <string name="google_static_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyC68nhqEWQaXQJqr422kpimzR7XuJuRndg
+    </string>
 
     <plurals name="days">
         <item quantity="one">%1$d day</item>
@@ -300,6 +334,7 @@
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
         <item>Camera</item>
+        <item>Location</item>
     </string-array>
 
 </resources>

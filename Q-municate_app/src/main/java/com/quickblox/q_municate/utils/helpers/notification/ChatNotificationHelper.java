@@ -1,20 +1,14 @@
 package com.quickblox.q_municate.utils.helpers.notification;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.listeners.simple.SimpleGlobalLoginListener;
 import com.quickblox.q_municate.utils.SystemUtils;
-import com.quickblox.q_municate.utils.helpers.LoginHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.NotificationEvent;
-import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
 
 public class ChatNotificationHelper {
 
@@ -56,27 +50,30 @@ public class ChatNotificationHelper {
 
         if (chatPush) {
             saveOpeningDialogData(userId, dialogId);
-            if (AppSession.getSession().getUser() != null && !isLoginNow) {
-                isLoginNow = true;
-                LoginHelper loginHelper = new LoginHelper(context);
-                loginHelper.makeGeneralLogin(new GlobalLoginListener());
-                return;
-            }
+            saveOpeningDialog(true);
+            sendChatNotification(message, userId, dialogId);
         } else {
-            // push about call
-            sendNotification(message);
+            sendCommonNotification(message);
         }
 
-        saveOpeningDialog(false);
     }
 
-    public void sendNotification(String message) {
+    public void sendChatNotification(String message, int userId, String dialogId) {
         NotificationEvent notificationEvent = new NotificationEvent();
         notificationEvent.setTitle(context.getString(R.string.app_name));
         notificationEvent.setSubject(message);
         notificationEvent.setBody(message);
 
-        NotificationManagerHelper.sendNotificationEvent(context, notificationEvent);
+        NotificationManagerHelper.sendChatNotificationEvent(context, userId, dialogId, notificationEvent);
+    }
+
+    private void sendCommonNotification(String message) {
+        NotificationEvent notificationEvent = new NotificationEvent();
+        notificationEvent.setTitle(context.getString(R.string.app_name));
+        notificationEvent.setSubject(message);
+        notificationEvent.setBody(message);
+
+        NotificationManagerHelper.sendCommonNotificationEvent(context, notificationEvent);
     }
 
     public void saveOpeningDialogData(int userId, String dialogId) {
@@ -86,32 +83,5 @@ public class ChatNotificationHelper {
 
     public void saveOpeningDialog(boolean open) {
         appSharedHelper.saveNeedToOpenDialog(open);
-    }
-
-    private boolean isPushForPrivateChat() {
-        Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(dialogId);
-        return dialog != null && dialog.getType().equals(Dialog.Type.PRIVATE);
-    }
-
-    private class GlobalLoginListener extends SimpleGlobalLoginListener {
-
-        @Override
-        public void onCompleteQbChatLogin() {
-            isLoginNow = false;
-
-            saveOpeningDialog(true);
-
-            Intent intent = SystemUtils.getPreviousIntent(context);
-            if (!isPushForPrivateChat() || intent == null) {
-                sendNotification(message);
-            }
-        }
-
-        @Override
-        public void onCompleteWithError(String error) {
-            isLoginNow = false;
-
-            saveOpeningDialog(false);
-        }
     }
 }

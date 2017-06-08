@@ -11,8 +11,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 
 import org.json.JSONException;
@@ -79,12 +79,12 @@ public class Utils {
         }
     }
 
-    public static QBUser friendToUser(User friend) {
+    public static QBUser friendToUser(QMUser friend) {
         if (friend == null) {
             return null;
         }
         QBUser user = new QBUser();
-        user.setId(friend.getUserId());
+        user.setId(friend.getId());
         user.setFullName(friend.getFullName());
         return user;
     }

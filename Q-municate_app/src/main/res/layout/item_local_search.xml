@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,7 +9,7 @@
     android:padding="10dp">
 
     <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
-        style="@style/AvatarImageViewStyle"
+        style="@style/AvatarImageViewStyle.Common"
         android:id="@+id/avatar_imageview"
         android:layout_width="@dimen/image_view_small_avatar_layout_width"
         android:layout_height="@dimen/image_view_small_avatar_layout_height"
@@ -20,7 +20,7 @@
         app:border_width="@dimen/avatar_border_width"
         app:oval="true" />
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -50,6 +50,6 @@
             android:textSize="@dimen/text_size_small"
             tools:text="Subtitle" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

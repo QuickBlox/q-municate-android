@@ -1,5 +1,12 @@
 package com.quickblox.q_municate.utils;
 
+import android.content.Context;
+
+import com.quickblox.core.helper.MimeUtils;
+import com.quickblox.q_municate.R;
+import com.quickblox.q_municate_db.models.Attachment;
+
+import java.io.File;
 import java.util.ArrayList;
 
 public class StringUtils {
@@ -30,5 +37,46 @@ public class StringUtils {
         }
 
         return stringBuilder.toString();
+    }
+
+    public static String getAttachmentNameByType(Context context, Attachment.Type type) {
+        String attachmentName = "";
+
+        switch (type) {
+            case IMAGE:
+                attachmentName = context.getString(R.string.dialog_attach);
+                break;
+            case LOCATION:
+                attachmentName = context.getString(R.string.dialog_location);
+                break;
+            //will be extend for new attachment types
+        }
+
+        return attachmentName;
+    }
+
+    public static Attachment.Type getAttachmentTypeByFile(File file) {
+        return getAttachmentTypeByFileName(file.getName());
+    }
+
+    public static Attachment.Type getAttachmentTypeByFileName(String fileName){
+        Attachment.Type attachmentType;
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+        String mimeType = MimeUtils.guessMimeTypeFromExtension(extension);
+        if (mimeType == null){
+            attachmentType = Attachment.Type.OTHER;
+        } else if (mimeType.startsWith("image")){
+            attachmentType = Attachment.Type.IMAGE;
+        } else if (mimeType.startsWith("audio")){
+            attachmentType = Attachment.Type.AUDIO;
+        } else if (mimeType.startsWith("video")){
+            attachmentType = Attachment.Type.VIDEO;
+        } else if (mimeType.startsWith("text")) {
+            attachmentType = Attachment.Type.DOC;
+        } else {
+            attachmentType = Attachment.Type.OTHER;
+        }
+
+        return attachmentType;
     }
 }

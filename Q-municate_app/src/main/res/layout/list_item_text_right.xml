@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.quickblox.ui.kit.chatmessage.adapter.widget.MessageTextViewRight xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/msg_message_text_view_right"
+    style="@style/ListItemTextMessage.Right"
+    custom:widget_id_bottom="@layout/custom_msg_right_bottom_widget">
+
+</com.quickblox.ui.kit.chatmessage.adapter.widget.MessageTextViewRight>

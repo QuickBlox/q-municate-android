@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBChatDialog ;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
@@ -25,9 +25,9 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
@@ -52,13 +52,14 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     TextView participantsCountTextView;
 
     private QBFile qbFile;
-    private List<User> friendsList;
+    private List<QMUser> friendsList;
     private ImagePickHelper imagePickHelper;
     private Uri imageUri;
 
-    public static void start(Context context, List<User> selectedFriendsList) {
+    public static void start(Context context, List<QMUser> selectedFriendsList) {
         Intent intent = new Intent(context, CreateGroupDialogActivity.class);
         intent.putExtra(EXTRA_FRIENDS_LIST, (Serializable) selectedFriendsList);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         context.startActivity(intent);
     }
 
@@ -88,11 +89,11 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     @Override
     protected void initRecyclerView() {
         super.initRecyclerView();
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<QMUser>() {
 
             @Override
-            public void onItemClicked(View view, User entity, int position) {
-                UserProfileActivity.start(CreateGroupDialogActivity.this, entity.getUserId());
+            public void onItemClicked(View view, QMUser entity, int position) {
+                UserProfileActivity.start(CreateGroupDialogActivity.this, entity.getId());
             }
         });
     }
@@ -128,9 +129,12 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     }
 
     @Override
-    public void onImagePicked(int requestCode, File file) {
-        canPerformLogout.set(true);
-        startCropActivity(Uri.fromFile(file));
+    public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
+        if (Attachment.Type.IMAGE.equals(attachmentType)){
+            canPerformLogout.set(true);
+            startCropActivity(Uri.fromFile((File) attachment));
+        }
+
     }
 
     @Override
@@ -146,7 +150,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
 
     private void initFields() {
         title = getString(R.string.create_group_title);
-        friendsList = (List<User>) getIntent().getExtras().getSerializable(EXTRA_FRIENDS_LIST);
+        friendsList = (List<QMUser>) getIntent().getExtras().getSerializable(EXTRA_FRIENDS_LIST);
         participantsCountTextView.setText(getString(R.string.create_group_participants, friendsList.size()));
         imagePickHelper = new ImagePickHelper();
     }
@@ -189,12 +193,14 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
 
     private void createGroupChat() {
         String photoUrl = qbFile != null ? qbFile.getPublicUrl() : null;
-        QBCreateGroupDialogCommand.start(this, groupNameEditText.getText().toString(), (ArrayList<User>) friendsList, photoUrl);
+        QBCreateGroupDialogCommand.start(this, groupNameEditText.getText().toString(), (ArrayList<QMUser>) friendsList, photoUrl);
     }
 
     private void startCropActivity(Uri originalUri) {
         canPerformLogout.set(false);
-        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
+        imageUri = Uri.fromFile(new File(getCacheDir(), extensionOriginalUri));
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
@@ -223,10 +229,10 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            QBChatDialog  dialog = (QBChatDialog ) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
             if (dialog != null) {
-                GroupDialogActivity.start(CreateGroupDialogActivity.this, ChatUtils.createLocalDialog(dialog));
+                GroupDialogActivity.start(CreateGroupDialogActivity.this, dialog);
                 finish();
             } else {
                 ErrorUtils.showError(CreateGroupDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));

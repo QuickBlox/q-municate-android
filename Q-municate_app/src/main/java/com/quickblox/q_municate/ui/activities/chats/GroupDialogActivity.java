@@ -3,86 +3,55 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.content.model.QBFile;
-import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.CombinationMessage;
-import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate.utils.ChatDialogUtils;
+import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.State;
-import com.quickblox.q_municate_db.models.User;
-import com.quickblox.q_municate_db.utils.ErrorUtils;
-import com.quickblox.users.model.QBUser;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
 
 public class GroupDialogActivity extends BaseDialogActivity {
 
-    public static void start(Context context, ArrayList<User> friends) {
+    private static final String TAG = GroupDialogActivity.class.getSimpleName();
+
+    public static void start(Context context, ArrayList<QMUser> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
         context.startActivity(intent);
     }
 
-    public static void start(Context context, Dialog dialog) {
+    public static void start(Context context, QBChatDialog chatDialog) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         context.startActivity(intent);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        initFields();
-
-        if (dialog == null) {
-            finish();
-        }
-
-        setUpActionBarWithUpButton();
-
-        if (isNetworkAvailable()) {
-            deleteTempMessages();
-        }
-
-        initMessagesRecyclerView();
+    public static void startForResult(Fragment context, QBChatDialog chatDialog, int requestCode) {
+        Intent intent = new Intent(context.getActivity(), GroupDialogActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
+        context.startActivityForResult(intent, requestCode);
     }
 
     @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
+        messagesAdapter = new GroupChatMessagesAdapter(this, currentChatDialog, combinationMessagesList);
         messagesRecyclerView.addItemDecoration(
-                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+                new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
 
         scrollMessagesToBottom();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateData();
-
-        if (isNetworkAvailable()) {
-            startLoadDialogMessages();
-        }
-
-        checkMessageSendingPossibility();
     }
 
     @Override
@@ -99,23 +68,10 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (GroupDialogDetailsActivity.UPDATE_DIALOG_REQUEST_CODE == requestCode && GroupDialogDetailsActivity.RESULT_LEAVE_GROUP == resultCode) {
+        if (GroupDialogDetailsActivity.UPDATE_DIALOG_REQUEST_CODE == requestCode && GroupDialogDetailsActivity.RESULT_DELETE_GROUP == resultCode) {
             finish();
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onFileLoaded(QBFile file, String dialogId) {
-        if(!dialogId.equals(dialog.getDialogId())){
-            return;
-        }
-
-        try {
-            ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
-        } catch (QBResponseException e) {
-            ErrorUtils.showError(this, e);
-        }
     }
 
     @Override
@@ -125,13 +81,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
 
     @Override
     protected void updateMessagesList() {
-        int oldMessagesCount = messagesAdapter.getAllItems().size();
 
-        this.combinationMessagesList = createCombinationMessagesList();
-        processCombinationMessages();
-        messagesAdapter.setList(combinationMessagesList);
-
-        checkForScrolling(oldMessagesCount);
     }
 
     @Override
@@ -143,45 +93,32 @@ public class GroupDialogActivity extends BaseDialogActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_group_details:
-                GroupDialogDetailsActivity.start(this, dialog.getDialogId());
+                GroupDialogDetailsActivity.start(this, currentChatDialog.getDialogId());
                 break;
             default:
-                super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void updateActionBar() {
-        if (isNetworkAvailable() && dialog != null) {
-            setActionBarTitle(dialog.getTitle());
-            checkActionBarLogo(dialog.getPhoto(), R.drawable.placeholder_group);
+        if (isNetworkAvailable() && currentChatDialog != null) {
+            setActionBarTitle(ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager));
+            checkActionBarLogo(currentChatDialog.getPhoto(), R.drawable.placeholder_group);
         }
     }
 
-    private void initFields() {
-        chatHelperIdentifier = QBService.GROUP_CHAT_HELPER;
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        combinationMessagesList = createCombinationMessagesList();
-        if (dialog != null)
-        title = dialog.getTitle();
-    }
-
-    private void processCombinationMessages(){
-        QBUser currentUser = AppSession.getSession().getUser();
-        for (CombinationMessage cm :combinationMessagesList){
-            boolean ownMessage = !cm.isIncoming(currentUser.getId());
-            if (!State.READ.equals(cm.getState()) && !ownMessage && isNetworkAvailable()) {
-                cm.setState(State.READ);
-                QBUpdateStatusMessageCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), cm, false);
-            } else if (ownMessage) {
-                cm.setState(State.READ);
-                dataManager.getMessageDataManager().update(cm.toMessage(), false);
-            }
+    @Override
+    protected void initFields() {
+        super.initFields();
+        if (currentChatDialog != null) {
+            title = ChatDialogUtils.getTitleForChatDialog(currentChatDialog, dataManager);
         }
     }
 
     public void sendMessage(View view) {
-        sendMessage(false);
+        sendMessage();
     }
+
 }

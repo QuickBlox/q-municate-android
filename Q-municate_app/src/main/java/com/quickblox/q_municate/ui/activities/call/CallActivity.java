@@ -20,7 +20,6 @@ import android.view.View;
 import android.widget.Chronometer;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
@@ -37,8 +36,9 @@ import com.quickblox.q_municate_core.utils.call.RingtonePlayer;
 import com.quickblox.q_municate_core.utils.call.SettingsUtil;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
+import com.quickblox.videochat.webrtc.BaseSession;
 import com.quickblox.videochat.webrtc.QBRTCClient;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
@@ -327,6 +327,11 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     @Override
+    public void onStateChanged(QBRTCSession qbrtcSession, BaseSession.QBRTCSessionState qbrtcSessionState) {
+
+    }
+
+    @Override
     public void onConnectedToUser(QBRTCSession session, final Integer userID) {
         forbiddenCloseByWifiState();
         if (isInComingCall) {
@@ -361,10 +366,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     @Override
-    public void onError(QBRTCSession qbrtcSession, QBRTCException e) {
-    }
-
-    @Override
     public void onConnectedToService(QBService service) {
         super.onConnectedToService(service);
         if (qbCallChatHelper == null) {
@@ -396,7 +397,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         };
     }
 
-    public User getOpponentAsUserFromDB(int opponentId){
+    public QMUser getOpponentAsUserFromDB(int opponentId){
         DataManager dataManager = DataManager.getInstance();
         Friend friend = dataManager.getFriendDataManager().getByUserId(opponentId);
         return friend.getUser();

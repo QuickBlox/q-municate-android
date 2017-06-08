@@ -23,23 +23,24 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.facebook.AccessToken;
-import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
-import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
 import com.quickblox.q_municate.utils.bridges.ConnectionBridge;
@@ -49,40 +50,36 @@ import com.quickblox.q_municate.utils.broadcasts.NetworkChangeReceiver;
 import com.quickblox.q_municate.utils.helpers.ActivityUIHelper;
 import com.quickblox.q_municate.utils.helpers.LoginHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
-import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHelper;
 import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
+
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.XMPPConnection;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
 public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
+
+    private static final String TAG = BaseActivity.class.getSimpleName();
 
     protected App app;
     protected Toolbar toolbar;
@@ -91,8 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected FailAction failAction;
     protected SuccessAction successAction;
     protected QBFriendListHelper friendListHelper;
-    protected QBPrivateChatHelper privateChatHelper;
-    protected QBGroupChatHelper groupChatHelper;
+    protected QBChatHelper chatHelper;
     protected QBService service;
     protected LocalBroadcastManager localBroadcastManager;
     protected String title;
@@ -101,6 +97,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private View snackBarView;
     private ActionBar actionBar;
     private Snackbar snackbar;
+    private SparseArray<Priority> snackbarClientPriority;
+
     private Map<String, Set<Command>> broadcastCommandMap;
     private Set<UserStatusChangingListener> fragmentsStatusChangingSet;
     private Set<ServiceConnectionListener> fragmentsServiceConnectionSet;
@@ -112,17 +110,22 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
+    private boolean isDialogLoading = false;
+    private ConnectionListener chatConnectionListener;
+    private ViewGroup root;
+    private boolean isUIDisabled;
 
     protected abstract int getContentResId();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(getContentResId());
+        root = (ViewGroup) getLayoutInflater().inflate(getContentResId(), null);
+        setContentView(root);
+        //setContentView(getContentResId());
         Log.d("BaseActivity", "onCreate");
 
         initFields();
-
         activateButterKnife();
     }
 
@@ -241,6 +244,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void showSnackbar(int titleResId, int duration) {
+        Log.i(TAG, "showSnackbar for:" + getString(titleResId));
         if (snackBarView != null) {
             createSnackBar(titleResId, duration);
             snackbar.show();
@@ -248,10 +252,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     @Override
-    public void showSnackbar(int titleResId, int duration, int buttonTitleResId, View.OnClickListener onClickListener) {
+    public void showSnackbar(int titleResId, int duration, Priority priority) {
+        Log.i(TAG, "showSnackbar for:" + getString(titleResId));
+        snackbarClientPriority.put(titleResId, priority);
         if (snackBarView != null) {
             createSnackBar(titleResId, duration);
-            snackbar.setAction(buttonTitleResId, onClickListener);
             snackbar.show();
         }
     }
@@ -267,9 +272,17 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void hideSnackBar() {
-        if (snackbar != null) {
+        Log.i(TAG, "hideSnackBar for:" );
+        if (snackbar != null && !isSnackBarHasMaxPriority()) {
             snackbar.dismiss();
         }
+    }
+
+    @Override
+    public void hideSnackBar(int titleResId) {
+        Log.i(TAG, "hideSnackBar for:" +getString(titleResId) );
+        snackbarClientPriority.remove(titleResId);
+        hideSnackBar();
     }
 
     @Override
@@ -278,6 +291,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         Log.d("BaseActivity", "onPause");
         unregisterBroadcastReceivers();
         removeActions();
+        unregisterConnectionListtener();
+        hideSnackBar(R.string.error_login_to_chat);
+    }
+
+    private void unregisterConnectionListtener() {
+        QBChatService.getInstance().removeConnectionListener(chatConnectionListener);
     }
 
     @Override
@@ -285,14 +304,18 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         super.onResume();
         Log.d("BaseActivity", "onResume");
         registerBroadcastReceivers();
-
+        registerConnectionListener();
         addActions();
-
         NotificationManagerHelper.clearNotificationEvent(this);
 
-        checkOpeningDialog();
-
         checkShowingConnectionError();
+    }
+
+    private void registerConnectionListener() {
+        if (chatConnectionListener == null) {
+            initChatConnectionListener();
+        }
+        QBChatService.getInstance().addConnectionListener(chatConnectionListener);
     }
 
     @Override
@@ -345,6 +368,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         fragmentsServiceConnectionSet = new HashSet<>();
         serviceConnection = new QBChatServiceConnection();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
+
+        snackbarClientPriority = new SparseArray<>();
     }
 
     protected void setUpActionBarWithUpButton() {
@@ -406,12 +431,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
         }
 
-        if (privateChatHelper == null) {
-            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
-        }
-
-        if (groupChatHelper == null) {
-            groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+        if (chatHelper == null){
+            chatHelper = (QBChatHelper) service.getHelper(QBService.CHAT_HELPER);
         }
 
         notifyConnectedToService();
@@ -432,11 +453,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void registerBroadcastReceivers() {
+        Log.v(TAG, "registerBroadcastReceivers()");
         IntentFilter globalActionsIntentFilter = new IntentFilter();
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL);
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
-        globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
         globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
         IntentFilter networkIntentFilter = new IntentFilter(NetworkChangeReceiver.ACTION_LOCAL_CONNECTIVITY);
         IntentFilter userStatusIntentFilter = new IntentFilter(QBServiceConsts.USER_STATUS_CHANGED_ACTION);
@@ -454,15 +475,20 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void addActions() {
+        Log.v(TAG, "addActions()");
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
         addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
+        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, new LoginChatCompositeFailAction());
+
         updateBroadcastActionList();
     }
 
     private void removeActions() {
         removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
+
 
         updateBroadcastActionList();
     }
@@ -493,10 +519,24 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         setCurrentFragment(fragment, null);
     }
 
+    public void setCurrentFragment(Fragment fragment, boolean needAddToBackStack) {
+        setCurrentFragment(fragment, null, needAddToBackStack);
+    }
+
     private void setCurrentFragment(Fragment fragment, String tag) {
         currentFragment = fragment;
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction transaction = buildTransaction();
+        transaction.replace(R.id.container_fragment, fragment, tag);
+        transaction.commit();
+    }
+
+    private void setCurrentFragment(Fragment fragment, String tag, boolean needAddToBackStack) {
+        currentFragment = fragment;
+        FragmentTransaction transaction = buildTransaction();
+        if(needAddToBackStack) {
+            transaction.addToBackStack(null);
+        }
         transaction.replace(R.id.container_fragment, fragment, tag);
         transaction.commit();
     }
@@ -526,35 +566,20 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void onFailAction(String action) {
     }
 
+    protected void onChatReconnected(){
+
+    }
+
+    protected void onChatDisconnected(Exception e){
+
+    }
+
     protected void onReceivedChatMessageNotification(Bundle extras) {
         activityUIHelper.showChatMessageNotification(extras);
     }
 
     protected void onReceivedContactRequestNotification(Bundle extras) {
         activityUIHelper.showContactRequestNotification(extras);
-    }
-
-    public void forceRelogin() {
-        ErrorUtils.showError(this, getString(R.string.dlg_force_relogin_on_token_required));
-        SplashActivity.start(this);
-        finish();
-    }
-
-    public void refreshSession() {
-        if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
-            QBLoginRestCommand.start(this, AppSession.getSession().getUser());
-        } else if (LoginType.FACEBOOK.equals(AppSession.getSession().getLoginType())){
-            QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, AccessToken.getCurrentAccessToken().getToken(), null);
-        } else if (LoginType.TWITTER_DIGITS.equals(AppSession.getSession().getLoginType())){
-            refreshTDSession();
-        }
-    }
-
-    private void refreshTDSession() {
-        Map<String, String> authHeaders = TwitterDigitsHelper.retrieveCurrentAuthHeaders();
-        String tdServiceProvider = authHeaders.get(TwitterDigitsHelper.PROVIDER);
-        String tdCredentials = authHeaders.get(TwitterDigitsHelper.CREDENTIALS);
-        QBSocialLoginCommand.start(this, QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials);
     }
 
     private Handler getHandler() {
@@ -565,12 +590,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void addAction(String action, Command command) {
-        Set<Command> commandSet = broadcastCommandMap.get(action);
-        if (commandSet == null) {
-            commandSet = new HashSet<Command>();
-            broadcastCommandMap.put(action, commandSet);
-        }
-        commandSet.add(command);
+            Set<Command> commandSet = broadcastCommandMap.get(action);
+            if (commandSet == null) {
+                commandSet = new HashSet<Command>();
+                broadcastCommandMap.put(action, commandSet);
+            }
+            commandSet.add(command);
     }
 
     public boolean hasAction(String action) {
@@ -596,14 +621,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         }
     }
 
-    public void onReceiveForceReloginAction(Bundle extras) {
-        forceRelogin();
-    }
-
-    public void onReceiveRefreshSessionAction(Bundle extras) {
-        ToastUtils.longToast(R.string.dlg_refresh_session);
-        refreshSession();
-    }
 
     public void onReceiveContactRequestAction(Bundle extras) {
         if (needShowReceivedNotification()) {
@@ -619,36 +636,22 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return friendListHelper;
     }
 
-    public QBPrivateChatHelper getPrivateChatHelper() {
-        return privateChatHelper;
-    }
-
-    public QBGroupChatHelper getGroupChatHelper() {
-        return groupChatHelper;
+    public QBChatHelper getChatHelper(){
+        return chatHelper;
     }
 
     public FailAction getFailAction() {
         return failAction;
     }
 
-    private void checkOpeningDialog() {
-        if (appSharedHelper.needToOpenDialog() && isChatInitializedAndUserLoggedIn()) {
-            Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
-            User user = DataManager.getInstance().getUserDataManager().get(appSharedHelper.getPushUserId());
-
-            if (dialog != null && user != null) {
-                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-                    startPrivateChatActivity(user, dialog);
-                } else {
-                    startGroupChatActivity(dialog);
-                }
-
-                appSharedHelper.saveNeedToOpenDialog(false);
-            }
-        }
+    public boolean isDialogLoading() {
+        return isDialogLoading;
     }
 
+
     protected void loginChat() {
+        isDialogLoading = true;
+        showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
         QBLoginChatCompositeCommand.start(this);
     }
 
@@ -660,12 +663,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return isAppInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
-    public void startPrivateChatActivity(User user, Dialog dialog) {
+    public void startPrivateChatActivity(QMUser user, QBChatDialog dialog) {
         PrivateDialogActivity.start(this, user, dialog);
     }
 
-    public void startGroupChatActivity(Dialog dialog) {
-        GroupDialogActivity.start(this, dialog);
+    public void startGroupChatActivity(QBChatDialog chatDialog) {
+        GroupDialogActivity.start(this, chatDialog);
     }
 
     protected void startLandingScreen() {
@@ -677,13 +680,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     protected void performLoginChatSuccessAction(Bundle bundle) {
         QBInitCallChatCommand.start(this, CallActivity.class);
-        showSnackbarUpdatingDialogs();
         hideProgress();
-    }
-
-    private void showSnackbarUpdatingDialogs() {
-        showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
-        loadDialogs();
     }
 
     @Override
@@ -692,16 +689,94 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         Log.d("BaseActivity", "onAttachFragment");
     }
 
-    protected void loadDialogs() {
-        QBLoadDialogsCommand.start(this);
+    private void initChatConnectionListener() {
+        chatConnectionListener = new ConnectionListener() {
+            @Override
+            public void connected(XMPPConnection xmppConnection) {
+
+            }
+
+            @Override
+            public void authenticated(XMPPConnection xmppConnection, boolean b) {
+                Log.d(TAG, "chatConnectionListener authenticated");
+                hideSnackBar(R.string.error_login_to_chat);
+                blockUI(false);
+            }
+
+            @Override
+            public void connectionClosed() {
+
+            }
+
+            @Override
+            public void connectionClosedOnError(Exception e) {
+                onChatDisconnected(e);
+                blockUI(true);
+                showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE);
+            }
+
+            @Override
+            public void reconnectionSuccessful() {
+                onChatReconnected();
+                Log.d(TAG, "chatConnectionListener reconnectionSuccessful");
+                hideSnackBar(R.string.error_login_to_chat);
+                blockUI(false);
+            }
+
+            @Override
+            public void reconnectingIn(int i) {
+
+            }
+
+            @Override
+            public void reconnectionFailed(Exception e) {
+
+            }
+        };
+    }
+
+    private void blockUI(boolean stopUserInteractions){
+        if (isUIDisabled == stopUserInteractions) {
+            return;
+        }
+        isUIDisabled = stopUserInteractions;
+        disableEnableControls(!stopUserInteractions, root);
+    }
+
+    private void disableEnableControls(boolean enable, ViewGroup vg){
+        if(vg instanceof Toolbar) {
+            return;
+        }
+
+        for (int i = 0; i < vg.getChildCount(); i++){
+            View child = vg.getChildAt(i);
+            child.setEnabled(enable);
+            if (child instanceof ViewGroup){
+                disableEnableControls(enable, (ViewGroup)child);
+            }
+        }
     }
 
     private void activateButterKnife() {
         ButterKnife.bind(this);
     }
 
-    private void performLoadChatsSuccessAction(Bundle bundle) {
-        hideSnackBar();
+    private boolean isSnackBarHasMaxPriority(){
+        if (snackbarClientPriority.size() == 0){
+            return false;
+        }
+        for (int i = 0; i < snackbarClientPriority.size(); i++) {
+            Log.i(TAG, "snackbar["+i+")="+snackbarClientPriority.valueAt(i));
+            if (Priority.MAX == snackbarClientPriority.valueAt(i)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void performLoadChatsSuccessAction(Bundle bundle) {
+       // hideSnackBar();
+        isDialogLoading = false;
     }
 
     public class LoadChatsSuccessAction implements Command {
@@ -727,6 +802,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
+            Log.d(TAG, "SuccessAction hideProgress");
             hideProgress();
             onSuccessAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
@@ -736,7 +812,19 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
+            QBLoginChatCompositeCommand.setIsRunning(false);
             performLoginChatSuccessAction(bundle);
+        }
+    }
+
+    public class LoginChatCompositeFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBLoginChatCompositeCommand.setIsRunning(false);
+            blockUI(true);
+            hideSnackBar(R.string.dialog_loading_dialogs);
+            showSnackbar(R.string.error_login_to_chat, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
         }
     }
 
@@ -749,8 +837,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             boolean activeConnection = intent
                     .getBooleanExtra(NetworkChangeReceiver.EXTRA_IS_ACTIVE_CONNECTION, false);
 
+            checkShowingConnectionError();
+
             if (activeConnection) {
-                checkShowingConnectionError();
 
                 if (!loggedIn && LoginHelper.isCorrectOldAppSession()) {
                     loggedIn = true;
@@ -807,7 +896,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                     } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
                         //                        onReceiveForceReloginAction(intent.getExtras());
                     } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
-                        onReceiveRefreshSessionAction(intent.getExtras());
+                        //onReceiveRefreshSessionAction(intent.getExtras());
                     }
                 }
             });
