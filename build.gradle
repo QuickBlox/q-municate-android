@@ -14,7 +14,7 @@ allprojects {
     repositories {
         jcenter()
 
-        maven { url 'https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/' }
+        maven { url= "file://Users/tereha/StudioProjects/quickblox-android-sdk-releases" }
         maven { url 'https://maven.fabric.io/public' }
     }
 }
@@ -35,7 +35,7 @@ ext {
 
 //    QuickBlox SDK version
     qbSdkVersion = '3.3.3'
-    qbMessageAdapterVersion = '1.1.0'
+    qbMessageAdapterVersion = '1.2.0-alpha'
 
     testRunnerVersion = "0.4.1"
 
