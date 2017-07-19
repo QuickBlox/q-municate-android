@@ -1,6 +1,8 @@
 package com.quickblox.q_municate.ui.activities.chats;
 
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -33,7 +36,9 @@ import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
+import com.quickblox.q_municate.utils.ClipboardUtils;
 import com.quickblox.q_municate.utils.StringUtils;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
@@ -67,6 +72,8 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBLinkPreviewClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.models.QBLinkPreview;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
@@ -131,6 +138,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
     private LocationAttachClickListener locationAttachClickListener;
     private ImageAttachClickListener imageAttachClickListener;
+    private LinkPreviewClickListener linkPreviewClickListener;
     private Handler mainThreadHandler;
     private View emojiconsFragment;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
@@ -394,6 +402,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesAdapter.setAttachLocationClickListener(locationAttachClickListener);
         messagesAdapter.setAttachImageClickListener(imageAttachClickListener);
+        messagesAdapter.setLinkPreviewClickListener(linkPreviewClickListener, false);
     }
 
     private void removeChatMessagesAdapterListeners() {
@@ -401,6 +410,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             messagesAdapter.removeMessageTextViewLinkClickListener();
             messagesAdapter.removeLocationImageClickListener(locationAttachClickListener);
             messagesAdapter.removeAttachImageClickListener(imageAttachClickListener);
+            messagesAdapter.removeLinkPreviewClickListener();
         }
     }
 
@@ -431,6 +441,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
         locationAttachClickListener = new LocationAttachClickListener();
         imageAttachClickListener = new ImageAttachClickListener();
+        linkPreviewClickListener = new LinkPreviewClickListener();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = new ArrayList<>();
     }
@@ -1069,6 +1080,21 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void onLinkClicked(QBAttachment qbAttachment, int i) {
             PreviewImageActivity.start(BaseDialogActivity.this, qbAttachment.getUrl());
+        }
+    }
+
+    protected class LinkPreviewClickListener implements QBLinkPreviewClickListener{
+
+        @Override
+        public void onLinkPreviewClicked(String link, QBLinkPreview linkPreview, int position) {
+
+        }
+
+        @Override
+        public void onLinkPreviewLongClicked(String link, QBLinkPreview linkPreview, int position) {
+            ClipboardUtils.copySimpleTextToClipboard(BaseDialogActivity.this, link);
+            ToastUtils.longToast(R.string.link_was_copied);
+            Log.v(TAG, linkPreview.toString());
         }
     }
 }
