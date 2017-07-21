@@ -49,7 +49,11 @@ public class EmailHelper {
 
         ContentResolver contentResolver = context.getContentResolver();
 
-        String[] PROJECTION = new String[]{ContactsContract.RawContacts._ID, ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.PHOTO_ID, ContactsContract.CommonDataKinds.Email.DATA, ContactsContract.CommonDataKinds.Photo.CONTACT_ID};
+        String[] PROJECTION = new String[]{ContactsContract.RawContacts._ID,
+                ContactsContract.Contacts.DISPLAY_NAME,
+                ContactsContract.Contacts.PHOTO_ID,
+                ContactsContract.CommonDataKinds.Email.DATA,
+                ContactsContract.CommonDataKinds.Photo.CONTACT_ID};
 
         String order = "upper("+ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + ") ASC";
 
@@ -83,4 +87,50 @@ public class EmailHelper {
 
         return friendsContactsList;
     }
+
+    public static List<InviteFriend> getContactsWithPhone(Context context) {
+        List<InviteFriend> friendsContactsList = new ArrayList<InviteFriend>();
+        Uri uri = null;
+
+        ContentResolver contentResolver = context.getContentResolver();
+
+        String[] PROJECTION = new String[]{ContactsContract.RawContacts._ID,
+                ContactsContract.Contacts.DISPLAY_NAME,
+                ContactsContract.Contacts.PHOTO_ID,
+                ContactsContract.CommonDataKinds.Phone.DATA,
+                ContactsContract.CommonDataKinds.Photo.CONTACT_ID};
+
+        String order = "upper("+ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + ") ASC";
+
+        String filter = ContactsContract.CommonDataKinds.Phone.DATA + " NOT LIKE ''";
+
+        Cursor cursor = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PROJECTION,
+                filter, null, order);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String id;
+            String name;
+            String phone;
+            do {
+                name = cursor.getString(cursor.getColumnIndex(
+                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DATA));
+                id = cursor.getString(cursor.getColumnIndex(
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+                if (ContactsContract.Contacts.CONTENT_URI != null) {
+                    uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(
+                            id));
+                    uri = Uri.withAppendedPath(uri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
+                }
+                friendsContactsList.add(new InviteFriend(phone, name, null, InviteFriend.VIA_CONTACTS_TYPE,
+                        uri, false));
+            } while (cursor.moveToNext());
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        return friendsContactsList;
+    }
+
 }

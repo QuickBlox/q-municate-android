@@ -27,7 +27,7 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class InviteFriendsActivity extends BaseLoggableActivity implements CounterChangedListener {
+public class ImportContactsActivity extends BaseLoggableActivity implements CounterChangedListener {
 
     @Bind(R.id.friends_listview)
     ListView friendsListView;
@@ -40,7 +40,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
     private SystemPermissionHelper systemPermissionHelper;
 
     public static void start(Context context) {
-        Intent intent = new Intent(context, InviteFriendsActivity.class);
+        Intent intent = new Intent(context, ImportContactsActivity.class);
         context.startActivity(intent);
     }
 
@@ -80,12 +80,12 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
     }
 
     private void initFields() {
-        title = getString(R.string.invite_friends_title);
+        title = getString(R.string.import_contacts_title);
         systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
     private void initFriendsList() {
-        friendsContactsList = EmailHelper.getContactsWithEmail(this);
+        friendsContactsList = EmailHelper.getContactsWithPhone(this);
         friendsAdapter = new InviteFriendsAdapter(this, friendsContactsList);
         friendsAdapter.setCounterChangedListener(this);
         friendsListView.setAdapter(friendsAdapter);
@@ -128,7 +128,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
         if (selectedContactsFriendsArray.length > ConstsCore.ZERO_INT_VALUE) {
             sendInviteToContacts();
         } else {
-            ToastUtils.longToast(R.string.dlg_no_friends_selected);
+            ToastUtils.longToast(R.string.dlg_no_contacts_selected);
         }
 
         clearCheckedFriends();
@@ -218,7 +218,7 @@ public class InviteFriendsActivity extends BaseLoggableActivity implements Count
                     @Override
                     public void onNegative(MaterialDialog dialog) {
                         super.onNegative(dialog);
-                        SystemPermissionHelper.openSystemSettings(InviteFriendsActivity.this);
+                        SystemPermissionHelper.openSystemSettings(ImportContactsActivity.this);
                     }
                 });
     }

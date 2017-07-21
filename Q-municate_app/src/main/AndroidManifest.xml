@@ -82,7 +82,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activities.invitefriends.InviteFriendsActivity"
+            android:name=".ui.activities.invitefriends.ImportContactsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity

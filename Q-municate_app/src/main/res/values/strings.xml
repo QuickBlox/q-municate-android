@@ -7,7 +7,7 @@
     <!-- ActionBar -->
     <string name="action_bar_chats">Chats</string>
     <string name="action_bar_settings">Settings</string>
-    <string name="action_bar_invite_friends">Invite Friends</string>
+    <string name="action_bar_import_contacts">Import Contacts</string>
     <string name="action_bar_feedback">Feedback</string>
     <string name="action_bar_about">About</string>
     <string name="action_bar_search">Search</string>
@@ -147,7 +147,7 @@
     <string name="settings_change_password">Change Password</string>
     <string name="settings_push_notifications">Push Notifications</string>
     <string name="settings_version">Version %1$s</string>
-    <string name="settings_invite_friends">Invite Friends</string>
+    <string name="settings_import_contacts">Import Contacts</string>
     <string name="settings_give_feedback">Give Feedback</string>
     <string name="settings_delete_my_account">Delete My Account</string>
 
@@ -214,7 +214,7 @@
 
 
     <!-- Invite Friends -->
-    <string name="invite_friends_title">Invite Friends</string>
+    <string name="import_contacts_title">Import Contacts</string>
     <string name="invite_friends_send">Send</string>
     <string name="invite_friends_select_all">Select All</string>
     <string name="invite_friends_choose_email_provider">Choose an email provider:</string>
@@ -244,10 +244,10 @@
     <string name="dlg_need_permission">%1$s needs access to your %2$s so that you can finish this action</string>
     <string name="dlg_permission_storage">External Storage</string>
     <string name="dlg_permission_camera">Camera</string>
-    <string name="dlg_need_permission_read_contacts">To invite friends via email %s needs to have an access to Contacts</string>
+    <string name="dlg_need_permission_read_contacts">To import contacts %s needs to have an access to Contacts</string>
     <string name="dlg_password_changed">Password changed</string>
     <string name="dlg_success_request_facebook">Request sent</string>
-    <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
+    <string name="dlg_no_contacts_selected">Please, select some Contacts for import!</string>
     <string name="dlg_leave_group">Leave Group</string>
     <string name="dlg_force_relogin_on_token_required">Token error is occurred in application. Relogin will be executed now</string>
     <string name="dlg_refresh_session">QB Session expired. Update session will be executed now</string>
