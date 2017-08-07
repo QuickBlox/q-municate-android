@@ -67,6 +67,7 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.media.SingleMediaManager;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
@@ -127,6 +128,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected BaseChatMessagesAdapter messagesAdapter;
     protected List<CombinationMessage> combinationMessagesList;
     protected ImagePickHelper imagePickHelper;
+    private SingleMediaManager mediaManager;
 
     private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
     private LocationAttachClickListener locationAttachClickListener;
@@ -190,6 +192,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         registerBroadcastReceivers();
 
         initMessagesRecyclerView();
+        initMediaManager();
 
         hideSmileLayout();
 
@@ -255,6 +258,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         loadNextPartMessagesAsync();
 
         checkMessageSendingPossibility();
+        resumeMediaPlayer();
     }
 
     @Override
@@ -262,6 +266,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onPause();
         hideSmileLayout();
         checkStartTyping();
+        suspendMediaPlayer();
     }
 
     @Override
@@ -356,6 +361,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
+    private void resumeMediaPlayer() {
+        if(mediaManager.isMediaPlayerReady()) {
+            mediaManager.resumePlay();
+        }
+    }
+
+    private void suspendMediaPlayer() {
+        if(mediaManager.isMediaPlayerReady()) {
+            mediaManager.suspendPlay();
+        }
+    }
+
     private void deleteTempMessagesAsync(){
         threadPool.execute(new Runnable() {
             @Override
@@ -446,6 +463,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void initMessagesRecyclerView() {
         messagesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(this));
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    protected void initMediaManager() {
+        mediaManager = messagesAdapter.getMediaManagerInstance();
     }
 
     protected void addActions() {
