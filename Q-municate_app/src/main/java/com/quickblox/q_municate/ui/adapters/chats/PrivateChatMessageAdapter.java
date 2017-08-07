@@ -178,7 +178,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void showAttachUI(ImageAttachHolder viewHolder, boolean isIncoming) {
-        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.VISIBLE);
+        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background), View.VISIBLE);
     }
 
     public void findLastFriendsRequestMessagesPosition() {

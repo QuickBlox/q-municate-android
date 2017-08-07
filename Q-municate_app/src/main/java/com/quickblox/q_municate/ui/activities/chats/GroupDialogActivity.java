@@ -44,9 +44,13 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
+    protected void initChatAdapter() {
+        messagesAdapter = new GroupChatMessagesAdapter(this, currentChatDialog, combinationMessagesList);
+    }
+
+    @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new GroupChatMessagesAdapter(this, currentChatDialog, combinationMessagesList);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);

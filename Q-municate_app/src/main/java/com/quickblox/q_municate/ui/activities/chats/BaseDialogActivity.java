@@ -73,9 +73,9 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
-import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.media.SingleMediaManager;
 import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.AudioRecorder;
 import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.exceptions.MediaRecorderException;
 import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.listeners.QBMediaRecordListener;
@@ -155,6 +155,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected BaseChatMessagesAdapter messagesAdapter;
     protected List<CombinationMessage> combinationMessagesList;
     protected ImagePickHelper imagePickHelper;
+    private SingleMediaManager mediaManager;
     protected AudioRecorder audioRecorder;
 
     private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
@@ -220,7 +221,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         addObservers();
         registerBroadcastReceivers();
 
+        initChatAdapter();
+
         initMessagesRecyclerView();
+        initMediaManager();
 
         hideSmileLayout();
 
@@ -286,6 +290,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         loadNextPartMessagesAsync();
 
         checkMessageSendingPossibility();
+        resumeMediaPlayer();
     }
 
     @Override
@@ -293,6 +298,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onPause();
         hideSmileLayout();
         checkStartTyping();
+        suspendMediaPlayer();
     }
 
     @Override
@@ -384,6 +390,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         } else {
             setActionBarTitle(title);
             updateActionBar();
+        }
+    }
+
+    private void resumeMediaPlayer() {
+        if(mediaManager.isMediaPlayerReady()) {
+            mediaManager.resumePlay();
+        }
+    }
+
+    private void suspendMediaPlayer() {
+        if(mediaManager.isMediaPlayerReady()) {
+            mediaManager.suspendPlay();
         }
     }
 
@@ -489,9 +507,15 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         recordAudioButton.setRecordTouchListener(new RecordTouchListener());
     }
 
+    protected abstract void initChatAdapter();
+
     protected void initMessagesRecyclerView() {
         messagesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(this));
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    protected void initMediaManager() {
+        mediaManager = messagesAdapter.getMediaManagerInstance();
     }
 
     protected void addActions() {
@@ -1145,7 +1169,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     }
 
-    protected class LocationAttachClickListener implements QBChatAttachLocationClickListener{
+    protected class LocationAttachClickListener implements QBChatAttachClickListener{
 
         @Override
         public void onLinkClicked(QBAttachment qbAttachment, int i) {
@@ -1153,7 +1177,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         }
     }
 
-    protected class ImageAttachClickListener implements QBChatAttachImageClickListener{
+    protected class ImageAttachClickListener implements QBChatAttachClickListener {
 
         @Override
         public void onLinkClicked(QBAttachment qbAttachment, int i) {
