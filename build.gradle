@@ -16,6 +16,7 @@ allprojects {
 
         maven { url= "file://Users/tereha/StudioProjects/quickblox-android-sdk-releases" }
         maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://maven.google.com' }
     }
 }
 
@@ -24,8 +25,8 @@ ext {
     buildToolsVersion = '23.0.2'
     minSdkVersion = 15
     targetSdkVersion = 23
-    versionName = '2.2'
-    versionCode = 211
+    versionName = '2.2.2'
+    versionCode = 232
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
@@ -35,7 +36,7 @@ ext {
 
 //    QuickBlox SDK version
     qbSdkVersion = '3.3.3'
-    qbMessageAdapterVersion = '1.2.0-alpha'
+    qbMessageAdapterVersion = '1.2.0a1'
 
     testRunnerVersion = "0.4.1"
 

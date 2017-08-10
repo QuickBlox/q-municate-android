@@ -455,7 +455,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void initMessagesRecyclerView() {
-        messagesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(this));
+        WrapContentLinearLayoutManager layoutManager = new WrapContentLinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        messagesRecyclerView.setLayoutManager(layoutManager);
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
