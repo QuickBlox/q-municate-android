@@ -1,0 +1,25 @@
+<LinearLayout android:id="@+id/layout_chat_audio_container"
+    style="@style/MatchWidth"
+
+    android:layout_alignParentBottom="true"
+    android:background="@color/text_color_white"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:id="@+id/bucket_imageview"
+        style="@style/BorderlessImageButtonStyle"
+        android:layout_gravity="center_vertical"
+        android:src="@android:drawable/ic_menu_delete" />
+
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginStart="50dp"
+        android:layout_marginLeft="50dp"
+        android:textSize="20sp"/>
+
+
+</LinearLayout>
