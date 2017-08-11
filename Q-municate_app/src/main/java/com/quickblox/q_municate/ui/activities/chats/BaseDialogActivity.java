@@ -10,6 +10,8 @@ import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.os.Vibrator;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +19,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -32,7 +40,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
-import com.quickblox.q_municate.ui.views.RecordButtonView;
 import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
 import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
@@ -68,6 +75,7 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.view.QBRecordAudioButton;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
@@ -116,7 +124,19 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     ImageButton attachButton;
 
     @Bind(R.id.chat_record_audio_button)
-    RecordButtonView recordAudioButton;
+    QBRecordAudioButton recordAudioButton;
+
+    @Bind(R.id.chat_audio_record_chronometer)
+    Chronometer recordChronometer;
+
+    @Bind(R.id.chat_audio_record_bucket_imageview)
+    ImageView bucketView;
+
+    @Bind(R.id.layout_chat_audio_container)
+    LinearLayout audioLayout;
+
+    @Bind(R.id.chat_audio_record_textview)
+    TextView audioRecordTextView;
 
     @Bind(R.id.send_button)
     ImageButton sendButton;
@@ -152,6 +172,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BlockingQueue<Runnable> threadQueue;
     private ThreadPoolExecutor threadPool;
     private boolean needUpdatePosition;
+    private Vibrator vibro;
 
     public static Intent makePrivateDialogIntent(Context context, QMUser user, QBChatDialog dialog){
         Intent intent = new Intent(context, PrivateDialogActivity.class);
@@ -437,6 +458,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         imageAttachClickListener = new ImageAttachClickListener();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = new ArrayList<>();
+        vibro = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     private void initCustomUI() {
@@ -445,6 +467,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void initCustomListeners() {
         messageSwipeRefreshLayout.setOnRefreshListener(new RefreshLayoutListener());
+        recordAudioButton.setRecordTouchListener(new RecordTouchListener());
     }
 
     protected void initMessagesRecyclerView() {
@@ -820,6 +843,44 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         isLoadingMessages = false;
     }
 
+    public void startRecord() {
+        Log.d(TAG, "startRecord");
+        recordChronometer.setBase(SystemClock.elapsedRealtime());
+        recordChronometer.start();
+        recordChronometer.setVisibility(View.VISIBLE);
+        audioRecordTextView.setVisibility(View.VISIBLE);
+        Log.d(TAG, "record start");
+        vibro.vibrate(100);
+        audioLayout.setVisibility(View.VISIBLE);
+//        audioRecorder.startRecord();
+    }
+
+    public void stopRecord() {
+        Log.d(TAG, "stopRecord");
+        recordChronometer.stop();
+        vibro.vibrate(100);
+        audioLayout.setVisibility(View.INVISIBLE);
+//        audioRecorder.stopRecord();
+    }
+
+    public void cancelRecord() {
+        Log.d(TAG, "cancelRecord");
+        recordChronometer.stop();
+        recordChronometer.setVisibility(View.INVISIBLE);
+        audioRecordTextView.setVisibility(View.INVISIBLE);
+        Animation shake = AnimationUtils.loadAnimation(this, R.anim.shake);
+        bucketView.startAnimation(shake);
+        vibro.vibrate(100);
+        audioLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                audioLayout.setVisibility(View.INVISIBLE);
+            }
+        }, 1500);
+
+//        audioRecorder.cancelRecord();
+    }
+
     protected abstract void updateActionBar();
 
     protected abstract void onConnectServiceLocally(QBService service);
@@ -1075,6 +1136,24 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void onLinkClicked(QBAttachment qbAttachment, int i) {
             PreviewImageActivity.start(BaseDialogActivity.this, qbAttachment.getUrl());
+        }
+    }
+
+    protected class RecordTouchListener implements QBRecordAudioButton.RecordTouchEventListener {
+
+        @Override
+        public void start() {
+            startRecord();
+        }
+
+        @Override
+        public void cancel() {
+            cancelRecord();
+        }
+
+        @Override
+        public void stop() {
+            stopRecord();
         }
     }
 }
