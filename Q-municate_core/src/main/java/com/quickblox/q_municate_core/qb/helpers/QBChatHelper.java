@@ -43,6 +43,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.DbUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
+import com.quickblox.q_municate_core.utils.MediaUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.DialogNotification;
@@ -189,6 +190,8 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             case VIDEO:
                 break;
             case AUDIO:
+                messageBody = context.getString(R.string.dlg_attached_audio_last_message);
+                attachment = getAttachmentAudio((QBFile) attachmentObject, localPath);
                 break;
             case DOC:
                 break;
@@ -346,6 +349,23 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         attachment.setData(location);
         attachment.setId(String.valueOf(location.hashCode()));
 
+        return attachment;
+    }
+
+    private QBAttachment getAttachmentAudio(QBFile file, String localPath) {
+        String contentType = "audio/mpeg";
+
+        QBAttachment attachment = new QBAttachment(QBAttachment.AUDIO_TYPE);
+        attachment.setId(file.getUid());
+        attachment.setName(file.getName());
+        attachment.setContentType(contentType);
+        attachment.setUrl(file.getPublicUrl());
+        attachment.setSize(file.getSize());
+
+        if(!TextUtils.isEmpty(localPath)) {
+            int duration = MediaUtils.getDurationAudioInSec(context, localPath);
+            attachment.setDuration(duration);
+        }
         return attachment;
     }
 

@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -75,6 +76,9 @@ import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.AudioRecorder;
+import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.exceptions.MediaRecorderException;
+import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.listeners.QBMediaRecordListener;
 import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.view.QBRecordAudioButton;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
@@ -151,6 +155,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected BaseChatMessagesAdapter messagesAdapter;
     protected List<CombinationMessage> combinationMessagesList;
     protected ImagePickHelper imagePickHelper;
+    protected AudioRecorder audioRecorder;
 
     private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
     private LocationAttachClickListener locationAttachClickListener;
@@ -209,6 +214,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         initCustomUI();
         initCustomListeners();
         initThreads();
+        initAudioRecorder();
 
         addActions();
         addObservers();
@@ -409,6 +415,19 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         threadPool.allowCoreThreadTimeOut(true);
     }
 
+    private void initAudioRecorder() {
+        audioRecorder = AudioRecorder.newBuilder(new QBMediaRecordListenerImpl())
+                // Required
+                .useInBuildFilePathGenerator(this)
+                .setDuration(10)
+                .build();
+        // Optional
+//                .setAudioSource(QBMediaRecorder.AudioSource.MIC)
+//                .setOutputFormat(QBMediaRecorder.OutputFormat.AMR_NB);
+//                .setSampleRate(AudioSampleRate.HZ_48000)
+
+    }
+
     private void restoreDefaultCanPerformLogout() {
         if (!canPerformLogout.get()) {
             canPerformLogout.set(true);
@@ -600,6 +619,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                                 showProgress();
                                 QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
                                 break;
+                            case AUDIO:
+                                showProgress();
+                                QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
                         }
                     }
                 });
@@ -852,7 +874,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         Log.d(TAG, "record start");
         vibro.vibrate(100);
         audioLayout.setVisibility(View.VISIBLE);
-//        audioRecorder.startRecord();
+        audioRecorder.startRecord();
     }
 
     public void stopRecord() {
@@ -860,7 +882,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         recordChronometer.stop();
         vibro.vibrate(100);
         audioLayout.setVisibility(View.INVISIBLE);
-//        audioRecorder.stopRecord();
+        audioRecorder.stopRecord();
     }
 
     public void cancelRecord() {
@@ -878,7 +900,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             }
         }, 1500);
 
-//        audioRecorder.cancelRecord();
+        audioRecorder.cancelRecord();
     }
 
     protected abstract void updateActionBar();
@@ -1154,6 +1176,27 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void stop() {
             stopRecord();
+        }
+    }
+
+    private class QBMediaRecordListenerImpl implements QBMediaRecordListener {
+
+        @Override
+        public void onMediaRecorded(File file) {
+            if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), Attachment.Type.AUDIO, file)){
+                startLoadAttachFile(Attachment.Type.AUDIO, file, currentChatDialog.getDialogId());
+            }
+        }
+
+        @Override
+        public void onMediaRecordError(MediaRecorderException e) {
+            ErrorUtils.showError(BaseDialogActivity.this, e);
+            cancelRecord();
+        }
+
+        @Override
+        public void onMediaRecordClosed() {
+            Toast.makeText(BaseDialogActivity.this, "Audio recording has been canceled", Toast.LENGTH_SHORT).show();
         }
     }
 }
