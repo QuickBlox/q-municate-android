@@ -150,26 +150,4 @@
         <item name="android:textColor">@color/dark_gray</item>
         <item name="android:autoLink">web|phone|email</item>
     </style>
-
-    <style name="LinkPreviewTitle" parent="MatchParent">
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">@dimen/text_size_link_preview_title</item>
-        <item name="android:textColor">@color/text_color_link_preview_title</item>
-    </style>
-
-    <style name="LinkPreviewImage">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:scaleType">centerCrop</item>
-        <item name="android:minHeight">120dp</item>
-        <item name="android:minWidth">@dimen/chat_attach_width</item>
-        <item name="android:maxHeight">@dimen/chat_attach_height</item>
-    </style>
-
-    <style name="LinkPreviewDescription" parent="MatchParent">
-        <item name="android:layout_gravity">left|bottom</item>
-        <item name="android:maxLines">3</item>
-        <item name="android:textSize">@dimen/text_size_link_preview_description</item>
-        <item name="android:textColor">@color/text_color_link_preview_description</item>
-    </style>
 </resources>
