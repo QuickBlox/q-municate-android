@@ -1,19 +1,10 @@
 package com.quickblox.q_municate.utils.helpers;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.util.Log;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate_core.qb.commands.friend.QBImportFriendsCommand;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,25 +12,28 @@ import java.util.List;
 public class ImportContactsHelper {
 
     public Activity activity;
+    private List<InviteFriend> friendsPhonesList;
+    private List<InviteFriend> friendsEmailsList;
     private List<InviteFriend> friendsFacebookList;
-    private List<InviteFriend> friendsContactsList;
 
     public ImportContactsHelper(Activity activity) {
         this.activity = activity;
+        friendsPhonesList = new ArrayList<>();
+        friendsEmailsList = new ArrayList<>();
         friendsFacebookList = new ArrayList<>();
-        friendsContactsList = new ArrayList<>();
     }
 
     public void startGetFriendsListTask(boolean isGetFacebookFriends) {
-        friendsContactsList = EmailHelper.getContactsWithPhone(activity);
+        friendsPhonesList.addAll(EmailHelper.getContactsWithPhone(activity));
+        friendsEmailsList.addAll(EmailHelper.getContactsWithEmail(activity));
         fiendsReceived();
     }
 
     private List<String> getIdsList(List<InviteFriend> friendsList) {
         if (friendsList.isEmpty()) {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
-        List<String> idsList = new ArrayList<String>();
+        List<String> idsList = new ArrayList<>();
         for (InviteFriend friend : friendsList) {
             idsList.add(friend.getId());
         }
@@ -47,7 +41,9 @@ public class ImportContactsHelper {
     }
 
     public void fiendsReceived() {
-        QBImportFriendsCommand.start(activity, getIdsList(friendsFacebookList), getIdsList(
-                friendsContactsList));
+        QBImportFriendsCommand.start(activity,
+                getIdsList(friendsPhonesList),
+                getIdsList(friendsEmailsList),
+                getIdsList(friendsFacebookList));
     }
 }

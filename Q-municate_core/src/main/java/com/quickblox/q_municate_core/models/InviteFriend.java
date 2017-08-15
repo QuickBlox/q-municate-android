@@ -6,8 +6,10 @@ import java.io.Serializable;
 
 public class InviteFriend implements Serializable {
 
-    public static final int VIA_FACEBOOK_TYPE = 0;
-    public static final int VIA_CONTACTS_TYPE = 1;
+    public static final int VIA_PHONE_TYPE = 0;
+    public static final int VIA_EMAIL_TYPE = 1;
+    public static final int VIA_FACEBOOK_TYPE = 2;
+
 
     private String id;
     private String name;
@@ -15,6 +17,10 @@ public class InviteFriend implements Serializable {
     private int viaLabelType;
     private Uri uri;
     private boolean selected;
+
+    private Integer qbId;
+    private String qbName;
+    private String qbAvatarUrl;
 
     public InviteFriend(String id, String name, String link, int viaLabelType, Uri uri, boolean selected) {
         this.id = id;
@@ -71,5 +77,29 @@ public class InviteFriend implements Serializable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public Integer getQbId() {
+        return qbId;
+    }
+
+    public void setQbId(Integer qbId) {
+        this.qbId = qbId;
+    }
+
+    public String getQbName() {
+        return qbName;
+    }
+
+    public void setQbName(String qbName) {
+        this.qbName = qbName;
+    }
+
+    public String getQbAvatarUrl() {
+        return qbAvatarUrl;
+    }
+
+    public void setQbAvatarUrl(String qbAvatarUrl) {
+        this.qbAvatarUrl = qbAvatarUrl;
     }
 }

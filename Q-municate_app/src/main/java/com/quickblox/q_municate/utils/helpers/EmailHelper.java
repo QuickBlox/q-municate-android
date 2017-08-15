@@ -77,7 +77,7 @@ public class EmailHelper {
                             id));
                     uri = Uri.withAppendedPath(uri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
                 }
-                friendsContactsList.add(new InviteFriend(email, name, null, InviteFriend.VIA_CONTACTS_TYPE,
+                friendsContactsList.add(new InviteFriend(email, name, null, InviteFriend.VIA_EMAIL_TYPE,
                         uri, false));
             } while (cursor.moveToNext());
         }
@@ -88,6 +88,7 @@ public class EmailHelper {
         return friendsContactsList;
     }
 
+    //TODO VT need move to another helper class
     public static List<InviteFriend> getContactsWithPhone(Context context) {
         List<InviteFriend> friendsContactsList = new ArrayList<InviteFriend>();
         Uri uri = null;
@@ -115,6 +116,7 @@ public class EmailHelper {
                 name = cursor.getString(cursor.getColumnIndex(
                         ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DATA));
+                phone = phone.replaceAll("[^0-9]", "");
                 id = cursor.getString(cursor.getColumnIndex(
                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
                 if (ContactsContract.Contacts.CONTENT_URI != null) {
@@ -122,7 +124,7 @@ public class EmailHelper {
                             id));
                     uri = Uri.withAppendedPath(uri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
                 }
-                friendsContactsList.add(new InviteFriend(phone, name, null, InviteFriend.VIA_CONTACTS_TYPE,
+                friendsContactsList.add(new InviteFriend(phone, name, null, InviteFriend.VIA_PHONE_TYPE,
                         uri, false));
             } while (cursor.moveToNext());
         }

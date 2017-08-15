@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands.friend;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
@@ -27,27 +28,47 @@ public class QBImportFriendsCommand extends ServiceCommand {
         this.friendListHelper = friendListHelper;
     }
 
-    public static void start(Context context, List<String> friendsFacebookList,
-            List<String> friendsContactsList) {
+    public static void start(Context context, List<String> friendsPhonesList,
+                             List<String> friendsEmailsList,
+                             List<String> friendsFacebookList) {
         Intent intent = new Intent(QBServiceConsts.IMPORT_FRIENDS_ACTION, null, context, QBService.class);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS_PHONES, (java.io.Serializable) friendsPhonesList);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS_EMAILS, (java.io.Serializable) friendsEmailsList);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS_FACEBOOK, (java.io.Serializable) friendsFacebookList);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS_CONTACTS, (java.io.Serializable) friendsContactsList);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
+        ArrayList<String> friendsPhonesList = extras.getStringArrayList(
+                QBServiceConsts.EXTRA_FRIENDS_PHONES);
+        ArrayList<String> friendsEmailsList = extras.getStringArrayList(
+                QBServiceConsts.EXTRA_FRIENDS_EMAILS);
         ArrayList<String> friendsFacebookList = extras.getStringArrayList(
                 QBServiceConsts.EXTRA_FRIENDS_FACEBOOK);
-        ArrayList<String> friendsContactsList = extras.getStringArrayList(
-                QBServiceConsts.EXTRA_FRIENDS_CONTACTS);
-
-        Bundle params = new Bundle();
 
         QBPagedRequestBuilder requestBuilder = null;
 
+        List<QBUser> realFriendsPhonesList = null;
+        List<QBUser> realFriendsEmailsList = null;
         List<QBUser> realFriendsFacebookList = null;
-        List<QBUser> realFriendsContactsList = null;
+
+        if (!friendsPhonesList.isEmpty()) {
+
+            List<QMUser> realQMFriendsPhonesList = QMUserService.getInstance().getUsersByPhoneNumbersSync(friendsPhonesList, requestBuilder, true);
+            realFriendsPhonesList = new ArrayList<>(realQMFriendsPhonesList.size());
+            for (QMUser user : realQMFriendsPhonesList){
+                realFriendsPhonesList.add(user);
+            }
+        }
+
+        if (!friendsEmailsList.isEmpty()) {
+            List<QMUser> realQMFriendsContactsList = QMUserService.getInstance().getUsersByEmailsSync(friendsEmailsList, requestBuilder, true);
+            realFriendsEmailsList = new ArrayList<>(realQMFriendsContactsList.size());
+            for (QMUser user : realQMFriendsContactsList){
+                realFriendsEmailsList.add(user);
+            }
+        }
 
         if (!friendsFacebookList.isEmpty()) {
             List<QMUser> realQMFriendsFacebookList=  QMUserService.getInstance().getUsersByFacebookIdSync(friendsFacebookList, requestBuilder, true);
@@ -57,23 +78,29 @@ public class QBImportFriendsCommand extends ServiceCommand {
             }
         }
 
-        if (!friendsContactsList.isEmpty()) {
-            List<QMUser> realQMFriendsContactsList = QMUserService.getInstance().getUsersByEmailsSync(friendsFacebookList, requestBuilder, true);
-            realFriendsContactsList = new ArrayList<>(realQMFriendsContactsList.size());
-            for (QMUser user : realQMFriendsContactsList){
-                realFriendsContactsList.add(user);
-            }
+        List<QBUser> realQbFriendsList = new ArrayList<>();
+        if (realFriendsFacebookList != null) {
+            realQbFriendsList.addAll(realFriendsFacebookList);
         }
 
-        List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList,
-                realFriendsContactsList);
-
-        for (int userId : realFriendsList) {
-            friendListHelper.inviteFriend(userId);
+        if (realFriendsEmailsList != null) {
+            realQbFriendsList.addAll(realFriendsEmailsList);
         }
+
+        if (realFriendsPhonesList != null) {
+            realQbFriendsList.addAll(realFriendsPhonesList);
+        }
+//
+//
+//        List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList,
+//                realFriendsEmailsList);
+//
+//        for (int userId : realFriendsList) {
+//            friendListHelper.inviteFriend(userId);
+//        }
 
         Bundle result = new Bundle();
-        result.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) realFriendsList);
+        result.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) realQbFriendsList);
 
         return result;
     }

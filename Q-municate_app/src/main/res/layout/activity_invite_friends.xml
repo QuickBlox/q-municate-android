@@ -7,7 +7,7 @@
 
     <include layout="@layout/toolbar" />
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/friends_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

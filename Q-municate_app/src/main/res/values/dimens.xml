@@ -53,6 +53,7 @@
 
 
     <dimen name="inf_list_avatar_height">48dp</dimen>
+    <dimen name="inf_list_avatar_width">48dp</dimen>
 
     <dimen name="corners_small_value">6dp</dimen>
     <dimen name="corners_middle_value">10dp</dimen>
@@ -86,5 +87,8 @@
 
     <dimen name="fab_margin_right">16dp</dimen>
     <dimen name="fab_margin_bottom">16dp</dimen>
+
+    <dimen name="qm_little_avatar_height">40dp</dimen>
+    <dimen name="qm_little_avatar_width">40dp</dimen>
 
 </resources>

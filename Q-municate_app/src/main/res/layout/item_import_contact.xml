@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contentRelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/padding_minimal_material">
+
+    <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+        android:id="@+id/contacts_avatar"
+        style="@style/AvatarImageViewStyle.Common"
+        android:layout_width="@dimen/inf_list_avatar_height"
+        android:layout_height="@dimen/inf_list_avatar_width"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="5dp"
+        app:border_color="@color/dark_gray"
+        app:border_width="@dimen/avatar_border_width"
+        app:oval="true" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/padding_minimal_material">
+
+        <TextView
+            android:id="@+id/contacts_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/select_user_checkbox"
+            android:layout_toRightOf="@id/avatar_imageview"
+            android:singleLine="true"
+            android:textColor="@color/text_dark"
+            android:textSize="@dimen/text_size"
+            tools:text="Contact Full Name" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/qm_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/select_user_checkbox"
+                    android:layout_toRightOf="@id/avatar_imageview"
+                    android:singleLine="true"
+                    android:textColor="@color/text_dark"
+                    android:textSize="@dimen/text_size_small"
+                    tools:text="Q-municate Name" />
+
+
+                <TextView
+                    android:id="@+id/via_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_small"
+                    tools:text="test_user@gmail.com" />
+            </LinearLayout>
+
+            <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+                android:id="@+id/qm_user_avatar"
+                android:layout_width="@dimen/qm_little_avatar_width"
+                android:layout_height="@dimen/qm_little_avatar_height"
+                android:layout_marginLeft="@dimen/padding_minimal_material"
+                android:scaleType="centerCrop"
+                app:border_color="@color/dark_gray"
+                app:border_width="@dimen/avatar_border_width"
+                app:oval="true"
+                tools:src="@drawable/placeholder_user"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/add_to_friends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding_minimal_material"
+        android:paddingRight="@dimen/padding_minimal_material"
+        android:src="@drawable/ic_add_user_dark" />
+
+</LinearLayout>
