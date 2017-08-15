@@ -27,7 +27,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -43,6 +42,7 @@ import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
 import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
 import com.quickblox.q_municate.utils.StringUtils;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
@@ -112,6 +112,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
     private static final int MESSAGES_PAGE_SIZE = ConstsCore.DIALOG_MESSAGES_PER_PAGE;
     private static final int KEEP_ALIVE_TIME = 1;
+    private static final int POST_DELAY_VIEW = 1500;
+    private static final int DURATION_VIBRATE = 100;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
@@ -155,7 +157,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected BaseChatMessagesAdapter messagesAdapter;
     protected List<CombinationMessage> combinationMessagesList;
     protected ImagePickHelper imagePickHelper;
-    private SingleMediaManager mediaManager;
+    protected SingleMediaManager mediaManager;
     protected AudioRecorder audioRecorder;
 
     private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
@@ -437,13 +439,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         audioRecorder = AudioRecorder.newBuilder(new QBMediaRecordListenerImpl())
                 // Required
                 .useInBuildFilePathGenerator(this)
-                .setDuration(10)
+                .setDuration(ConstsCore.MAX_RECORD_DURATION_IN_SEC)
                 .build();
-        // Optional
-//                .setAudioSource(QBMediaRecorder.AudioSource.MIC)
-//                .setOutputFormat(QBMediaRecorder.OutputFormat.AMR_NB);
-//                .setSampleRate(AudioSampleRate.HZ_48000)
-
     }
 
     private void restoreDefaultCanPerformLogout() {
@@ -889,42 +886,73 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         isLoadingMessages = false;
     }
 
+    private boolean checkRecordPermission() {
+        if(systemPermissionHelper.isAllAudioRecordPermissionGranted()) {
+            return true;
+        } else {
+            systemPermissionHelper.requestAllPermissionForAudioRecord();
+            return false;
+        }
+    }
+
     public void startRecord() {
-        Log.d(TAG, "startRecord");
-        recordChronometer.setBase(SystemClock.elapsedRealtime());
-        recordChronometer.start();
-        recordChronometer.setVisibility(View.VISIBLE);
-        audioRecordTextView.setVisibility(View.VISIBLE);
-        Log.d(TAG, "record start");
-        vibro.vibrate(100);
-        audioLayout.setVisibility(View.VISIBLE);
+        setRecorderViewsVisibility(View.VISIBLE);
+        audioViewVisibility(View.VISIBLE);
+        vibrate(DURATION_VIBRATE);
         audioRecorder.startRecord();
+        startChronometer();
     }
 
     public void stopRecord() {
-        Log.d(TAG, "stopRecord");
-        recordChronometer.stop();
-        vibro.vibrate(100);
-        audioLayout.setVisibility(View.INVISIBLE);
+        vibrate(DURATION_VIBRATE);
+        audioViewVisibility(View.INVISIBLE);
+        stopChronometer();
         audioRecorder.stopRecord();
     }
 
     public void cancelRecord() {
-        Log.d(TAG, "cancelRecord");
+        stopChronometer();
+        setRecorderViewsVisibility(View.INVISIBLE);
+        animateCanceling();
+        vibrate(DURATION_VIBRATE);
+        audioViewPostDelayInvisible();
+        audioRecorder.cancelRecord();
+    }
+
+    private void startChronometer() {
+        recordChronometer.setBase(SystemClock.elapsedRealtime());
+        recordChronometer.start();
+    }
+
+    private void stopChronometer() {
         recordChronometer.stop();
-        recordChronometer.setVisibility(View.INVISIBLE);
-        audioRecordTextView.setVisibility(View.INVISIBLE);
-        Animation shake = AnimationUtils.loadAnimation(this, R.anim.shake);
-        bucketView.startAnimation(shake);
-        vibro.vibrate(100);
+    }
+
+    private void setRecorderViewsVisibility(int visibility) {
+        audioRecordTextView.setVisibility(visibility);
+        recordChronometer.setVisibility(visibility);
+    }
+
+    private void audioViewPostDelayInvisible() {
         audioLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                audioLayout.setVisibility(View.INVISIBLE);
+                audioViewVisibility(View.INVISIBLE);
             }
-        }, 1500);
+        }, POST_DELAY_VIEW);
+    }
 
-        audioRecorder.cancelRecord();
+    private void audioViewVisibility(int visibility) {
+        audioLayout.setVisibility(visibility);
+    }
+
+    private void vibrate(int duration) {
+        vibro.vibrate(duration);
+    }
+
+    private void animateCanceling() {
+        Animation shake = AnimationUtils.loadAnimation(this, R.anim.shake);
+        bucketView.startAnimation(shake);
     }
 
     protected abstract void updateActionBar();
@@ -1181,24 +1209,26 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onLinkClicked(QBAttachment qbAttachment, int i) {
-            PreviewImageActivity.start(BaseDialogActivity.this, qbAttachment.getUrl());
+            PreviewImageActivity.start(BaseDialogActivity.this, QBFile.getPrivateUrlForUID(qbAttachment.getId()));
         }
     }
 
     protected class RecordTouchListener implements QBRecordAudioButton.RecordTouchEventListener {
 
         @Override
-        public void start() {
-            startRecord();
+        public void onStartClick(View v) {
+            if(checkRecordPermission()) {
+                startRecord();
+            }
         }
 
         @Override
-        public void cancel() {
+        public void onCancelClick(View v) {
             cancelRecord();
         }
 
         @Override
-        public void stop() {
+        public void onStopClick(View v) {
             stopRecord();
         }
     }
@@ -1207,6 +1237,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onMediaRecorded(File file) {
+            audioViewVisibility(View.INVISIBLE);
             if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), Attachment.Type.AUDIO, file)){
                 startLoadAttachFile(Attachment.Type.AUDIO, file, currentChatDialog.getDialogId());
             }
@@ -1220,7 +1251,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onMediaRecordClosed() {
-            Toast.makeText(BaseDialogActivity.this, "Audio recording has been canceled", Toast.LENGTH_SHORT).show();
+            ToastUtils.shortToast(R.string.dialog_record_canceled);
         }
     }
 }

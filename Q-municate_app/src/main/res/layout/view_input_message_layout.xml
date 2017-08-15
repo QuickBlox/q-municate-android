@@ -14,8 +14,7 @@
 
     <LinearLayout
         android:id="@+id/action_buttons_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/WrapContent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
@@ -43,8 +42,7 @@
 
     <com.rockerhieu.emojicon.EmojiconEditText
         android:id="@+id/message_edittext"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        style="@style/MatchParent"
         android:layout_toLeftOf="@id/action_buttons_view"
         android:layout_toRightOf="@+id/smile_panel_imagebutton"
         android:autoLink="all"
