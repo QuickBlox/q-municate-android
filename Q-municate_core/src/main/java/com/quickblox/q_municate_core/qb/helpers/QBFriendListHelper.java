@@ -193,7 +193,7 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         return rosterEntry != null && (UserFriendUtils.isOutgoingFriend(rosterEntry) || UserFriendUtils.isNoneFriend(rosterEntry));
     }
 
-    public List<QBUser> getNotFriendUsers(List<QBUser> allUsers){
+    public List<QBUser> getNotInvitedUsers(List<QBUser> allUsers){
         List<QBUser> notInvitedUsers = new ArrayList<>();
         for (QBUser qbUser : allUsers){
             if (!isInvited(qbUser)){

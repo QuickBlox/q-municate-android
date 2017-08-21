@@ -107,6 +107,6 @@ public class QBImportContactsCommand extends ServiceCommand {
     }
 
     private List<QBUser> getNotInvitedUsersFromAll(List<QBUser> allUsers){
-        return friendListHelper.getNotFriendUsers(allUsers);
+        return friendListHelper.getNotInvitedUsers(allUsers);
     }
 }
