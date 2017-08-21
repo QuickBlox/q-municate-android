@@ -139,6 +139,8 @@ dependencies {
     compile project(path: ':q-municate_user_service')
     compile project(path: ':q-municate_auth_service')
     compile project(path: ':q-municate_user_cache')
+
+    compile "com.googlecode.libphonenumber:libphonenumber:${rootProject.libphonenumberVersion}"
 }
 
 def changeApkFileName(variant) {

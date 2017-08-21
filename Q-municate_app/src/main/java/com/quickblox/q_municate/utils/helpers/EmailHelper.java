@@ -8,9 +8,12 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.DeviceInfoUtils;
+import com.quickblox.q_municate.utils.PhoneNumbersUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
@@ -77,8 +80,11 @@ public class EmailHelper {
                             id));
                     uri = Uri.withAppendedPath(uri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
                 }
-                friendsContactsList.add(new InviteFriend(email, name, null, InviteFriend.VIA_EMAIL_TYPE,
-                        uri, false));
+
+                if (ValidationUtils.isEmailValid(email)) {
+                    friendsContactsList.add(new InviteFriend(email, name, null, InviteFriend.VIA_EMAIL_TYPE,
+                            uri, false));
+                }
             } while (cursor.moveToNext());
         }
         if (cursor != null) {
@@ -116,7 +122,6 @@ public class EmailHelper {
                 name = cursor.getString(cursor.getColumnIndex(
                         ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DATA));
-                phone = phone.replaceAll("[^0-9]", "");
                 id = cursor.getString(cursor.getColumnIndex(
                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
                 if (ContactsContract.Contacts.CONTENT_URI != null) {
@@ -124,8 +129,26 @@ public class EmailHelper {
                             id));
                     uri = Uri.withAppendedPath(uri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
                 }
-                friendsContactsList.add(new InviteFriend(phone, name, null, InviteFriend.VIA_PHONE_TYPE,
-                        uri, false));
+
+                if (PhoneNumbersUtils.isPhoneNumberValid(context, phone)) {
+//                    phone = phone.replaceAll("[^0-9]", "");
+
+//                    int countryCode = PhoneNumbersUtils.getCountryCodeFromPhoneNumber(phone);
+
+//                    if (countryCode == -1){
+//                        phone = String.valueOf(PhoneNumbersUtils.getCountryCodeFromSim(context)) + phone;
+//                    }
+
+//                Log.v("EmailHelper", "is phone number " + phone + " valid " + PhoneNumbersUtils.isPhoneNumberValid(context, phone));
+//                if (PhoneNumbersUtils.isPhoneNumberValid(context, phone)) {
+////                    Log.v("EmailHelper", "prepared phone number " + PhoneNumbersUtils.getCorrectPhoneNumber(context, phone));
+//                } else {
+//                    Log.e("EmailHelper", "not valid number " + phone);
+//                }
+
+                    friendsContactsList.add(new InviteFriend(PhoneNumbersUtils.getCorrectPhoneNumber(context, phone), name, null, InviteFriend.VIA_PHONE_TYPE,
+                            uri, false));
+                }
             } while (cursor.moveToNext());
         }
         if (cursor != null) {

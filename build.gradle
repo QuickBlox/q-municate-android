@@ -71,4 +71,5 @@ ext {
     crashlyticsVersion = '2.2.2'
     firebaseVersion = '10.2.1'
     firebaseDispatcherVersion = '0.6.0'
+    libphonenumberVersion = '8.7.1'
 }

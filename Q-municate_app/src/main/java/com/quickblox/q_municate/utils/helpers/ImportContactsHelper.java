@@ -1,7 +1,6 @@
 package com.quickblox.q_municate.utils.helpers;
 
 import android.app.Activity;
-import android.util.Log;
 
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate_core.qb.commands.friend.QBImportFriendsCommand;
@@ -15,18 +14,26 @@ public class ImportContactsHelper {
     private List<InviteFriend> friendsPhonesList;
     private List<InviteFriend> friendsEmailsList;
     private List<InviteFriend> friendsFacebookList;
+    private List<InviteFriend> addressBookContacts;
 
     public ImportContactsHelper(Activity activity) {
         this.activity = activity;
         friendsPhonesList = new ArrayList<>();
         friendsEmailsList = new ArrayList<>();
         friendsFacebookList = new ArrayList<>();
+        addressBookContacts = new ArrayList<>();
     }
 
-    public void startGetFriendsListTask(boolean isGetFacebookFriends) {
-        friendsPhonesList.addAll(EmailHelper.getContactsWithPhone(activity));
-        friendsEmailsList.addAll(EmailHelper.getContactsWithEmail(activity));
-        fiendsReceived();
+    public void startGetFriendsListTask(boolean includeFacebookContacts) {
+        List<InviteFriend> contactsForImporting = new ArrayList<>();
+
+        contactsForImporting.addAll(getContactsFromAdressBook());
+
+        if (includeFacebookContacts){
+            //TODO VT need add code for importing contacts from FB
+        }
+
+        fiendsReceived(contactsForImporting);
     }
 
     private List<String> getIdsList(List<InviteFriend> friendsList) {
@@ -40,10 +47,17 @@ public class ImportContactsHelper {
         return idsList;
     }
 
-    public void fiendsReceived() {
+    public List<InviteFriend> getContactsFromAdressBook() {
+        if (addressBookContacts.isEmpty()) {
+            addressBookContacts.addAll(EmailHelper.getContactsWithPhone(activity));
+            addressBookContacts.addAll(EmailHelper.getContactsWithEmail(activity));
+        }
+
+        return addressBookContacts;
+    }
+
+    public void fiendsReceived(List<InviteFriend> contactsForImporting) {
         QBImportFriendsCommand.start(activity,
-                getIdsList(friendsPhonesList),
-                getIdsList(friendsEmailsList),
-                getIdsList(friendsFacebookList));
+                contactsForImporting);
     }
 }
