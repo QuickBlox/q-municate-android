@@ -58,13 +58,13 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
         if (friendsRequestMessage) {
             textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()*SECOND_IN_MILLIS));
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate() * SECOND_IN_MILLIS));
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
             Log.d(TAG, "friendsInfoRequestMessage onBindViewCustomHolder combinationMessage getBody= " + chatMessage.getBody());
             textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()*SECOND_IN_MILLIS));
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate() * SECOND_IN_MILLIS));
 
             setVisibilityFriendsActions(friendsViewHolder, View.GONE);
 
@@ -72,7 +72,7 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
         } else {
             Log.d(TAG, "else onBindViewCustomHolderr combinationMessage getBody= " + chatMessage.getBody());
             textView.setText(chatMessage.getBody());
-            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate()*SECOND_IN_MILLIS));
+            timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(chatMessage.getCreatedDate() * SECOND_IN_MILLIS));
         }
 
         if (!State.READ.equals(chatMessage.getState()) && isIncoming(chatMessage) && baseActivity.isNetworkAvailable()) {
@@ -120,22 +120,50 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
 
     @Override
     protected void onBindViewAttachRightHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
-        ImageView view = (ImageView) holder.itemView.findViewById(R.id.msg_signs_attach);
-
-        if (chatMessage.getState() != null) {
-            setMessageStatus(view, State.DELIVERED.equals(
-                    chatMessage.getState()), State.READ.equals(chatMessage.getState()));
-        } else {
-            view.setImageResource(android.R.color.transparent);
-        }
-
+        showSendStatusView(holder, chatMessage);
         super.onBindViewAttachRightHolder(holder, chatMessage, position);
+    }
+
+    @Override
+    protected void onBindViewAttachRightVideoHolder(VideoAttachHolder holder, CombinationMessage chatMessage, int position) {
+        showSendStatusView(holder, chatMessage);
+        super.onBindViewAttachRightVideoHolder(holder, chatMessage, position);
+    }
+
+    @Override
+    protected void onBindViewAttachLeftVideoHolder(VideoAttachHolder holder, CombinationMessage chatMessage, int position) {
+        setViewVisibility(holder.avatar, View.GONE);
+        updateMessageState(chatMessage, chatDialog);
+        super.onBindViewAttachLeftVideoHolder(holder, chatMessage, position);
     }
 
     @Override
     protected void onBindViewAttachLeftHolder(ImageAttachHolder holder, CombinationMessage chatMessage, int position) {
         setViewVisibility(holder.avatar, View.GONE);
         super.onBindViewAttachLeftHolder(holder, chatMessage, position);
+    }
+
+    @Override
+    protected void onBindViewAttachLeftAudioHolder(AudioAttachHolder holder, CombinationMessage chatMessage, int position) {
+        setViewVisibility(holder.avatar, View.GONE);
+        updateMessageState(chatMessage, chatDialog);
+        super.onBindViewAttachLeftAudioHolder(holder, chatMessage, position);
+    }
+
+    @Override
+    protected void onBindViewAttachRightAudioHolder(AudioAttachHolder holder, CombinationMessage chatMessage, int position) {
+        showSendStatusView(holder, chatMessage);
+        super.onBindViewAttachRightAudioHolder(holder, chatMessage, position);
+    }
+
+    private void showSendStatusView(BaseAttachHolder holder, CombinationMessage chatMessage) {
+        ImageView signAttachView = holder.signAttachView;
+        if (chatMessage.getState() != null) {
+            setMessageStatus(signAttachView, State.DELIVERED.equals(
+                    chatMessage.getState()), State.READ.equals(chatMessage.getState()));
+        } else {
+            signAttachView.setImageResource(android.R.color.transparent);
+        }
     }
 
     @Override

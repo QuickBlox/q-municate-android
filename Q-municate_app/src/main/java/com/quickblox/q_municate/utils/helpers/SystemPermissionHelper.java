@@ -157,6 +157,10 @@ public class SystemPermissionHelper {
             checkAndRequestPermissions(PERMISSIONS_FOR_TAKE_PHOTO_REQUEST, Manifest.permission.CAMERA);
     }
 
+    public void requestPermissionsTakeVideo() {
+            checkAndRequestPermissions(PERMISSIONS_FOR_VIDEO_RECORD_REQUEST, Manifest.permission.CAMERA);
+    }
+
     public boolean isAllPermissionsGrantedForImportFriends() {
         return isAllPermissionGranted(Manifest.permission.READ_CONTACTS);
     }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.content.res.Resources;
@@ -80,6 +81,7 @@ import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.AudioRecorder;
 import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.exceptions.MediaRecorderException;
 import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.listeners.QBMediaRecordListener;
 import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.view.QBRecordAudioButton;
+import com.quickblox.ui.kit.chatmessage.adapter.media.video.ui.VideoPlayerActivity;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
@@ -163,6 +165,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
     private LocationAttachClickListener locationAttachClickListener;
     private ImageAttachClickListener imageAttachClickListener;
+    private VideoAttachClickListener videoAttachClickListener;
     private Handler mainThreadHandler;
     private View emojiconsFragment;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
@@ -453,6 +456,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesAdapter.setAttachLocationClickListener(locationAttachClickListener);
         messagesAdapter.setAttachImageClickListener(imageAttachClickListener);
+        messagesAdapter.setAttachVideoClickListener(videoAttachClickListener);
     }
 
     private void removeChatMessagesAdapterListeners() {
@@ -460,6 +464,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             messagesAdapter.removeMessageTextViewLinkClickListener();
             messagesAdapter.removeLocationImageClickListener(locationAttachClickListener);
             messagesAdapter.removeAttachImageClickListener(imageAttachClickListener);
+            messagesAdapter.removeAttachVideoClickListener(videoAttachClickListener);
         }
     }
 
@@ -490,6 +495,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
         locationAttachClickListener = new LocationAttachClickListener();
         imageAttachClickListener = new ImageAttachClickListener();
+        videoAttachClickListener = new VideoAttachClickListener();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = new ArrayList<>();
         vibro = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -643,6 +649,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                             case AUDIO:
                                 showProgress();
                                 QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
+                                break;
+                            case VIDEO:
+                                showProgress();
+                                QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
+                                break;
                         }
                     }
                 });
@@ -1200,7 +1211,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected class LocationAttachClickListener implements QBChatAttachClickListener{
 
         @Override
-        public void onLinkClicked(QBAttachment qbAttachment, int i) {
+        public void onLinkClicked(QBAttachment qbAttachment, int position) {
             MapsActivity.startMapForResult(BaseDialogActivity.this, qbAttachment.getData());
         }
     }
@@ -1208,8 +1219,16 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected class ImageAttachClickListener implements QBChatAttachClickListener {
 
         @Override
-        public void onLinkClicked(QBAttachment qbAttachment, int i) {
+        public void onLinkClicked(QBAttachment qbAttachment, int position) {
             PreviewImageActivity.start(BaseDialogActivity.this, QBFile.getPrivateUrlForUID(qbAttachment.getId()));
+        }
+    }
+
+    protected class VideoAttachClickListener implements QBChatAttachClickListener {
+
+        @Override
+        public void onLinkClicked(QBAttachment qbAttachment, int position) {
+            VideoPlayerActivity.start(BaseDialogActivity.this, Uri.parse(QBFile.getPrivateUrlForUID(qbAttachment.getId())));
         }
     }
 

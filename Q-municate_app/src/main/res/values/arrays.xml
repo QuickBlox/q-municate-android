@@ -26,6 +26,7 @@
         <item>IMAGE</item>
         <item>LOCATION</item>
         <item>AUDIO</item>
+        <item>VIDEO</item>
     </string-array>
 
 </resources>

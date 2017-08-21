@@ -188,6 +188,8 @@ public class QBChatHelper extends BaseThreadPoolHelper{
                 attachment = getAttachmentLocation((String) attachmentObject);
                 break;
             case VIDEO:
+                messageBody = context.getString(R.string.dlg_attached_video_last_message);
+                attachment = getAttachmentVideo((QBFile) attachmentObject, localPath);
                 break;
             case AUDIO:
                 messageBody = context.getString(R.string.dlg_attached_audio_last_message);
@@ -353,8 +355,20 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         QBAttachment attachment = getAttachment(file, QBAttachment.AUDIO_TYPE, MimeTypeAttach.AUDIO_MIME);
 
         if (!TextUtils.isEmpty(localPath)) {
-            int duration = MediaUtils.getDurationAudioInSec(context, localPath);
-            attachment.setDuration(duration);
+            int durationSec = MediaUtils.getMetaData(localPath).durationSec();
+            attachment.setDuration(durationSec);
+        }
+        return attachment;
+    }
+
+    private QBAttachment getAttachmentVideo(QBFile file, String localPath) {
+        QBAttachment attachment = getAttachment(file, QBAttachment.VIDEO_TYPE, MimeTypeAttach.VIDEO_MIME);
+
+        if (!TextUtils.isEmpty(localPath)) {
+            MediaUtils.MetaData metaData = MediaUtils.getMetaData(localPath);
+            attachment.setHeight(metaData.videoHeight());
+            attachment.setWidth(metaData.videoWidth());
+            attachment.setDuration(metaData.durationSec());
         }
         return attachment;
     }

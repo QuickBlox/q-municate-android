@@ -335,7 +335,8 @@
 
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
-        <item>Camera</item>
+        <item>Take a Photo</item>
+        <item>Take a Video</item>
         <item>Location</item>
     </string-array>
 
