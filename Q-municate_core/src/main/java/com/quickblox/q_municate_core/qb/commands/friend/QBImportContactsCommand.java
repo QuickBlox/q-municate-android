@@ -3,15 +3,15 @@ package com.quickblox.q_municate_core.qb.commands.friend;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.InviteFriend;
+import com.quickblox.q_municate_core.models.InviteContact;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
@@ -19,50 +19,41 @@ import com.quickblox.users.model.QBUser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QBImportFriendsCommand extends ServiceCommand {
+public class QBImportContactsCommand extends ServiceCommand {
 
     private QBFriendListHelper friendListHelper;
 
-    public QBImportFriendsCommand(Context context, QBFriendListHelper friendListHelper, String successAction,
-            String failAction) {
+    public QBImportContactsCommand(Context context, QBFriendListHelper friendListHelper, String successAction,
+                                   String failAction) {
         super(context, successAction, failAction);
         this.friendListHelper = friendListHelper;
     }
 
-    public static void start(Context context, List<InviteFriend> friendsList) {
+    public static void start(Context context, List<InviteContact> friendsList) {
         Intent intent = new Intent(QBServiceConsts.IMPORT_FRIENDS_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendsList);
+        intent.putParcelableArrayListExtra(QBServiceConsts.EXTRA_FRIENDS, (ArrayList<? extends Parcelable>) friendsList);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        ArrayList<String> friendsPhonesList = null;
-        ArrayList<String> friendsEmailsList = null;
-        ArrayList<String> friendsFacebookList = null;
+        ArrayList<String> friendsPhonesList = new ArrayList<>();
+        ArrayList<String> friendsEmailsList = new ArrayList<>();
+        ArrayList<String> friendsFacebookList = new ArrayList<>();
 
-        ArrayList<InviteFriend> friendsList = (ArrayList<InviteFriend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+        ArrayList<InviteContact> friendsList = extras.getParcelableArrayList(QBServiceConsts.EXTRA_FRIENDS);
 
 
-        for (InviteFriend inviteFriend : friendsList){
-            switch (inviteFriend.getViaLabelType()){
-                case InviteFriend.VIA_PHONE_TYPE:
-                    if (friendsPhonesList == null){
-                        friendsPhonesList = new ArrayList<>();
-                    }
-                    friendsPhonesList.add(inviteFriend.getId());
+        for (InviteContact inviteContact : friendsList){
+            switch (inviteContact.getViaLabelType()){
+                case InviteContact.VIA_PHONE_TYPE:
+                    friendsPhonesList.add(inviteContact.getId());
                     break;
-                case InviteFriend.VIA_EMAIL_TYPE:
-                    if (friendsEmailsList == null){
-                        friendsEmailsList = new ArrayList<>();
-                    }
-                    friendsEmailsList.add(inviteFriend.getId());
+                case InviteContact.VIA_EMAIL_TYPE:
+                    friendsEmailsList.add(inviteContact.getId());
                     break;
-                case InviteFriend.VIA_FACEBOOK_TYPE:
-                    if (friendsFacebookList == null){
-                        friendsFacebookList = new ArrayList<>();
-                    }
-                    friendsFacebookList.add(inviteFriend.getId());
+                case InviteContact.VIA_FACEBOOK_TYPE:
+                    friendsFacebookList.add(inviteContact.getId());
             }
         }
 

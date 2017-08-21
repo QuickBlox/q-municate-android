@@ -13,20 +13,20 @@ import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.listeners.CounterChangedListener;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
-import com.quickblox.q_municate_core.models.InviteFriend;
+import com.quickblox.q_municate_core.models.InviteContact;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImportFriendAdapter extends RecyclerView.Adapter<ImportFriendAdapter.ImportFriendViewHolder> {
+public class ImportContactAdapter extends RecyclerView.Adapter<ImportContactAdapter.ImportFriendViewHolder> {
 
     private final Context context;
-    private final List<InviteFriend> inviteFriendsList;
+    private List<InviteContact> inviteFriendsList;
     private CounterChangedListener counterChangedListener;
     private final UserOperationListener userOperationListener;
     private List<Integer> selectedFriends = new ArrayList<>();
 
-    public ImportFriendAdapter(Context context, List<InviteFriend> inviteFriendsList, UserOperationListener userOperationListener) {
+    public ImportContactAdapter(Context context, List<InviteContact> inviteFriendsList, UserOperationListener userOperationListener) {
         this.context = context;
         this.inviteFriendsList = inviteFriendsList;
         this.userOperationListener = userOperationListener;
@@ -40,15 +40,15 @@ public class ImportFriendAdapter extends RecyclerView.Adapter<ImportFriendAdapte
 
     @Override
     public void onBindViewHolder(ImportFriendViewHolder holder, int position) {
-        InviteFriend inviteFriend = inviteFriendsList.get(position);
-        holder.contactsNameTextView.setText(inviteFriend.getName());
-        holder.qmNameTextView.setText(inviteFriend.getQbName());
-        holder.qmIdentificatorTextView.setText(inviteFriend.getId());
+        InviteContact inviteContact = inviteFriendsList.get(position);
+        holder.contactsNameTextView.setText(inviteContact.getName());
+        holder.qmNameTextView.setText(inviteContact.getQbName());
+        holder.qmIdentificatorTextView.setText(inviteContact.getId());
 
-        ImageLoaderUtils.displayAvatarImageByUri(context, inviteFriend.getUri(), holder.contactsAvatarImageView);
-        ImageLoaderUtils.displayAvatarImageByLink(context, inviteFriend.getQbAvatarUrl(), holder.qmAvatarImageView);
+        ImageLoaderUtils.displayAvatarImageByUri(context, inviteContact.getUri(), holder.contactsAvatarImageView);
+        ImageLoaderUtils.displayAvatarImageByLink(context, inviteContact.getQbAvatarUrl(), holder.qmAvatarImageView);
 
-        initListeners(holder, inviteFriend.getQbId());
+        initListeners(holder, inviteContact.getQbId());
 
         if (selectedFriends.isEmpty()){
             holder.addToFriendsImageView.setVisibility(View.VISIBLE);
@@ -56,7 +56,7 @@ public class ImportFriendAdapter extends RecyclerView.Adapter<ImportFriendAdapte
             holder.addToFriendsImageView.setVisibility(View.INVISIBLE);
         }
 
-        if (selectedFriends.contains(inviteFriend.getQbId())){
+        if (selectedFriends.contains(inviteContact.getQbId())){
             holder.getMainView().setBackgroundColor(context.getResources().getColor(R.color.light_gray));
         } else {
             holder.getMainView().setBackgroundColor(context.getResources().getColor(R.color.bg_main));
@@ -92,11 +92,9 @@ public class ImportFriendAdapter extends RecyclerView.Adapter<ImportFriendAdapte
 
                     if (selectedFriends.contains(userId)){
                         selectedFriends.remove(userId);
-//                        holder.addToFriendsImageView.setVisibility(View.VISIBLE);
                         holder.getMainView().setBackgroundColor(context.getResources().getColor(R.color.bg_main));
                     } else {
                         selectedFriends.add(userId);
-//                        holder.addToFriendsImageView.setVisibility(View.INVISIBLE);
                         holder.getMainView().setBackgroundColor(context.getResources().getColor(R.color.light_gray));
                     }
 
@@ -115,12 +113,17 @@ public class ImportFriendAdapter extends RecyclerView.Adapter<ImportFriendAdapte
         return selectedFriends;
     }
 
-    public void selectAllFriends(){
-        for (InviteFriend inviteFriend : inviteFriendsList){
-            if (!selectedFriends.contains(inviteFriend.getQbId())){
-                selectedFriends.add(inviteFriend.getQbId());
+    public void selectAllContacts(){
+        for (InviteContact inviteContact : inviteFriendsList){
+            if (!selectedFriends.contains(inviteContact.getQbId())){
+                selectedFriends.add(inviteContact.getQbId());
             }
         }
+        notifyDataSetChanged();
+    }
+
+    public void setNewData(List<InviteContact> newData){
+        inviteFriendsList = newData;
         notifyDataSetChanged();
     }
 

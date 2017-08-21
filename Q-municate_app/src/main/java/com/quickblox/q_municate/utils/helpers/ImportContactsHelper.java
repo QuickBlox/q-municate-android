@@ -2,8 +2,9 @@ package com.quickblox.q_municate.utils.helpers;
 
 import android.app.Activity;
 
-import com.quickblox.q_municate_core.models.InviteFriend;
-import com.quickblox.q_municate_core.qb.commands.friend.QBImportFriendsCommand;
+import com.quickblox.q_municate.utils.ContactsUtils;
+import com.quickblox.q_municate_core.models.InviteContact;
+import com.quickblox.q_municate_core.qb.commands.friend.QBImportContactsCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,23 +12,19 @@ import java.util.List;
 public class ImportContactsHelper {
 
     public Activity activity;
-    private List<InviteFriend> friendsPhonesList;
-    private List<InviteFriend> friendsEmailsList;
-    private List<InviteFriend> friendsFacebookList;
-    private List<InviteFriend> addressBookContacts;
+    private List<InviteContact> facebookContacts;
+    private List<InviteContact> addressBookContacts;
 
     public ImportContactsHelper(Activity activity) {
         this.activity = activity;
-        friendsPhonesList = new ArrayList<>();
-        friendsEmailsList = new ArrayList<>();
-        friendsFacebookList = new ArrayList<>();
+        facebookContacts = new ArrayList<>();
         addressBookContacts = new ArrayList<>();
     }
 
     public void startGetFriendsListTask(boolean includeFacebookContacts) {
-        List<InviteFriend> contactsForImporting = new ArrayList<>();
+        List<InviteContact> contactsForImporting = new ArrayList<>();
 
-        contactsForImporting.addAll(getContactsFromAdressBook());
+        contactsForImporting.addAll(getContactsFromAddressBook());
 
         if (includeFacebookContacts){
             //TODO VT need add code for importing contacts from FB
@@ -36,28 +33,28 @@ public class ImportContactsHelper {
         fiendsReceived(contactsForImporting);
     }
 
-    private List<String> getIdsList(List<InviteFriend> friendsList) {
+    private List<String> getIdsList(List<InviteContact> friendsList) {
         if (friendsList.isEmpty()) {
             return new ArrayList<>();
         }
         List<String> idsList = new ArrayList<>();
-        for (InviteFriend friend : friendsList) {
+        for (InviteContact friend : friendsList) {
             idsList.add(friend.getId());
         }
         return idsList;
     }
 
-    public List<InviteFriend> getContactsFromAdressBook() {
+    public List<InviteContact> getContactsFromAddressBook() {
         if (addressBookContacts.isEmpty()) {
-            addressBookContacts.addAll(EmailHelper.getContactsWithPhone(activity));
-            addressBookContacts.addAll(EmailHelper.getContactsWithEmail(activity));
+            addressBookContacts.addAll(ContactsUtils.getContactsWithPhone(activity));
+            addressBookContacts.addAll(ContactsUtils.getContactsWithEmail(activity));
         }
 
         return addressBookContacts;
     }
 
-    public void fiendsReceived(List<InviteFriend> contactsForImporting) {
-        QBImportFriendsCommand.start(activity,
+    public void fiendsReceived(List<InviteContact> contactsForImporting) {
+        QBImportContactsCommand.start(activity,
                 contactsForImporting);
     }
 }
