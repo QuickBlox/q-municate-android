@@ -10,13 +10,13 @@ buildscript {
     }
 }
 
-ext.isDebugBuild = true
+ext.isPrivateRepository = true
 
 allprojects {
     repositories {
         jcenter()
         maven {
-            if (isDebugBuild) {
+            if (isPrivateRepository) {
                 url = qbRepository
                 credentials {
                     username qbUser
@@ -32,12 +32,12 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 23
-    buildToolsVersion = '23.0.2'
+    compileSdkVersion = 25
+    buildToolsVersion = '25.0.0'
     minSdkVersion = 15
     targetSdkVersion = 23
-    versionName = '2.3.3'
-    versionCode = 233
+    versionName = '2.3.4'
+    versionCode = 234
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
@@ -46,15 +46,15 @@ ext {
     lintAbortOnError = false
 
 //    QuickBlox SDK version
-    qbSdkVersion = '3.3.3'
+    qbSdkVersion = '3.3.5'
     qbMessageAdapterVersion = '2.1.0-alfa'
 
     testRunnerVersion = "0.4.1"
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
-    supportVersion = '23.4.0'
-    googlePlayServicesVersion = '10.2.1'
+    supportVersion = '25.4.0'
+    googlePlayServicesVersion = '11.0.2'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '5.0'
     ormliteCoreVersion = '5.0'
@@ -81,6 +81,6 @@ ext {
     robotoTextViewVersion = '2.4.3'
     stickersVersion = '0.7.3'
     crashlyticsVersion = '2.2.2'
-    firebaseVersion = '10.2.1'
+    firebaseVersion = '11.0.2'
     firebaseDispatcherVersion = '0.6.0'
 }

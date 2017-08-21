@@ -43,7 +43,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
     public File performInBackground(Intent... params) throws Exception {
         Intent data = params[0];
 
-        String imageFilePath = null;
+        String filePath = null;
         Uri uri = data.getData();
         String uriScheme = uri.getScheme();
 
@@ -57,21 +57,20 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imageFilePath = cursor.getString(columnIndex);
+                    filePath = cursor.getString(columnIndex);
                 }
                 cursor.close();
             }
         } else if (SchemeType.SCHEME_FILE.equalsIgnoreCase(uriScheme)) {
-            imageFilePath = uri.getPath();
+            filePath = uri.getPath();
         } else {
-            imageFilePath = ImageUtils.saveUriToFile(uri);
+            filePath = ImageUtils.saveUriToFile(uri);
         }
-
-        if (TextUtils.isEmpty(imageFilePath)) {
+        if (TextUtils.isEmpty(filePath)) {
             throw new IOException("Can't find a filepath for URI " + uri.toString());
         }
 
-        return new File(imageFilePath);
+        return new File(filePath);
     }
 
     @Override

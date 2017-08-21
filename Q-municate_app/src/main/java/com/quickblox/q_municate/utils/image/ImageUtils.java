@@ -27,6 +27,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.utils.MimeType;
 import com.quickblox.q_municate.utils.StorageUtil;
+import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -46,14 +47,17 @@ import java.util.List;
 public class ImageUtils {
 
     public static final int GALLERY_REQUEST_CODE = 111;
-    public static final int CAMERA_REQUEST_CODE = 222;
+    public static final int CAMERA_PHOTO_REQUEST_CODE = 222;
+    public static final int CAMERA_VIDEO_REQUEST_CODE = 232;
     public static final int IMAGE_REQUEST_CODE = 333;
     public static final int IMAGE_LOCATION_REQUEST_CODE = 444;
 
     private static final String TAG = ImageUtils.class.getSimpleName();
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
-    private static final String CAMERA_FILE_EXT = ".jpg";
-    private static final String CAMERA_FILE_NAME = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_FILE_EXT;
+    private static final String CAMERA_PHOTO_FILE_EXT = ".jpg";
+    private static final String CAMERA_VIDEO_FILE_EXT = ".mp4";
+    private static final String CAMERA_PHOTO_FILE_NAME = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_PHOTO_FILE_EXT;
+    private static final String CAMERA_VIDEO_FILE_NAME = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_VIDEO_FILE_EXT;
     private static final int AVATAR_SIZE = 110;
 
     private Activity activity;
@@ -78,26 +82,50 @@ public class ImageUtils {
                 GALLERY_REQUEST_CODE);
     }
 
-    public static void startCameraForResult(Activity activity) {
+    public static void startCameraPhotoForResult(Activity activity) {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (intent.resolveActivity(activity.getPackageManager()) == null) {
             return;
         }
 
-        File photoFile = getTemporaryCameraFile();
+        File photoFile = getTemporaryCameraFilePhoto();
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-        activity.startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        activity.startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
     }
 
-    public static void startCameraForResult(Fragment fragment) {
+    public static void startCameraPhotoForResult(Fragment fragment) {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (intent.resolveActivity(App.getInstance().getPackageManager()) == null) {
             return;
         }
 
-        File photoFile = getTemporaryCameraFile();
+        File photoFile = getTemporaryCameraFilePhoto();
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-        fragment.startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        fragment.startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
+    }
+
+    public static void startCameraVideoForResult(Activity activity) {
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (intent.resolveActivity(activity.getPackageManager()) == null) {
+            return;
+        }
+
+        File videoFile = getTemporaryCameraFileVideo();
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(videoFile));
+        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
+        activity.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
+    }
+
+    public static void startCameraVideoForResult(Fragment fragment) {
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (intent.resolveActivity(App.getInstance().getPackageManager()) == null) {
+            return;
+        }
+
+        File videoFile = getTemporaryCameraFileVideo();
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(videoFile));
+        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
+        fragment.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }
 
     public static void startMapForResult(Activity activity){
@@ -110,9 +138,17 @@ public class ImageUtils {
         fragment.startActivityForResult(intent, IMAGE_LOCATION_REQUEST_CODE);
     }
 
-    public static File getTemporaryCameraFile() {
+    public static File getTemporaryCameraFilePhoto() {
+        return getTemporaryCameraFile(CAMERA_PHOTO_FILE_NAME);
+    }
+
+    public static File getTemporaryCameraFileVideo() {
+        return getTemporaryCameraFile(CAMERA_VIDEO_FILE_NAME);
+    }
+
+    public static File getTemporaryCameraFile(String fileName) {
         File storageDir = StorageUtil.getAppExternalDataDirectoryFile();
-        File file = new File(storageDir, CAMERA_FILE_NAME);
+        File file = new File(storageDir, fileName);
         try {
             file.createNewFile();
         } catch (IOException e) {
@@ -139,6 +175,17 @@ public class ImageUtils {
         }
     }
 
+    private static String getExtensionFromMimeType(Uri uri) {
+        String extension = "";
+        String mimeType = StringUtils.getMimeType(uri);
+        if (mimeType.startsWith("image")) {
+            extension = CAMERA_PHOTO_FILE_EXT;
+        } else if (mimeType.startsWith("video")) {
+            extension = CAMERA_VIDEO_FILE_EXT;
+        }
+        return extension;
+    }
+
     public static String saveUriToFile(Uri uri) throws Exception {
         ParcelFileDescriptor parcelFileDescriptor = App.getInstance().getContentResolver()
                 .openFileDescriptor(uri, "r");
@@ -152,8 +199,8 @@ public class ImageUtils {
         String extension = "";
         if(path.lastIndexOf(".") != -1) {
             extension = path.substring(path.lastIndexOf("."), path.length());
-        } else{
-            extension = CAMERA_FILE_EXT;
+        } else {
+            extension = getExtensionFromMimeType(uri);
         }
         String fileName = String.valueOf(System.currentTimeMillis()) + extension;
         File resultFile = new File(parentDir, fileName);

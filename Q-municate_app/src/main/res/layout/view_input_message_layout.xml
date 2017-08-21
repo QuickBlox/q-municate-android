@@ -12,10 +12,9 @@
         android:layout_marginBottom="5dp"
         android:background="@color/gray" />
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/action_buttons_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/WrapContent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
@@ -33,12 +32,17 @@
             android:id="@+id/attach_button"
             android:src="@drawable/ic_attach_dark" />
 
-    </FrameLayout>
+        <com.quickblox.ui.kit.chatmessage.adapter.media.recorder.view.QBRecordAudioButton
+            android:id="@+id/chat_record_audio_button"
+            style="@style/BorderlessImageButtonStyle"
+            android:layout_gravity="center_vertical"
+            android:src="@android:drawable/ic_btn_speak_now"/>
+
+    </LinearLayout>
 
     <com.rockerhieu.emojicon.EmojiconEditText
         android:id="@+id/message_edittext"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        style="@style/MatchParent"
         android:layout_toLeftOf="@id/action_buttons_view"
         android:layout_toRightOf="@+id/smile_panel_imagebutton"
         android:autoLink="all"
@@ -60,5 +64,8 @@
         android:layout_centerVertical="true"
         android:layout_marginTop="2dp"
         android:src="@drawable/ic_smile_dark" />
+
+    <include layout="@layout/view_input_audio_container"
+        android:visibility="invisible"/>
 
 </RelativeLayout>

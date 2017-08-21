@@ -43,6 +43,8 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.DbUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
+import com.quickblox.q_municate_core.utils.MediaUtils;
+import com.quickblox.q_municate_core.utils.MimeTypeAttach;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.DialogNotification;
@@ -64,7 +66,6 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -180,15 +181,19 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         switch (attachmentType) {
             case IMAGE:
                 messageBody = context.getString(R.string.dlg_attached_last_message);
-                attachment = getAttachment((QBFile) attachmentObject, localPath);
+                attachment = getAttachmentImage((QBFile) attachmentObject, localPath);
                 break;
             case LOCATION:
                 messageBody = context.getString(R.string.dlg_location_last_message);
-                attachment = getAttachment((String) attachmentObject);
+                attachment = getAttachmentLocation((String) attachmentObject);
                 break;
             case VIDEO:
+                messageBody = context.getString(R.string.dlg_attached_video_last_message);
+                attachment = getAttachmentVideo((QBFile) attachmentObject, localPath);
                 break;
             case AUDIO:
+                messageBody = context.getString(R.string.dlg_attached_audio_last_message);
+                attachment = getAttachmentAudio((QBFile) attachmentObject, localPath);
                 break;
             case DOC:
                 break;
@@ -315,37 +320,56 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         return chatMessage;
     }
 
-    private QBAttachment getAttachment(QBFile file) {
-        return getAttachment(file, null);
-    }
-
-    private QBAttachment getAttachment(QBFile file, String localPath) {
-        // TODO temp value
-        String contentType = "image/jpeg";
-
-        QBAttachment attachment = new QBAttachment(QBAttachment.IMAGE_TYPE);
+    private QBAttachment getAttachment(QBFile file, String attachType, String contentType) {
+        QBAttachment attachment = new QBAttachment(attachType);
         attachment.setId(file.getUid());
         attachment.setName(file.getName());
         attachment.setContentType(contentType);
-        attachment.setUrl(file.getPublicUrl());
         attachment.setSize(file.getSize());
+        return attachment;
+    }
 
-        if(!TextUtils.isEmpty(localPath)){
+    private QBAttachment getAttachmentImage(QBFile file, String localPath) {
+        QBAttachment attachment = getAttachment(file, QBAttachment.IMAGE_TYPE, MimeTypeAttach.IMAGE_MIME);
+
+        if (!TextUtils.isEmpty(localPath)) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(localPath, options);
             attachment.setWidth(options.outWidth);
             attachment.setHeight(options.outHeight);
-       }
+        }
 
         return attachment;
     }
 
-    private QBAttachment getAttachment(String location) {
+    private QBAttachment getAttachmentLocation(String location) {
         QBAttachment attachment = new QBAttachment(Attachment.Type.LOCATION.toString().toLowerCase());
         attachment.setData(location);
         attachment.setId(String.valueOf(location.hashCode()));
 
+        return attachment;
+    }
+
+    private QBAttachment getAttachmentAudio(QBFile file, String localPath) {
+        QBAttachment attachment = getAttachment(file, QBAttachment.AUDIO_TYPE, MimeTypeAttach.AUDIO_MIME);
+
+        if (!TextUtils.isEmpty(localPath)) {
+            int durationSec = MediaUtils.getMetaData(localPath).durationSec();
+            attachment.setDuration(durationSec);
+        }
+        return attachment;
+    }
+
+    private QBAttachment getAttachmentVideo(QBFile file, String localPath) {
+        QBAttachment attachment = getAttachment(file, QBAttachment.VIDEO_TYPE, MimeTypeAttach.VIDEO_MIME);
+
+        if (!TextUtils.isEmpty(localPath)) {
+            MediaUtils.MetaData metaData = MediaUtils.getMetaData(localPath);
+            attachment.setHeight(metaData.videoHeight());
+            attachment.setWidth(metaData.videoWidth());
+            attachment.setDuration(metaData.durationSec());
+        }
         return attachment;
     }
 
