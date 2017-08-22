@@ -60,4 +60,7 @@ public class ConstsCore {
     public static final long MAX_AUDIO_VIDEO_SIZE = 100*1024*1024; //100mb
     public static final long MAX_FILENAME_LENGTH = 100;
 
+    // AudioVideoRecorder
+    public static final int MAX_RECORD_DURATION_IN_SEC = 30;
+
 }

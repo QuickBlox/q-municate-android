@@ -30,6 +30,8 @@ public class SystemPermissionHelper {
     public static final int PERMISSIONS_FOR_IMPORT_FRIENDS_REQUEST = 16;
     public static final int PERMISSIONS_FOR_SAVE_FILE_REQUEST = 17;
     public static final int PERMISSIONS_FOR_TAKE_PHOTO_REQUEST = 18;
+    public static final int PERMISSIONS_FOR_AUDIO_RECORD_REQUEST = 19;
+    public static final int PERMISSIONS_FOR_VIDEO_RECORD_REQUEST = 20;
 
     private Activity activity;
     private Fragment fragment;
@@ -135,6 +137,10 @@ public class SystemPermissionHelper {
         return isPermissionGranted(Manifest.permission.RECORD_AUDIO);
     }
 
+    public boolean isAllAudioRecordPermissionGranted() {
+        return isAllPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO);
+    }
+
     public void requestPermissionsForCallByType(QBRTCTypes.QBConferenceType qbConferenceType) {
         if (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO.equals(qbConferenceType)) {
             checkAndRequestPermissions(PERMISSIONS_FOR_CALL_REQUEST, Manifest.permission.RECORD_AUDIO);
@@ -143,8 +149,16 @@ public class SystemPermissionHelper {
         }
     }
 
+    public void requestAllPermissionForAudioRecord() {
+        checkAndRequestPermissions(PERMISSIONS_FOR_AUDIO_RECORD_REQUEST, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
     public void requestPermissionsTakePhoto() {
             checkAndRequestPermissions(PERMISSIONS_FOR_TAKE_PHOTO_REQUEST, Manifest.permission.CAMERA);
+    }
+
+    public void requestPermissionsTakeVideo() {
+            checkAndRequestPermissions(PERMISSIONS_FOR_VIDEO_RECORD_REQUEST, Manifest.permission.CAMERA);
     }
 
     public boolean isAllPermissionsGrantedForImportFriends() {

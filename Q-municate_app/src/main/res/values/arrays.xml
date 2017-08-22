@@ -25,6 +25,8 @@
     <string-array name="supported_attachment_types">
         <item>IMAGE</item>
         <item>LOCATION</item>
+        <item>AUDIO</item>
+        <item>VIDEO</item>
     </string-array>
 
 </resources>

@@ -123,6 +123,8 @@
     <string name="dialog_ctx_menu_remove">Leave and remove chat</string>
     <string name="dialog_ctx_menu_delete">Delete dialog</string>
     <string name="dialog_loading_dialogs">Updating dialogs list… Please wait</string>
+    <string name="dialog_record_cancel">to cancel</string>
+    <string name="dialog_record_canceled">Audio recording has been canceled</string>
 
     <string-array name="dialog_attach_types_array">
         <item>Take Photo</item>
@@ -333,7 +335,8 @@
 
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
-        <item>Camera</item>
+        <item>Take a Photo</item>
+        <item>Take a Video</item>
         <item>Location</item>
     </string-array>
 

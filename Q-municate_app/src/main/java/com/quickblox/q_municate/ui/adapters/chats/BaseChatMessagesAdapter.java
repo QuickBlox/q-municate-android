@@ -39,7 +39,7 @@ import butterknife.ButterKnife;
 
 public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessage> implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
     private static final String TAG = BaseChatMessagesAdapter.class.getSimpleName();
-    protected static final int TYPE_REQUEST_MESSAGE = 5;
+    protected static final int TYPE_REQUEST_MESSAGE = 100;
     protected QBUser currentUser;
     protected final BaseActivity baseActivity;
     protected FileUtils fileUtils;
@@ -48,7 +48,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     protected QBChatDialog chatDialog;
 
     BaseChatMessagesAdapter(BaseActivity baseActivity, QBChatDialog dialog, List<CombinationMessage> chatMessages) {
-        super(baseActivity.getBaseContext(), chatMessages);
+        super(baseActivity, chatMessages);
         this.baseActivity = baseActivity;
         chatDialog = dialog;
         currentUser = AppSession.getSession().getUser();
@@ -89,12 +89,6 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     }
 
     @Override
-    protected int customViewType(int position) {
-        //TODO VT temp fix before implementation attachment's type 'audio' and 'video' in ChatMessagesAdapter-android lib
-        return isIncoming(getItem(position)) ? TYPE_TEXT_LEFT : TYPE_TEXT_RIGHT;
-    }
-
-    @Override
     protected RequestListener getRequestListener(QBMessageViewHolder holder, int position) {
         CombinationMessage chatMessage = getItem(position);
 
@@ -107,7 +101,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
     }
 
     private void resetAttachUI(ImageAttachHolder viewHolder) {
-        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.GONE);
+        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background), View.GONE);
         setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.GONE);
     }
 
@@ -115,7 +109,7 @@ public class BaseChatMessagesAdapter extends QBMessagesAdapter<CombinationMessag
         if (isIncoming) {
             setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_image_avatar), View.VISIBLE);
         }
-        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background_attach), View.VISIBLE);
+        setViewVisibility(viewHolder.itemView.findViewById(R.id.msg_bubble_background), View.VISIBLE);
     }
 
     protected void setViewVisibility(View view, int visibility) {

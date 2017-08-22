@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_chat_audio_container"
+    style="@style/MatchWidth"
+    android:layout_alignParentBottom="true"
+    android:background="@color/text_color_white"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/chat_audio_record_bucket_imageview"
+        style="@style/BorderlessImageButtonStyle"
+        android:layout_gravity="center_vertical"
+        android:src="@android:drawable/ic_menu_delete" />
+
+    <Chronometer
+        android:id="@+id/chat_audio_record_chronometer"
+        style="@style/WrapContent"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/padding_extra_large"
+        android:layout_marginStart="@dimen/padding_extra_large"
+        android:textSize="@dimen/text_size" />
+
+    <TextView
+        android:id="@+id/chat_audio_record_textview"
+        style="@style/WrapContent"
+        android:layout_gravity="center"
+        android:paddingLeft="@dimen/padding_minimal_material"
+        android:paddingStart="@dimen/padding_minimal_material"
+        android:text="@string/dialog_record_cancel"
+        android:textSize="@dimen/text_size"
+        android:typeface="sans" />
+
+
+</LinearLayout>
