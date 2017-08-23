@@ -14,7 +14,7 @@
 
     <item
         android:id="@+id/action_start_invite_friends"
-        android:title="@string/action_bar_invite_friends"
+        android:title="@string/action_bar_import_contacts"
         app:showAsAction="never" />
 
     <item

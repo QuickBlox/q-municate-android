@@ -5,10 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -19,6 +22,7 @@ import com.nostra13.universalimageloader.core.decode.ImageDecoder;
 import com.nostra13.universalimageloader.core.decode.ImageDecodingInfo;
 import com.quickblox.q_municate.R;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -51,6 +55,22 @@ public class ImageLoaderUtils {
                 .denyCacheImageMultipleSizesInMemory()
                 .discCacheFileNameGenerator(new HashCodeFileNameGeneratorWithoutToken()).build();
         return imageLoaderConfiguration;
+    }
+
+    public static void displayAvatarImageByLink(Context context, String url, ImageView imageView) {
+        Glide.with(context)
+                .load(url)
+                .placeholder(R.drawable.placeholder_user)
+                .dontAnimate()
+                .into(imageView);
+    }
+
+    public static void displayAvatarImageByUri(Context context, Uri uri, ImageView imageView) {
+        Glide.with(context)
+                .load(uri)
+                .placeholder(R.drawable.placeholder_user)
+                .dontAnimate()
+                .into(imageView);
     }
 
     public static Bitmap getThumbnailFromVideo(String videoPath) {

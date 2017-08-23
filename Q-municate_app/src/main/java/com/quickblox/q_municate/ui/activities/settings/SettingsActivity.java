@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.activities.settings;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,7 +15,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.changepassword.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
-import com.quickblox.q_municate.ui.activities.invitefriends.InviteFriendsActivity;
+import com.quickblox.q_municate.ui.activities.invitefriends.ImportContactsActivity;
 import com.quickblox.q_municate.ui.activities.profile.MyProfileActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
@@ -103,9 +102,9 @@ public class SettingsActivity extends BaseLoggableActivity {
         QBSettings.getInstance().setEnablePushNotification(enable);
     }
 
-    @OnClick(R.id.invite_friends_button)
+    @OnClick(R.id.import_contacts_button)
     void inviteFriends() {
-        InviteFriendsActivity.start(this);
+        ImportContactsActivity.start(this);
     }
 
     @OnClick(R.id.give_feedback_button)

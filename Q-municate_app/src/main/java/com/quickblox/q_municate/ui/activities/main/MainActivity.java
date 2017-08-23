@@ -17,7 +17,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
-import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
+import com.quickblox.q_municate.utils.helpers.ImportContactsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -203,18 +203,6 @@ public class MainActivity extends BaseLoggableActivity {
     private void launchDialogsListFragment() {
         Log.d("MainActivity", "launchDialogsListFragment()");
         setCurrentFragment(DialogsListFragment.newInstance(),true);
-    }
-
-    private void startImportFriends(){
-        ImportFriendsHelper importFriendsHelper = new ImportFriendsHelper(MainActivity.this);
-
-        if (facebookHelper.isSessionOpened()){
-            importFriendsHelper.startGetFriendsListTask(true);
-        } else {
-            importFriendsHelper.startGetFriendsListTask(false);
-        }
-
-        hideProgress();
     }
 
     private class ImportFriendsSuccessAction implements Command {

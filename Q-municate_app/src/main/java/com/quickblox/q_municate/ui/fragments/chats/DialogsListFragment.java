@@ -29,7 +29,7 @@ import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
-import com.quickblox.q_municate.ui.activities.invitefriends.InviteFriendsActivity;
+import com.quickblox.q_municate.ui.activities.invitefriends.ImportContactsActivity;
 import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
@@ -161,7 +161,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                 launchContactsFragment();
                 break;
             case R.id.action_start_invite_friends:
-                InviteFriendsActivity.start(getActivity());
+                ImportContactsActivity.start(getActivity());
                 break;
             case R.id.action_start_feedback:
                 FeedbackActivity.start(getActivity());

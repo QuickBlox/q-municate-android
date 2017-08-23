@@ -374,11 +374,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 
         @Override
         public void execute(Bundle bundle) {
-            int userId = bundle.getInt(QBServiceConsts.EXTRA_FRIEND_ID);
-
-            QMUser addedUser = QMUserService.getInstance().getUserCache().get((long)userId);
             globalSearchAdapter.notifyDataSetChanged();
-
             baseActivity.hideProgress();
         }
     }

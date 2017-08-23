@@ -303,6 +303,10 @@ public class QMUserService extends QMBaseService {
         return getUsersByColumnSync(QMUserColumns.EMAIL, usersEmails, requestBuilder, forceLoad);
     }
 
+    public List<QMUser> getUsersByPhoneNumbersSync(final Collection<String> usersPhones, final QBPagedRequestBuilder requestBuilder, boolean forceLoad) throws QBResponseException {
+        return getUsersByColumnSync(QMUserColumns.PHONE, usersPhones, requestBuilder, forceLoad);
+    }
+
 
     public Observable<List<QMUser>>  getUsersByEmails(final Collection<String> usersEmails, final QBPagedRequestBuilder requestBuilder, boolean forceLoad){
         return getUsersByColumn(QMUserColumns.EMAIL, usersEmails, requestBuilder, forceLoad);

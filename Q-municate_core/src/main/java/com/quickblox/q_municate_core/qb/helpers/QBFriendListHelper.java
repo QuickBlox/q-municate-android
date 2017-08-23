@@ -29,6 +29,7 @@ import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
@@ -100,6 +101,10 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         invite(userId);
     }
 
+    public void addFriends(List<Integer> usersIds) throws Exception {
+        invite(usersIds);
+    }
+
     public void acceptFriend(int userId) throws Exception {
         roster.confirmSubscription(userId);
 
@@ -144,6 +149,17 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         sendNotificationToFriend(chatMessage, userId);
     }
 
+    public void invite(List<Integer> usersIds) throws Exception {
+
+        for (Integer userId: usersIds) {
+            sendInvitation(userId);
+
+            QBChatMessage chatMessage = ChatNotificationUtils.createPrivateMessageAboutFriendsRequests(context,
+                    NotificationType.FRIENDS_REQUEST);
+            sendNotificationToFriend(chatMessage, userId);
+        }
+    }
+
     private synchronized void sendNotificationToFriend(QBChatMessage qbChatMessage, int userId) throws QBResponseException {
         QBChatDialog qbDialog = chatHelper.createPrivateDialogIfNotExist(userId);
         if (qbDialog != null) {
@@ -170,6 +186,22 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
 
     private boolean isNotInvited(int userId) {
         return !isInvited(userId);
+    }
+
+    private boolean isInvited(QBUser qbUser) {
+        QBRosterEntry rosterEntry = roster.getEntry(qbUser.getId());
+        return rosterEntry != null && (UserFriendUtils.isOutgoingFriend(rosterEntry) || UserFriendUtils.isNoneFriend(rosterEntry));
+    }
+
+    public List<QBUser> getNotInvitedUsers(List<QBUser> allUsers){
+        List<QBUser> notInvitedUsers = new ArrayList<>();
+        for (QBUser qbUser : allUsers){
+            if (!isInvited(qbUser)){
+                notInvitedUsers.add(qbUser);
+            }
+        }
+
+        return notInvitedUsers;
     }
 
     private void sendInvitation(int userId) throws Exception {

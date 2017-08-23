@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.util.Patterns;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
@@ -13,8 +14,6 @@ import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.users.model.QBUser;
 
 import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ValidationUtils {
 
@@ -221,11 +220,8 @@ public class ValidationUtils {
     }
 
 
-    private boolean isEmailValid(String email) {
-        String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
-        Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
+    public static boolean isEmailValid(String email) {
+        return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
 }

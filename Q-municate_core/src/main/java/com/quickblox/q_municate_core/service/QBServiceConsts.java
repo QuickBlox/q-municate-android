@@ -170,7 +170,8 @@ public class QBServiceConsts {
     public static final String EXTRA_FRIEND_ID = "friend_id";
     public static final String EXTRA_FRIENDS = "friends";
     public static final String EXTRA_FRIENDS_FACEBOOK = "friends_facebook";
-    public static final String EXTRA_FRIENDS_CONTACTS = "friends_contacts";
+    public static final String EXTRA_FRIENDS_EMAILS = "friends_emails";
+    public static final String EXTRA_FRIENDS_PHONES = "friends_phones";
     public static final String EXTRA_FILE = "file";
     public static final String EXTRA_QBFILE = "qb_file";
     public static final String EXTRA_SOCIAL_PROVIDER = "social_provider";
@@ -208,6 +209,7 @@ public class QBServiceConsts {
     public static final String EXTRA_MESSAGE_ID = "message_id";
     public static final String EXTRA_STATUS_MESSAGE = "status_message";
     public static final String EXTRA_USER_ID = "user_id";
+    public static final String EXTRA_USERS_IDS = "users_ids";
     public static final String EXTRA_DATE_SENT = "date_sent";
     public static final String EXTRA_EMOJIS = "emojis";
     public static final String EXTRA_MESSAGE = "message";
