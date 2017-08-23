@@ -152,6 +152,19 @@
             android:screenOrientation="portrait" />
         <activity android:name=".ui.activities.location.MapsActivity"
             android:screenOrientation="portrait" />
+        <activity android:name="com.quickblox.ui.kit.chatmessage.adapter.media.video.ui.VideoPlayerActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:launchMode="singleTop"
+            android:theme="@style/VideoPlayerTheme">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:scheme="content"/>
+                <data android:scheme="asset"/>
+                <data android:scheme="file"/>
+            </intent-filter>
+        </activity>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

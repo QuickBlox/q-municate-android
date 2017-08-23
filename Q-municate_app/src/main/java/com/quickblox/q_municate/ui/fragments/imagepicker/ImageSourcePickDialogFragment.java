@@ -28,8 +28,9 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     private static final long DELAY_PERMISSIONS_RESULT_ACTIONS = 300;
 
     private static final int POSITION_GALLERY = 0;
-    private static final int POSITION_CAMERA = 1;
-    private static final int POSITION_LOCATION = 2;
+    private static final int POSITION_CAMERA_PHOTO = 1;
+    private static final int POSITION_CAMERA_VIDEO = 2;
+    private static final int POSITION_LOCATION = 3;
     private static SystemPermissionHelper systemPermissionHelper;
 
     private OnImageSourcePickedListener onImageSourcePickedListener;
@@ -78,11 +79,18 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                             systemPermissionHelper.requestPermissionsForSaveFile();
                         }
                         break;
-                    case POSITION_CAMERA:
+                    case POSITION_CAMERA_PHOTO:
                         if (systemPermissionHelper.isCameraPermissionGranted()) {
-                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_PHOTO);
                         } else {
                             systemPermissionHelper.requestPermissionsTakePhoto();
+                        }
+                        break;
+                    case POSITION_CAMERA_VIDEO:
+                        if (systemPermissionHelper.isCameraPermissionGranted()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_VIDEO);
+                        } else {
+                            systemPermissionHelper.requestPermissionsTakeVideo();
                         }
                         break;
                     case POSITION_LOCATION:
@@ -133,7 +141,8 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     public enum ImageSource {
         GALLERY,
-        CAMERA,
+        CAMERA_PHOTO,
+        CAMERA_VIDEO,
         LOCATION
     }
 
@@ -149,7 +158,14 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                 switch(requestCode) {
                     case (SystemPermissionHelper.PERMISSIONS_FOR_TAKE_PHOTO_REQUEST):
                         if (systemPermissionHelper.isCameraPermissionGranted()) {
-                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_PHOTO);
+                        } else {
+                            showPermissionSettingsDialog(R.string.dlg_permission_camera);
+                        }
+                        break;
+                    case (SystemPermissionHelper.PERMISSIONS_FOR_VIDEO_RECORD_REQUEST):
+                        if (systemPermissionHelper.isCameraPermissionGranted()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_VIDEO);
                         } else {
                             showPermissionSettingsDialog(R.string.dlg_permission_camera);
                         }
@@ -199,14 +215,24 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                         ImageUtils.startImagePicker(activity);
                     }
                     break;
-                case CAMERA:
+                case CAMERA_PHOTO:
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startCameraForResult(fragment);
+                        ImageUtils.startCameraPhotoForResult(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startCameraForResult(activity);
+                        ImageUtils.startCameraPhotoForResult(activity);
+                    }
+                    break;
+                case CAMERA_VIDEO:
+                    if (fragment != null) {
+                        Activity activity = fragment.getActivity();
+                        setupActivityToBeNonLoggable(activity);
+                        ImageUtils.startCameraVideoForResult(fragment);
+                    } else {
+                        setupActivityToBeNonLoggable(activity);
+                        ImageUtils.startCameraVideoForResult(activity);
                     }
                     break;
                 case LOCATION:
