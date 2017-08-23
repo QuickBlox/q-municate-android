@@ -150,5 +150,4 @@
         <item name="android:textColor">@color/dark_gray</item>
         <item name="android:autoLink">web|phone|email</item>
     </style>
-
 </resources>

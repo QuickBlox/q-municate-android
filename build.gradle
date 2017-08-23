@@ -10,12 +10,24 @@ buildscript {
     }
 }
 
+ext.isDebugBuild = true
+
 allprojects {
     repositories {
         jcenter()
-
-        maven { url 'https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/' }
+        maven {
+            if (isDebugBuild) {
+                url = qbRepository
+                credentials {
+                    username qbUser
+                    password qbPassword
+                }
+            } else {
+                url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
+            }
+        }
         maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://maven.google.com' }
     }
 }
 
@@ -24,8 +36,8 @@ ext {
     buildToolsVersion = '23.0.2'
     minSdkVersion = 15
     targetSdkVersion = 23
-    versionName = '2.2'
-    versionCode = 211
+    versionName = '2.3.3'
+    versionCode = 233
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
@@ -35,7 +47,7 @@ ext {
 
 //    QuickBlox SDK version
     qbSdkVersion = '3.3.3'
-    qbMessageAdapterVersion = '1.1.0'
+    qbMessageAdapterVersion = '2.1.0-alfa'
 
     testRunnerVersion = "0.4.1"
 
