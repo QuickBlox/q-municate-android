@@ -188,14 +188,14 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
         return !isInvited(userId);
     }
 
-    private boolean isInvited(QBUser qbUser) {
-        QBRosterEntry rosterEntry = roster.getEntry(qbUser.getId());
+    private boolean isInvited(QMUser qmUser) {
+        QBRosterEntry rosterEntry = roster.getEntry(qmUser.getId());
         return rosterEntry != null && (UserFriendUtils.isOutgoingFriend(rosterEntry) || UserFriendUtils.isNoneFriend(rosterEntry));
     }
 
-    public List<QBUser> getNotInvitedUsers(List<QBUser> allUsers){
-        List<QBUser> notInvitedUsers = new ArrayList<>();
-        for (QBUser qbUser : allUsers){
+    public List<QMUser> getNotInvitedUsers(List<QMUser> allUsers){
+        List<QMUser> notInvitedUsers = new ArrayList<>();
+        for (QMUser qbUser : allUsers){
             if (!isInvited(qbUser)){
                 notInvitedUsers.add(qbUser);
             }

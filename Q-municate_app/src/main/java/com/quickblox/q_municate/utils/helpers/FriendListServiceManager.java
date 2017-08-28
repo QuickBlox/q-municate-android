@@ -1,29 +1,28 @@
 package com.quickblox.q_municate.utils.helpers;
 
 import android.content.Context;
-import android.text.TextUtils;
-import android.util.Log;
 
-import com.quickblox.auth.model.QBProvider;
-import com.quickblox.auth.session.QBSessionManager;
-import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.utils.Utils;
-import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
-import com.quickblox.users.model.QBUser;
+import com.quickblox.q_municate_core.models.InviteContact;
+import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.exceptions.Exceptions;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 public class FriendListServiceManager {
 
+    private static final String TAG = FriendListServiceManager.class.getSimpleName();
     private static FriendListServiceManager instance;
     private final Context context;
+    private QBFriendListHelper friendListHelper;
 
     public static FriendListServiceManager getInstance(){
         if (instance == null){
@@ -35,41 +34,65 @@ public class FriendListServiceManager {
 
     private FriendListServiceManager() {
         this.context = App.getInstance();
+        this.friendListHelper = new QBFriendListHelper(context);
+        friendListHelper.init(new QBChatHelper(context));
     }
 
-    public Observable<QBUser> login(final String socialProvider, final String accessToken, final String accessTokenSecret) {
-        Observable<QBUser> result = authService.login(socialProvider, accessToken, accessTokenSecret).subscribeOn(Schedulers.io())
-                .map(new Func1<QBUser, QBUser>() {
+    public Observable<List<QMUser>> findeContactsOnQb(List<InviteContact> friendsList) {
+        final List<Observable<List<QMUser>>> observableArrayList = new ArrayList<>();
+
+        ArrayList<String> friendsPhonesList = new ArrayList<>();
+        ArrayList<String> friendsEmailsList = new ArrayList<>();
+        ArrayList<String> friendsFacebookList = new ArrayList<>();
+
+        for (InviteContact inviteContact : friendsList) {
+            switch (inviteContact.getViaLabelType()) {
+                case InviteContact.VIA_PHONE_TYPE:
+                    friendsPhonesList.add(inviteContact.getId());
+                    break;
+                case InviteContact.VIA_EMAIL_TYPE:
+                    friendsEmailsList.add(inviteContact.getId());
+                    break;
+                case InviteContact.VIA_FACEBOOK_TYPE:
+                    friendsFacebookList.add(inviteContact.getId());
+            }
+        }
+
+        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
+        requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
+
+        if (!friendsPhonesList.isEmpty()) {
+            observableArrayList.add(QMUserService.getInstance().getUsersByPhoneNumbers(friendsPhonesList, requestBuilder, true));
+        }
+
+        if (!friendsEmailsList.isEmpty()) {
+            observableArrayList.add(QMUserService.getInstance().getUsersByEmails(friendsEmailsList, requestBuilder, true));
+        }
+
+        if (!friendsFacebookList.isEmpty()) {
+            observableArrayList.add(QMUserService.getInstance().getUsersByFacebookId(friendsFacebookList, requestBuilder, true));
+        }
+
+        Observable<List<QMUser>> result = Observable.from(observableArrayList)
+                .flatMap(new Func1<Observable<List<QMUser>>, Observable<List<QMUser>>>() {
                     @Override
-                    public QBUser call(QBUser qbUser) {
-                        Log.d(TAG, "login observer call " + qbUser);
-                        UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
-                        if (QBProvider.FACEBOOK.equals(socialProvider) && TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
-                            //Actions for first login via Facebook
-                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
-                            getFBUserWithAvatar(qbUser);
-                        } else if (QBProvider.TWITTER_DIGITS.equals(socialProvider) && TextUtils.isEmpty(qbUser.getFullName())) {
-                            //Actions for first login via Twitter Digits
-                            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
-                            getTDUserWithFullName(qbUser);
-                        }
-                        try {
-                            updateUserSync(qbUser);
-                        } catch (QBResponseException e) {
-                            Log.d(TAG, "updateUser " + e.getMessage());
-                            throw Exceptions.propagate(e);
-                        }
-
-                        qbUser.setPassword(QBSessionManager.getInstance().getToken());
-
-                        saveOwnerUser(qbUser);
-
-                        AppSession.startSession(qbUser);
-
-                        return qbUser;
+                    public Observable<List<QMUser>> call(Observable<List<QMUser>> listObservable) {
+                        return listObservable;
                     }
                 })
-                .observeOn(AndroidSchedulers.mainThread());
+                .toList()
+                .map(new Func1<List<List<QMUser>>, List<QMUser>>() {
+                    @Override
+                    public List<QMUser> call(List<List<QMUser>> lists) {
+                        List<QMUser> realQbFriends = new ArrayList<>();
+
+                        for (List<QMUser> tempList : lists){
+                            realQbFriends.addAll(tempList);
+                        }
+
+                        return friendListHelper.getNotInvitedUsers(realQbFriends);
+                    }
+                });
 
         return result;
     }

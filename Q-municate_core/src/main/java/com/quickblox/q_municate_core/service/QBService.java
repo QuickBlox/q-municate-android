@@ -24,7 +24,6 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBCreatePrivateChatCommand
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.qb.commands.QBGetFileCommand;
-import com.quickblox.q_municate_core.qb.commands.friend.QBImportContactsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitChatServiceCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitChatsCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBInitFriendListCommand;
@@ -135,7 +134,6 @@ public class QBService extends Service {
         registerAcceptFriendCommand();
         registerRemoveFriendCommand();
         registerRejectFriendCommand();
-        registerImportFriendsCommand();
 
         // other commands
         registerGetFileCommand();
@@ -360,16 +358,6 @@ public class QBService extends Service {
                 QBServiceConsts.REJECT_FRIEND_FAIL_ACTION);
 
         serviceCommandMap.put(QBServiceConsts.REJECT_FRIEND_ACTION, rejectFriendCommand);
-    }
-
-    private void registerImportFriendsCommand() {
-        QBFriendListHelper friendListHelper = (QBFriendListHelper) getHelper(FRIEND_LIST_HELPER);
-
-        QBImportContactsCommand importContactsCommand = new QBImportContactsCommand(this, friendListHelper,
-                QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION,
-                QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.IMPORT_FRIENDS_ACTION, importContactsCommand);
     }
 
 

@@ -20,7 +20,7 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 23
+    compileSdkVersion = 25
     buildToolsVersion = '23.0.2'
     minSdkVersion = 15
     targetSdkVersion = 23
@@ -42,7 +42,7 @@ ext {
     // Dependencies versions
     multiDexVersion = '1.0.1'
     supportVersion = '23.4.0'
-    googlePlayServicesVersion = '10.2.1'
+    googlePlayServicesVersion = '11.0.2'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '5.0'
     ormliteCoreVersion = '5.0'
@@ -69,7 +69,7 @@ ext {
     robotoTextViewVersion = '2.4.3'
     stickersVersion = '0.7.3'
     crashlyticsVersion = '2.2.2'
-    firebaseVersion = '10.2.1'
+    firebaseVersion = '11.0.2'
     firebaseDispatcherVersion = '0.6.0'
     libphonenumberVersion = '8.7.1'
 }

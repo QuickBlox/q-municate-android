@@ -15,16 +15,7 @@ public class PhoneNumbersUtils {
     public static boolean isPhoneNumberValid(Context context, String phoneNumberString) {
         phoneNumberString = phoneNumberString.replaceAll("[^0-9+]", "");
         PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber phoneNumber = new Phonenumber.PhoneNumber();
-
-        if (!phoneNumberString.startsWith("+") && phoneNumberString.length() == 10) {
-            phoneNumberString = String.valueOf(phoneNumberUtil.getCountryCodeForRegion(getCountryLatterCodeFromSim(context)) + String.valueOf(Long.parseLong(phoneNumberString)));
-        }
-
-
-        if (!phoneNumberString.startsWith("+")) {
-            phoneNumberString = "+" + phoneNumberString;
-        }
+        Phonenumber.PhoneNumber phoneNumber = null;
 
         try {
             phoneNumber = phoneNumberUtil.parse(phoneNumberString, getCountryLatterCodeFromSim(context));
@@ -32,7 +23,7 @@ public class PhoneNumbersUtils {
             //ignore
         }
 
-        return phoneNumber != null && phoneNumberUtil.isValidNumber(phoneNumber);
+        return phoneNumber != null && phoneNumberUtil.isPossibleNumber(phoneNumber);
     }
 
     public static String getCorrectPhoneNumber(Context context, String phoneNumberString) {

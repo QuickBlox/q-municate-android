@@ -4,7 +4,6 @@ import android.app.Activity;
 
 import com.quickblox.q_municate.utils.ContactsUtils;
 import com.quickblox.q_municate_core.models.InviteContact;
-import com.quickblox.q_municate_core.qb.commands.friend.QBImportContactsCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +28,6 @@ public class ImportContactsHelper {
         if (includeFacebookContacts){
             //TODO VT need add code for importing contacts from FB
         }
-
-        fiendsReceived(contactsForImporting);
     }
 
     private List<String> getIdsList(List<InviteContact> friendsList) {
@@ -51,10 +48,5 @@ public class ImportContactsHelper {
         }
 
         return addressBookContacts;
-    }
-
-    public void fiendsReceived(List<InviteContact> contactsForImporting) {
-        QBImportContactsCommand.start(activity,
-                contactsForImporting);
     }
 }

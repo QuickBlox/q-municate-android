@@ -15,6 +15,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.invitefriends.ImportContactAdapter;
 import com.quickblox.q_municate.utils.ContactsUtils;
 import com.quickblox.q_municate.utils.DialogsUtils;
+import com.quickblox.q_municate.utils.helpers.FriendListServiceManager;
 import com.quickblox.q_municate.utils.helpers.ImportContactsHelper;
 import com.quickblox.q_municate.utils.listeners.CounterChangedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
@@ -27,15 +28,19 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.utils.Utils;
-import com.quickblox.users.model.QBUser;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class ImportContactsActivity extends BaseLoggableActivity implements CounterChangedListener {
 
+    private static final String TAG = ImportContactsActivity.class.getSimpleName();
     @Bind(R.id.contacts)
     RecyclerView contactsRecyclerView;
 
@@ -44,8 +49,6 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
     private ActionMode actionMode;
     private SystemPermissionHelper systemPermissionHelper;
     private ImportContactsHelper importContactsHelper;
-    private ImportContactsSuccessAction importContactsSuccessAction;
-    private ImportContactsFailAction importContactsFailAction;
     private AddContactsToFriendSuccessAction addContactsToFriendSuccessAction;
     private AddContactsToFriendFailAction addContactsToFriendFailAction;
 
@@ -71,25 +74,17 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
         title = getString(R.string.import_contacts_title);
         systemPermissionHelper = new SystemPermissionHelper(this);
         importContactsHelper = new ImportContactsHelper(this);
-        importContactsSuccessAction = new ImportContactsSuccessAction();
-        importContactsFailAction = new ImportContactsFailAction();
         addContactsToFriendSuccessAction = new AddContactsToFriendSuccessAction();
         addContactsToFriendFailAction = new AddContactsToFriendFailAction();
         contactsList = new ArrayList<>();
     }
 
     private void addActions(){
-        addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, importContactsSuccessAction);
-        addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, importContactsFailAction);
-
         addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, addContactsToFriendSuccessAction);
         addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, addContactsToFriendFailAction);
     }
 
     protected void removeActions() {
-        removeAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION);
-
         removeAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION);
         removeAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION);
     }
@@ -111,7 +106,25 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
     private void initImportContactsTask() {
         showProgress();
         contactsList.addAll(importContactsHelper.getContactsFromAddressBook());
-        importContactsHelper.startGetFriendsListTask(false);
+        FriendListServiceManager.getInstance().findeContactsOnQb(contactsList)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<QMUser>>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideProgress();
+                    }
+
+                    @Override
+                    public void onNext(List<QMUser> qmUsers) {
+                        hideProgress();
+                        initFriendsList(prepareFriendsListFromQbUsers(qmUsers));
+                    }
+                });
     }
 
     @Override
@@ -200,10 +213,10 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
         contactsRecyclerView.setAdapter(importContactAdapter);
     }
 
-    private List<InviteContact> prepareFriendsListFromQbUsers(List<QBUser> realQbFriendsList) {
+    private List<InviteContact> prepareFriendsListFromQbUsers(List<QMUser> realQbFriendsList) {
         List<InviteContact> realFriendsList = new ArrayList<>(realQbFriendsList.size());
 
-        for (QBUser qbUser : realQbFriendsList){
+        for (QMUser qbUser : realQbFriendsList){
             InviteContact inviteContact = null;
 
             if (qbUser.getPhone() != null){
@@ -222,11 +235,6 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
 
         return realFriendsList;
     }
-
-
-
-
-
 
     private void updateContactsListWithoutInvitedContacts(List<Integer> invitedUsers){
         contactsList = ContactsUtils.removeInviteContactsByQbIds(contactsList, invitedUsers);
@@ -273,25 +281,6 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
-        }
-    }
-
-
-    private class ImportContactsSuccessAction implements Command{
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            hideProgress();
-            List<QBUser> realQbFriendsList = (List<QBUser>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
-            initFriendsList(prepareFriendsListFromQbUsers(realQbFriendsList));
-        }
-    }
-
-    private class ImportContactsFailAction implements Command{
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            hideProgress();
         }
     }
 
