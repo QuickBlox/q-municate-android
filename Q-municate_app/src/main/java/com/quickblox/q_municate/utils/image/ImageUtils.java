@@ -20,11 +20,13 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.util.TypedValue;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
+import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.MimeType;
 import com.quickblox.q_municate.utils.StorageUtil;
 import com.quickblox.q_municate.utils.StringUtils;
@@ -89,7 +91,7 @@ public class ImageUtils {
         }
 
         File photoFile = getTemporaryCameraFilePhoto();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(activity, FileUtils.AUTHORITY, photoFile));
         activity.startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
     }
 
@@ -100,7 +102,7 @@ public class ImageUtils {
         }
 
         File photoFile = getTemporaryCameraFilePhoto();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(fragment.getContext(), FileUtils.AUTHORITY, photoFile));
         fragment.startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
     }
 
@@ -111,7 +113,7 @@ public class ImageUtils {
         }
 
         File videoFile = getTemporaryCameraFileVideo();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(videoFile));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(activity, FileUtils.AUTHORITY, videoFile));
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         activity.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }
@@ -123,7 +125,7 @@ public class ImageUtils {
         }
 
         File videoFile = getTemporaryCameraFileVideo();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(videoFile));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(fragment.getContext(), FileUtils.AUTHORITY, videoFile));
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         fragment.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }

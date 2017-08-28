@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +17,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
@@ -130,7 +132,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
         if (Attachment.Type.IMAGE.equals(attachmentType)){
             canPerformLogout.set(true);
-            startCropActivity(Uri.fromFile((File)attachment));
+            startCropActivity(FileProvider.getUriForFile(this, FileUtils.AUTHORITY, (File)attachment));
         }
     }
 
@@ -202,7 +204,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
         String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
 
         canPerformLogout.set(false);
-        imageUri = Uri.fromFile(new File(getCacheDir(), extensionOriginalUri));
+        imageUri = FileProvider.getUriForFile(this, FileUtils.AUTHORITY, new File(getCacheDir(), extensionOriginalUri));
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 

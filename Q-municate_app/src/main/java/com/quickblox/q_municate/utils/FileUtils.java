@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.quickblox.q_municate.BuildConfig;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
@@ -21,6 +22,7 @@ public class FileUtils {
     private static final String TAG = FileUtils.class.getSimpleName();
     private static final String folderName = "/Q-municate";
     private static final String fileType = ".jpg";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
 
     private File filesFolder;
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.FileProvider;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
@@ -154,7 +156,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     }
 
     private void startCropActivity(Uri originalUri) {
-        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        imageUri = FileProvider.getUriForFile(this, FileUtils.AUTHORITY, new File(getCacheDir(), Crop.class.getName()));
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
@@ -262,7 +264,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
         if (Attachment.Type.IMAGE.equals(attachmentType)) {
-            startCropActivity(Uri.fromFile((File)attachment));
+            startCropActivity(FileProvider.getUriForFile(this, FileUtils.AUTHORITY, (File)attachment));
         }
     }
 

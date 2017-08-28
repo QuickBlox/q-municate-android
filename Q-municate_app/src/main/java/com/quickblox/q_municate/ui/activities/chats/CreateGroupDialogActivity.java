@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -16,6 +17,7 @@ import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.image.ImageUtils;
@@ -132,7 +134,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
         if (Attachment.Type.IMAGE.equals(attachmentType)){
             canPerformLogout.set(true);
-            startCropActivity(Uri.fromFile((File) attachment));
+            startCropActivity(FileProvider.getUriForFile(this, FileUtils.AUTHORITY, (File)attachment));
         }
 
     }
@@ -200,7 +202,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         canPerformLogout.set(false);
 
         String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
-        imageUri = Uri.fromFile(new File(getCacheDir(), extensionOriginalUri));
+        imageUri = FileProvider.getUriForFile(this, FileUtils.AUTHORITY, new File(getCacheDir(), extensionOriginalUri));
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
