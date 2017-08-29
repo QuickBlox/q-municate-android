@@ -58,8 +58,6 @@ public class ImageUtils {
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
     private static final String CAMERA_PHOTO_FILE_EXT = ".jpg";
     private static final String CAMERA_VIDEO_FILE_EXT = ".mp4";
-    private static final String CAMERA_PHOTO_FILE_NAME = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_PHOTO_FILE_EXT;
-    private static final String CAMERA_VIDEO_FILE_NAME = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_VIDEO_FILE_EXT;
     private static final int AVATAR_SIZE = 110;
 
     private Activity activity;
@@ -141,11 +139,13 @@ public class ImageUtils {
     }
 
     public static File getTemporaryCameraFilePhoto() {
-        return getTemporaryCameraFile(CAMERA_PHOTO_FILE_NAME);
+        String fileName = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_PHOTO_FILE_EXT;
+        return getTemporaryCameraFile(fileName);
     }
 
     public static File getTemporaryCameraFileVideo() {
-        return getTemporaryCameraFile(CAMERA_VIDEO_FILE_NAME);
+        String fileName = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_VIDEO_FILE_EXT;
+        return getTemporaryCameraFile(fileName);
     }
 
     public static File getTemporaryCameraFile(String fileName) {

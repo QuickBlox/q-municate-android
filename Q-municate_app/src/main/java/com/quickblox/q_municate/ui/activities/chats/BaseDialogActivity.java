@@ -1106,6 +1106,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
             sendMessageWithAttachment(dialogId, StringUtils.getAttachmentTypeByFileName(file.getName()), file, localPath);
             hideProgress();
+//          ToDo here delete all temp files
         }
     }
 
