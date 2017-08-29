@@ -42,10 +42,10 @@ public class ImportContactsHelper {
     }
 
     public List<InviteContact> getContactsFromAddressBook() {
-        if (addressBookContacts.isEmpty()) {
-            addressBookContacts.addAll(ContactsUtils.getContactsWithPhone(activity));
-            addressBookContacts.addAll(ContactsUtils.getContactsWithEmail(activity));
-        }
+        List<InviteContact> addressBookContacts = new ArrayList<>();
+
+        addressBookContacts.addAll(ContactsUtils.getContactsWithPhone(activity));
+        addressBookContacts.addAll(ContactsUtils.getContactsWithEmail(activity));
 
         return addressBookContacts;
     }

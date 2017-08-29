@@ -150,7 +150,6 @@ public class QBFriendListHelper extends BaseThreadPoolHelper implements Serializ
     }
 
     public void invite(List<Integer> usersIds) throws Exception {
-
         for (Integer userId: usersIds) {
             sendInvitation(userId);
 

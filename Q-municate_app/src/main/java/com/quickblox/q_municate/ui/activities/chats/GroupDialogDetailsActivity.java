@@ -30,6 +30,7 @@ import com.quickblox.q_municate.ui.activities.profile.MyProfileActivity;
 import com.quickblox.q_municate.ui.adapters.chats.GroupDialogOccupantsAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
+import com.quickblox.q_municate.utils.helpers.FriendListServiceManager;
 import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
@@ -41,7 +42,6 @@ import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
-import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -65,6 +65,9 @@ import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class GroupDialogDetailsActivity extends BaseLoggableActivity implements AdapterView.OnItemClickListener, OnImagePickedListener {
 
@@ -299,9 +302,6 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION, new UpdateGroupDialogSuccessAction());
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION, new UpdateGroupFailAction());
 
-        addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new AddFriendFailAction());
-
         updateBroadcastActionList();
     }
 
@@ -311,9 +311,6 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         removeAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION);
         removeAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION);
-
-        removeAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION);
 
         updateBroadcastActionList();
     }
@@ -500,7 +497,27 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void addToFriendList(final int userId) {
         if (isChatInitializedAndUserLoggedIn()) {
             showProgress();
-            QBAddFriendCommand.start(this, userId);
+            FriendListServiceManager.getInstance().addFriend(userId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Observer<List<Integer>>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            ToastUtils.longToast(e.getMessage());
+                            hideProgress();
+                        }
+
+                        @Override
+                        public void onNext(List<Integer> integers) {
+                            groupDialogOccupantsAdapter.notifyDataSetChanged();
+                            hideProgress();
+                        }
+                    });
         } else {
             ToastUtils.longToast(R.string.chat_service_is_initializing);
         }
@@ -565,28 +582,6 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
             if (checkNetworkAvailableWithError()) {
                 addToFriendList(userId);
             }
-        }
-    }
-
-    private class AddFriendSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            groupDialogOccupantsAdapter.notifyDataSetChanged();
-            hideProgress();
-        }
-    }
-
-    private class AddFriendFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            if (exception != null) {
-                ToastUtils.longToast(exception.getMessage());
-            }
-
-            hideProgress();
         }
     }
 

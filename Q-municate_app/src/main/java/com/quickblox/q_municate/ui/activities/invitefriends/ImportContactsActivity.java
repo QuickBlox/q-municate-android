@@ -7,10 +7,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.quickblox.core.helper.CollectionUtils;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.invitefriends.ImportContactAdapter;
 import com.quickblox.q_municate.utils.ContactsUtils;
@@ -21,16 +23,14 @@ import com.quickblox.q_municate.utils.listeners.CounterChangedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.utils.listeners.simple.SimpleActionModeCallback;
-import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.InviteContact;
-import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.Bind;
@@ -49,8 +49,6 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
     private ActionMode actionMode;
     private SystemPermissionHelper systemPermissionHelper;
     private ImportContactsHelper importContactsHelper;
-    private AddContactsToFriendSuccessAction addContactsToFriendSuccessAction;
-    private AddContactsToFriendFailAction addContactsToFriendFailAction;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ImportContactsActivity.class);
@@ -67,26 +65,13 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
         super.onCreate(savedInstanceState);
         initFields();
         setUpActionBarWithUpButton();
-        addActions();
     }
 
     private void initFields() {
         title = getString(R.string.import_contacts_title);
         systemPermissionHelper = new SystemPermissionHelper(this);
         importContactsHelper = new ImportContactsHelper(this);
-        addContactsToFriendSuccessAction = new AddContactsToFriendSuccessAction();
-        addContactsToFriendFailAction = new AddContactsToFriendFailAction();
         contactsList = new ArrayList<>();
-    }
-
-    private void addActions(){
-        addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, addContactsToFriendSuccessAction);
-        addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, addContactsToFriendFailAction);
-    }
-
-    protected void removeActions() {
-        removeAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION);
     }
 
     @Override
@@ -106,7 +91,7 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
     private void initImportContactsTask() {
         showProgress();
         contactsList.addAll(importContactsHelper.getContactsFromAddressBook());
-        FriendListServiceManager.getInstance().findeContactsOnQb(contactsList)
+        FriendListServiceManager.getInstance().findContactsOnQb(contactsList)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<List<QMUser>>() {
@@ -159,9 +144,33 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
         importContactAdapter.selectAllContacts();
     }
 
-    private void addContactsToFriends(){
+    private void addContactsToFriends(List<Integer> usersIds) {
         showProgress();
-        QBAddFriendCommand.start(this, importContactAdapter.getSelectedFriends());
+        FriendListServiceManager.getInstance().addFriends(usersIds)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<Integer>>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.v(TAG, "onCompleted()");
+                        hideProgress();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideProgress();
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(List<Integer> integers) {
+                        if (!CollectionUtils.isEmpty(integers)) {
+                            updateContactsListWithoutInvitedContacts(integers);
+                        }
+                        hideProgress();
+                        Log.v(TAG, "onNext(List<Integer> integers)");
+                    }
+                });
     }
 
     @Override
@@ -205,7 +214,7 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
             @Override
             public void onAddUserClicked(int userId) {
                 showProgress();
-                QBAddFriendCommand.start(ImportContactsActivity.this, userId);
+                addContactsToFriends(Collections.singletonList(userId));
             }
         });
         contactsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -213,6 +222,7 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
         contactsRecyclerView.setAdapter(importContactAdapter);
     }
 
+    //TODO VT need move tu utils-class
     private List<InviteContact> prepareFriendsListFromQbUsers(List<QMUser> realQbFriendsList) {
         List<InviteContact> realFriendsList = new ArrayList<>(realQbFriendsList.size());
 
@@ -241,12 +251,6 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
         importContactAdapter.setNewData(contactsList);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeActions();
-    }
-
     private class ActionModeCallback extends SimpleActionModeCallback {
 
         @Override
@@ -266,7 +270,7 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
             switch (menuItem.getItemId()) {
                 case R.id.action_send:
                     if (checkNetworkAvailableWithError()) {
-                        addContactsToFriends();
+                        addContactsToFriends(importContactAdapter.getSelectedFriends());
                         actionMode.finish();
                     }
                     return true;
@@ -281,26 +285,6 @@ public class ImportContactsActivity extends BaseLoggableActivity implements Coun
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
-        }
-    }
-
-    private class AddContactsToFriendSuccessAction implements Command{
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            hideProgress();
-            List<Integer> invitedContacts = (List<Integer>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS_IDS);
-            if (!invitedContacts.isEmpty()){
-                updateContactsListWithoutInvitedContacts(invitedContacts);
-            }
-        }
-    }
-
-    private class AddContactsToFriendFailAction implements Command{
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            hideProgress();
         }
     }
 }

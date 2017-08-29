@@ -17,7 +17,6 @@ import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogByIdsCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
-import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreatePrivateChatCommand;
@@ -130,7 +129,6 @@ public class QBService extends Service {
         // users/friends commands
         registerLoadUsersCommand();
         registerLoadFriendsCommand();
-        registerAddFriendCommand();
         registerAcceptFriendCommand();
         registerRemoveFriendCommand();
         registerRejectFriendCommand();
@@ -318,16 +316,6 @@ public class QBService extends Service {
                 QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
 
         serviceCommandMap.put(QBServiceConsts.LOAD_FRIENDS_ACTION, loadFriendListCommand);
-    }
-
-    private void registerAddFriendCommand() {
-        QBFriendListHelper friendListHelper = (QBFriendListHelper) getHelper(FRIEND_LIST_HELPER);
-
-        QBAddFriendCommand addFriendCommand = new QBAddFriendCommand(this, friendListHelper,
-                QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION,
-                QBServiceConsts.ADD_FRIEND_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, addFriendCommand);
     }
 
     private void registerAcceptFriendCommand() {

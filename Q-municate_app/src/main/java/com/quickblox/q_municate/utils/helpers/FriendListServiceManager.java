@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate.App;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.InviteContact;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
@@ -12,9 +13,11 @@ import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.functions.Func1;
 
 public class FriendListServiceManager {
@@ -35,10 +38,13 @@ public class FriendListServiceManager {
     private FriendListServiceManager() {
         this.context = App.getInstance();
         this.friendListHelper = new QBFriendListHelper(context);
-        friendListHelper.init(new QBChatHelper(context));
+        QBChatHelper chatHelper = new QBChatHelper(context);
+        chatHelper.initChatService();
+        chatHelper.init(AppSession.getSession().getUser());
+        friendListHelper.init(chatHelper);
     }
 
-    public Observable<List<QMUser>> findeContactsOnQb(List<InviteContact> friendsList) {
+    public Observable<List<QMUser>> findContactsOnQb(List<InviteContact> friendsList) {
         final List<Observable<List<QMUser>>> observableArrayList = new ArrayList<>();
 
         ArrayList<String> friendsPhonesList = new ArrayList<>();
@@ -95,5 +101,26 @@ public class FriendListServiceManager {
                 });
 
         return result;
+    }
+
+    public Observable<List<Integer>> addFriends(final List<Integer> idsToAdding) {
+        Observable<List<Integer>> result = Observable.create(new Observable.OnSubscribe<List<Integer>>() {
+            @Override
+            public void call(Subscriber<? super List<Integer>> subscriber) {
+                try {
+                    friendListHelper.addFriends(idsToAdding);
+                    subscriber.onNext(idsToAdding);
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+
+        return result;
+    }
+
+    public Observable<List<Integer>> addFriend(final Integer userId) {
+        return addFriends(Collections.singletonList(userId));
     }
 }

@@ -14,6 +14,7 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.helpers.FriendListServiceManager;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.utils.listeners.SearchListener;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
@@ -25,12 +26,12 @@ import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoratio
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
@@ -214,18 +215,12 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         baseActivity.removeAction(QBServiceConsts.FIND_USERS_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.FIND_USERS_FAIL_ACTION);
 
-        baseActivity.removeAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION);
-        baseActivity.removeAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION);
-
         baseActivity.updateBroadcastActionList();
     }
 
     private void addActions() {
         baseActivity.addAction(QBServiceConsts.FIND_USERS_SUCCESS_ACTION, new FindUserSuccessAction());
         baseActivity.addAction(QBServiceConsts.FIND_USERS_FAIL_ACTION, new FindUserFailAction());
-
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
 
         baseActivity.updateBroadcastActionList();
     }
@@ -310,7 +305,27 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         }
 
         baseActivity.showProgress();
-        QBAddFriendCommand.start(baseActivity, userId);
+        FriendListServiceManager.getInstance().addFriend(userId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new rx.Observer<List<Integer>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ErrorUtils.showError(baseActivity, e);
+                        baseActivity.hideProgress();
+                    }
+
+                    @Override
+                    public void onNext(List<Integer> integers) {
+                        globalSearchAdapter.notifyDataSetChanged();
+                        baseActivity.hideProgress();
+                    }
+                });
         KeyboardUtils.hideKeyboard(baseActivity);
     }
 
@@ -367,15 +382,6 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         @Override
         public void onAddUserClicked(int userId) {
             addToFriendList(userId);
-        }
-    }
-
-    private class AddFriendSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            globalSearchAdapter.notifyDataSetChanged();
-            baseActivity.hideProgress();
         }
     }
 
