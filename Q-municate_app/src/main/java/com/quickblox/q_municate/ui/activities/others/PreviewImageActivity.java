@@ -5,11 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.views.TouchImageView;
-import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 
 import butterknife.Bind;
 
@@ -49,8 +48,9 @@ public class PreviewImageActivity extends BaseLoggableActivity {
     private void displayImage() {
         String imageUrl = getIntent().getStringExtra(EXTRA_IMAGE_URL);
         if (!TextUtils.isEmpty(imageUrl)) {
-            ImageLoader.getInstance().displayImage(imageUrl, imageTouchImageView,
-                    ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS);
+            Glide.with(this)
+                    .load(imageUrl)
+                    .into(imageTouchImageView);
         }
     }
 
