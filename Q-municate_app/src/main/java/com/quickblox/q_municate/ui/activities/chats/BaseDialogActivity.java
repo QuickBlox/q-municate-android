@@ -219,6 +219,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             finish();
         }
 
+        loginChatIfNotLoggedIn();
+
         setUpActionBarWithUpButton();
 
         initCustomUI();
@@ -339,6 +341,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loginChatIfNotLoggedIn() {
+//      ToDo TEMP if started by makePGroupDialogIntent or makePrivateDialogIntent
+        if (!isChatInitializedAndUserLoggedIn()) {
+            Log.d(TAG, "onCreate !isChatInitializedAndUserLoggedIn()");
+            loginChat();
+        }
     }
 
     private void returnResult(){
