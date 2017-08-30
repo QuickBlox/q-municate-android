@@ -183,6 +183,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BroadcastReceiver updatingDialogBroadcastReceiver;
     private SystemPermissionHelper systemPermissionHelper;
     private boolean isLoadingMessages;
+    private boolean shouldLogin;
 
     private BlockingQueue<Runnable> threadQueue;
     private ThreadPoolExecutor threadPool;
@@ -193,6 +194,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         Intent intent = new Intent(context, PrivateDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, user);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.putExtra(QBServiceConsts.EXTRA_SHOULD_LOGIN, true);
         intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         return intent;
     }
@@ -200,6 +202,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     public static Intent makePGroupDialogIntent(Context context, QBChatDialog dialog){
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
+        intent.putExtra(QBServiceConsts.EXTRA_SHOULD_LOGIN, true);
         intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         return intent;
     }
@@ -219,7 +222,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             finish();
         }
 
-        loginChatIfNotLoggedIn();
+        loginChatIfShould();
 
         setUpActionBarWithUpButton();
 
@@ -343,10 +346,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void loginChatIfNotLoggedIn() {
-//      ToDo TEMP if started by makePGroupDialogIntent or makePrivateDialogIntent
-        if (!isChatInitializedAndUserLoggedIn()) {
-            Log.d(TAG, "onCreate !isChatInitializedAndUserLoggedIn()");
+    private void loginChatIfShould() {
+//      ToDo Review this logic after merge CHAT_SERVICE
+        if (shouldLogin) {
+            Log.d(TAG, "onCreate shouldLogin()");
             loginChat();
         }
     }
@@ -514,6 +517,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         linkPreviewClickListener = new LinkPreviewClickListener();
         videoAttachClickListener = new VideoAttachClickListener();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        shouldLogin = getIntent().getBooleanExtra(QBServiceConsts.EXTRA_SHOULD_LOGIN, false);
         combinationMessagesList = new ArrayList<>();
         vibro = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }

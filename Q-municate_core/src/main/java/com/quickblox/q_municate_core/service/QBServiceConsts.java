@@ -189,6 +189,7 @@ public class QBServiceConsts {
     public static final String EXTRA_LAST_CHAT_MESSAGE = "last_chat_message";
     public static final String EXTRA_OPPONENT_ID = "opponent_id";
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
+    public static final String EXTRA_SHOULD_LOGIN= "should_login";
     public static final String EXTRA_DIALOG = "dialog";
     public static final String EXTRA_DIALOG_ID = "dialog_id";
     public static final String EXTRA_DIALOG_UPDATE_POSITION = "dialog_update_position";

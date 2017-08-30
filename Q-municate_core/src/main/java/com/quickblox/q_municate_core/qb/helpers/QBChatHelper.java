@@ -125,6 +125,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
                 && currentDialog.getDialogId().equals(chatDialog.getDialogId())
                 && chatService != null
                 && chatService.isLoggedIn()) {
+            chatDialog.initForChat(chatService);
             if (QBDialogType.GROUP.equals(currentDialog.getType())) {
                 if (currentDialog.getParticipantListeners().contains(participantListener)) {
                     currentDialog.removeParticipantListener(participantListener);
@@ -968,7 +969,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
         @Override
         public void processPresence(String dialogId, QBPresence presence) {
-            boolean validData = currentDialog != null && presence.getUserId() != null;
+            boolean validData = currentDialog != null && presence.getUserId() != null && currentDialog.getRoomJid() != null;
             if (validData && currentDialog.getRoomJid().equals(JIDHelper.INSTANCE.getRoomJidByDialogId(dialogId))) {
                 notifyUpdatingDialogDetails(presence.getUserId(), QBPresence.Type.online.equals(presence.getType()));
             }
