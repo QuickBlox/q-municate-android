@@ -74,7 +74,6 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
-import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBLinkPreviewClickListener;
@@ -170,6 +169,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private ImageAttachClickListener imageAttachClickListener;
     private LinkPreviewClickListener linkPreviewClickListener;
     private VideoAttachClickListener videoAttachClickListener;
+    private QBMediaRecordListenerImpl recordListener;
     private Handler mainThreadHandler;
     private View emojiconsFragment;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
@@ -273,6 +273,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onStart() {
         super.onStart();
         addChatMessagesAdapterListeners();
+        addAudioRecorderListener();
         checkPermissionSaveFiles();
     }
 
@@ -299,6 +300,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onStop() {
         super.onStop();
         removeChatMessagesAdapterListeners();
+        clearAudioRecorder();
     }
 
     @Override
@@ -428,7 +430,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     private void initAudioRecorder() {
-        audioRecorder = AudioRecorder.newBuilder(new QBMediaRecordListenerImpl())
+        audioRecorder = AudioRecorder.newBuilder()
                 // Required
                 .useInBuildFilePathGenerator(this)
                 .setDuration(ConstsCore.MAX_RECORD_DURATION_IN_SEC)
@@ -449,6 +451,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messagesAdapter.setLinkPreviewClickListener(linkPreviewClickListener, false);
     }
 
+    private void addAudioRecorderListener() {
+        audioRecorder.setMediaRecordListener(recordListener);
+    }
+
     private void removeChatMessagesAdapterListeners() {
         if (messagesAdapter != null) {
             messagesAdapter.removeMessageTextViewLinkClickListener();
@@ -456,6 +462,20 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             messagesAdapter.removeAttachImageClickListener(imageAttachClickListener);
             messagesAdapter.removeAttachVideoClickListener(videoAttachClickListener);
             messagesAdapter.removeLinkPreviewClickListener();
+        }
+    }
+
+    private void clearAudioRecorder() {
+        if(audioRecorder != null) {
+            audioRecorder.removeMediaRecordListener();
+            stopRecordIfNeed();
+        }
+    }
+
+    private void stopRecordIfNeed() {
+        if (audioRecorder.isRecording()) {
+            Log.d(TAG, "stopRecordIfNeed");
+            stopRecord();
         }
     }
 
@@ -488,6 +508,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         imageAttachClickListener = new ImageAttachClickListener();
         linkPreviewClickListener = new LinkPreviewClickListener();
         videoAttachClickListener = new VideoAttachClickListener();
+        recordListener = new QBMediaRecordListenerImpl();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = new ArrayList<>();
         vibro = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -908,8 +929,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         startChronometer();
     }
 
-    public void stopRecord() {
+    public void stopRecordByClick() {
         vibrate(DURATION_VIBRATE);
+        stopRecord();
+    }
+
+    private void stopRecord(){
         audioViewVisibility(View.INVISIBLE);
         stopChronometer();
         audioRecorder.stopRecord();
@@ -1243,7 +1268,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onStopClick(View v) {
-            stopRecord();
+            stopRecordByClick();
         }
     }
 
