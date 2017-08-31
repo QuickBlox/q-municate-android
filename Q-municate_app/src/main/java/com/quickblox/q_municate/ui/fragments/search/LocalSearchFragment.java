@@ -221,12 +221,14 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
     private void addObservers() {
         dataManager.getUserRequestDataManager().addObserver(commonObserver);
         dataManager.getFriendDataManager().addObserver(commonObserver);
+        dataManager.getDialogOccupantDataManager().addObserver(commonObserver);
     }
 
     private void deleteObservers() {
         if (dataManager != null) {
             dataManager.getUserRequestDataManager().deleteObserver(commonObserver);
             dataManager.getFriendDataManager().deleteObserver(commonObserver);
+            dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
         }
     }
 
@@ -366,7 +368,10 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
         public void update(Observable observable, Object data) {
             if (data != null) {
                 String observerKey = ((Bundle) data).getString(BaseManager.EXTRA_OBSERVE_KEY);
-                if (observerKey.equals(dataManager.getUserRequestDataManager().getObserverKey()) || observerKey.equals(dataManager.getFriendDataManager().getObserverKey())) {
+                if (observerKey.equals(dataManager.getUserRequestDataManager().getObserverKey())
+                        || observerKey.equals(dataManager.getFriendDataManager().getObserverKey())
+                        || observerKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
+                    dialogsListLoader.setLoadAll(true);
                     updateList();
                 }
             }
