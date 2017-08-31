@@ -1248,6 +1248,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onLinkClicked(QBAttachment qbAttachment, int position) {
+            canPerformLogout.set(false);
             VideoPlayerActivity.start(BaseDialogActivity.this, Uri.parse(QBFile.getPrivateUrlForUID(qbAttachment.getId())));
         }
     }
