@@ -33,7 +33,6 @@ import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.DialogSearchWrapper;
 import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
@@ -56,6 +55,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
 
     private final static int LOADER_ID = LocalSearchFragment.class.hashCode();
     private static final String TAG = LocalSearchFragment.class.getSimpleName();
+    private static final String RESULT_ACTION_NAME = "load_dialogs_for_local_search_screen";
 
     @Bind(R.id.dialogs_recyclerview)
     RecyclerView dialogsRecyclerView;
@@ -235,7 +235,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
             loadDialogsBroadcastReceiver = new  LoadDialogsBroadcastReceiver();
         }
 
-        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(loadDialogsBroadcastReceiver, new IntentFilter(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION));
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(loadDialogsBroadcastReceiver, new IntentFilter(RESULT_ACTION_NAME));
     }
 
     private void unregisterLoadDialogsReceiver(){
@@ -332,7 +332,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
                 return;
             }
 
-            DialogsUtils.loadAllDialogsFromCacheByPagesTask(getContext(), dialogsCount);
+            DialogsUtils.loadAllDialogsFromCacheByPagesTask(getContext(), dialogsCount, RESULT_ACTION_NAME);
         }
 
         @Override

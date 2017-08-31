@@ -8,6 +8,7 @@ import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.DialogWrapper;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 
@@ -103,7 +104,7 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
             return;
         }
         loadFromCache = true;
-        DialogsUtils.loadAllDialogsFromCacheByPagesTask(getContext(), dialogsCount);
+        DialogsUtils.loadAllDialogsFromCacheByPagesTask(getContext(), dialogsCount, QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
     }
 
     @Override

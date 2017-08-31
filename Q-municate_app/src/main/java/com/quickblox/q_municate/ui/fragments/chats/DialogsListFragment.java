@@ -443,6 +443,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
         baseActivity.removeAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION);
+        baseActivity.removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
 
         baseActivity.updateBroadcastActionList();
