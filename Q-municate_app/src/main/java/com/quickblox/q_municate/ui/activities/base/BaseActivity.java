@@ -80,6 +80,7 @@ import butterknife.ButterKnife;
 public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
+    protected static boolean appInitialized;
 
     protected App app;
     protected Toolbar toolbar;

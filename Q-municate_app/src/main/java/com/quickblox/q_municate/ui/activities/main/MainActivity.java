@@ -12,6 +12,8 @@ import android.view.View;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
@@ -25,6 +27,10 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_user_service.QMUserService;
+import com.quickblox.q_municate_user_service.model.QMUser;
 
 public class MainActivity extends BaseLoggableActivity {
 
@@ -48,8 +54,8 @@ public class MainActivity extends BaseLoggableActivity {
 
     @Override
     public void onBackPressed() {
-        if( getSupportFragmentManager().getBackStackEntryCount() == 1){
-           finish();
+        if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
+            finish();
         } else {
             super.onBackPressed();
         }
@@ -58,22 +64,41 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("MainActivity", "onCreate");
+        Log.d(TAG, "onCreate");
 
         initFields();
         setUpActionBarWithUpButton();
 
         if (!isChatInitializedAndUserLoggedIn()) {
-            Log.d("MainActivity", "onCreate. !isChatInitializedAndUserLoggedIn()");
+            Log.d(TAG, "onCreate. !isChatInitializedAndUserLoggedIn()");
             loginChat();
         }
 
         addDialogsAction();
         launchDialogsListFragment();
+        openPushDialogIfPossible();
+    }
+
+    private void openPushDialogIfPossible() {
+        CoreSharedHelper sharedHelper = CoreSharedHelper.getInstance();
+        if (sharedHelper.needToOpenDialog()) {
+            QBChatDialog chatDialog = DataManager.getInstance().getQBChatDialogDataManager()
+                    .getByDialogId(sharedHelper.getPushDialogId());
+            QMUser user = QMUserService.getInstance().getUserCache().get((long) sharedHelper.getPushUserId());
+            startDialogActivity(chatDialog, user);
+        }
+    }
+
+    private void startDialogActivity(QBChatDialog chatDialog, QMUser user) {
+        if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
+            startPrivateChatActivity(user, chatDialog);
+        } else {
+            startGroupChatActivity(chatDialog);
+        }
     }
 
     private void initFields() {
-        Log.d("MainActivity", "initFields()");
+        Log.d(TAG, "initFields()");
         title = " " + AppSession.getSession().getUser().getFullName();
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
         importFriendsFailAction = new ImportFriendsFailAction();
@@ -97,13 +122,13 @@ public class MainActivity extends BaseLoggableActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("MainActivity", "onStart()");
+        Log.d(TAG, "onStart()");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.d("MainActivity", "onRestart()");
+        Log.d(TAG, "onRestart()");
     }
 
     @Override
@@ -176,7 +201,7 @@ public class MainActivity extends BaseLoggableActivity {
             loadLogoActionBar(userCustomData.getAvatarUrl());
         } else {
             setActionBarIcon(ImageUtils.getRoundIconDrawable(this,
-                            BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));
+                    BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));
         }
     }
 
@@ -201,14 +226,14 @@ public class MainActivity extends BaseLoggableActivity {
     }
 
     private void launchDialogsListFragment() {
-        Log.d("MainActivity", "launchDialogsListFragment()");
-        setCurrentFragment(DialogsListFragment.newInstance(),true);
+        Log.d(TAG, "launchDialogsListFragment()");
+        setCurrentFragment(DialogsListFragment.newInstance(), true);
     }
 
-    private void startImportFriends(){
+    private void startImportFriends() {
         ImportFriendsHelper importFriendsHelper = new ImportFriendsHelper(MainActivity.this);
 
-        if (facebookHelper.isSessionOpened()){
+        if (facebookHelper.isSessionOpened()) {
             importFriendsHelper.startGetFriendsListTask(true);
         } else {
             importFriendsHelper.startGetFriendsListTask(false);
