@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.utils.image;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -17,6 +18,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -87,9 +89,10 @@ public class ImageUtils {
         if (intent.resolveActivity(activity.getPackageManager()) == null) {
             return;
         }
-
         File photoFile = getTemporaryCameraFilePhoto();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(activity, FileUtils.AUTHORITY, photoFile));
+        Uri uri = FileProvider.getUriForFile(activity, FileUtils.AUTHORITY, photoFile);
+        setFileProviderPermission(intent, activity, uri);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         activity.startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
     }
 
@@ -98,9 +101,10 @@ public class ImageUtils {
         if (intent.resolveActivity(App.getInstance().getPackageManager()) == null) {
             return;
         }
-
         File photoFile = getTemporaryCameraFilePhoto();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(fragment.getContext(), FileUtils.AUTHORITY, photoFile));
+        Uri uri = FileProvider.getUriForFile(fragment.getContext(), FileUtils.AUTHORITY, photoFile);
+        setFileProviderPermission(intent, fragment.getContext(), uri);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         fragment.startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
     }
 
@@ -109,9 +113,10 @@ public class ImageUtils {
         if (intent.resolveActivity(activity.getPackageManager()) == null) {
             return;
         }
-
         File videoFile = getTemporaryCameraFileVideo();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(activity, FileUtils.AUTHORITY, videoFile));
+        Uri uri = FileProvider.getUriForFile(activity, FileUtils.AUTHORITY, videoFile);
+        setFileProviderPermission(intent, activity, uri);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         activity.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }
@@ -123,17 +128,31 @@ public class ImageUtils {
         }
 
         File videoFile = getTemporaryCameraFileVideo();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(fragment.getContext(), FileUtils.AUTHORITY, videoFile));
+        Uri uri = FileProvider.getUriForFile(fragment.getContext(), FileUtils.AUTHORITY, videoFile);
+        setFileProviderPermission(intent, fragment.getContext(), uri);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         fragment.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }
 
-    public static void startMapForResult(Activity activity){
+    private static void setFileProviderPermission(Intent intent, Context context, Uri outputUri) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            ClipData clip =
+                    ClipData.newUri(context.getContentResolver(), "CAMERA", outputUri);
+
+            intent.setClipData(clip);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        }
+    }
+
+    public static void startMapForResult(Activity activity) {
         Intent intent = new Intent(activity, MapsActivity.class);
         activity.startActivityForResult(intent, IMAGE_LOCATION_REQUEST_CODE);
     }
 
-    public static void startMapForResult(Fragment fragment){
+    public static void startMapForResult(Fragment fragment) {
         Intent intent = new Intent(fragment.getContext(), MapsActivity.class);
         fragment.startActivityForResult(intent, IMAGE_LOCATION_REQUEST_CODE);
     }
@@ -199,7 +218,7 @@ public class ImageUtils {
         File parentDir = StorageUtil.getAppExternalDataDirectoryFile();
         String path = uri.getPath();
         String extension = "";
-        if(path.lastIndexOf(".") != -1) {
+        if (path.lastIndexOf(".") != -1) {
             extension = path.substring(path.lastIndexOf("."), path.length());
         } else {
             extension = getExtensionFromMimeType(uri);
@@ -284,7 +303,7 @@ public class ImageUtils {
     }
 
     private static Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight,
-            ScalingLogic scalingLogic) {
+                                             ScalingLogic scalingLogic) {
         Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth,
                 dstHeight, scalingLogic);
         Rect dstRect = calculateDstRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth,
@@ -296,7 +315,7 @@ public class ImageUtils {
     }
 
     private static Rect calculateSrcRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-            ScalingLogic scalingLogic) {
+                                         ScalingLogic scalingLogic) {
         if (scalingLogic == ScalingLogic.CROP) {
             final float srcAspect = (float) srcWidth / (float) srcHeight;
             final float dstAspect = (float) dstWidth / (float) dstHeight;
@@ -317,7 +336,7 @@ public class ImageUtils {
     }
 
     public static Rect calculateDstRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-            ScalingLogic scalingLogic) {
+                                        ScalingLogic scalingLogic) {
         if (scalingLogic == ScalingLogic.FIT) {
             final float srcAspect = (float) srcWidth / (float) srcHeight;
             final float dstAspect = (float) dstWidth / (float) dstHeight;

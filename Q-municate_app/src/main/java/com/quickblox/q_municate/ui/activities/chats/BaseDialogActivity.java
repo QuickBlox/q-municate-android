@@ -1286,7 +1286,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void onMediaRecordError(MediaRecorderException e) {
             ErrorUtils.showError(BaseDialogActivity.this, e);
-            cancelRecord();
+            audioRecorder.releaseMediaRecorder();
         }
 
         @Override
