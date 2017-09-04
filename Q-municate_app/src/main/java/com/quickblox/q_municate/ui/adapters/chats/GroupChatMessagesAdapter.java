@@ -10,8 +10,8 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.ColorUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
-import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_db.models.State;
+import com.quickblox.ui.kit.chatmessage.adapter.utils.LinkUtils;
 
 import java.util.List;
 
@@ -63,6 +63,18 @@ public class GroupChatMessagesAdapter extends BaseChatMessagesAdapter {
         customMessageTimeTextView.setText(getDate(chatMessage.getDateSent()));
 
         updateMessageState(chatMessage, chatDialog);
+
+        View customViewTopLeft = holder.itemView.findViewById(R.id.custom_view_top_left);
+        ViewGroup.LayoutParams layoutParams = customViewTopLeft.getLayoutParams();
+
+        final List<String> urlsList = LinkUtils.extractUrls(chatMessage.getBody());
+        if (!urlsList.isEmpty()) {
+            layoutParams.width = (int) context.getResources().getDimension(com.quickblox.ui.kit.chatmessage.adapter.R.dimen.link_preview_width);
+        } else {
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        }
+
+        customViewTopLeft.setLayoutParams(layoutParams);
         super.onBindViewMsgLeftHolder(holder, chatMessage, position);
     }
 }
