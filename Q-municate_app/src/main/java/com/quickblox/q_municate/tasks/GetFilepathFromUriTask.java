@@ -57,11 +57,15 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    filePath = cursor.getString(columnIndex);
+                    if (columnIndex >= 0) {
+                        filePath = cursor.getString(columnIndex);
+                        return new File(filePath);
+                    }
                 }
                 cursor.close();
             }
-        } else if (SchemeType.SCHEME_FILE.equalsIgnoreCase(uriScheme)) {
+        }
+        if (SchemeType.SCHEME_FILE.equalsIgnoreCase(uriScheme)) {
             filePath = uri.getPath();
         } else {
             filePath = ImageUtils.saveUriToFile(uri);

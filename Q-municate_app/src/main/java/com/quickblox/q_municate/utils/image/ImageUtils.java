@@ -90,8 +90,7 @@ public class ImageUtils {
             return;
         }
         File photoFile = getTemporaryCameraFilePhoto();
-        Uri uri = FileProvider.getUriForFile(activity, FileUtils.AUTHORITY, photoFile);
-        setFileProviderPermission(intent, activity, uri);
+        Uri uri = getValidUri(photoFile, activity);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         activity.startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
     }
@@ -102,8 +101,7 @@ public class ImageUtils {
             return;
         }
         File photoFile = getTemporaryCameraFilePhoto();
-        Uri uri = FileProvider.getUriForFile(fragment.getContext(), FileUtils.AUTHORITY, photoFile);
-        setFileProviderPermission(intent, fragment.getContext(), uri);
+        Uri uri = getValidUri(photoFile, fragment.getContext());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         fragment.startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
     }
@@ -114,8 +112,7 @@ public class ImageUtils {
             return;
         }
         File videoFile = getTemporaryCameraFileVideo();
-        Uri uri = FileProvider.getUriForFile(activity, FileUtils.AUTHORITY, videoFile);
-        setFileProviderPermission(intent, activity, uri);
+        Uri uri = getValidUri(videoFile, activity);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         activity.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
@@ -128,23 +125,20 @@ public class ImageUtils {
         }
 
         File videoFile = getTemporaryCameraFileVideo();
-        Uri uri = FileProvider.getUriForFile(fragment.getContext(), FileUtils.AUTHORITY, videoFile);
-        setFileProviderPermission(intent, fragment.getContext(), uri);
+        Uri uri = getValidUri(videoFile, fragment.getContext());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         fragment.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }
 
-    private static void setFileProviderPermission(Intent intent, Context context, Uri outputUri) {
+    public static Uri getValidUri(File file, Context context) {
+        Uri outputUri = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            outputUri = FileProvider.getUriForFile(context, FileUtils.AUTHORITY, file);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            ClipData clip =
-                    ClipData.newUri(context.getContentResolver(), "CAMERA", outputUri);
-
-            intent.setClipData(clip);
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            outputUri = Uri.fromFile(file);
         }
+        return outputUri;
     }
 
     public static void startMapForResult(Activity activity) {

@@ -2,17 +2,14 @@ package com.quickblox.q_municate.ui.fragments.imagepicker;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.FileProvider;
 import android.support.v4.util.Pair;
 
 import com.quickblox.q_municate.tasks.GetFilepathFromUriTask;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -83,7 +80,7 @@ public class ImagePickHelperFragment extends Fragment {
                     // When setting EXTRA_OUTPUT param in the camera intent there is a chance that data will return as null
                     // So we just pass temporary camera file as a data, because RESULT_OK means that photo was written in the file.
                     data = new Intent();
-                    data.setData(FileProvider.getUriForFile(this.getContext(), FileUtils.AUTHORITY, ImageUtils.getLastUsedCameraFile()));
+                    data.setData(ImageUtils.getValidUri(ImageUtils.getLastUsedCameraFile(), this.getContext()));
                 }
                 new GetFilepathFromUriTask(getChildFragmentManager(), listener,
                         getArguments().getInt(ARG_REQUEST_CODE)).execute(data);
