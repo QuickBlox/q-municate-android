@@ -315,8 +315,8 @@ public class MapsActivity extends BaseLoggableActivity
                 Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                 if (lastLocation != null) {
                     latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-                    buildRequestLocation();
                 }
+                buildRequestLocation();
             }
         }
 
