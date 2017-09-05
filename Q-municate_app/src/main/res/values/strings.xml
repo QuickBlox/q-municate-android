@@ -197,6 +197,7 @@
 
     <!-- Preview Images -->
     <string name="preview_image_title">Preview image</string>
+    <string name="preview_image_error">Image has not loaded</string>
 
 
     <!-- Call -->
