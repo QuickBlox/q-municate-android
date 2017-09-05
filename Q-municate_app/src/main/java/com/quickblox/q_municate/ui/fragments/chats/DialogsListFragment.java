@@ -209,7 +209,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
-        initDataLoader(LOADER_ID);
+
+        if (dialogsListAdapter.getCount() == 0){
+            initDataLoader(LOADER_ID);
+        }
     }
 
     @Override
@@ -224,6 +227,10 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         }
         checkLoaderConsumerQueue();
         checkUpdateDialogs();
+
+        if (State.finished == updateDialogsProcess){
+            baseActivity.hideSnackBar(R.string.dialog_loading_dialogs);
+        }
     }
 
     private void checkUpdateDialogs() {
