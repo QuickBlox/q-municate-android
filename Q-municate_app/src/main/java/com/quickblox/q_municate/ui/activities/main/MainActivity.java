@@ -85,7 +85,9 @@ public class MainActivity extends BaseLoggableActivity {
             QBChatDialog chatDialog = DataManager.getInstance().getQBChatDialogDataManager()
                     .getByDialogId(sharedHelper.getPushDialogId());
             QMUser user = QMUserService.getInstance().getUserCache().get((long) sharedHelper.getPushUserId());
-            startDialogActivity(chatDialog, user);
+            if(chatDialog != null) {
+                startDialogActivity(chatDialog, user);
+            }
         }
     }
 
