@@ -13,12 +13,14 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogByIdsCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class GroupDialogActivity extends BaseDialogActivity {
 
@@ -41,6 +43,18 @@ public class GroupDialogActivity extends BaseDialogActivity {
         Intent intent = new Intent(context.getActivity(), GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
         context.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        actualizeCurrentDialogInfo();
+    }
+
+    private void actualizeCurrentDialogInfo() {
+        if (currentChatDialog != null) {
+            QBLoadDialogByIdsCommand.start(this, new ArrayList<>(Collections.singletonList(currentChatDialog.getDialogId())));
+        }
     }
 
     @Override
