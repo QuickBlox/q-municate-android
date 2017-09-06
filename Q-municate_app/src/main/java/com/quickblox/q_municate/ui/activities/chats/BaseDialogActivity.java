@@ -882,6 +882,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messageEditText.setEnabled(enable);
         smilePanelImageButton.setEnabled(enable);
         attachButton.setEnabled(enable);
+        recordAudioButton.setEnabled(enable);
     }
 
     private void replaceMessageInCurrentList(CombinationMessage combinationMessage){
