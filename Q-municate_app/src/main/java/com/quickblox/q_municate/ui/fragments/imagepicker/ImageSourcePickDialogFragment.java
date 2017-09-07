@@ -60,7 +60,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
-        builder.title(R.string.dlg_choose_image_from);
+        builder.title(R.string.dlg_choose_media_from);
         String[] imagePickArray = getResources().getStringArray(R.array.dlg_image_pick);
         ArrayList<String> imagePickList = new ArrayList<>(Arrays.asList(imagePickArray));
         if (getArguments().getInt("requestCode") != ImageUtils.IMAGE_LOCATION_REQUEST_CODE) {
@@ -209,10 +209,10 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startImagePicker(fragment);
+                        ImageUtils.startMediaPicker(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startImagePicker(activity);
+                        ImageUtils.startMediaPicker(activity);
                     }
                     break;
                 case CAMERA_PHOTO:

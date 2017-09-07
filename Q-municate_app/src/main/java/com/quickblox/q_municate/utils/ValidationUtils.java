@@ -1,9 +1,11 @@
 package com.quickblox.q_municate.utils;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.webkit.MimeTypeMap;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
@@ -182,6 +184,15 @@ public class ValidationUtils {
             return false;
         }
 
+        if (attachment instanceof File) {
+            File file = (File) attachment;
+            String mimeType = StringUtils.getMimeType(Uri.fromFile(file));
+            if(!isValidFileType(mimeType)) {
+                OneButtonDialogFragment.show(fragmentManager, R.string.dlg_unsupported_file, false);
+                return false;
+            }
+        }
+
         if(attachment instanceof File){
             File file = (File)attachment;
             if(file.getName().length() > ConstsCore.MAX_FILENAME_LENGTH){
@@ -207,7 +218,7 @@ public class ValidationUtils {
         return true;
     }
 
-    private static boolean isSupportAttachmentType(String[] supportedAttachmentTypes, Attachment.Type type){
+    private static boolean isSupportAttachmentType(String[] supportedAttachmentTypes, Attachment.Type type) {
         boolean supported = false;
         for(String supportedTypeSrt : supportedAttachmentTypes){
             Attachment.Type supportedType =  Attachment.Type.valueOf(supportedTypeSrt);
@@ -220,6 +231,18 @@ public class ValidationUtils {
         return supported;
     }
 
+    private static boolean isValidFileType(String mimeType) {
+        String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
+        return isValidMimeType(mimeType) || isValidExtension(extension);
+    }
+
+    private static boolean isValidMimeType(String mimeType) {
+        return !TextUtils.isEmpty(mimeType) && mimeType.startsWith(MimeType.IMAGE_MIME_PREFIX);
+    }
+
+    private static boolean isValidExtension(String extension) {
+        return !TextUtils.isEmpty(extension) && (extension.equals(MimeType.VIDEO_MIME_EXTENSION_MP4) || extension.equals(MimeType.AUDIO_MIME_EXTENSION_MP3));
+    }
 
     private boolean isEmailValid(String email) {
         String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";

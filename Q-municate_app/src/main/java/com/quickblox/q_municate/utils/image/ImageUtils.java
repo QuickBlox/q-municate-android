@@ -1,7 +1,6 @@
 package com.quickblox.q_municate.utils.image;
 
 import android.app.Activity;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -24,6 +23,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.util.TypedValue;
+import android.webkit.MimeTypeMap;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -68,19 +68,19 @@ public class ImageUtils {
         this.activity = activity;
     }
 
-    public static void startImagePicker(Activity activity) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType(MimeType.IMAGE_MIME);
+    public static void startMediaPicker(Activity activity) {
+        Intent intent = new Intent();
+        setIntentPicker(intent);
         activity.startActivityForResult(
-                Intent.createChooser(intent, activity.getString(R.string.dlg_choose_image_from)),
+                Intent.createChooser(intent, activity.getString(R.string.dlg_choose_media_from)),
                 GALLERY_REQUEST_CODE);
     }
 
-    public static void startImagePicker(Fragment fragment) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType(MimeType.IMAGE_MIME);
+    public static void startMediaPicker(Fragment fragment) {
+        Intent intent = new Intent();
+        setIntentPicker(intent);
         fragment.startActivityForResult(
-                Intent.createChooser(intent, fragment.getString(R.string.dlg_choose_image_from)),
+                Intent.createChooser(intent, fragment.getString(R.string.dlg_choose_media_from)),
                 GALLERY_REQUEST_CODE);
     }
 
@@ -151,6 +151,19 @@ public class ImageUtils {
         fragment.startActivityForResult(intent, IMAGE_LOCATION_REQUEST_CODE);
     }
 
+
+    private static void setIntentPicker(Intent intent) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.setType(MimeType.IMAGE_MIME + MimeType.VIDEO_MIME_MP4 + MimeType.AUDIO_MIME_MP3);
+        } else {
+            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, MimeType.mediaMimeTypes);
+        }
+    }
+
     public static File getTemporaryCameraFilePhoto() {
         String fileName = CAMERA_FILE_NAME_PREFIX + DateUtilsCore.getCurrentTime() + CAMERA_PHOTO_FILE_EXT;
         return getTemporaryCameraFile(fileName);
@@ -190,15 +203,10 @@ public class ImageUtils {
         }
     }
 
-    private static String getExtensionFromMimeType(Uri uri) {
-        String extension = "";
+    private static String getExtensionFromUri(Uri uri) {
         String mimeType = StringUtils.getMimeType(uri);
-        if (mimeType.startsWith("image")) {
-            extension = CAMERA_PHOTO_FILE_EXT;
-        } else if (mimeType.startsWith("video")) {
-            extension = CAMERA_VIDEO_FILE_EXT;
-        }
-        return extension;
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(mimeType);
     }
 
     public static String saveUriToFile(Uri uri) throws Exception {
@@ -215,7 +223,7 @@ public class ImageUtils {
         if (path.lastIndexOf(".") != -1) {
             extension = path.substring(path.lastIndexOf("."), path.length());
         } else {
-            extension = getExtensionFromMimeType(uri);
+            extension = "." + getExtensionFromUri(uri);
         }
         String fileName = String.valueOf(System.currentTimeMillis()) + extension;
         File resultFile = new File(parentDir, fileName);

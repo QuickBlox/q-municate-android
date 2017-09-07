@@ -65,7 +65,7 @@ public class StringUtils {
 
     public static Attachment.Type getAttachmentTypeByFileName(String fileName){
         Attachment.Type attachmentType;
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()).toLowerCase();
         String mimeType = MimeUtils.guessMimeTypeFromExtension(extension);
         if (mimeType == null){
             attachmentType = Attachment.Type.OTHER;
