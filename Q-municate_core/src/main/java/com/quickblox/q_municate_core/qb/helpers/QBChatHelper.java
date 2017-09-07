@@ -60,6 +60,7 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 
@@ -83,16 +84,19 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     private PrivateChatMessagesStatusListener privateChatMessagesStatusListener;
     private List<QBNotificationChatListener> notificationChatListeners = new CopyOnWriteArrayList<>();
     private final AllChatMessagesListener allChatMessagesListener;
+    private final SystemMessageListener systemMessagesListener;
     private QBSystemMessagesManager systemMessagesManager;
     private List<QBChatDialog> groupDialogsList;
     private QBChatDialogParticipantListener participantListener;
     private final ConnectionListener chatConnectionListener;
+    private boolean isInitialized;
 
 
     public QBChatHelper(Context context) {
         super(context);
         participantListener = new ParticipantListener();
         allChatMessagesListener = new AllChatMessagesListener();
+        systemMessagesListener = new SystemMessageListener();
         typingListener = new TypingListener();
         privateChatMessagesStatusListener = new PrivateChatMessagesStatusListener();
 
@@ -143,6 +147,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     public void initChatService() {
         Log.v(TAG, "initChatService()");
         this.chatService = QBChatService.getInstance();
+        chatService.addConnectionListener(chatConnectionListener);
     }
 
     public void init(QBUser chatCreator) {
@@ -151,20 +156,21 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
         initCurrentDialogForChatIfPossible();
 
+        initMainChatListeners();
+
+        isInitialized = true;
+    }
+
+    private void initMainChatListeners() {
         chatService.getMessageStatusesManager().addMessageStatusListener(privateChatMessagesStatusListener);
         chatService.getIncomingMessagesManager().addDialogMessageListener(allChatMessagesListener);
 
-        chatService.addConnectionListener(chatConnectionListener);
         systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
-        addSystemMessageListener(new SystemMessageListener());
+        systemMessagesManager.addSystemMessageListener(systemMessagesListener);
     }
 
     public boolean isLoggedInToChat(){
         return chatService != null && chatService.isLoggedIn();
-    }
-
-    protected void addSystemMessageListener(QBSystemMessageListener systemMessageListener) {
-        systemMessagesManager.addSystemMessageListener(systemMessageListener);
     }
 
     protected void addNotificationChatListener(QBNotificationChatListener notificationChatListener) {
@@ -849,6 +855,10 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
 
     interface QBNotificationChatListener {
 
@@ -859,6 +869,11 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         @Override
         public void reconnectionSuccessful() {
             tryJoinRoomChats();
+        }
+
+        @Override
+        public void authenticated(XMPPConnection connection, boolean resumed) {
+            initMainChatListeners();
         }
     }
 
