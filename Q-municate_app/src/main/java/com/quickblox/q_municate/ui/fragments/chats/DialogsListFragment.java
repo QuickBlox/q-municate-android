@@ -669,7 +669,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                     }
                     else if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
                         int action = ((Bundle) data).getInt(BaseManager.EXTRA_ACTION);
-                        if (action == BaseManager.DELETE_ACTION) {
+                        if (action == BaseManager.DELETE_ACTION
+                                || action == BaseManager.DELETE_BY_ID_ACTION) {
                             return;
                         }
                         Dialog dialog = getObjFromBundle((Bundle) data);

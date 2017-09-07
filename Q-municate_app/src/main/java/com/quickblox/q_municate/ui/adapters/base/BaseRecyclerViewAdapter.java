@@ -66,6 +66,16 @@ public abstract class BaseRecyclerViewAdapter<T, VH extends BaseClickListenerVie
         notifyItemRangeInserted(0, collection.size());
     }
 
+    public void addOrUpdateItem(T item){
+        if (!objectsList.contains(item)){
+            addItem(0, item);
+        } else {
+            int existItemPosition = objectsList.indexOf(item);
+            objectsList.remove(existItemPosition);
+            addItem(existItemPosition, item);
+        }
+    }
+
     public void removeItem(int position) {
         objectsList.remove(position);
         notifyItemRemoved(position);

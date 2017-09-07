@@ -3,7 +3,6 @@ package com.quickblox.q_municate_db.managers.base;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Parcelable;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -55,6 +54,16 @@ public abstract class BaseManager<T> extends Observable implements Manager {
             public void run() {
                 setChanged();
                 BaseManager.super.notifyObservers(getDataToNotify(data, action));
+            }
+        });
+    }
+
+    public void notifyObserversDeletedById(final Object id){
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                setChanged();
+                BaseManager.super.notifyObservers(getDataToNotifyDeletedById(id));
             }
         });
     }
@@ -226,7 +235,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         try {
             dao.deleteById(id);
 
-            notifyObservers(null, DELETE_ACTION);
+            notifyObserversDeletedById(id);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
@@ -254,6 +263,16 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         bundle.putString(EXTRA_OBSERVE_KEY, getObserverKey());
         return bundle;
     }
+
+    protected Object getDataToNotifyDeletedById(Object id){
+        Bundle bundle = new Bundle();
+        bundle.putInt(EXTRA_ACTION, DELETE_BY_ID_ACTION);
+        bundle.putString(EXTRA_OBSERVE_KEY, getObserverKey());
+        addIdToNotification(bundle, id);
+        return bundle;
+    }
+
+    abstract protected void addIdToNotification(Bundle bundle, Object id);
 
     protected EventObject<T> getEventToNotify(T data, int action){
         return new EventObject<T>(data, action, getObserverKey());

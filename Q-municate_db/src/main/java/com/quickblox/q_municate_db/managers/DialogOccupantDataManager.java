@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Bundle;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -7,7 +9,6 @@ import com.j256.ormlite.stmt.Where;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
@@ -47,6 +48,11 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate(DialogOccupant) - " + e.getMessage());
         }
+    }
+
+    @Override
+    protected void addIdToNotification(Bundle bundle, Object id) {
+        bundle.putLong(EXTRA_OBJECT_ID, (Long) id);
     }
 
     public List<DialogOccupant> getDialogOccupantsListByDialogId(String dialogId) {

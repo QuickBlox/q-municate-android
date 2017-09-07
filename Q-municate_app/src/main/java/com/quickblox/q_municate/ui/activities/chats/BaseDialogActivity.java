@@ -1030,7 +1030,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     }
                 }
 
-                if (action == MessageDataManager.DELETE_ACTION) {
+                if (action == MessageDataManager.DELETE_BY_ID_ACTION
+                    || action == MessageDataManager.DELETE_ACTION) {
                     combinationMessagesList.clear();
                     loadNextPartMessagesFromDb(false, true);
                 }
@@ -1065,7 +1066,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                         }
                     }
 
-                    if (action == DialogNotificationDataManager.DELETE_ACTION) {
+                    if (action == DialogNotificationDataManager.DELETE_BY_ID_ACTION
+                            ||action == DialogNotificationDataManager.DELETE_ACTION) {
                         combinationMessagesList.clear();
                         loadNextPartMessagesFromDb(false, true);
                     }

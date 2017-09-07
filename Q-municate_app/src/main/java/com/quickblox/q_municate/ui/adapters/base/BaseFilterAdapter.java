@@ -80,6 +80,12 @@ public abstract class BaseFilterAdapter<T, VH extends BaseClickListenerViewHolde
     }
 
     @Override
+    public void addOrUpdateItem(T item) {
+        super.addOrUpdateItem(item);
+        setFilter(query);
+    }
+
+    @Override
     public void clear() {
         super.clear();
         setFilter(query);
