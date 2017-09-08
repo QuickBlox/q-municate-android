@@ -69,7 +69,7 @@ public class GroupDialogActivity extends BaseDialogActivity {
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
 
-        scrollMessagesToBottom();
+        scrollMessagesToBottom(0);
     }
 
     @Override

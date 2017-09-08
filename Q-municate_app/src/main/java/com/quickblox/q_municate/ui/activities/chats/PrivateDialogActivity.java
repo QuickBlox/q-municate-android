@@ -115,7 +115,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         findLastFriendsRequest(true);
 
         messagesRecyclerView.setAdapter(messagesAdapter);
-        scrollMessagesToBottom();
+        scrollMessagesToBottom(0);
     }
 
     @Override

@@ -188,6 +188,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private ThreadPoolExecutor threadPool;
     private boolean needUpdatePosition;
     private Vibrator vibro;
+    private int lastVisiblePosition;
+    private MessagesScrollListener messagesScrollListener;
 
 
     @Override
@@ -512,6 +514,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = new ArrayList<>();
         vibro = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        messagesScrollListener = new MessagesScrollListener();
     }
 
     private void initCustomUI() {
@@ -530,6 +533,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         layoutManager.setStackFromEnd(true);
         messagesRecyclerView.setLayoutManager(layoutManager);
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        //use deprecated listener for support old devices
+        messagesRecyclerView.setOnScrollListener(messagesScrollListener);
     }
 
     protected void initMediaManager() {
@@ -718,14 +724,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         return emojiconsFragment.getVisibility() == View.VISIBLE;
     }
 
-    protected void checkForScrolling(int oldMessagesCount) {
-        if (oldMessagesCount != messagesAdapter.getItemCount()) {
-            scrollMessagesToBottom();
+    protected boolean needScrollBottom(int countAddedMessages) {
+        if (lastVisiblePosition + countAddedMessages < messagesAdapter.getItemCount() - 1){
+            return false;
         }
+
+        return true;
     }
 
-    protected void scrollMessagesToBottom() {
-        scrollMessagesWithDelay();
+    protected void scrollMessagesToBottom(int countAddedMessages) {
+        if (needScrollBottom(countAddedMessages)) {
+            scrollMessagesWithDelay();
+        }
     }
 
     private void scrollMessagesWithDelay() {
@@ -864,7 +874,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (isLoadOld) {
             messagesAdapter.notifyItemRangeInserted(0, partSize);
         } else {
-            scrollMessagesToBottom();
+            scrollMessagesToBottom(partSize);
         }
     }
 
@@ -904,7 +914,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private void addMessageItemToAdapter(CombinationMessage combinationMessage){
         combinationMessagesList.add(combinationMessage);
         messagesAdapter.setList(combinationMessagesList, true);
-        scrollMessagesToBottom();
+        scrollMessagesToBottom(1);
     }
 
     private void afterLoadingMessagesActions(){
@@ -1062,7 +1072,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                         if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
                             updateMessagesList();
                             messagesAdapter.notifyDataSetChanged();
-                            scrollMessagesToBottom();
+                            scrollMessagesToBottom(1);
                         }
                     }
 
@@ -1310,6 +1320,20 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             ClipboardUtils.copySimpleTextToClipboard(BaseDialogActivity.this, link);
             ToastUtils.longToast(R.string.link_was_copied);
             Log.v(TAG, linkPreview.toString());
+        }
+    }
+
+    protected class MessagesScrollListener extends RecyclerView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            WrapContentLinearLayoutManager layoutManager1  = (WrapContentLinearLayoutManager) recyclerView.getLayoutManager();
+            lastVisiblePosition = layoutManager1.findLastVisibleItemPosition();
         }
     }
 }
