@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -59,13 +60,17 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        @StringRes int title = R.string.dlg_choose_media_from;
+        final boolean imageRequest = getArguments().getInt("requestCode") != ImageUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE;
         MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
-        builder.title(R.string.dlg_choose_media_from);
         String[] imagePickArray = getResources().getStringArray(R.array.dlg_image_pick);
         ArrayList<String> imagePickList = new ArrayList<>(Arrays.asList(imagePickArray));
-        if (getArguments().getInt("requestCode") != ImageUtils.IMAGE_LOCATION_REQUEST_CODE) {
-            imagePickList.remove(2);
+        if (imageRequest) {
+            title = R.string.dlg_choose_image_from;
+            imagePickList.remove(imagePickArray[2]);
+            imagePickList.remove(imagePickArray[3]);
         }
+        builder.title(title);
         builder.items(imagePickList.toArray(new String[imagePickList.size()]));
         builder.itemsCallback(new MaterialDialog.ListCallback() {
             @Override
@@ -73,10 +78,18 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                                     CharSequence charSequence) {
                 switch (i) {
                     case POSITION_GALLERY:
-                        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
-                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                        if (imageRequest) {
+                            if (systemPermissionHelper.isAllPermissionsGrantedForSaveFileImage()) {
+                                onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY_IMAGE);
+                            } else {
+                                systemPermissionHelper.requestPermissionsForSaveFileImage();
+                            }
                         } else {
-                            systemPermissionHelper.requestPermissionsForSaveFile();
+                            if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
+                                onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                            } else {
+                                systemPermissionHelper.requestPermissionsForSaveFile();
+                            }
                         }
                         break;
                     case POSITION_CAMERA_PHOTO:
@@ -105,8 +118,8 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if ((keyCode ==  android.view.KeyEvent.KEYCODE_BACK)) {
-                    if(getFragmentManager() != null) {
+                if ((keyCode == android.view.KeyEvent.KEYCODE_BACK)) {
+                    if (getFragmentManager() != null) {
                         getFragmentManager().popBackStack();
                     }
                 }
@@ -141,6 +154,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     public enum ImageSource {
         GALLERY,
+        GALLERY_IMAGE,
         CAMERA_PHOTO,
         CAMERA_VIDEO,
         LOCATION
@@ -155,7 +169,7 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                switch(requestCode) {
+                switch (requestCode) {
                     case (SystemPermissionHelper.PERMISSIONS_FOR_TAKE_PHOTO_REQUEST):
                         if (systemPermissionHelper.isCameraPermissionGranted()) {
                             onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_PHOTO);
@@ -173,6 +187,13 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     case (SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST):
                         if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
                             onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                        } else {
+                            showPermissionSettingsDialog(R.string.dlg_permission_storage);
+                        }
+                        break;
+                    case (SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_IMAGE_REQUEST):
+                        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFileImage()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY_IMAGE);
                         } else {
                             showPermissionSettingsDialog(R.string.dlg_permission_storage);
                         }
@@ -213,6 +234,16 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     } else {
                         setupActivityToBeNonLoggable(activity);
                         ImageUtils.startMediaPicker(activity);
+                    }
+                    break;
+                case GALLERY_IMAGE:
+                    if (fragment != null) {
+                        Activity activity = fragment.getActivity();
+                        setupActivityToBeNonLoggable(activity);
+                        ImageUtils.startImagePicker(fragment);
+                    } else {
+                        setupActivityToBeNonLoggable(activity);
+                        ImageUtils.startImagePicker(activity);
                     }
                     break;
                 case CAMERA_PHOTO:

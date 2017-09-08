@@ -258,7 +258,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_LOCATION_REQUEST_CODE);
+        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE);
     }
 
     @Override

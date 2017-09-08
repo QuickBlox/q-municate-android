@@ -65,7 +65,7 @@ public class ImagePickHelperFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (isResultFromImagePick(requestCode, resultCode, data)) {
-            if (requestCode == ImageUtils.IMAGE_LOCATION_REQUEST_CODE) {
+            if (requestCode == ImageUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE) {
                 if (data != null) {
                     Bundle bundle = data.getExtras();
                     double latitude = bundle.getDouble(ConstsCore.EXTRA_LOCATION_LATITUDE);
@@ -126,6 +126,6 @@ public class ImagePickHelperFragment extends Fragment {
 
     private boolean isResultFromImagePick(int requestCode, int resultCode, Intent data) {
         return resultCode == Activity.RESULT_OK && ((requestCode == ImageUtils.CAMERA_PHOTO_REQUEST_CODE || requestCode == ImageUtils.CAMERA_VIDEO_REQUEST_CODE) || (requestCode == ImageUtils.GALLERY_REQUEST_CODE && data != null)
-                || (requestCode == ImageUtils.IMAGE_LOCATION_REQUEST_CODE && data != null));
+                || (requestCode == ImageUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE && data != null));
     }
 }

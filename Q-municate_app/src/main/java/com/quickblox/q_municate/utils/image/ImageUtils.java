@@ -54,7 +54,7 @@ public class ImageUtils {
     public static final int CAMERA_PHOTO_REQUEST_CODE = 222;
     public static final int CAMERA_VIDEO_REQUEST_CODE = 232;
     public static final int IMAGE_REQUEST_CODE = 333;
-    public static final int IMAGE_LOCATION_REQUEST_CODE = 444;
+    public static final int IMAGE_VIDEO_LOCATION_REQUEST_CODE = 444;
 
     private static final String TAG = ImageUtils.class.getSimpleName();
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
@@ -70,7 +70,7 @@ public class ImageUtils {
 
     public static void startMediaPicker(Activity activity) {
         Intent intent = new Intent();
-        setIntentPicker(intent);
+        setIntentMediaPicker(intent);
         activity.startActivityForResult(
                 Intent.createChooser(intent, activity.getString(R.string.dlg_choose_media_from)),
                 GALLERY_REQUEST_CODE);
@@ -78,9 +78,25 @@ public class ImageUtils {
 
     public static void startMediaPicker(Fragment fragment) {
         Intent intent = new Intent();
-        setIntentPicker(intent);
+        setIntentMediaPicker(intent);
         fragment.startActivityForResult(
                 Intent.createChooser(intent, fragment.getString(R.string.dlg_choose_media_from)),
+                GALLERY_REQUEST_CODE);
+    }
+
+    public static void startImagePicker(Activity activity) {
+        Intent intent = new Intent();
+        setIntentImagePicker(intent);
+        activity.startActivityForResult(
+                Intent.createChooser(intent, activity.getString(R.string.dlg_choose_image_from)),
+                GALLERY_REQUEST_CODE);
+    }
+
+    public static void startImagePicker(Fragment fragment) {
+        Intent intent = new Intent();
+        setIntentImagePicker(intent);
+        fragment.startActivityForResult(
+                Intent.createChooser(intent, fragment.getString(R.string.dlg_choose_image_from)),
                 GALLERY_REQUEST_CODE);
     }
 
@@ -143,16 +159,16 @@ public class ImageUtils {
 
     public static void startMapForResult(Activity activity) {
         Intent intent = new Intent(activity, MapsActivity.class);
-        activity.startActivityForResult(intent, IMAGE_LOCATION_REQUEST_CODE);
+        activity.startActivityForResult(intent, IMAGE_VIDEO_LOCATION_REQUEST_CODE);
     }
 
     public static void startMapForResult(Fragment fragment) {
         Intent intent = new Intent(fragment.getContext(), MapsActivity.class);
-        fragment.startActivityForResult(intent, IMAGE_LOCATION_REQUEST_CODE);
+        fragment.startActivityForResult(intent, IMAGE_VIDEO_LOCATION_REQUEST_CODE);
     }
 
 
-    private static void setIntentPicker(Intent intent) {
+    private static void setIntentMediaPicker(Intent intent) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             intent.setAction(Intent.ACTION_GET_CONTENT);
             intent.setType(MimeType.IMAGE_MIME + MimeType.VIDEO_MIME_MP4 + MimeType.AUDIO_MIME_MP3);
@@ -161,6 +177,17 @@ public class ImageUtils {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("*/*");
             intent.putExtra(Intent.EXTRA_MIME_TYPES, MimeType.mediaMimeTypes);
+        }
+    }
+
+    private static void setIntentImagePicker(Intent intent) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.setType(MimeType.IMAGE_MIME);
+        } else {
+            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType(MimeType.IMAGE_MIME);
         }
     }
 

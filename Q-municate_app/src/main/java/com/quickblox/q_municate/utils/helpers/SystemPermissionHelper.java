@@ -29,9 +29,10 @@ public class SystemPermissionHelper {
     public static final int PERMISSIONS_FOR_CALL_REQUEST = 15;
     public static final int PERMISSIONS_FOR_IMPORT_FRIENDS_REQUEST = 16;
     public static final int PERMISSIONS_FOR_SAVE_FILE_REQUEST = 17;
-    public static final int PERMISSIONS_FOR_TAKE_PHOTO_REQUEST = 18;
-    public static final int PERMISSIONS_FOR_AUDIO_RECORD_REQUEST = 19;
-    public static final int PERMISSIONS_FOR_VIDEO_RECORD_REQUEST = 20;
+    public static final int PERMISSIONS_FOR_SAVE_FILE_IMAGE_REQUEST = 18;
+    public static final int PERMISSIONS_FOR_TAKE_PHOTO_REQUEST = 19;
+    public static final int PERMISSIONS_FOR_AUDIO_RECORD_REQUEST = 20;
+    public static final int PERMISSIONS_FOR_VIDEO_RECORD_REQUEST = 21;
 
     private Activity activity;
     private Fragment fragment;
@@ -173,8 +174,16 @@ public class SystemPermissionHelper {
         return isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
+    public boolean isAllPermissionsGrantedForSaveFileImage() {
+        return isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
     public void requestPermissionsForSaveFile() {
         checkAndRequestPermissions(PERMISSIONS_FOR_SAVE_FILE_REQUEST, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    public void requestPermissionsForSaveFileImage() {
+        checkAndRequestPermissions(PERMISSIONS_FOR_SAVE_FILE_IMAGE_REQUEST, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     public ArrayList<String> collectDeniedPermissionsFomResult(String permissions[], int[] grantResults) {
