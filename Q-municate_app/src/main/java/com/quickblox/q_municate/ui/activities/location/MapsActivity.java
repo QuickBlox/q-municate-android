@@ -15,7 +15,6 @@ import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -109,9 +108,6 @@ public class MapsActivity extends BaseLoggableActivity
             isMessageLocation = true;
             receivedLocation = getIntent().getExtras().getString(EXTRA_LOCATION_DATA);
             sendLocationPanel.setVisibility(View.GONE);
-            setLocationButtonPosition(true);
-        } else {
-            setLocationButtonPosition(false);
         }
     }
 
@@ -120,19 +116,6 @@ public class MapsActivity extends BaseLoggableActivity
         super.onResume();
         canPerformLogout.set(true);
         Log.d(TAG, "onResume()");
-    }
-
-    private void setLocationButtonPosition(boolean toBottom) {
-        View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-        // position on right bottom
-        params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        if (toBottom) {
-            params.setMargins(0, 0, 30, 30);
-        } else {
-            params.setMargins(0, 0, 180, 180);
-        }
     }
 
     @Override
