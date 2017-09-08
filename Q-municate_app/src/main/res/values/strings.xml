@@ -72,7 +72,7 @@
     <string name="user_profile_send_message">Send Message</string>
     <string name="user_profile_audio_call">Audio Call</string>
     <string name="user_profile_video_call">Video Call</string>
-    <string name="user_delete_chat_history">Delete Chat History</string>
+    <string name="user_delete_chat_history">Delete Dialog</string>
     <string name="user_remove_contact_and_chat_history">Remove Contact and Chat</string>
     <string name="user_profile_remove_contact_and_chat_history">Do you really want to delete %1$s from your contact list with his chat?</string>
     <string name="user_profile_delete_chat_history">Do you really want to delete chat history with %1$s?</string>
