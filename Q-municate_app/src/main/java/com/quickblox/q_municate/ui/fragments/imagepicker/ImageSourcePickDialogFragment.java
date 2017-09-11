@@ -53,6 +53,8 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         fragmentManager.popBackStack();
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        //add fragment to backstack for getting permission request result to this fragment
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.add(this, tag);
         fragmentTransaction.commit();

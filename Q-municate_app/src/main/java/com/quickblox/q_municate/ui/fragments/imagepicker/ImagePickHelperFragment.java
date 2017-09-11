@@ -92,6 +92,7 @@ public class ImagePickHelperFragment extends Fragment {
             }
         }
 
+        //remove fragments from stack added before getting media from device
         getFragmentManager().popBackStack();
     }
 
