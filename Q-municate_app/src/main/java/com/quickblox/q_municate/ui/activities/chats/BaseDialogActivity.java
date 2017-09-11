@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -524,6 +525,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private void initCustomListeners() {
         messageSwipeRefreshLayout.setOnRefreshListener(new RefreshLayoutListener());
         recordAudioButton.setRecordTouchListener(new RecordTouchListener());
+        recordChronometer.setOnChronometerTickListener(new ChronometerTickListener());
     }
 
     protected abstract void initChatAdapter();
@@ -1283,6 +1285,41 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         @Override
         public void onStopClick(View v) {
             stopRecordByClick();
+        }
+    }
+
+    protected class ChronometerTickListener implements Chronometer.OnChronometerTickListener {
+        private long elapsedSecond;
+
+        @Override
+        public void onChronometerTick(Chronometer chronometer) {
+            setChronometerAppropriateColor();
+        }
+
+        private void setChronometerAppropriateColor() {
+            elapsedSecond = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - recordChronometer.getBase());
+            if (isStartSecond()) {
+                setChronometerBaseColor();
+            }
+            if (isAlarmSecond()) {
+                setChronometerAlarmColor();
+            }
+        }
+
+        private boolean isStartSecond() {
+            return elapsedSecond == 0;
+        }
+
+        private boolean isAlarmSecond() {
+            return elapsedSecond == ConstsCore.CHRONOMETER_ALARM_SECOND;
+        }
+
+        private void setChronometerAlarmColor() {
+            recordChronometer.setTextColor(ContextCompat.getColor(BaseDialogActivity.this, android.R.color.holo_red_light));
+        }
+
+        private void setChronometerBaseColor() {
+            recordChronometer.setTextColor(ContextCompat.getColor(BaseDialogActivity.this, android.R.color.black));
         }
     }
 
