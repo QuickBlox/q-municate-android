@@ -55,10 +55,10 @@ public class SystemPermissionHelper {
 
     public void requestPermissions(int requestCode, String... permissions) {
         if (fragment != null){
-            Log.v("Permissions", "request Permissions for Fragment");
+            Log.v("Permissions", "request Permissions for fragment " + fragment.getClass().getSimpleName());
             fragment.requestPermissions(permissions, requestCode);
         } else {
-            Log.v("Permissions", "request Permissions for Activity");
+            Log.v("Permissions", "request Permissions for activity " + activity.getClass().getSimpleName());
             ActivityCompat.requestPermissions(activity, permissions, requestCode);
         }
     }

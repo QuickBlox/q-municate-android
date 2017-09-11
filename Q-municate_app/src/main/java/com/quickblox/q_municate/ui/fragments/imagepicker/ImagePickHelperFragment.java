@@ -91,6 +91,8 @@ public class ImagePickHelperFragment extends Fragment {
                 listener.onImagePickClosed(getArguments().getInt(ARG_REQUEST_CODE));
             }
         }
+
+        getFragmentManager().popBackStack();
     }
 
     @Override
