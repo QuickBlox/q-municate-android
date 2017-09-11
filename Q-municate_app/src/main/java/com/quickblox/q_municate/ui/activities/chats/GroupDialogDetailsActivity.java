@@ -401,7 +401,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void startCropActivity(Uri originalUri) {
-        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf(".")).toLowerCase();
         imageUri = ImageUtils.getValidUri(new File(getCacheDir(), extensionOriginalUri), this);
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }

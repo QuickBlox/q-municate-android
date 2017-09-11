@@ -130,6 +130,7 @@ public class ImageUtils {
         File videoFile = getTemporaryCameraFileVideo();
         Uri uri = getValidUri(videoFile, activity);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, ConstsCore.VIDEO_QUALITY_LOW);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         activity.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }
@@ -143,6 +144,7 @@ public class ImageUtils {
         File videoFile = getTemporaryCameraFileVideo();
         Uri uri = getValidUri(videoFile, fragment.getContext());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, ConstsCore.VIDEO_QUALITY_LOW);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         fragment.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }

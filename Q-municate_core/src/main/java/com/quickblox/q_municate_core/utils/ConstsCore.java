@@ -56,12 +56,14 @@ public class ConstsCore {
 
     public static final int LAST_MESSAGE_LENGTH = 100;
 
-    public static final long MAX_IMAGE_SIZE = 10*1024*1024; //10Mb
-    public static final long MAX_AUDIO_VIDEO_SIZE = 100*1024*1024; //100mb
+    public static final long MAX_IMAGE_SIZE = 10 * 1024 * 1024; //10Mb
+    public static final long MAX_AUDIO_VIDEO_SIZE = 100 * 1024 * 1024; //100mb
     public static final long MAX_FILENAME_LENGTH = 100;
 
     // AudioVideoRecorder
     public static final int MAX_RECORD_DURATION_IN_SEC = 30;
+    public static final int VIDEO_QUALITY_LOW = 0;
+    public static final int VIDEO_QUALITY_HIGH = 1;
     public static final int CHRONOMETER_ALARM_SECOND = 27;
 
 }
