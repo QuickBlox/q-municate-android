@@ -199,7 +199,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     }
 
     private void startCropActivity(Uri originalUri) {
-        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf(".")).toLowerCase();
 
         canPerformLogout.set(false);
         imageUri = ImageUtils.getValidUri(new File(getCacheDir(), extensionOriginalUri), this);

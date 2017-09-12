@@ -51,7 +51,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         boolean isKitKatAndUpper = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
         if (SchemeType.SCHEME_CONTENT.equalsIgnoreCase(uriScheme) && !isFromGoogleApp && !isKitKatAndUpper) {
-            String[] filePathColumn = { MediaStore.Images.Media.DATA};
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = App.getInstance().getContentResolver().query(uri, filePathColumn, null, null, null);
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
@@ -73,8 +73,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         if (TextUtils.isEmpty(filePath)) {
             throw new IOException("Can't find a filepath for URI " + uri.toString());
         }
-
-        return new File(filePath);
+        return new File(ImageUtils.getPathWithExtensionInLowerCase(filePath));
     }
 
     @Override

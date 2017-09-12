@@ -159,6 +159,12 @@ public class ImageUtils {
         return outputUri;
     }
 
+    public static String getPathWithExtensionInLowerCase(String path) {
+        String extensionInLowerCase = path.substring(path.lastIndexOf("."), path.length()).toLowerCase();
+        String pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
+        return pathWithoutExtension + extensionInLowerCase;
+    }
+
     public static void startMapForResult(Activity activity) {
         Intent intent = new Intent(activity, MapsActivity.class);
         activity.startActivityForResult(intent, IMAGE_VIDEO_LOCATION_REQUEST_CODE);

@@ -199,7 +199,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     private void startCropActivity(Uri originalUri) {
         canPerformLogout.set(false);
 
-        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf(".")).toLowerCase();
         imageUri = ImageUtils.getValidUri(new File(getCacheDir(), extensionOriginalUri), this);
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
