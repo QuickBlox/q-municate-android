@@ -166,9 +166,9 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
             case R.id.action_leave:
                 if (isChatInitializedAndUserLoggedIn() && checkNetworkAvailableWithError()) {
                     boolean joined = chatHelper != null && chatHelper.isDialogJoined(qbDialog);
-                    if(joined) {
+                    if (joined) {
                         showLeaveGroupDialog();
-                    } else{
+                    } else {
                         ToastUtils.longToast(R.string.dialog_details_service_is_initializing);
                     }
                 } else {
@@ -232,7 +232,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
         if (Attachment.Type.IMAGE.equals(attachmentType)) {
-            startCropActivity(ImageUtils.getValidUri((File)attachment, this));
+            startCropActivity(ImageUtils.getValidUri((File) attachment, this));
         }
     }
 
@@ -359,7 +359,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void deleteDialog(QBChatDialog chatDialog) {
-        if(chatDialog == null || chatDialog.getDialogId() == null){
+        if (chatDialog == null || chatDialog.getDialogId() == null) {
             return;
         }
 
@@ -414,7 +414,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateCurrentData() {
-        QBChatDialog  qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(qbDialog.getDialogId());
+        QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(qbDialog.getDialogId());
         occupantsList = QMUserService.getInstance().getUserCache().getUsersByIDs(qbChatDialog.getOccupants());
         groupNameCurrent = groupNameEditText.getText().toString();
     }
@@ -532,18 +532,18 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
 
     public List<QMUser> getUsersForGroupChat(String dialogId, List<Integer> idsList) {
-        List<QMUser> usersList  = new ArrayList<>();
+        List<QMUser> usersList = new ArrayList<>();
 
-        List<QMUser> qmUsers =QMUserService.getInstance().getUserCache().getUsersByIDs(idsList);
+        List<QMUser> qmUsers = QMUserService.getInstance().getUserCache().getUsersByIDs(idsList);
 
         List<DialogOccupant> dialogOccupants = dataManager.getDialogOccupantDataManager().getActualDialogOccupantsByDialog(dialogId);
         Set<Integer> dialogOccupantIdsSet = new HashSet<>();
-        for(DialogOccupant dialogOccupant : dialogOccupants){
+        for (DialogOccupant dialogOccupant : dialogOccupants) {
             dialogOccupantIdsSet.add(dialogOccupant.getUser().getId());
         }
 
-        for(QMUser qmUser: qmUsers){
-            if( dialogOccupantIdsSet.contains(qmUser.getId())) {
+        for (QMUser qmUser : qmUsers) {
+            if (dialogOccupantIdsSet.contains(qmUser.getId())) {
                 usersList.add(qmUser);
             }
         }

@@ -128,7 +128,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
 
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
-        if (Attachment.Type.IMAGE.equals(attachmentType)){
+        if (Attachment.Type.IMAGE.equals(attachmentType)) {
             canPerformLogout.set(true);
             startCropActivity(ImageUtils.getValidUri((File) attachment, this));
         }
@@ -250,7 +250,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
 
             Observable<QMUser> qmUserObservable;
 
-            if (file != null){
+            if (file != null) {
                 qmUserObservable = ServiceManager.getInstance().updateUser(newUser, file);
             } else {
                 qmUserObservable = ServiceManager.getInstance().updateUser(newUser);

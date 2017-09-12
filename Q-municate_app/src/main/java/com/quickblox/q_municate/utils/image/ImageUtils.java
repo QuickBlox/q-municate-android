@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.util.TypedValue;
@@ -38,12 +39,14 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -443,5 +446,96 @@ public class ImageUtils {
 
     private enum ScalingLogic {
         CROP, FIT
+    }
+
+    /**
+     * Allows to fix issue for some phones when image processed with android-crop
+     * is not rotated properly.
+     * Should be used in non-UI thread.
+     */
+    public static void normalizeRotationImageIfNeed(File file) {
+        Context context = App.getInstance().getApplicationContext();
+        String filePath = file.getPath();
+        Uri uri = getValidUri(file, context);
+        try {
+            ExifInterface exif = new ExifInterface(filePath);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+            Bitmap rotatedBitmap = rotateBitmap(bitmap, orientation);
+            if (!bitmap.equals(rotatedBitmap)) {
+                saveBitmapToFile(context, rotatedBitmap, uri);
+            }
+        } catch (Exception e) {
+            ErrorUtils.logError("Exception:", e.getMessage());
+        }
+    }
+
+    private static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return bitmap;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
+        }
+        try {
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            bitmap.recycle();
+
+            return bmRotated;
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static void saveBitmapToFile(Context context, Bitmap croppedImage, Uri saveUri) {
+        if (saveUri != null) {
+            OutputStream outputStream = null;
+            try {
+                outputStream = context.getContentResolver().openOutputStream(saveUri);
+                if (outputStream != null) {
+                    croppedImage.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
+                }
+            } catch (IOException e) {
+                ErrorUtils.logError("Cannot open file:", e.getMessage());
+            } finally {
+                closeSilently(outputStream);
+                croppedImage.recycle();
+            }
+        }
+    }
+
+    private static void closeSilently(@Nullable Closeable c) {
+        if (c == null) return;
+        try {
+            c.close();
+        } catch (Throwable t) {
+            // Do nothing
+        }
     }
 }

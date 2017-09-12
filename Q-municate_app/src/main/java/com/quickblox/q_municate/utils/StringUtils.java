@@ -84,6 +84,10 @@ public class StringUtils {
         return attachmentType;
     }
 
+    public static boolean isImageFile(File file) {
+        return Attachment.Type.IMAGE.equals(StringUtils.getAttachmentTypeByFile(file));
+    }
+
     public static String getMimeType(Uri uri) {
         String mimeType;
         if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {

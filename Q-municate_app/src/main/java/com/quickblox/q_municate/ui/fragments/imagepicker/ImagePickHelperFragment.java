@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.fragments.imagepicker;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -15,6 +16,8 @@ import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
+
+import java.io.File;
 
 
 public class ImagePickHelperFragment extends Fragment {
@@ -82,6 +85,7 @@ public class ImagePickHelperFragment extends Fragment {
                     data = new Intent();
                     data.setData(ImageUtils.getValidUri(ImageUtils.getLastUsedCameraFile(), this.getContext()));
                 }
+
                 new GetFilepathFromUriTask(getChildFragmentManager(), listener,
                         getArguments().getInt(ARG_REQUEST_CODE)).execute(data);
             }

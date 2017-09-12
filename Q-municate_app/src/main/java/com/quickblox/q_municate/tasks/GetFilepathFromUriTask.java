@@ -59,7 +59,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                     if (columnIndex >= 0) {
                         filePath = cursor.getString(columnIndex);
-                        return new File(filePath);
+                        return new File(ImageUtils.getPathWithExtensionInLowerCase(filePath));
                     }
                 }
                 cursor.close();
@@ -73,7 +73,9 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         if (TextUtils.isEmpty(filePath)) {
             throw new IOException("Can't find a filepath for URI " + uri.toString());
         }
-        return new File(ImageUtils.getPathWithExtensionInLowerCase(filePath));
+        File file = new File(ImageUtils.getPathWithExtensionInLowerCase(filePath));
+        setCorrectRotationIfNeed(file);
+        return file;
     }
 
     @Override
@@ -105,6 +107,12 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         FragmentManager fragmentManager = fmWeakReference.get();
         if (fragmentManager != null) {
             ProgressDialogFragment.hide(fragmentManager);
+        }
+    }
+
+    private void setCorrectRotationIfNeed(File file) {
+        if (StringUtils.isImageFile(file)) {
+            ImageUtils.normalizeRotationImageIfNeed(file);
         }
     }
 }

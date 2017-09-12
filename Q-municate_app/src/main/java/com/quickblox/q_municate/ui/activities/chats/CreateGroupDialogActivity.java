@@ -130,9 +130,9 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
 
     @Override
     public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
-        if (Attachment.Type.IMAGE.equals(attachmentType)){
+        if (Attachment.Type.IMAGE.equals(attachmentType)) {
             canPerformLogout.set(true);
-            startCropActivity(ImageUtils.getValidUri((File)attachment, this));
+            startCropActivity(ImageUtils.getValidUri((File) attachment, this));
         }
 
     }
@@ -229,7 +229,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            QBChatDialog  dialog = (QBChatDialog ) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            QBChatDialog dialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
             if (dialog != null) {
                 GroupDialogActivity.start(CreateGroupDialogActivity.this, dialog);
