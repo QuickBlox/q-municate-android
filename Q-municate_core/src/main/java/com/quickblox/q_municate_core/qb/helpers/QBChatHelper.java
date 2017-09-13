@@ -415,8 +415,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             return;
         }
 
-        sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE, qbChatMessage, user, dialogId,
-                isPrivateChat);
+        if (!ownMessage) {
+            sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE, qbChatMessage, user, dialogId, isPrivateChat);
+        }
 
         if (currentDialog != null) {
             if (!ownMessage && !currentDialog.getDialogId().equals(dialogId)) {
