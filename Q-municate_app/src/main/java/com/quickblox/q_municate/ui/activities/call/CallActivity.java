@@ -277,7 +277,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
             ToastUtils.longToast("User " + participantName + " " + getString(
                     R.string.call_hung_up) + " conversation");
-            finish();
         }
     }
 
