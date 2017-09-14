@@ -11,6 +11,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.MediaUtils;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.users.model.QBUser;
 
@@ -211,6 +212,13 @@ public class ValidationUtils {
             File file = (File)attachment;
             if(file.length() > ConstsCore.MAX_AUDIO_VIDEO_SIZE){
                 OneButtonDialogFragment.show(fragmentManager, R.string.dlg_audio_video_big, false);
+                return false;
+            }
+        }
+        if (type.equals(Attachment.Type.AUDIO)) {
+            File file = (File) attachment;
+            int duration = MediaUtils.getMetaData(file.getPath()).durationSec();
+            if (duration < ConstsCore.MIN_RECORD_DURATION_IN_SEC) {
                 return false;
             }
         }

@@ -661,18 +661,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        switch (type){
+                        switch (type) {
                             case LOCATION:
                                 sendMessageWithAttachment(dialogId, Attachment.Type.LOCATION, attachment, null);
                                 break;
                             case IMAGE:
-                                showProgress();
-                                QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
-                                break;
                             case AUDIO:
-                                showProgress();
-                                QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
-                                break;
                             case VIDEO:
                                 showProgress();
                                 QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
@@ -1131,7 +1125,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
             sendMessageWithAttachment(dialogId, StringUtils.getAttachmentTypeByFileName(file.getName()), file, localPath);
             hideProgress();
-//          ToDo here delete all temp files
         }
     }
 
@@ -1330,19 +1323,25 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             audioViewVisibility(View.INVISIBLE);
             if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), Attachment.Type.AUDIO, file)){
                 startLoadAttachFile(Attachment.Type.AUDIO, file, currentChatDialog.getDialogId());
+            } else {
+                audioRecordErrorAnimate();
             }
         }
 
         @Override
         public void onMediaRecordError(MediaRecorderException e) {
             audioRecorder.releaseMediaRecorder();
-            Animation shake = AnimationUtils.loadAnimation(BaseDialogActivity.this, R.anim.shake_record_button);
-            recordAudioButton.startAnimation(shake);
+            audioRecordErrorAnimate();
         }
 
         @Override
         public void onMediaRecordClosed() {
             ToastUtils.shortToast(R.string.dialog_record_canceled);
+        }
+
+        private void audioRecordErrorAnimate() {
+            Animation shake = AnimationUtils.loadAnimation(BaseDialogActivity.this, R.anim.shake_record_button);
+            recordAudioButton.startAnimation(shake);
         }
     }
 

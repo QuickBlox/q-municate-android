@@ -62,6 +62,7 @@ public class ConstsCore {
 
     // AudioVideoRecorder
     public static final int MAX_RECORD_DURATION_IN_SEC = 30;
+    public static final int MIN_RECORD_DURATION_IN_SEC = 1;
     public static final int VIDEO_QUALITY_LOW = 0;
     public static final int VIDEO_QUALITY_HIGH = 1;
     public static final int CHRONOMETER_ALARM_SECOND = 27;

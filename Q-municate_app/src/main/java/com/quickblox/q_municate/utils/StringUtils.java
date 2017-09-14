@@ -48,7 +48,13 @@ public class StringUtils {
 
         switch (type) {
             case IMAGE:
-                attachmentName = context.getString(R.string.dialog_attach);
+                attachmentName = context.getString(R.string.dialog_attach_image);
+                break;
+            case AUDIO:
+                attachmentName = context.getString(R.string.dialog_attach_audio);
+                break;
+            case VIDEO:
+                attachmentName = context.getString(R.string.dialog_attach_video);
                 break;
             case LOCATION:
                 attachmentName = context.getString(R.string.dialog_location);
