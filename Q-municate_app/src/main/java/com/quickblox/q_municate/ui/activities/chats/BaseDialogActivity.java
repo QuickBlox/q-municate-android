@@ -1335,7 +1335,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onMediaRecordError(MediaRecorderException e) {
-            ErrorUtils.showError(BaseDialogActivity.this, e);
             audioRecorder.releaseMediaRecorder();
             Animation shake = AnimationUtils.loadAnimation(BaseDialogActivity.this, R.anim.shake_record_button);
             recordAudioButton.startAnimation(shake);

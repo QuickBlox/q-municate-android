@@ -440,7 +440,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (qbCallChatHelper != null && qbCallChatHelper.getCurrentRtcSession() != null) {
             qbCallChatHelper.getCurrentRtcSession().rejectCall(new HashMap<String, String>());
         }
-        finish();
     }
 
     public void hangUpCurrentSession() {
@@ -448,7 +447,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (qbCallChatHelper != null && qbCallChatHelper.getCurrentRtcSession() != null) {
             qbCallChatHelper.getCurrentRtcSession().hangUp(new HashMap<String, String>());
         }
-        finish();
     }
 
     private void startIncomeCallTimer(long time) {

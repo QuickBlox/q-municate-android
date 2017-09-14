@@ -100,6 +100,12 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     protected Handler handler = new Handler();
     private State updateDialogsProcess;
 
+    private DeleteDialogSuccessAction deleteDialogSuccessAction;
+    private DeleteDialogFailAction deleteDialogFailAction;
+    private LoadChatsSuccessAction loadChatsSuccessAction;
+    private LoadChatsFailedAction loadChatsFailedAction;
+    private UpdateDialogSuccessAction updateDialogSuccessAction;
+
     enum State {started, stopped, finished}
 
     public static DialogsListFragment newInstance() {
@@ -112,7 +118,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         Log.d(TAG, "onCreate");
         initFields();
         initChatsDialogs();
-        addActions();
+        initActions();
         addObservers();
     }
 
@@ -209,7 +215,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
-
+        addActions();
         if (dialogsListAdapter.getCount() == 0){
             initDataLoader(LOADER_ID);
         }
@@ -457,11 +463,11 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void addActions() {
-        baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new DeleteDialogSuccessAction());
-        baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, new DeleteDialogFailAction());
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, new LoadChatsFailedAction());
-        baseActivity.addAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, new UpdateDialogSuccessAction());
+        baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, deleteDialogSuccessAction);
+        baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, deleteDialogFailAction);
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, loadChatsSuccessAction);
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, loadChatsFailedAction);
+        baseActivity.addAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, updateDialogSuccessAction);
 
         baseActivity.updateBroadcastActionList();
     }
@@ -469,6 +475,14 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private void initChatsDialogs() {
         List<DialogWrapper> dialogsList = new ArrayList<>();
         dialogsListAdapter = new DialogsListAdapter(baseActivity, dialogsList);
+    }
+
+    private void initActions() {
+        deleteDialogSuccessAction = new DeleteDialogSuccessAction();
+        deleteDialogFailAction = new DeleteDialogFailAction();
+        loadChatsSuccessAction = new LoadChatsSuccessAction();
+        loadChatsFailedAction = new LoadChatsFailedAction();
+        updateDialogSuccessAction = new UpdateDialogSuccessAction();
     }
 
     private void startPrivateChatActivity(QBChatDialog chatDialog) {
