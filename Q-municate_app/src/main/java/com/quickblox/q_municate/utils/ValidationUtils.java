@@ -35,7 +35,7 @@ public class ValidationUtils {
     }
 
     public boolean isLoginDataValid(TextInputLayout emailTextInputLayout,
-            TextInputLayout passwordTextInputLayout, String email, String password) {
+                                    TextInputLayout passwordTextInputLayout, String email, String password) {
         boolean isEmailEntered = !TextUtils.isEmpty(email.trim());
         boolean isPasswordEntered = !TextUtils.isEmpty(password.trim());
 
@@ -66,8 +66,8 @@ public class ValidationUtils {
     }
 
     public boolean isSignUpDataValid(TextInputLayout fullNameTextInputLayout,
-            TextInputLayout emailTextInputLayout, TextInputLayout passwordTextInputLayout, String fullName,
-            String email, String password) {
+                                     TextInputLayout emailTextInputLayout, TextInputLayout passwordTextInputLayout, String fullName,
+                                     String email, String password) {
         boolean isFullNameEntered = !TextUtils.isEmpty(fullName.trim());
         boolean isEmailEntered = !TextUtils.isEmpty(email.trim());
         boolean isPasswordEntered = !TextUtils.isEmpty(password.trim());
@@ -111,7 +111,7 @@ public class ValidationUtils {
     }
 
     public boolean isChangePasswordDataValid(TextInputLayout oldPasswordTextInputLayout,
-            TextInputLayout newPasswordTextInputLayout, String oldPassword, String newPassword) {
+                                             TextInputLayout newPasswordTextInputLayout, String oldPassword, String newPassword) {
         boolean isOldPasswordEntered = !TextUtils.isEmpty(oldPassword.trim());
         boolean isNewPasswordEntered = !TextUtils.isEmpty(newPassword.trim());
 
@@ -174,64 +174,72 @@ public class ValidationUtils {
         return false;
     }
 
-    public static boolean isNull(String value){
+    public static boolean isNull(String value) {
         return value == null || value.equals(NULL);
     }
 
     public static boolean validateAttachment(FragmentManager fragmentManager, String[] supportedAttachmentTypes, Attachment.Type type, Object attachment) {
 
-        if (!isSupportAttachmentType(supportedAttachmentTypes, type)){
+        if (!isSupportAttachmentType(supportedAttachmentTypes, type)) {
             OneButtonDialogFragment.show(fragmentManager, R.string.dlg_unsupported_file, false);
             return false;
         }
 
         if (attachment instanceof File) {
-            File file = (File) attachment;
-            String mimeType = StringUtils.getMimeType(Uri.fromFile(file));
-            if(!isValidFileType(mimeType)) {
+            String mimeType = StringUtils.getMimeType(Uri.fromFile((File) attachment));
+            if (!isValidFileType(mimeType)) {
                 OneButtonDialogFragment.show(fragmentManager, R.string.dlg_unsupported_file, false);
                 return false;
             }
-        }
 
-        if(attachment instanceof File){
-            File file = (File)attachment;
-            if(file.getName().length() > ConstsCore.MAX_FILENAME_LENGTH){
+            if (!isValidMaxLengthName((File) attachment)) {
                 OneButtonDialogFragment.show(fragmentManager, R.string.dlg_filename_long, false);
                 return false;
             }
-        }
 
-        if(type.equals(Attachment.Type.IMAGE)){
-            File file = (File)attachment;
-            if(file.length() > ConstsCore.MAX_IMAGE_SIZE){
-                OneButtonDialogFragment.show(fragmentManager, R.string.dlg_image_big, false);
-                return false;
+            if (type.equals(Attachment.Type.IMAGE)) {
+                if (!isValidMaxImageSize((File) attachment)) {
+                    OneButtonDialogFragment.show(fragmentManager, R.string.dlg_image_big, false);
+                    return false;
+                }
+            } else if (type.equals(Attachment.Type.AUDIO) || type.equals(Attachment.Type.VIDEO)) {
+                if (!isValidMaxAudioVideoSize((File) attachment)) {
+                    OneButtonDialogFragment.show(fragmentManager, R.string.dlg_audio_video_big, false);
+                    return false;
+                }
             }
-        } else if (type.equals(Attachment.Type.AUDIO) || type.equals(Attachment.Type.VIDEO)) {
-            File file = (File)attachment;
-            if(file.length() > ConstsCore.MAX_AUDIO_VIDEO_SIZE){
-                OneButtonDialogFragment.show(fragmentManager, R.string.dlg_audio_video_big, false);
-                return false;
-            }
-        }
-        if (type.equals(Attachment.Type.AUDIO)) {
-            File file = (File) attachment;
-            int duration = MediaUtils.getMetaData(file.getPath()).durationSec();
-            if (duration < ConstsCore.MIN_RECORD_DURATION_IN_SEC) {
-                return false;
+            if (type.equals(Attachment.Type.AUDIO)) {
+                if (!isValidMinAudioDuration((File) attachment)) {
+                    return false;
+                }
             }
         }
-
         return true;
+    }
+
+    private static boolean isValidMaxLengthName(File file) {
+        return file.getName().length() < ConstsCore.MAX_FILENAME_LENGTH;
+    }
+
+    private static boolean isValidMaxImageSize(File file) {
+        return file.length() < ConstsCore.MAX_IMAGE_SIZE;
+    }
+
+    private static boolean isValidMaxAudioVideoSize(File file) {
+        return file.length() < ConstsCore.MAX_AUDIO_VIDEO_SIZE;
+    }
+
+    private static boolean isValidMinAudioDuration(File file) {
+        int duration = MediaUtils.getMetaData(file.getPath()).durationSec();
+        return duration >= ConstsCore.MIN_RECORD_DURATION_IN_SEC;
     }
 
     private static boolean isSupportAttachmentType(String[] supportedAttachmentTypes, Attachment.Type type) {
         boolean supported = false;
-        for(String supportedTypeSrt : supportedAttachmentTypes){
-            Attachment.Type supportedType =  Attachment.Type.valueOf(supportedTypeSrt);
-            if(type.equals(supportedType)){
-                supported  = true;
+        for (String supportedTypeSrt : supportedAttachmentTypes) {
+            Attachment.Type supportedType = Attachment.Type.valueOf(supportedTypeSrt);
+            if (type.equals(supportedType)) {
+                supported = true;
                 break;
             }
         }

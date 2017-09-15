@@ -117,7 +117,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
     private static final int MESSAGES_PAGE_SIZE = ConstsCore.DIALOG_MESSAGES_PER_PAGE;
     private static final int KEEP_ALIVE_TIME = 1;
-    private static final int POST_DELAY_VIEW = 1500;
+    private static final int POST_DELAY_VIEW = 1000;
     private static final int DURATION_VIBRATE = 100;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
@@ -929,6 +929,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     public void startRecord() {
+        setMessageAttachViewsEnable(false);
         setRecorderViewsVisibility(View.VISIBLE);
         audioViewVisibility(View.VISIBLE);
         vibrate(DURATION_VIBRATE);
@@ -937,11 +938,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     public void stopRecordByClick() {
+        setMessageAttachViewsEnable(true);
         vibrate(DURATION_VIBRATE);
         stopRecord();
     }
 
-    private void stopRecord(){
+    private void stopRecord() {
         audioViewVisibility(View.INVISIBLE);
         stopChronometer();
         audioRecorder.stopRecord();
@@ -949,10 +951,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     public void cancelRecord() {
         stopChronometer();
+        setMessageAttachViewsEnable(true);
         setRecorderViewsVisibility(View.INVISIBLE);
         animateCanceling();
         vibrate(DURATION_VIBRATE);
-        audioViewPostDelayInvisible();
+        audioViewPostDelayVisibility(View.INVISIBLE);
         audioRecorder.cancelRecord();
     }
 
@@ -970,11 +973,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         recordChronometer.setVisibility(visibility);
     }
 
-    private void audioViewPostDelayInvisible() {
+    private void setMessageAttachViewsEnable(boolean enable) {
+        messageEditText.setFocusableInTouchMode(enable);
+        messageEditText.setFocusable(enable);
+        smilePanelImageButton.setEnabled(enable);
+        attachButton.setEnabled(enable);
+    }
+
+    private void audioViewPostDelayVisibility(final int visibility) {
         audioLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                audioViewVisibility(View.INVISIBLE);
+                audioViewVisibility(visibility);
             }
         }, POST_DELAY_VIEW);
     }
@@ -1336,7 +1346,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
         @Override
         public void onMediaRecordClosed() {
-            ToastUtils.shortToast(R.string.dialog_record_canceled);
         }
 
         private void audioRecordErrorAnimate() {
