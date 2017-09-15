@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.j256.ormlite.stmt.query.In;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -778,6 +779,17 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void performLoadChatsSuccessAction(Bundle bundle) {
        // hideSnackBar();
         isDialogLoading = false;
+    }
+
+    protected void startActivityByName (Class<?> activityName, boolean needClearTask){
+        Intent intent = new Intent(this, activityName);
+
+        if (needClearTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        }
+
+        startActivity(intent);
+        finish();
     }
 
     public class LoadChatsSuccessAction implements Command {

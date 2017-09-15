@@ -48,7 +48,6 @@ import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCSessionConnectionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCSignalingCallback;
-import com.quickblox.videochat.webrtc.exception.QBRTCException;
 import com.quickblox.videochat.webrtc.exception.QBRTCSignalException;
 
 import java.io.Serializable;
@@ -99,7 +98,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType);
         intent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE, StartConversationReason.OUTCOME_CALL_MADE);
         intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivityForResult(intent, CALL_ACTIVITY_CLOSE);
     }
 
@@ -175,6 +174,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     protected void onPause() {
         isInFront = false;
         super.onPause();
+        appSharedHelper.saveLastOpenActivity(getClass().getName());
     }
 
     @Override
@@ -209,6 +209,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             qbCallChatHelper.removeRTCSessionUserCallback();
             qbCallChatHelper.releaseCurrentSession(CallActivity.this, CallActivity.this);
         }
+
+        appSharedHelper.saveLastOpenActivity(null);
     }
 
     @Override
