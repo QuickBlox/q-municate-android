@@ -96,7 +96,7 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         }
     }
 
-    public void updateItemPosition(DialogWrapper dlgWrapper) {
+    public void moveToFirstPosition(DialogWrapper dlgWrapper) {
         if (!objectsList.get(0).equals(dlgWrapper)) {
             objectsList.remove(dlgWrapper);
             objectsList.add(0, dlgWrapper);

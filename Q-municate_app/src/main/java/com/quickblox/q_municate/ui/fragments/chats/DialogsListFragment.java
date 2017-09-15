@@ -322,7 +322,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         dialogsListAdapter.updateItem(dialogWrapper);
 
         if(updatePosition) {
-            dialogsListAdapter.updateItemPosition(dialogWrapper);
+            dialogsListAdapter.moveToFirstPosition(dialogWrapper);
         }
 
         int start = dialogsListView.getFirstVisiblePosition();
@@ -675,7 +675,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                         }
                         Dialog dialog = getObjFromBundle((Bundle) data);
                         if (dialog != null) {
-                            updateOrAddDialog(dialog.getDialogId(), true);
+                            updateOrAddDialog(dialog.getDialogId(), false);
                         }
                     } else if (observeKey.equals(dataManager.getDialogOccupantDataManager().getObserverKey())) {
                         DialogOccupant dialogOccupant = getObjFromBundle((Bundle) data);
