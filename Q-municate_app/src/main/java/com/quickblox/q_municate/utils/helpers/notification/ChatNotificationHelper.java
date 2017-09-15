@@ -3,7 +3,6 @@ package com.quickblox.q_municate.utils.helpers.notification;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -91,6 +90,6 @@ public class ChatNotificationHelper {
     }
 
     private boolean isOwnMessage(int senderUserId) {
-        return appSharedHelper.getUserId() != senderUserId;
+        return appSharedHelper.getUserId() == senderUserId;
     }
 }
