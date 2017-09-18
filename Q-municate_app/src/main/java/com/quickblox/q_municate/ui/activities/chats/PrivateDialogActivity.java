@@ -57,7 +57,8 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         Intent intent = new Intent(context, PrivateDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
-        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         context.startActivity(intent);
     }
 
