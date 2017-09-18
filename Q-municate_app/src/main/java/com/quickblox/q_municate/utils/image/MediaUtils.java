@@ -51,7 +51,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ImageUtils {
+public class MediaUtils {
 
     public static final int GALLERY_REQUEST_CODE = 111;
     public static final int CAMERA_PHOTO_REQUEST_CODE = 222;
@@ -59,7 +59,7 @@ public class ImageUtils {
     public static final int IMAGE_REQUEST_CODE = 333;
     public static final int IMAGE_VIDEO_LOCATION_REQUEST_CODE = 444;
 
-    private static final String TAG = ImageUtils.class.getSimpleName();
+    private static final String TAG = MediaUtils.class.getSimpleName();
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
     private static final String CAMERA_PHOTO_FILE_EXT = ".jpg";
     private static final String CAMERA_VIDEO_FILE_EXT = ".mp4";
@@ -67,7 +67,7 @@ public class ImageUtils {
 
     private Activity activity;
 
-    public ImageUtils(Activity activity) {
+    public MediaUtils(Activity activity) {
         this.activity = activity;
     }
 
@@ -291,7 +291,7 @@ public class ImageUtils {
         File file = null;
         try {
             if (uri != null) {
-                filePath = ImageUtils.saveUriToFile(uri);
+                filePath = MediaUtils.saveUriToFile(uri);
                 file = new File(filePath);
             }
         } catch (Exception e) {

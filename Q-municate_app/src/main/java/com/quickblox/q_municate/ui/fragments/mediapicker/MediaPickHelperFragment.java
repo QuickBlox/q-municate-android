@@ -1,8 +1,7 @@
-package com.quickblox.q_municate.ui.fragments.imagepicker;
+package com.quickblox.q_municate.ui.fragments.mediapicker;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -11,28 +10,26 @@ import android.support.v4.util.Pair;
 
 import com.quickblox.q_municate.tasks.GetFilepathFromUriTask;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate.utils.image.MediaUtils;
+import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.LocationUtils;
 
-import java.io.File;
 
-
-public class ImagePickHelperFragment extends Fragment {
+public class MediaPickHelperFragment extends Fragment {
 
     private static final String ARG_REQUEST_CODE = "requestCode";
     private static final String ARG_PARENT_FRAGMENT = "parentFragment";
 
-    private static final String TAG = ImagePickHelperFragment.class.getSimpleName();
+    private static final String TAG = MediaPickHelperFragment.class.getSimpleName();
 
-    private OnImagePickedListener listener;
+    private OnMediaPickedListener listener;
 
-    public ImagePickHelperFragment() {
+    public MediaPickHelperFragment() {
     }
 
-    public static ImagePickHelperFragment start(Fragment fragment, int requestCode) {
+    public static MediaPickHelperFragment start(Fragment fragment, int requestCode) {
         Bundle args = new Bundle();
         args.putInt(ARG_REQUEST_CODE, requestCode);
         args.putString(ARG_PARENT_FRAGMENT, fragment.getClass().getSimpleName());
@@ -40,17 +37,17 @@ public class ImagePickHelperFragment extends Fragment {
         return start(fragment.getActivity().getSupportFragmentManager(), args);
     }
 
-    public static ImagePickHelperFragment start(FragmentActivity activity, int requestCode) {
+    public static MediaPickHelperFragment start(FragmentActivity activity, int requestCode) {
         Bundle args = new Bundle();
         args.putInt(ARG_REQUEST_CODE, requestCode);
 
         return start(activity.getSupportFragmentManager(), args);
     }
 
-    private static ImagePickHelperFragment start(FragmentManager fm, Bundle args) {
-        ImagePickHelperFragment fragment = (ImagePickHelperFragment) fm.findFragmentByTag(TAG);
+    private static MediaPickHelperFragment start(FragmentManager fm, Bundle args) {
+        MediaPickHelperFragment fragment = (MediaPickHelperFragment) fm.findFragmentByTag(TAG);
         if (fragment == null) {
-            fragment = new ImagePickHelperFragment();
+            fragment = new MediaPickHelperFragment();
             fm.beginTransaction().add(fragment, TAG).commitAllowingStateLoss();
             fragment.setArguments(args);
         }
@@ -67,23 +64,23 @@ public class ImagePickHelperFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (isResultFromImagePick(requestCode, resultCode, data)) {
-            if (requestCode == ImageUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE) {
+        if (isResultFromMediaPick(requestCode, resultCode, data)) {
+            if (requestCode == MediaUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE) {
                 if (data != null) {
                     Bundle bundle = data.getExtras();
                     double latitude = bundle.getDouble(ConstsCore.EXTRA_LOCATION_LATITUDE);
                     double longitude = bundle.getDouble(ConstsCore.EXTRA_LOCATION_LONGITUDE);
                     String location = LocationUtils.generateLocationJson(new Pair<>(ConstsCore.LATITUDE_PARAM, latitude),
                             new Pair<>(ConstsCore.LONGITUDE_PARAM, longitude));
-                    listener.onImagePicked(requestCode, Attachment.Type.LOCATION, location);
+                    listener.onMediaPicked(requestCode, Attachment.Type.LOCATION, location);
                 }
             } else {
-                if ((requestCode == ImageUtils.CAMERA_PHOTO_REQUEST_CODE || requestCode == ImageUtils.CAMERA_VIDEO_REQUEST_CODE) && (data == null || data.getData() == null)) {
+                if ((requestCode == MediaUtils.CAMERA_PHOTO_REQUEST_CODE || requestCode == MediaUtils.CAMERA_VIDEO_REQUEST_CODE) && (data == null || data.getData() == null)) {
                     // Hacky way to get EXTRA_OUTPUT param to work.
                     // When setting EXTRA_OUTPUT param in the camera intent there is a chance that data will return as null
                     // So we just pass temporary camera file as a data, because RESULT_OK means that photo was written in the file.
                     data = new Intent();
-                    data.setData(ImageUtils.getValidUri(ImageUtils.getLastUsedCameraFile(), this.getContext()));
+                    data.setData(MediaUtils.getValidUri(MediaUtils.getLastUsedCameraFile(), this.getContext()));
                 }
 
                 new GetFilepathFromUriTask(getChildFragmentManager(), listener,
@@ -92,7 +89,7 @@ public class ImagePickHelperFragment extends Fragment {
         } else {
             stop(getChildFragmentManager());
             if (listener != null) {
-                listener.onImagePickClosed(getArguments().getInt(ARG_REQUEST_CODE));
+                listener.onMediaPickClosed(getArguments().getInt(ARG_REQUEST_CODE));
             }
         }
 
@@ -106,18 +103,18 @@ public class ImagePickHelperFragment extends Fragment {
         Fragment fragment = ((BaseActivity) activity).getSupportFragmentManager()
                 .findFragmentByTag(getArguments().getString(ARG_PARENT_FRAGMENT));
         if (fragment != null) {
-            if (fragment instanceof OnImagePickedListener) {
-                listener = (OnImagePickedListener) fragment;
+            if (fragment instanceof OnMediaPickedListener) {
+                listener = (OnMediaPickedListener) fragment;
             }
         } else {
-            if (activity instanceof OnImagePickedListener) {
-                listener = (OnImagePickedListener) activity;
+            if (activity instanceof OnMediaPickedListener) {
+                listener = (OnMediaPickedListener) activity;
             }
         }
 
         if (listener == null) {
             throw new IllegalStateException(
-                    "Either activity or fragment should implement OnImagePickedListener");
+                    "Either activity or fragment should implement OnMediaPickedListener");
         }
     }
 
@@ -127,12 +124,12 @@ public class ImagePickHelperFragment extends Fragment {
         listener = null;
     }
 
-    public void setListener(OnImagePickedListener listener) {
+    public void setListener(OnMediaPickedListener listener) {
         this.listener = listener;
     }
 
-    private boolean isResultFromImagePick(int requestCode, int resultCode, Intent data) {
-        return resultCode == Activity.RESULT_OK && ((requestCode == ImageUtils.CAMERA_PHOTO_REQUEST_CODE || requestCode == ImageUtils.CAMERA_VIDEO_REQUEST_CODE) || (requestCode == ImageUtils.GALLERY_REQUEST_CODE && data != null)
-                || (requestCode == ImageUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE && data != null));
+    private boolean isResultFromMediaPick(int requestCode, int resultCode, Intent data) {
+        return resultCode == Activity.RESULT_OK && ((requestCode == MediaUtils.CAMERA_PHOTO_REQUEST_CODE || requestCode == MediaUtils.CAMERA_VIDEO_REQUEST_CODE) || (requestCode == MediaUtils.GALLERY_REQUEST_CODE && data != null)
+                || (requestCode == MediaUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE && data != null));
     }
 }
