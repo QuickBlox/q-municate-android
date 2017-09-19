@@ -1040,7 +1040,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     if (action == MessageDataManager.UPDATE_ACTION) {
                         Log.d(TAG, "updated message = " + message);
                         updateMessageItemInAdapter(combinationMessage);
-                    } else if (action == MessageDataManager.CREATE_OR_UPDATE_ACTION) {
+                    } else if (action == MessageDataManager.CREATE_ACTION) {
                         Log.d(TAG, "created message = " + message);
                         addMessageItemToAdapter(combinationMessage);
                     }
@@ -1072,7 +1072,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     if (action == DialogNotificationDataManager.UPDATE_ACTION) {
                         Log.d(TAG, "updated dialogNotification = " + dialogNotification);
                         updateMessageItemInAdapter(combinationMessage);
-                    } else if (action == DialogNotificationDataManager.CREATE_OR_UPDATE_ACTION) {
+                    } else if (action == DialogNotificationDataManager.CREATE_ACTION) {
                         Log.d(TAG, "created dialogNotification = " + dialogNotification);
                         addMessageItemToAdapter(combinationMessage);
                         if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {

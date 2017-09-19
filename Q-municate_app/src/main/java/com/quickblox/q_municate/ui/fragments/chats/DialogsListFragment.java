@@ -325,7 +325,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
         Log.i(TAG, "updateOrAddDialog dialogWrapper= " + dialogWrapper.getTotalCount());
-        dialogsListAdapter.updateItem(dialogWrapper);
+        if (updateDialogsProcess == State.finished) {
+            dialogsListAdapter.updateItem(dialogWrapper);
+        }
 
         if(updatePosition) {
             dialogsListAdapter.moveToFirstPosition(dialogWrapper);
@@ -673,6 +675,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                     Log.i(TAG, "CommonObserver update, key="+observeKey);
                     if (observeKey.equals(dataManager.getMessageDataManager().getObserverKey())
                             && (((Bundle) data).getSerializable(BaseManager.EXTRA_OBJECT) instanceof Message)){
+                        int action = ((Bundle) data).getInt(BaseManager.EXTRA_ACTION);
+                        Log.i(TAG, "CommonObserver action =  " + action);
                         Message message = getObjFromBundle((Bundle) data);
                         if (message.getDialogOccupant() != null && message.getDialogOccupant().getDialog() != null) {
                             boolean updatePosition = message.isIncoming(AppSession.getSession().getUser().getId());

@@ -89,7 +89,6 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     private List<QBChatDialog> groupDialogsList;
     private QBChatDialogParticipantListener participantListener;
     private final ConnectionListener chatConnectionListener;
-    private boolean isInitialized;
 
 
     public QBChatHelper(Context context) {
@@ -157,8 +156,6 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         initCurrentDialogForChatIfPossible();
 
         initMainChatListeners();
-
-        isInitialized = true;
     }
 
     private void initMainChatListeners() {
@@ -856,11 +853,6 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
-    public boolean isInitialized() {
-        return isInitialized;
-    }
-
-
     interface QBNotificationChatListener {
 
         void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
@@ -874,6 +866,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
         @Override
         public void authenticated(XMPPConnection connection, boolean resumed) {
+            chatCreator = AppSession.getSession().getUser();
             initMainChatListeners();
         }
     }

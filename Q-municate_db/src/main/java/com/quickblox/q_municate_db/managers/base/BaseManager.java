@@ -87,10 +87,10 @@ public abstract class BaseManager<T> extends Observable implements Manager {
     @Override
     public void createOrUpdate(Object object, boolean notify) {
         try {
-            dao.createOrUpdate((T) object);
+            Dao.CreateOrUpdateStatus status = dao.createOrUpdate((T) object);
 
             if (notify) {
-                notifyObservers((T) object, CREATE_OR_UPDATE_ACTION);
+                notifyObservers((T) object, status.isCreated() ? CREATE_ACTION : UPDATE_ACTION);
             }
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate(Object) - " + e.getMessage());
