@@ -387,7 +387,12 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     public void onLoadFinished(Loader<List<DialogWrapper>> loader, List<DialogWrapper> dialogsList) {
         updateDialogsProcess = State.started;
         Log.d(TAG, "onLoadFinished!!! dialogsListLoader.isLoadCacheFinished() " + dialogsListLoader.isLoadCacheFinished());
-        updateDialogsListFromQueue();
+        if (dialogsListLoader.isLoadCacheFinished()){
+            //clear queue after loading all dialogs from cache before updating all dialogs from REST
+            loaderConsumerQueue.clear();
+        }else {
+            updateDialogsListFromQueue();
+        }
 
         updateDialogsAdapter(dialogsList);
 
