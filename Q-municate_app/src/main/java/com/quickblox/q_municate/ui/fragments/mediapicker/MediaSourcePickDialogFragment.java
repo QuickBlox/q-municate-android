@@ -19,7 +19,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
-import com.quickblox.q_municate.utils.image.MediaUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

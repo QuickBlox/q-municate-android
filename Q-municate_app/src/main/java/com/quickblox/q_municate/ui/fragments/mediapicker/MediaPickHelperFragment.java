@@ -10,7 +10,7 @@ import android.support.v4.util.Pair;
 
 import com.quickblox.q_municate.tasks.GetFilepathFromUriTask;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate.utils.image.MediaUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.Attachment;

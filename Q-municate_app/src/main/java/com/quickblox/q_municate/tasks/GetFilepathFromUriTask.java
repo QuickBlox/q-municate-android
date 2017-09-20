@@ -13,7 +13,7 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
 import com.quickblox.q_municate.utils.SchemeType;
 import com.quickblox.q_municate.utils.StringUtils;
-import com.quickblox.q_municate.utils.image.MediaUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 

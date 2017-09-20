@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.utils.image;
+package com.quickblox.q_municate.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,10 +29,6 @@ import android.webkit.MimeTypeMap;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
-import com.quickblox.q_municate.utils.FileUtils;
-import com.quickblox.q_municate.utils.MimeType;
-import com.quickblox.q_municate.utils.StorageUtil;
-import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -291,7 +287,7 @@ public class MediaUtils {
         File file = null;
         try {
             if (uri != null) {
-                filePath = MediaUtils.saveUriToFile(uri);
+                filePath = saveUriToFile(uri);
                 file = new File(filePath);
             }
         } catch (Exception e) {

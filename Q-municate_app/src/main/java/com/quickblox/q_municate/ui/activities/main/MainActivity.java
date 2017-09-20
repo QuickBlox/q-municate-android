@@ -21,7 +21,7 @@ import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.image.MediaUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;

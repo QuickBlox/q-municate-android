@@ -53,7 +53,7 @@ import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.utils.helpers.MediaPickHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.image.MediaUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
