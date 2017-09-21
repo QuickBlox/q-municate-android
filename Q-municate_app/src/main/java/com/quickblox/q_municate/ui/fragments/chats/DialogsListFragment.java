@@ -325,7 +325,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         QBChatDialog qbChatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
         DialogWrapper dialogWrapper = new DialogWrapper(getContext(), dataManager, qbChatDialog);
         Log.i(TAG, "updateOrAddDialog dialogWrapper= " + dialogWrapper.getTotalCount());
-        if (updateDialogsProcess == State.finished) {
+        if (updateDialogsProcess == State.finished || dialogsListAdapter.getCount() != 0) {
             dialogsListAdapter.updateItem(dialogWrapper);
         }
 
@@ -687,7 +687,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                             boolean updatePosition = message.isIncoming(AppSession.getSession().getUser().getId());
                             Log.i(TAG, "CommonObserver getMessageDataManager updatePosition= " + updatePosition);
 
-                            updateOrAddDialog(message.getDialogOccupant().getDialog().getDialogId(), updatePosition);
+                            updateOrAddDialog(message.getDialogOccupant().getDialog().getDialogId(), action == BaseManager.CREATE_ACTION);
                         }
                     }
                     else if (observeKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
