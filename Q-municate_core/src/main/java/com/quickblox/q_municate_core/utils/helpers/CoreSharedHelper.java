@@ -3,16 +3,9 @@ package com.quickblox.q_municate_core.utils.helpers;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.users.model.QBUser;
-
 import static com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper.Constants.*;
 
 public class CoreSharedHelper {
-
-
-
 
     public class Constants {
 
@@ -21,8 +14,7 @@ public class CoreSharedHelper {
         public static final String IMPORT_INITIALIZED = "import_initialized";
         public static final String FIRST_AUTH = "first_auth";
         public static final String FB_TOKEN = "fb_token";
-        public static final String TD_SERVICE_PROVIDER = "x_auth_service_provider";
-        public static final String TD_CREDENTIALS = "x_verify_credentials_authorization";
+        public static final String FIREBASE_TOKEN = "firebase_token";
 
         public static final String USER_ID = "user_id";
         public static final String USER_EMAIL = "user_email";
@@ -134,20 +126,12 @@ public class CoreSharedHelper {
         savePref(Constants.FB_TOKEN, token);
     }
 
-    public void saveTDServiceProvider(String serviceProvider){
-        savePref(TD_SERVICE_PROVIDER, serviceProvider);
+    public void saveFirebaseToken(String firebaseToken){
+        savePref(FIREBASE_TOKEN, firebaseToken);
     }
 
-    public String getTDServiceProvider(){
-        return getPref(TD_SERVICE_PROVIDER, null);
-    }
-
-    public void saveTDCredentials(String credentials){
-        savePref(TD_CREDENTIALS, credentials);
-    }
-
-    public String getTDCredentials(){
-        return getPref(TD_CREDENTIALS, null);
+    public String getFirebaseToken(){
+        return getPref(FIREBASE_TOKEN, null);
     }
 
     public int getUserId() {

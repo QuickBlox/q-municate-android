@@ -4,22 +4,14 @@ package com.quickblox.q_municate;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.digits.sdk.android.Digits;
-import com.digits.sdk.android.DigitsOAuthSigning;
-import com.digits.sdk.android.DigitsSession;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSessionListenerImpl;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.auth.session.QBSessionParameters;
 import com.quickblox.q_municate.service.SessionJobService;
-import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
+import com.quickblox.q_municate.utils.helpers.FirebaseAuthHelper;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.users.model.QBUser;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterAuthToken;
-import com.twitter.sdk.android.core.TwitterCore;
-
-import java.util.Map;
 
 public class SessionListener {
 
@@ -51,25 +43,23 @@ public class SessionListener {
         public void onProviderSessionExpired(String provider) {
             Log.d(TAG, "onProviderSessionExpired :" +provider );
 
-            if (!QBProvider.TWITTER_DIGITS.equals(provider)){
+            if (!QBProvider.FIREBASE_PHONE.equals(provider)){
                 return;
             }
-            TwitterAuthConfig authConfig = TwitterCore.getInstance().getAuthConfig();
-            DigitsSession session = Digits.getActiveSession();
-            if (session == null) {
-                return;
-            }
-            TwitterAuthToken authToken = session.getAuthToken();
-            DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
-            Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
 
-            Log.d(TAG, "authHeaders provider = " + authHeaders.get(TwitterDigitsHelper.PROVIDER)
-                    + "\n, credentials= " + authHeaders.get(TwitterDigitsHelper.CREDENTIALS));
+            FirebaseAuthHelper.getIdTokenForCurrentUser(new FirebaseAuthHelper.RequestFirebaseIdTokenCallback() {
+                @Override
+                public void onSuccess(String authToken) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAuthHelper.EXTRA_FIREBASE_ACCESS_TOKEN, authToken);
+                    SessionJobService.startSignInSocial(App.getInstance(), bundle);
+                }
 
-            Bundle bundle = new Bundle();
-            bundle.putString(TwitterDigitsHelper.PROVIDER, authHeaders.get(TwitterDigitsHelper.PROVIDER));
-            bundle.putString(TwitterDigitsHelper.CREDENTIALS, authHeaders.get(TwitterDigitsHelper.CREDENTIALS));
-            SessionJobService.startSignInSocial(App.getInstance(), bundle);
+                @Override
+                public void onError(Exception e) {
+
+                }
+            });
         }
     }
 }

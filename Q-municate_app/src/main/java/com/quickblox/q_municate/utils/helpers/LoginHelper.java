@@ -5,12 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.utils.listeners.ExistingQbSessionListener;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.listeners.GlobalLoginListener;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -18,10 +17,7 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
-
-import java.util.concurrent.TimeUnit;
 
 import rx.Subscriber;
 
@@ -33,7 +29,6 @@ public class LoginHelper {
     private SharedHelper appSharedHelper;
     private CommandBroadcastReceiver commandBroadcastReceiver;
     private GlobalLoginListener globalLoginListener;
-    private ExistingQbSessionListener existingQbSessionListener;
 
     private String userEmail;
     private String userPassword;
@@ -46,53 +41,8 @@ public class LoginHelper {
         userPassword = appSharedHelper.getUserPassword();
     }
 
-    public LoginHelper(Context context, ExistingQbSessionListener existingQbSessionListener) {
-        this(context);
-        this.existingQbSessionListener = existingQbSessionListener;
-    }
-
-    public void checkStartExistSession() {
-
-        if (appSharedHelper.isSavedRememberMe()) {
-            startExistSession();
-        } else {
-            if (existingQbSessionListener != null) {
-                existingQbSessionListener.onStartSessionFail();
-            }
-        }
-    }
-
-    public void startExistSession() {
-        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
-        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
-        if ((isEmailEntered && isPasswordEntered) || (isLoggedViaSocial(isPasswordEntered))) {
-            runExistSession();
-        } else {
-            if (existingQbSessionListener != null) {
-                existingQbSessionListener.onStartSessionFail();
-            }
-        }
-    }
-
-    public boolean isLoggedViaSocial(boolean isPasswordEntered) {
-        return isPasswordEntered && !LoginType.EMAIL.equals(getCurrentLoginType());
-    }
-
     public LoginType getCurrentLoginType() {
         return AppSession.getSession().getLoginType();
-    }
-
-    public void runExistSession() {
-        //check is token valid for about 1 minute
-        if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
-                ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
-            Log.d(TAG, "runExistSession()");
-            if (existingQbSessionListener != null) {
-                existingQbSessionListener.onStartSessionSuccess();
-            }
-        } else {
-            login();
-        }
     }
 
     public void login() {
@@ -100,8 +50,8 @@ public class LoginHelper {
             loginQB();
         } else if (LoginType.FACEBOOK.equals(getCurrentLoginType())) {
             loginFB();
-        } else if (LoginType.TWITTER_DIGITS.equals(getCurrentLoginType())){
-            loginTD();
+        } else if (LoginType.FIREBASE_PHONE.equals(getCurrentLoginType())){
+            loginPhoneNumber();
         }
     }
 
@@ -138,10 +88,9 @@ public class LoginHelper {
                 });
     }
 
-    private void loginTD() {
-        String tdServiceProvider = appSharedHelper.getTDServiceProvider();
-        String tdCredentials = appSharedHelper.getTDCredentials();
-        ServiceManager.getInstance().login(QBProvider.TWITTER_DIGITS, tdServiceProvider, tdCredentials)
+    private void loginPhoneNumber() {
+        String firebaseAccessToken = appSharedHelper.getFirebaseToken();
+        ServiceManager.getInstance().login(QBProvider.FIREBASE_PHONE, firebaseAccessToken, StringObfuscator.getFirebaseAuthProjectId())
                 .subscribe(new Subscriber<QBUser>() {
                     @Override
                     public void onCompleted() {

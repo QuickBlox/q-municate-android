@@ -4,20 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.digits.sdk.android.Digits;
-import com.digits.sdk.android.DigitsOAuthSigning;
-import com.digits.sdk.android.DigitsSession;
-import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
-import com.quickblox.auth.session.QBSession;
-import com.quickblox.auth.session.QBSessionListenerImpl;
 import com.quickblox.auth.session.QBSessionManager;
-import com.quickblox.auth.session.QBSessionParameters;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
-import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.server.Performer;
 import com.quickblox.extensions.RxJavaPerformProcessor;
 import com.quickblox.messages.services.QBPushManager;
@@ -27,7 +18,6 @@ import com.quickblox.q_municate_auth_service.QMAuthService;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.network.NetworkGCMTaskService;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -35,20 +25,14 @@ import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterAuthToken;
-import com.twitter.sdk.android.core.TwitterCore;
 
 import java.io.File;
-import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.exceptions.Exceptions;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -123,16 +107,16 @@ public class ServiceManager {
                 .map(new Func1<QBUser, QBUser>() {
                     @Override
                     public QBUser call(QBUser qbUser) {
-                        Log.d(TAG, "login observer call " + qbUser);
+                        Log.d(TAG, "loginByPhone observer call " + qbUser);
                         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
                         if (QBProvider.FACEBOOK.equals(socialProvider) && TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
-                            //Actions for first login via Facebook
+                            //Actions for first loginByPhone via Facebook
                             CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
                             getFBUserWithAvatar(qbUser);
-                        } else if (QBProvider.TWITTER_DIGITS.equals(socialProvider) && TextUtils.isEmpty(qbUser.getFullName())) {
-                            //Actions for first login via Twitter Digits
+                        } else if (QBProvider.FIREBASE_PHONE.equals(socialProvider) && TextUtils.isEmpty(qbUser.getFullName())) {
+                            //Actions for first loginByPhone via Twitter Digits
                             CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
-                            getTDUserWithFullName(qbUser);
+                            getUserWithFullNameAsPhone(qbUser);
                         }
                         try {
                             updateUserSync(qbUser);
@@ -342,14 +326,14 @@ public class ServiceManager {
         return user;
     }
 
-    private QBUser getTDUserWithFullName(QBUser user) {
+    private QBUser getUserWithFullNameAsPhone(QBUser user) {
         user.setFullName(user.getPhone());
         user.setCustomData(Utils.customDataToString(getUserCustomData(ConstsCore.EMPTY_STRING)));
         return user;
     }
 
     private UserCustomData getUserCustomData(String avatarUrl) {
-        String isImport = "1"; // TODO: temp, first FB or TD login (for correct work need use crossplatform)
+        String isImport = "1"; // TODO: temp, first FB or TD loginByPhone (for correct work need use crossplatform)
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
 

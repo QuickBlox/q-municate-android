@@ -156,4 +156,15 @@
         <item name="android:padding">@dimen/padding_common</item>
         <item name="android:scaleType">centerInside</item>
     </style>
+
+    <style name="FirebaseStyle" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+
+        <item name="colorControlNormal">@color/material_green_500</item>
+        <item name="colorControlActivated">@color/material_green_500</item>
+        <item name="colorControlHighlight">@color/material_green_a200</item>
+        <item name="android:windowBackground">@color/material_green_50</item>
+    </style>
 </resources>

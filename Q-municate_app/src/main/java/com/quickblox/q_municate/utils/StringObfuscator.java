@@ -35,4 +35,8 @@ public class StringObfuscator {
     public static String getTwitterConsumerSecret(){
         return BuildConfig.TWITTER_SECRET;
     }
+
+    public static String getFirebaseAuthProjectId(){
+        return BuildConfig.FIREBASE_AUTH_PROJECT_ID;
+    }
 }

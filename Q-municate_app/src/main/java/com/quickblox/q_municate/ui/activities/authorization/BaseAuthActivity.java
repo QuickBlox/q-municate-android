@@ -5,37 +5,32 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.util.Log;
 import android.widget.EditText;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.digits.sdk.android.AuthCallback;
-import com.digits.sdk.android.DigitsException;
-import com.digits.sdk.android.DigitsOAuthSigning;
-import com.digits.sdk.android.DigitsSession;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
+import com.firebase.ui.auth.ErrorCodes;
+import com.firebase.ui.auth.IdpResponse;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.AuthUtils;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
-import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
+import com.quickblox.q_municate.utils.helpers.FirebaseAuthHelper;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.users.model.QBUser;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterAuthToken;
-import com.twitter.sdk.android.core.TwitterCore;
-
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.OnTextChanged;
@@ -64,11 +59,12 @@ public abstract class BaseAuthActivity extends BaseActivity {
     protected EditText passwordEditText;
 
     protected FacebookHelper facebookHelper;
-    protected TwitterDigitsHelper twitterDigitsHelper;
+    private FirebaseAuthHelper firebaseAuthHelper;
+    private FirebaseAuthCallback firebaseAuthCallback;
+
     protected LoginType loginType = LoginType.EMAIL;
     protected Resources resources;
 
-    private TwitterDigitsAuthCallback twitterDigitsAuthCallback;
     private ServiceManager serviceManager;
 
     public static void start(Context context) {
@@ -104,7 +100,32 @@ public abstract class BaseAuthActivity extends BaseActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FirebaseAuthHelper.RC_SIGN_IN){
+            onReceiveFirebaseAuthResult(resultCode, data);
+        }
         facebookHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void onReceiveFirebaseAuthResult(int resultCode, Intent data) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+
+            // Successfully signed in
+            if (resultCode == RESULT_OK) {
+                FirebaseAuthHelper.getIdTokenForCurrentUser(firebaseAuthCallback);
+                return;
+            } else {
+                 //Sign in failed
+                if (response == null) {
+                    // User pressed back button
+                    Log.i(TAG, "BACK button pressed");
+                    return;
+                }
+
+                if (response.getErrorCode() == ErrorCodes.NO_NETWORK || response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+                    showSnackbar(R.string.dlg_internet_connection_error, Snackbar.LENGTH_INDEFINITE);
+                    return;
+                }
+            }
     }
 
     @Nullable
@@ -125,8 +146,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
             loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
         facebookHelper = new FacebookHelper(this);
-        twitterDigitsHelper = new TwitterDigitsHelper();
-        twitterDigitsAuthCallback = new TwitterDigitsAuthCallback();
+        firebaseAuthHelper = new FirebaseAuthHelper();
+        firebaseAuthCallback = new FirebaseAuthCallback();
         failAction = new FailAction();
         serviceManager = ServiceManager.getInstance();
     }
@@ -152,8 +173,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
         appSharedHelper.saveSavedRememberMe(true);
         if (loginType.equals(LoginType.FACEBOOK)) {
             facebookHelper.login(new FacebookLoginCallback());
-        } else if (loginType.equals(LoginType.TWITTER_DIGITS)) {
-            twitterDigitsHelper.login(twitterDigitsAuthCallback);
+        } else if (loginType.equals(LoginType.FIREBASE_PHONE)) {
+            firebaseAuthHelper.loginByPhone(BaseAuthActivity.this);
         }
     }
 
@@ -249,28 +270,18 @@ public abstract class BaseAuthActivity extends BaseActivity {
         }
     }
 
-    private class TwitterDigitsAuthCallback implements AuthCallback {
+    private class FirebaseAuthCallback implements FirebaseAuthHelper.RequestFirebaseIdTokenCallback {
 
         @Override
-        public void success(DigitsSession session, String phoneNumber) {
-            Log.d(TAG, "Success login by number: " + phoneNumber);
-
+        public void onSuccess(String authToken) {
             showProgress();
-
-            TwitterAuthConfig authConfig = TwitterCore.getInstance().getAuthConfig();
-            TwitterAuthToken authToken = session.getAuthToken();
-            DigitsOAuthSigning authSigning = new DigitsOAuthSigning(authConfig, authToken);
-            Map<String, String> authHeaders = authSigning.getOAuthEchoHeadersForVerifyCredentials();
-
-            serviceManager.login(QBProvider.TWITTER_DIGITS, authHeaders.get(TwitterDigitsHelper.PROVIDER),authHeaders.get(TwitterDigitsHelper.CREDENTIALS))
-                          .subscribe(socialLoginObserver);
+            serviceManager.login(QBProvider.FIREBASE_PHONE, authToken, StringObfuscator.getFirebaseAuthProjectId())
+                    .subscribe(socialLoginObserver);
         }
 
         @Override
-        public void failure(DigitsException error) {
-            Log.d(TAG, "Failure!!!! error: " + error.getLocalizedMessage());
+        public void onError(Exception e) {
             hideProgress();
         }
     }
-
 }

@@ -60,4 +60,9 @@
 
     <color name="about_version_text">#757575</color>
 
+    <color name="material_green_50">#E8F5E9</color>
+    <color name="material_green_500">#4CAF50</color>
+    <color name="material_green_700">#388E3C</color>
+    <color name="material_green_a200">#69F0AE</color>
+
 </resources>

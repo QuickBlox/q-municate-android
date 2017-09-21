@@ -1,5 +1,5 @@
 package com.quickblox.q_municate_core.models;
 
 public enum LoginType {
-    EMAIL, FACEBOOK, TWITTER_DIGITS
+    EMAIL, FACEBOOK, FIREBASE_PHONE
 }

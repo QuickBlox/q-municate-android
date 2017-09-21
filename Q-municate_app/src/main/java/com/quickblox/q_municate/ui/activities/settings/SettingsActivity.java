@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.activities.settings;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,8 +21,8 @@ import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragme
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.FirebaseAuthHelper;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
-import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -55,7 +54,7 @@ public class SettingsActivity extends BaseLoggableActivity {
 
     private QMUser user;
     private FacebookHelper facebookHelper;
-    private TwitterDigitsHelper twitterDigitsHelper;
+    private FirebaseAuthHelper firebaseAuthHelper;
 
     public static void startForResult(Fragment fragment) {
         Intent intent = new Intent(fragment.getActivity(), SettingsActivity.class);
@@ -130,7 +129,7 @@ public class SettingsActivity extends BaseLoggableActivity {
                                     showProgress();
 
                                     facebookHelper.logout();
-                                    twitterDigitsHelper.logout();
+                                    firebaseAuthHelper.logout();
 
                                     ServiceManager.getInstance().logout(new Subscriber<Void>() {
                                         @Override
@@ -167,7 +166,7 @@ public class SettingsActivity extends BaseLoggableActivity {
         title = getString(R.string.settings_title);
         user = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
         facebookHelper = new FacebookHelper(this);
-        twitterDigitsHelper = new TwitterDigitsHelper();
+        firebaseAuthHelper = new FirebaseAuthHelper();
     }
 
     private void fillUI() {

@@ -32,10 +32,10 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 25
-    buildToolsVersion = '25.0.0'
-    minSdkVersion = 15
-    targetSdkVersion = 23
+    compileSdkVersion = 26
+    buildToolsVersion = '26.0.1'
+    minSdkVersion = 16
+    targetSdkVersion = 26
     versionName = '2.3.8'
     versionCode = 238
 
@@ -54,7 +54,7 @@ ext {
     // Dependencies versions
     multiDexVersion = '1.0.1'
     supportVersion = '25.4.0'
-    googlePlayServicesVersion = '11.0.2'
+    googlePlayServicesVersion = '11.4.0'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '5.0'
     ormliteCoreVersion = '5.0'
@@ -81,7 +81,8 @@ ext {
     robotoTextViewVersion = '2.4.3'
     stickersVersion = '0.7.3'
     crashlyticsVersion = '2.2.2'
-    firebaseVersion = '11.0.2'
-    firebaseAuthVersion = '11.4.0'
+    firebaseVersion = ext.googlePlayServicesVersion
+    firebaseAuthVersion = ext.googlePlayServicesVersion
+    firebaseUiAuthVersion = '2.3.0'
     firebaseDispatcherVersion = '0.6.0'
 }

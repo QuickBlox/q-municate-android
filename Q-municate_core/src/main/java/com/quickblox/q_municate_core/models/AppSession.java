@@ -4,13 +4,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.auth.model.QBProvider;
-import com.quickblox.auth.session.BaseService;
-import com.quickblox.auth.session.QBSession;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.auth.session.QBSessionParameters;
-import com.quickblox.core.exception.BaseServiceException;
-import com.quickblox.auth.QBAuth;
-import com.quickblox.q_municate_base_service.QMServiceManagerListener;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
 
@@ -145,8 +140,8 @@ public class AppSession implements Serializable {
             loginType = LoginType.EMAIL;
         } else if (socialProvider.equals(QBProvider.FACEBOOK)){
             loginType = LoginType.FACEBOOK;
-        } else if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
-            loginType = LoginType.TWITTER_DIGITS;
+        } else if (socialProvider.equals(QBProvider.FIREBASE_PHONE)){
+            loginType = LoginType.FIREBASE_PHONE;
         }
         return result;
     }
