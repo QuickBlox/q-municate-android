@@ -82,5 +82,6 @@ ext {
     stickersVersion = '0.7.3'
     crashlyticsVersion = '2.2.2'
     firebaseVersion = '11.0.2'
+    firebaseAuthVersion = '11.4.0'
     firebaseDispatcherVersion = '0.6.0'
 }
