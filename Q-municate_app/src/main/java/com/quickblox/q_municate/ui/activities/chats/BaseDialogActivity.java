@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -33,6 +34,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -282,12 +284,19 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        checkLoginToChatOrShowError();
         restoreDefaultCanPerformLogout();
 
         loadNextPartMessagesAsync();
 
         checkMessageSendingPossibility();
         resumeMediaPlayer();
+    }
+
+    private void checkLoginToChatOrShowError() {
+        if (!QBChatService.getInstance().isLoggedIn()){
+            showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE);
+        }
     }
 
     @Override
@@ -318,6 +327,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onChatReconnected() {
         loadNextPartMessagesAsync();
+        initCurrentDialog();
+        checkMessageSendingPossibility();
     }
 
     @Override
