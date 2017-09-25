@@ -21,7 +21,7 @@ import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.image.ImageUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
@@ -202,7 +202,7 @@ public class MainActivity extends BaseLoggableActivity {
         if (!TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
             loadLogoActionBar(userCustomData.getAvatarUrl());
         } else {
-            setActionBarIcon(ImageUtils.getRoundIconDrawable(this,
+            setActionBarIcon(MediaUtils.getRoundIconDrawable(this,
                     BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));
         }
     }
@@ -213,7 +213,7 @@ public class MainActivity extends BaseLoggableActivity {
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
-                        setActionBarIcon(ImageUtils.getRoundIconDrawable(MainActivity.this, loadedBitmap));
+                        setActionBarIcon(MediaUtils.getRoundIconDrawable(MainActivity.this, loadedBitmap));
                     }
                 });
     }

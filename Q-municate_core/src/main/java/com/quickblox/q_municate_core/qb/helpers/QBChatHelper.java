@@ -611,7 +611,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     public void joinRoomChat(QBChatDialog dialog, QBEntityCallback<Void> callback) {
         dialog.initForChat(chatService);
-        dialog.join(history(), callback); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
+        if (!dialog.isJoined()) { //join only to unjoined dialogs
+            dialog.join(history(), callback); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
+        }
     }
 
     public void joinRoomChat(QBChatDialog dialog) throws XMPPException, SmackException {

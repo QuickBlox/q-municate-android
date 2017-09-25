@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.utils.image;
+package com.quickblox.q_municate.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,10 +29,6 @@ import android.webkit.MimeTypeMap;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
-import com.quickblox.q_municate.utils.FileUtils;
-import com.quickblox.q_municate.utils.MimeType;
-import com.quickblox.q_municate.utils.StorageUtil;
-import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -51,7 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ImageUtils {
+public class MediaUtils {
 
     public static final int GALLERY_REQUEST_CODE = 111;
     public static final int CAMERA_PHOTO_REQUEST_CODE = 222;
@@ -59,7 +55,7 @@ public class ImageUtils {
     public static final int IMAGE_REQUEST_CODE = 333;
     public static final int IMAGE_VIDEO_LOCATION_REQUEST_CODE = 444;
 
-    private static final String TAG = ImageUtils.class.getSimpleName();
+    private static final String TAG = MediaUtils.class.getSimpleName();
     private static final String CAMERA_FILE_NAME_PREFIX = "CAMERA_";
     private static final String CAMERA_PHOTO_FILE_EXT = ".jpg";
     private static final String CAMERA_VIDEO_FILE_EXT = ".mp4";
@@ -67,7 +63,7 @@ public class ImageUtils {
 
     private Activity activity;
 
-    public ImageUtils(Activity activity) {
+    public MediaUtils(Activity activity) {
         this.activity = activity;
     }
 
@@ -133,7 +129,7 @@ public class ImageUtils {
         File videoFile = getTemporaryCameraFileVideo();
         Uri uri = getValidUri(videoFile, activity);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, ConstsCore.VIDEO_QUALITY_LOW);
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, ConstsCore.VIDEO_QUALITY_HIGH);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         activity.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }
@@ -147,7 +143,7 @@ public class ImageUtils {
         File videoFile = getTemporaryCameraFileVideo();
         Uri uri = getValidUri(videoFile, fragment.getContext());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, ConstsCore.VIDEO_QUALITY_LOW);
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, ConstsCore.VIDEO_QUALITY_HIGH);
         intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, ConstsCore.MAX_RECORD_DURATION_IN_SEC);
         fragment.startActivityForResult(intent, CAMERA_VIDEO_REQUEST_CODE);
     }
@@ -291,7 +287,7 @@ public class ImageUtils {
         File file = null;
         try {
             if (uri != null) {
-                filePath = ImageUtils.saveUriToFile(uri);
+                filePath = saveUriToFile(uri);
                 file = new File(filePath);
             }
         } catch (Exception e) {

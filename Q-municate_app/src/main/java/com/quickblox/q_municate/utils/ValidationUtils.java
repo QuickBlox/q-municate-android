@@ -253,7 +253,7 @@ public class ValidationUtils {
     }
 
     private static boolean isValidMimeType(String mimeType) {
-        return !TextUtils.isEmpty(mimeType) && mimeType.startsWith(MimeType.IMAGE_MIME_PREFIX);
+        return !TextUtils.isEmpty(mimeType) && (mimeType.startsWith(MimeType.IMAGE_MIME_PREFIX) || mimeType.equals(MimeType.AUDIO_MIME_MP3));
     }
 
     private static boolean isValidExtension(String extension) {

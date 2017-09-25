@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.fragments.imagepicker;
+package com.quickblox.q_municate.ui.fragments.mediapicker;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -19,13 +19,13 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
-import com.quickblox.q_municate.utils.image.ImageUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ImageSourcePickDialogFragment extends DialogFragment {
-    private static final String TAG = ImageSourcePickDialogFragment.class.getSimpleName();
+public class MediaSourcePickDialogFragment extends DialogFragment {
+    private static final String TAG = MediaSourcePickDialogFragment.class.getSimpleName();
     private static final long DELAY_PERMISSIONS_RESULT_ACTIONS = 300;
 
     private static final int POSITION_GALLERY = 0;
@@ -37,15 +37,15 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     private OnImageSourcePickedListener onImageSourcePickedListener;
     protected Handler handler = new Handler();
 
-    public ImageSourcePickDialogFragment() {
+    public MediaSourcePickDialogFragment() {
         systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
-    public static void show(FragmentManager fragmentManager, Fragment imagePickHelperFragment) {
-        ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
-        fragment.setArguments(imagePickHelperFragment.getArguments());
-        fragment.setOnImageSourcePickedListener(new ImageSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(imagePickHelperFragment));
-        fragment.show(fragmentManager, ImageSourcePickDialogFragment.class.getSimpleName());
+    public static void show(FragmentManager fragmentManager, Fragment mediaPickHelperFragment) {
+        MediaSourcePickDialogFragment fragment = new MediaSourcePickDialogFragment();
+        fragment.setArguments(mediaPickHelperFragment.getArguments());
+        fragment.setOnImageSourcePickedListener(new MediaSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(mediaPickHelperFragment));
+        fragment.show(fragmentManager, MediaSourcePickDialogFragment.class.getSimpleName());
     }
 
     @Override
@@ -63,17 +63,17 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         @StringRes int title = R.string.dlg_choose_media_from;
-        final boolean imageRequest = getArguments().getInt("requestCode") != ImageUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE;
+        final boolean imageRequest = getArguments().getInt("requestCode") != MediaUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE;
         MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
-        String[] imagePickArray = getResources().getStringArray(R.array.dlg_image_pick);
-        ArrayList<String> imagePickList = new ArrayList<>(Arrays.asList(imagePickArray));
+        String[] mediaPickArray = getResources().getStringArray(R.array.dlg_image_pick);
+        ArrayList<String> mediaPickList = new ArrayList<>(Arrays.asList(mediaPickArray));
         if (imageRequest) {
             title = R.string.dlg_choose_image_from;
-            imagePickList.remove(imagePickArray[2]);
-            imagePickList.remove(imagePickArray[3]);
+            mediaPickList.remove(mediaPickArray[2]);
+            mediaPickList.remove(mediaPickArray[3]);
         }
         builder.title(title);
-        builder.items(imagePickList.toArray(new String[imagePickList.size()]));
+        builder.items(mediaPickList.toArray(new String[mediaPickList.size()]));
         builder.itemsCallback(new MaterialDialog.ListCallback() {
             @Override
             public void onSelection(MaterialDialog materialDialog, View view, int i,
@@ -232,50 +232,50 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startMediaPicker(fragment);
+                        MediaUtils.startMediaPicker(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startMediaPicker(activity);
+                        MediaUtils.startMediaPicker(activity);
                     }
                     break;
                 case GALLERY_IMAGE:
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startImagePicker(fragment);
+                        MediaUtils.startImagePicker(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startImagePicker(activity);
+                        MediaUtils.startImagePicker(activity);
                     }
                     break;
                 case CAMERA_PHOTO:
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startCameraPhotoForResult(fragment);
+                        MediaUtils.startCameraPhotoForResult(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startCameraPhotoForResult(activity);
+                        MediaUtils.startCameraPhotoForResult(activity);
                     }
                     break;
                 case CAMERA_VIDEO:
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startCameraVideoForResult(fragment);
+                        MediaUtils.startCameraVideoForResult(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startCameraVideoForResult(activity);
+                        MediaUtils.startCameraVideoForResult(activity);
                     }
                     break;
                 case LOCATION:
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startMapForResult(fragment);
+                        MediaUtils.startMapForResult(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startMapForResult(activity);
+                        MediaUtils.startMapForResult(activity);
                     }
                     break;
             }

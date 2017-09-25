@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -33,6 +34,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -50,12 +52,12 @@ import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.helpers.MediaPickHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.image.ImageUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -109,7 +111,7 @@ import butterknife.OnTouch;
 
 public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener,
-        ChatUIHelperListener, OnImagePickedListener {
+        ChatUIHelperListener, OnMediaPickedListener {
 
     private static final String TAG = BaseDialogActivity.class.getSimpleName();
     private static final int TYPING_DELAY = 1000;
@@ -158,10 +160,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected QBChatDialog currentChatDialog;
     protected Resources resources;
     protected DataManager dataManager;
-    protected ImageUtils imageUtils;
     protected BaseChatMessagesAdapter messagesAdapter;
     protected List<CombinationMessage> combinationMessagesList;
-    protected ImagePickHelper imagePickHelper;
+    protected MediaPickHelper mediaPickHelper;
     protected SingleMediaManager mediaManager;
     protected AudioRecorder audioRecorder;
 
@@ -259,7 +260,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE);
+        mediaPickHelper.pickAnMedia(this, MediaUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE);
     }
 
     @Override
@@ -283,12 +284,19 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        checkLoginToChatOrShowError();
         restoreDefaultCanPerformLogout();
 
         loadNextPartMessagesAsync();
 
         checkMessageSendingPossibility();
         resumeMediaPlayer();
+    }
+
+    private void checkLoginToChatOrShowError() {
+        if (!QBChatService.getInstance().isLoggedIn()){
+            showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE);
+        }
     }
 
     @Override
@@ -319,6 +327,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onChatReconnected() {
         loadNextPartMessagesAsync();
+        initCurrentDialog();
+        checkMessageSendingPossibility();
     }
 
     @Override
@@ -358,7 +368,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    public void onImagePicked(int requestCode, Attachment.Type type, Object attachment) {
+    public void onMediaPicked(int requestCode, Attachment.Type type, Object attachment) {
         canPerformLogout.set(true);
         if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), type, attachment)){
             startLoadAttachFile(type, attachment, currentChatDialog.getDialogId());
@@ -366,12 +376,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    public void onImagePickClosed(int requestCode) {
+    public void onMediaPickClosed(int requestCode) {
         canPerformLogout.set(true);
     }
 
     @Override
-    public void onImagePickError(int requestCode, Exception e) {
+    public void onMediaPickError(int requestCode, Exception e) {
         canPerformLogout.set(true);
         ErrorUtils.logError(e);
     }
@@ -494,7 +504,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         mainThreadHandler = new Handler(Looper.getMainLooper());
         resources = getResources();
         dataManager = DataManager.getInstance();
-        imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
@@ -504,7 +513,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         dialogNotificationObserver = new DialogNotificationObserver();
         updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
         appSharedHelper.saveNeedToOpenDialog(false);
-        imagePickHelper = new ImagePickHelper();
+        mediaPickHelper = new MediaPickHelper();
         systemPermissionHelper = new SystemPermissionHelper(this);
         messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
         locationAttachClickListener = new LocationAttachClickListener();
@@ -644,13 +653,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
                         setActionBarIcon(
-                                ImageUtils.getRoundIconDrawable(BaseDialogActivity.this, loadedBitmap));
+                                MediaUtils.getRoundIconDrawable(BaseDialogActivity.this, loadedBitmap));
                     }
                 });
     }
 
     protected void setDefaultActionBarLogo(int drawableResId) {
-        setActionBarIcon(ImageUtils
+        setActionBarIcon(MediaUtils
                 .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
