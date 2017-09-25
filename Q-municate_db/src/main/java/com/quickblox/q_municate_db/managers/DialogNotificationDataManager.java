@@ -1,5 +1,6 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
@@ -247,5 +248,10 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         }
 
         return dialogNotificationsList;
+    }
+
+    @Override
+    protected void addIdToNotification(Bundle bundle, Object id) {
+        bundle.putString(EXTRA_OBJECT_ID, (String) id);
     }
 }

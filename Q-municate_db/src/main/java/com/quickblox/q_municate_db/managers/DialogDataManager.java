@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Bundle;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -56,7 +58,7 @@ public class DialogDataManager extends BaseManager<Dialog> {
 
             if (deleteBuilder.delete() > 0){
                 //TODO VT need to think how to send ID to observers
-                notifyObservers(null, DELETE_ACTION);
+                notifyObserversDeletedById(dialogId);
             }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
@@ -69,5 +71,10 @@ public class DialogDataManager extends BaseManager<Dialog> {
 
     public List<Dialog> getSkippedSorted(int startRow, int perPage) {
         return super.getSkippedSorted(startRow, perPage, Dialog.Column.MODIFIED_DATE_LOCAL, false);
+    }
+
+    @Override
+    protected void addIdToNotification(Bundle bundle, Object id) {
+        bundle.putString(EXTRA_OBJECT_ID, (String) id);
     }
 }

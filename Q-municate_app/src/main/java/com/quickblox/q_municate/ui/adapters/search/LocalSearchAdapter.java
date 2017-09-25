@@ -81,6 +81,14 @@ public class LocalSearchAdapter extends BaseFilterAdapter<DialogSearchWrapper, B
         }
     }
 
+    public void removeItemByDialogId(String dialogId){
+        for (DialogSearchWrapper dialogSearchWrapper : getAllItems()){
+            if (dialogSearchWrapper.getChatDialog().getDialogId().equals(dialogId)){
+                removeItem(dialogSearchWrapper);
+            }
+        }
+    }
+
     public void setFriendListHelper(QBFriendListHelper qbFriendListHelper) {
         this.qbFriendListHelper = qbFriendListHelper;
         notifyDataSetChanged();

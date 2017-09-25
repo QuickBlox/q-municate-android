@@ -12,6 +12,8 @@ import static com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper.Const
 public class CoreSharedHelper {
 
 
+
+
     public class Constants {
 
         public static final String NAME = "Q-municate";
@@ -43,6 +45,8 @@ public class CoreSharedHelper {
         public static final String CALL_STARTBITRATE_VALUE = "call_startbitrate_value";
         public static final String CALL_VIDEO_CODEC = "call_video_codec";
         public static final String CALL_AUDIO_CODEC = "call_audio_codec";
+
+        public static final String LAST_OPEN_ACTIVITY = "last_open_activity";
 
         public static final String PERMISSIONS_SAVE_FILE_WAS_REQUESTED = "permission_save_file_was_requested";
     }
@@ -297,5 +301,13 @@ public class CoreSharedHelper {
 
     public String getCallAudioCodec(String defValue) {
         return getPref(Constants.CALL_AUDIO_CODEC, defValue);
+    }
+
+    public void saveLastOpenActivity(String activityClassName) {
+        savePref(LAST_OPEN_ACTIVITY, activityClassName);
+    }
+
+    public String getLastOpenActivity() {
+        return getPref(LAST_OPEN_ACTIVITY);
     }
 }

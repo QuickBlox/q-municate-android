@@ -17,17 +17,17 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
-import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
-import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate.utils.helpers.MediaPickHelper;
+import com.quickblox.q_municate.utils.helpers.ServiceManager;
+import com.quickblox.q_municate.utils.MediaUtils;
+import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSignUpCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -42,7 +42,7 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import rx.Subscriber;
 
-public class SignUpActivity extends BaseAuthActivity implements OnImagePickedListener {
+public class SignUpActivity extends BaseAuthActivity implements OnMediaPickedListener {
 
     private static final String FULL_NAME_BLOCKED_CHARACTERS = "<>;";
 
@@ -58,7 +58,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     private boolean isNeedUpdateImage;
     private QBUser qbUser;
     private Uri imageUri;
-    private ImagePickHelper imagePickHelper;
+    private MediaPickHelper mediaPickHelper;
 
     private SignUpSuccessAction signUpSuccessAction;
     private UpdateUserSuccessAction updateUserSuccessAction;
@@ -131,7 +131,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
 
     @OnClick(R.id.change_avatar_view)
     void selectAvatar(View view) {
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        mediaPickHelper.pickAnMedia(this, MediaUtils.IMAGE_REQUEST_CODE);
     }
 
     @OnTextChanged(R.id.full_name_edittext)
@@ -150,11 +150,11 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
         signUpSuccessAction = new SignUpSuccessAction();
         updateUserSuccessAction = new UpdateUserSuccessAction();
         fullNameEditText.setFilters(new InputFilter[]{ fullNameFilter });
-        imagePickHelper = new ImagePickHelper();
+        mediaPickHelper = new MediaPickHelper();
     }
 
     private void startCropActivity(Uri originalUri) {
-        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        imageUri = MediaUtils.getValidUri(new File(getCacheDir(), Crop.class.getName()), this);
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
@@ -199,7 +199,7 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
             showProgress();
 
             if (isNeedUpdateImage && imageUri != null) {
-                startSignUp(ImageUtils.getCreatedFileFromUri(imageUri));
+                startSignUp(MediaUtils.getCreatedFileFromUri(imageUri));
             } else {
                 appSharedHelper.saveUsersImportInitialized(false);
                 startSignUp(null);
@@ -260,19 +260,19 @@ public class SignUpActivity extends BaseAuthActivity implements OnImagePickedLis
     };
 
     @Override
-    public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
+    public void onMediaPicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
         if (Attachment.Type.IMAGE.equals(attachmentType)) {
-            startCropActivity(Uri.fromFile((File)attachment));
+            startCropActivity(MediaUtils.getValidUri((File)attachment, this));
         }
     }
 
     @Override
-    public void onImagePickError(int requestCode, Exception e) {
+    public void onMediaPickError(int requestCode, Exception e) {
         ErrorUtils.showError(this, e);
     }
 
     @Override
-    public void onImagePickClosed(int requestCode) {
+    public void onMediaPickClosed(int requestCode) {
     }
 
     private class SignUpSuccessAction implements Command {

@@ -11,10 +11,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.chats.BaseDialogActivity;
-import com.quickblox.q_municate.ui.activities.main.MainActivity;
+import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate_core.models.NotificationEvent;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -33,21 +31,10 @@ public class NotificationManagerHelper {
                 .getByDialogId(dialogId);
         QMUser user = QMUserService.getInstance().getUserCache().get((long) userId);
 
-        Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog + " user: " + user);
+        Log.d(TAG, "chatDialog for opening by push: " + chatDialog + " user: " + user);
 
-        Intent intent = null;
-        if (chatDialog != null && user != null) {
-            Log.d(TAG, "chatDialog for oppeneng by push: " + chatDialog);
-            if (QBDialogType.PRIVATE.equals(chatDialog.getType())) {
-                intent = BaseDialogActivity.makePrivateDialogIntent(context, user, chatDialog);
-            } else {
-                intent = BaseDialogActivity.makePGroupDialogIntent(context, chatDialog);
-            }
-        }
-
-        if (intent == null) {
-            intent = new Intent(context, MainActivity.class);
-        }
+        Intent intent = new Intent(context, SplashActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_SHOULD_OPEN_DIALOG, true);
         sendChatNotificationEvent(context, intent, notificationEvent);
         sendNotifyIncomingMessage(context, dialogId);
     }
@@ -61,7 +48,7 @@ public class NotificationManagerHelper {
     public static void sendCommonNotificationEvent(Context context,
                                              NotificationEvent notificationEvent) {
 
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, SplashActivity.class);
         sendChatNotificationEvent(context, intent, notificationEvent);
 
     }

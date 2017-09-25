@@ -13,8 +13,8 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
 import com.quickblox.q_municate.utils.SchemeType;
 import com.quickblox.q_municate.utils.StringUtils;
-import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate.utils.MediaUtils;
+import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.core.concurrency.BaseAsyncTask;
 
 import java.io.File;
@@ -24,10 +24,10 @@ import java.lang.ref.WeakReference;
 public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
 
     private WeakReference<FragmentManager> fmWeakReference;
-    private OnImagePickedListener listener;
+    private OnMediaPickedListener listener;
     private int requestCode;
 
-    public GetFilepathFromUriTask(FragmentManager fragmentManager, OnImagePickedListener listener, int requestCode) {
+    public GetFilepathFromUriTask(FragmentManager fragmentManager, OnMediaPickedListener listener, int requestCode) {
         this.fmWeakReference = new WeakReference<>(fragmentManager);
         this.listener = listener;
         this.requestCode = requestCode;
@@ -43,7 +43,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
     public File performInBackground(Intent... params) throws Exception {
         Intent data = params[0];
 
-        String imageFilePath = null;
+        String filePath = null;
         Uri uri = data.getData();
         String uriScheme = uri.getScheme();
 
@@ -51,27 +51,31 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         boolean isKitKatAndUpper = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
         if (SchemeType.SCHEME_CONTENT.equalsIgnoreCase(uriScheme) && !isFromGoogleApp && !isKitKatAndUpper) {
-            String[] filePathColumn = { MediaStore.Images.Media.DATA};
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = App.getInstance().getContentResolver().query(uri, filePathColumn, null, null, null);
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imageFilePath = cursor.getString(columnIndex);
+                    if (columnIndex >= 0) {
+                        filePath = cursor.getString(columnIndex);
+                        return new File(MediaUtils.getPathWithExtensionInLowerCase(filePath));
+                    }
                 }
                 cursor.close();
             }
-        } else if (SchemeType.SCHEME_FILE.equalsIgnoreCase(uriScheme)) {
-            imageFilePath = uri.getPath();
-        } else {
-            imageFilePath = ImageUtils.saveUriToFile(uri);
         }
-
-        if (TextUtils.isEmpty(imageFilePath)) {
+        if (SchemeType.SCHEME_FILE.equalsIgnoreCase(uriScheme)) {
+            filePath = uri.getPath();
+        } else {
+            filePath = MediaUtils.saveUriToFile(uri);
+        }
+        if (TextUtils.isEmpty(filePath)) {
             throw new IOException("Can't find a filepath for URI " + uri.toString());
         }
-
-        return new File(imageFilePath);
+        File file = new File(MediaUtils.getPathWithExtensionInLowerCase(filePath));
+        setCorrectRotationIfNeed(file);
+        return file;
     }
 
     @Override
@@ -79,7 +83,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         hideProgress();
         Log.w(GetFilepathFromUriTask.class.getSimpleName(), "onResult listener = " + listener);
         if (listener != null) {
-            listener.onImagePicked(requestCode, StringUtils.getAttachmentTypeByFile(file), file);
+            listener.onMediaPicked(requestCode, StringUtils.getAttachmentTypeByFile(file), file);
         }
     }
 
@@ -88,7 +92,7 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         hideProgress();
         Log.w(GetFilepathFromUriTask.class.getSimpleName(), "onException listener = " + listener);
         if (listener != null) {
-            listener.onImagePickError(requestCode, e);
+            listener.onMediaPickError(requestCode, e);
         }
     }
 
@@ -103,6 +107,12 @@ public class GetFilepathFromUriTask extends BaseAsyncTask<Intent, Void, File> {
         FragmentManager fragmentManager = fmWeakReference.get();
         if (fragmentManager != null) {
             ProgressDialogFragment.hide(fragmentManager);
+        }
+    }
+
+    private void setCorrectRotationIfNeed(File file) {
+        if (StringUtils.isImageFile(file)) {
+            MediaUtils.normalizeRotationImageIfNeed(file);
         }
     }
 }

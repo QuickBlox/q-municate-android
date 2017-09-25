@@ -1,8 +1,12 @@
 package com.quickblox.q_municate.utils;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
+import android.webkit.MimeTypeMap;
 
 import com.quickblox.core.helper.MimeUtils;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_db.models.Attachment;
 
@@ -44,7 +48,13 @@ public class StringUtils {
 
         switch (type) {
             case IMAGE:
-                attachmentName = context.getString(R.string.dialog_attach);
+                attachmentName = context.getString(R.string.dialog_attach_image);
+                break;
+            case AUDIO:
+                attachmentName = context.getString(R.string.dialog_attach_audio);
+                break;
+            case VIDEO:
+                attachmentName = context.getString(R.string.dialog_attach_video);
                 break;
             case LOCATION:
                 attachmentName = context.getString(R.string.dialog_location);
@@ -61,7 +71,7 @@ public class StringUtils {
 
     public static Attachment.Type getAttachmentTypeByFileName(String fileName){
         Attachment.Type attachmentType;
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()).toLowerCase();
         String mimeType = MimeUtils.guessMimeTypeFromExtension(extension);
         if (mimeType == null){
             attachmentType = Attachment.Type.OTHER;
@@ -78,5 +88,23 @@ public class StringUtils {
         }
 
         return attachmentType;
+    }
+
+    public static boolean isImageFile(File file) {
+        return Attachment.Type.IMAGE.equals(StringUtils.getAttachmentTypeByFile(file));
+    }
+
+    public static String getMimeType(Uri uri) {
+        String mimeType;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            ContentResolver cr = App.getInstance().getContentResolver();
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
     }
 }

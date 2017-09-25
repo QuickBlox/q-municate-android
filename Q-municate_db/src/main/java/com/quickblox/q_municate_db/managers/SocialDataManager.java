@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Bundle;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -30,5 +32,10 @@ public class SocialDataManager extends BaseManager<Social> {
         }
 
         return social;
+    }
+
+    @Override
+    protected void addIdToNotification(Bundle bundle, Object id) {
+        bundle.putString(EXTRA_OBJECT_ID, (String) id);
     }
 }

@@ -31,10 +31,8 @@ import android.widget.ProgressBar;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
@@ -63,7 +61,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
-import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import org.jivesoftware.smack.ConnectionListener;
@@ -80,6 +77,7 @@ import butterknife.ButterKnife;
 public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
+    protected static boolean appInitialized;
 
     protected App app;
     protected Toolbar toolbar;
@@ -291,11 +289,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         Log.d("BaseActivity", "onPause");
         unregisterBroadcastReceivers();
         removeActions();
-        unregisterConnectionListtener();
-        hideSnackBar(R.string.error_login_to_chat);
+        unregisterConnectionListener();
+        hideSnackBar(R.string.error_disconnected);
     }
 
-    private void unregisterConnectionListtener() {
+    private void unregisterConnectionListener() {
         QBChatService.getInstance().removeConnectionListener(chatConnectionListener);
     }
 
@@ -699,7 +697,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             @Override
             public void authenticated(XMPPConnection xmppConnection, boolean b) {
                 Log.d(TAG, "chatConnectionListener authenticated");
-                hideSnackBar(R.string.error_login_to_chat);
+                hideSnackBar(R.string.error_disconnected);
                 blockUI(false);
             }
 
@@ -719,7 +717,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             public void reconnectionSuccessful() {
                 onChatReconnected();
                 Log.d(TAG, "chatConnectionListener reconnectionSuccessful");
-                hideSnackBar(R.string.error_login_to_chat);
+                hideSnackBar(R.string.error_disconnected);
                 blockUI(false);
             }
 
@@ -779,6 +777,17 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         isDialogLoading = false;
     }
 
+    protected void startActivityByName (Class<?> activityName, boolean needClearTask){
+        Intent intent = new Intent(this, activityName);
+
+        if (needClearTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        }
+
+        startActivity(intent);
+        finish();
+    }
+
     public class LoadChatsSuccessAction implements Command {
 
         @Override
@@ -824,7 +833,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             QBLoginChatCompositeCommand.setIsRunning(false);
             blockUI(true);
             hideSnackBar(R.string.dialog_loading_dialogs);
-            showSnackbar(R.string.error_login_to_chat, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
+            showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
         }
     }
 

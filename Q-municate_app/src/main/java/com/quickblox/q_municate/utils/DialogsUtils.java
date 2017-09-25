@@ -48,7 +48,7 @@ public class DialogsUtils {
      *     return result perPage, startRow and needUpdate params by sendBroadcast
      *     @param dialogsCount Amount of all dialogs.
      */
-    public static void loadAllDialogsFromCacheByPagesTask(Context context, long dialogsCount) {
+    public static void loadAllDialogsFromCacheByPagesTask(Context context, long dialogsCount, String resultAction) {
         boolean needToLoadMore;
 
         int startRow = 0;
@@ -65,15 +65,15 @@ public class DialogsUtils {
             bundle.putInt(ConstsCore.DIALOGS_START_ROW, startRow);
             bundle.putInt(ConstsCore.DIALOGS_PER_PAGE, perPage);
 
-            sendLoadPageSuccess(context, bundle);
+            sendLoadPageSuccess(context, bundle, resultAction);
             dialogsCount -= perPage;
 
             startRow += perPage;
         } while (needToLoadMore);
     }
 
-    private static void sendLoadPageSuccess(Context context, Bundle result) {
-        Intent intent = new Intent(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION);
+    private static void sendLoadPageSuccess(Context context, Bundle result, String resultAction) {
+        Intent intent = new Intent(resultAction);
         if (null != result) {
             intent.putExtras(result);
         }

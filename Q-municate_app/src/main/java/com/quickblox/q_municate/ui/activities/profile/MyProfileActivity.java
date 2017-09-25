@@ -18,11 +18,11 @@ import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.helpers.MediaPickHelper;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate.utils.MediaUtils;
+import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -40,7 +40,7 @@ import butterknife.OnTextChanged;
 import rx.Observable;
 import rx.Subscriber;
 
-public class MyProfileActivity extends BaseLoggableActivity implements OnImagePickedListener {
+public class MyProfileActivity extends BaseLoggableActivity implements OnMediaPickedListener {
 
     private static String TAG = MyProfileActivity.class.getSimpleName();
 
@@ -58,7 +58,7 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     private UserCustomData userCustomData;
     private String currentFullName;
     private String oldFullName;
-    private ImagePickHelper imagePickHelper;
+    private MediaPickHelper mediaPickHelper;
     private Uri imageUri;
 
     public static void start(Context context) {
@@ -123,31 +123,31 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     @OnClick(R.id.change_photo_view)
     void changePhoto(View view) {
         fullNameTextInputLayout.setError(null);
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        mediaPickHelper.pickAnMedia(this, MediaUtils.IMAGE_REQUEST_CODE);
     }
 
     @Override
-    public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
-        if (Attachment.Type.IMAGE.equals(attachmentType)){
+    public void onMediaPicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
+        if (Attachment.Type.IMAGE.equals(attachmentType)) {
             canPerformLogout.set(true);
-            startCropActivity(Uri.fromFile((File)attachment));
+            startCropActivity(MediaUtils.getValidUri((File) attachment, this));
         }
     }
 
     @Override
-    public void onImagePickError(int requestCode, Exception e) {
+    public void onMediaPickError(int requestCode, Exception e) {
         canPerformLogout.set(true);
         ErrorUtils.showError(this, e);
     }
 
     @Override
-    public void onImagePickClosed(int requestCode) {
+    public void onMediaPickClosed(int requestCode) {
         canPerformLogout.set(true);
     }
 
     private void initFields() {
         title = getString(R.string.profile_title);
-        imagePickHelper = new ImagePickHelper();
+        mediaPickHelper = new MediaPickHelper();
         qbUser = AppSession.getSession().getUser();
     }
 
@@ -199,10 +199,10 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
     }
 
     private void startCropActivity(Uri originalUri) {
-        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf(".")).toLowerCase();
 
         canPerformLogout.set(false);
-        imageUri = Uri.fromFile(new File(getCacheDir(), extensionOriginalUri));
+        imageUri = MediaUtils.getValidUri(new File(getCacheDir(), extensionOriginalUri), this);
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
@@ -245,12 +245,12 @@ public class MyProfileActivity extends BaseLoggableActivity implements OnImagePi
             QBUser newUser = createUserForUpdating();
             File file = null;
             if (isNeedUpdateImage && imageUri != null) {
-                file = ImageUtils.getCreatedFileFromUri(imageUri);
+                file = MediaUtils.getCreatedFileFromUri(imageUri);
             }
 
             Observable<QMUser> qmUserObservable;
 
-            if (file != null){
+            if (file != null) {
                 qmUserObservable = ServiceManager.getInstance().updateUser(newUser, file);
             } else {
                 qmUserObservable = ServiceManager.getInstance().updateUser(newUser);

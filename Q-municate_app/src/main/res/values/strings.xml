@@ -72,7 +72,7 @@
     <string name="user_profile_send_message">Send Message</string>
     <string name="user_profile_audio_call">Audio Call</string>
     <string name="user_profile_video_call">Video Call</string>
-    <string name="user_delete_chat_history">Delete Chat History</string>
+    <string name="user_delete_chat_history">Delete Dialog</string>
     <string name="user_remove_contact_and_chat_history">Remove Contact and Chat</string>
     <string name="user_profile_remove_contact_and_chat_history">Do you really want to delete %1$s from your contact list with his chat?</string>
     <string name="user_profile_delete_chat_history">Do you really want to delete chat history with %1$s?</string>
@@ -112,7 +112,9 @@
     <string name="dialog_reply">Reply</string>
     <string name="dialog_user_is_not_friend">User is not your friend</string>
     <string name="dialog_confirm_sending_attach">Do you really want to send %1$s?</string>
-    <string name="dialog_attach">attachment</string>
+    <string name="dialog_attach_image">attachment image</string>
+    <string name="dialog_attach_audio">attachment audio</string>
+    <string name="dialog_attach_video">attachment video</string>
     <string name="dialog_location">location</string>
     <string name="dialog_now_typing">Typing…</string>
     <string name="dialog_message_reject_friend">Do you really want to reject contact request from %1$s?</string>
@@ -123,6 +125,8 @@
     <string name="dialog_ctx_menu_remove">Leave and remove chat</string>
     <string name="dialog_ctx_menu_delete">Delete dialog</string>
     <string name="dialog_loading_dialogs">Updating dialogs list… Please wait</string>
+    <string name="dialog_record_cancel">slide to cancel</string>
+    <string name="dialog_record_canceled">Audio recording has been canceled</string>
 
     <string-array name="dialog_attach_types_array">
         <item>Take Photo</item>
@@ -195,6 +199,7 @@
 
     <!-- Preview Images -->
     <string name="preview_image_title">Preview image</string>
+    <string name="preview_image_error">Image has not loaded</string>
 
 
     <!-- Call -->
@@ -259,9 +264,9 @@
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogin. This email has already been taken</string>
     <string name="error_unauthorized">Unauthorized</string>
     <string name="error_unauthorized_from_app">Incorrect Email or Password</string>
-    <string name="error_login_to_chat">Not logged in to chat.</string>
     <string name="error_disconnected">Disconnected… Please check your Internet connection!</string>
     <string name="dlg_choose_image_from">Select image from…</string>
+    <string name="dlg_choose_media_from">Select media from…</string>
     <string name="snackbar_new_message_title">%1$s\nMessage: %2$s</string>
     <string name="snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
     <string name="facebook_exception">Facebook exception: </string>
@@ -295,8 +300,9 @@
     <string name="send_selected_location">Send selected location</string>
     <string name="dlg_unsupported_file">This file format isn\'t supported</string>
     <string name="dlg_filename_long">File name must be less than 100 characters</string>
-    <string name="dlg_image_big">File mustn’\t be more than 10 MB</string>
-    <string name="dlg_audio_video_big">File mustn’\t be more than 100 MB</string>
+    <string name="dlg_image_big">File mustn\u0027t be more than 10 MB</string>
+    <string name="dlg_audio_video_big">File mustn\u0027t be more than 100 MB</string>
+    <string name="link_was_copied">Link was copied to clipboard</string>
 
     <!--   Location Permissions   -->
     <string name="permission_rationale_location">Access to the location service is required to show your current location on the map.</string>
@@ -333,7 +339,8 @@
 
     <string-array name="dlg_image_pick">
         <item>Gallery</item>
-        <item>Camera</item>
+        <item>Take a Photo</item>
+        <item>Take a Video</item>
         <item>Location</item>
     </string-array>
 

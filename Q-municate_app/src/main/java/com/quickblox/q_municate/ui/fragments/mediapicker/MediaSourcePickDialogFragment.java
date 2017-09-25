@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.fragments.imagepicker;
+package com.quickblox.q_municate.ui.fragments.mediapicker;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,32 +19,33 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.DialogsUtils;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
-import com.quickblox.q_municate.utils.image.ImageUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ImageSourcePickDialogFragment extends DialogFragment {
-    private static final String TAG = ImageSourcePickDialogFragment.class.getSimpleName();
+public class MediaSourcePickDialogFragment extends DialogFragment {
+    private static final String TAG = MediaSourcePickDialogFragment.class.getSimpleName();
     private static final long DELAY_PERMISSIONS_RESULT_ACTIONS = 300;
 
     private static final int POSITION_GALLERY = 0;
-    private static final int POSITION_CAMERA = 1;
-    private static final int POSITION_LOCATION = 2;
+    private static final int POSITION_CAMERA_PHOTO = 1;
+    private static final int POSITION_CAMERA_VIDEO = 2;
+    private static final int POSITION_LOCATION = 3;
     private static SystemPermissionHelper systemPermissionHelper;
 
     private OnImageSourcePickedListener onImageSourcePickedListener;
     protected Handler handler = new Handler();
 
-    public ImageSourcePickDialogFragment() {
+    public MediaSourcePickDialogFragment() {
         systemPermissionHelper = new SystemPermissionHelper(this);
     }
 
-    public static void show(FragmentManager fragmentManager, Fragment imagePickHelperFragment) {
-        ImageSourcePickDialogFragment fragment = new ImageSourcePickDialogFragment();
-        fragment.setArguments(imagePickHelperFragment.getArguments());
-        fragment.setOnImageSourcePickedListener(new ImageSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(imagePickHelperFragment));
-        fragment.show(fragmentManager, ImageSourcePickDialogFragment.class.getSimpleName());
+    public static void show(FragmentManager fragmentManager, Fragment mediaPickHelperFragment) {
+        MediaSourcePickDialogFragment fragment = new MediaSourcePickDialogFragment();
+        fragment.setArguments(mediaPickHelperFragment.getArguments());
+        fragment.setOnImageSourcePickedListener(new MediaSourcePickDialogFragment.LoggableActivityImageSourcePickedListener(mediaPickHelperFragment));
+        fragment.show(fragmentManager, MediaSourcePickDialogFragment.class.getSimpleName());
     }
 
     @Override
@@ -51,6 +53,8 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         fragmentManager.popBackStack();
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        //add fragment to backstack for getting permission request result to this fragment
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.add(this, tag);
         fragmentTransaction.commit();
@@ -58,31 +62,50 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        @StringRes int title = R.string.dlg_choose_media_from;
+        final boolean imageRequest = getArguments().getInt("requestCode") != MediaUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE;
         MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
-        builder.title(R.string.dlg_choose_image_from);
-        String[] imagePickArray = getResources().getStringArray(R.array.dlg_image_pick);
-        ArrayList<String> imagePickList = new ArrayList<>(Arrays.asList(imagePickArray));
-        if (getArguments().getInt("requestCode") != ImageUtils.IMAGE_LOCATION_REQUEST_CODE) {
-            imagePickList.remove(2);
+        String[] mediaPickArray = getResources().getStringArray(R.array.dlg_image_pick);
+        ArrayList<String> mediaPickList = new ArrayList<>(Arrays.asList(mediaPickArray));
+        if (imageRequest) {
+            title = R.string.dlg_choose_image_from;
+            mediaPickList.remove(mediaPickArray[2]);
+            mediaPickList.remove(mediaPickArray[3]);
         }
-        builder.items(imagePickList.toArray(new String[imagePickList.size()]));
+        builder.title(title);
+        builder.items(mediaPickList.toArray(new String[mediaPickList.size()]));
         builder.itemsCallback(new MaterialDialog.ListCallback() {
             @Override
             public void onSelection(MaterialDialog materialDialog, View view, int i,
                                     CharSequence charSequence) {
                 switch (i) {
                     case POSITION_GALLERY:
-                        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
-                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                        if (imageRequest) {
+                            if (systemPermissionHelper.isAllPermissionsGrantedForSaveFileImage()) {
+                                onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY_IMAGE);
+                            } else {
+                                systemPermissionHelper.requestPermissionsForSaveFileImage();
+                            }
                         } else {
-                            systemPermissionHelper.requestPermissionsForSaveFile();
+                            if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
+                                onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                            } else {
+                                systemPermissionHelper.requestPermissionsForSaveFile();
+                            }
                         }
                         break;
-                    case POSITION_CAMERA:
+                    case POSITION_CAMERA_PHOTO:
                         if (systemPermissionHelper.isCameraPermissionGranted()) {
-                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_PHOTO);
                         } else {
                             systemPermissionHelper.requestPermissionsTakePhoto();
+                        }
+                        break;
+                    case POSITION_CAMERA_VIDEO:
+                        if (systemPermissionHelper.isCameraPermissionGranted()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_VIDEO);
+                        } else {
+                            systemPermissionHelper.requestPermissionsTakeVideo();
                         }
                         break;
                     case POSITION_LOCATION:
@@ -97,8 +120,8 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if ((keyCode ==  android.view.KeyEvent.KEYCODE_BACK)) {
-                    if(getFragmentManager() != null) {
+                if ((keyCode == android.view.KeyEvent.KEYCODE_BACK)) {
+                    if (getFragmentManager() != null) {
                         getFragmentManager().popBackStack();
                     }
                 }
@@ -133,7 +156,9 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
 
     public enum ImageSource {
         GALLERY,
-        CAMERA,
+        GALLERY_IMAGE,
+        CAMERA_PHOTO,
+        CAMERA_VIDEO,
         LOCATION
     }
 
@@ -146,10 +171,17 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                switch(requestCode) {
+                switch (requestCode) {
                     case (SystemPermissionHelper.PERMISSIONS_FOR_TAKE_PHOTO_REQUEST):
                         if (systemPermissionHelper.isCameraPermissionGranted()) {
-                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA);
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_PHOTO);
+                        } else {
+                            showPermissionSettingsDialog(R.string.dlg_permission_camera);
+                        }
+                        break;
+                    case (SystemPermissionHelper.PERMISSIONS_FOR_VIDEO_RECORD_REQUEST):
+                        if (systemPermissionHelper.isCameraPermissionGranted()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_VIDEO);
                         } else {
                             showPermissionSettingsDialog(R.string.dlg_permission_camera);
                         }
@@ -157,6 +189,13 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     case (SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_REQUEST):
                         if (systemPermissionHelper.isAllPermissionsGrantedForSaveFile()) {
                             onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY);
+                        } else {
+                            showPermissionSettingsDialog(R.string.dlg_permission_storage);
+                        }
+                        break;
+                    case (SystemPermissionHelper.PERMISSIONS_FOR_SAVE_FILE_IMAGE_REQUEST):
+                        if (systemPermissionHelper.isAllPermissionsGrantedForSaveFileImage()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.GALLERY_IMAGE);
                         } else {
                             showPermissionSettingsDialog(R.string.dlg_permission_storage);
                         }
@@ -193,30 +232,50 @@ public class ImageSourcePickDialogFragment extends DialogFragment {
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startImagePicker(fragment);
+                        MediaUtils.startMediaPicker(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startImagePicker(activity);
+                        MediaUtils.startMediaPicker(activity);
                     }
                     break;
-                case CAMERA:
+                case GALLERY_IMAGE:
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startCameraForResult(fragment);
+                        MediaUtils.startImagePicker(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startCameraForResult(activity);
+                        MediaUtils.startImagePicker(activity);
+                    }
+                    break;
+                case CAMERA_PHOTO:
+                    if (fragment != null) {
+                        Activity activity = fragment.getActivity();
+                        setupActivityToBeNonLoggable(activity);
+                        MediaUtils.startCameraPhotoForResult(fragment);
+                    } else {
+                        setupActivityToBeNonLoggable(activity);
+                        MediaUtils.startCameraPhotoForResult(activity);
+                    }
+                    break;
+                case CAMERA_VIDEO:
+                    if (fragment != null) {
+                        Activity activity = fragment.getActivity();
+                        setupActivityToBeNonLoggable(activity);
+                        MediaUtils.startCameraVideoForResult(fragment);
+                    } else {
+                        setupActivityToBeNonLoggable(activity);
+                        MediaUtils.startCameraVideoForResult(activity);
                     }
                     break;
                 case LOCATION:
                     if (fragment != null) {
                         Activity activity = fragment.getActivity();
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startMapForResult(fragment);
+                        MediaUtils.startMapForResult(fragment);
                     } else {
                         setupActivityToBeNonLoggable(activity);
-                        ImageUtils.startMapForResult(activity);
+                        MediaUtils.startMapForResult(activity);
                     }
                     break;
             }

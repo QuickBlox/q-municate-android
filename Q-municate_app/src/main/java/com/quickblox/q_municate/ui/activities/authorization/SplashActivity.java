@@ -7,9 +7,10 @@ import android.util.Log;
 
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.listeners.ExistingQbSessionListener;
-import com.quickblox.q_municate.utils.helpers.LoginHelper;
+import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,17 +34,25 @@ public class SplashActivity extends BaseAuthActivity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-
+        appInitialized = true;
         AppSession.load();
 
+        processPushIntent();
+
         if (QBSessionManager.getInstance().getSessionParameters() != null && appSharedHelper.isSavedRememberMe()) {
-            startMainActivity();
+            startLastOpenActivityOrMain();
         } else {
             startLandingActivity();
         }
     }
 
+    private void processPushIntent() {
+        boolean openPushDialog = getIntent().getBooleanExtra(QBServiceConsts.EXTRA_SHOULD_OPEN_DIALOG, false);
+        CoreSharedHelper.getInstance().saveNeedToOpenDialog(openPushDialog);
+    }
+
     private void startLandingActivity() {
+        Log.v(TAG, "startLandingActivity();");
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -51,5 +60,24 @@ public class SplashActivity extends BaseAuthActivity  {
                 finish();
             }
         }, DELAY_FOR_OPENING_LANDING_ACTIVITY);
+    }
+
+    private void startLastOpenActivityOrMain() {
+        Class<?> lastActivityClass;
+        boolean needCleanTask = false;
+        try {
+            String lastActivityName = appSharedHelper.getLastOpenActivity();
+            if (lastActivityName != null) {
+                lastActivityClass = Class.forName(appSharedHelper.getLastOpenActivity());
+            } else {
+                needCleanTask = true;
+                lastActivityClass = MainActivity.class;
+            }
+        } catch (ClassNotFoundException e) {
+            needCleanTask = true;
+            lastActivityClass = MainActivity.class;
+        }
+        Log.v(TAG, "start " + lastActivityClass.getSimpleName());
+        startActivityByName(lastActivityClass, needCleanTask);
     }
 }

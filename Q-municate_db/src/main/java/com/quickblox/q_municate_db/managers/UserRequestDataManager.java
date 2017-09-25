@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Bundle;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -42,6 +44,11 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
         }
     }
 
+    @Override
+    protected void addIdToNotification(Bundle bundle, Object id) {
+        bundle.putInt(EXTRA_OBJECT_ID, (Integer) id);
+    }
+
     public QMUser getUserRequestById(int userId) {
         UserRequest userRequest = null;
 
@@ -64,7 +71,7 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
 
             if (deleteBuilder.delete() > 0) {
                 //TODO VT need to think how to send ID to observers
-                notifyObservers(null, DELETE_ACTION);
+                notifyObserversDeletedById(userId);
             }
         } catch (SQLException e) {
             ErrorUtils.logError(e);

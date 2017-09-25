@@ -95,6 +95,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     private boolean isFrontCameraSelected = true;
     private AppRTCAudioManager audioManager;
     private SystemPermissionHelper systemPermissionHelper;
+    private boolean isAllViewsInitialized = true;
 
     public static ConversationCallFragment newInstance(List<QBUser> opponents, String callerName,
             QBRTCTypes.QBConferenceType qbConferenceType,
@@ -208,6 +209,9 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     }
 
     public void actionButtonsEnabled(boolean enability) {
+        if (!isAllViewsInitialized){
+            return;
+        }
 
         if (isVideoCall){
             cameraToggle.setEnabled(enability);
@@ -284,6 +288,8 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         avatarImageview = (ImageView) avatarAndNameView.findViewById(R.id.avatar_imageview);
 
         callingToTextView = (TextView) avatarAndNameView.findViewById(R.id.calling_to_text_view);
+
+        isAllViewsInitialized = true;
 
         actionButtonsEnabled(false);
     }

@@ -4,13 +4,15 @@
     <string name="dlg_ok">OK</string>
     <string name="dlg_cancel">Cancel</string>
     <string name="dlg_attached_last_message">Attachment</string>
+    <string name="dlg_attached_audio_last_message">Voice attachment</string>
+    <string name="dlg_attached_video_last_message">Video attachment</string>
     <string name="dlg_location_last_message">Location</string>
     <string name="dlg_fail_send_msg">Errors occurred while sending msg! Please, try later</string>
     <string name="dlg_fail_connection">Sorry, connection lost. It will be reestablished when the Internet will be available.</string>
     <string name="dlg_not_joined_room">You have not joined chat room! Please wait…</string>
     <string name="dlg_fail_create_groupchat">Errors occurred while creating group chat! Please, try later</string>
     <string name="dlg_fail_create_chat">Errors occurred while creating chat! Please, try later</string>
-    <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
+    <string name="dlg_fail_upload_attach">Errors occurred during loading file. Please, check your internet connection</string>
 
     <string name="frl_online">Online</string>
     <string name="frl_offline">Offline</string>

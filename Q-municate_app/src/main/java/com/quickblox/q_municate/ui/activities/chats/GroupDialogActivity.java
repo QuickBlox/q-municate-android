@@ -13,12 +13,14 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate.ui.adapters.chats.GroupChatMessagesAdapter;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogByIdsCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class GroupDialogActivity extends BaseDialogActivity {
 
@@ -44,14 +46,30 @@ public class GroupDialogActivity extends BaseDialogActivity {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        actualizeCurrentDialogInfo();
+    }
+
+    private void actualizeCurrentDialogInfo() {
+        if (currentChatDialog != null) {
+            QBLoadDialogByIdsCommand.start(this, new ArrayList<>(Collections.singletonList(currentChatDialog.getDialogId())));
+        }
+    }
+
+    @Override
+    protected void initChatAdapter() {
+        messagesAdapter = new GroupChatMessagesAdapter(this, currentChatDialog, combinationMessagesList);
+    }
+
+    @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new GroupChatMessagesAdapter(this, currentChatDialog, combinationMessagesList);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         messagesRecyclerView.setAdapter(messagesAdapter);
 
-        scrollMessagesToBottom();
+        scrollMessagesToBottom(0);
     }
 
     @Override

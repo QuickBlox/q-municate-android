@@ -46,6 +46,10 @@ public class ChatNotificationHelper {
             return;
         }
 
+        if (isOwnMessage(userId)){
+            return;
+        }
+
         boolean chatPush = userId != 0 && !TextUtils.isEmpty(dialogId);
 
         if (chatPush) {
@@ -83,5 +87,9 @@ public class ChatNotificationHelper {
 
     public void saveOpeningDialog(boolean open) {
         appSharedHelper.saveNeedToOpenDialog(open);
+    }
+
+    private boolean isOwnMessage(int senderUserId) {
+        return appSharedHelper.getUserId() == senderUserId;
     }
 }

@@ -55,7 +55,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        final boolean updateAll = extras.getBoolean(ConstsCore.DIALOGS_UPDATE_ALL);
+        boolean updateAll = extras.getBoolean(ConstsCore.DIALOGS_UPDATE_ALL);
         Log.d("QBLoadDialogsCommand", "perform updateAll= " + updateAll);
         final ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
 
@@ -67,6 +67,9 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
         parcelableQBDialog.addAll(ChatUtils.qBDialogsToParcelableQBDialogs(
                 loadAllDialogsByPages(returnedBundle, qbRequestGetBuilder, updateAll)));
+
+        //now all dialogs were loaded from rest
+        updateAll = true;
 
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);

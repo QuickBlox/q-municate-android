@@ -4,12 +4,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
+import android.os.Vibrator;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -17,12 +22,19 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -32,18 +44,20 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.location.MapsActivity;
 import com.quickblox.q_municate.ui.activities.others.PreviewImageActivity;
-import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
-import com.quickblox.q_municate.utils.StringUtils;
-import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.ui.adapters.chats.BaseChatMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
+import com.quickblox.q_municate.ui.views.recyclerview.WrapContentLinearLayoutManager;
+import com.quickblox.q_municate.utils.ClipboardUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.StringUtils;
+import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate.utils.helpers.MediaPickHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.image.ImageUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -63,10 +77,16 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
-import com.quickblox.q_municate_user_service.model.QMUser;
-import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachImageClickListener;
-import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachLocationClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatAttachClickListener;
 import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBChatMessageLinkClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.listeners.QBLinkPreviewClickListener;
+import com.quickblox.ui.kit.chatmessage.adapter.media.SingleMediaManager;
+import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.AudioRecorder;
+import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.exceptions.MediaRecorderException;
+import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.listeners.QBMediaRecordListener;
+import com.quickblox.ui.kit.chatmessage.adapter.media.recorder.view.QBRecordAudioButton;
+import com.quickblox.ui.kit.chatmessage.adapter.media.video.ui.VideoPlayerActivity;
+import com.quickblox.ui.kit.chatmessage.adapter.models.QBLinkPreview;
 import com.quickblox.ui.kit.chatmessage.adapter.utils.QBMessageTextClickMovement;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
@@ -91,7 +111,7 @@ import butterknife.OnTouch;
 
 public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener,
-        ChatUIHelperListener, OnImagePickedListener {
+        ChatUIHelperListener, OnMediaPickedListener {
 
     private static final String TAG = BaseDialogActivity.class.getSimpleName();
     private static final int TYPING_DELAY = 1000;
@@ -99,6 +119,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
     private static final int MESSAGES_PAGE_SIZE = ConstsCore.DIALOG_MESSAGES_PER_PAGE;
     private static final int KEEP_ALIVE_TIME = 1;
+    private static final int POST_DELAY_VIEW = 1000;
+    private static final int DURATION_VIBRATE = 100;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
@@ -114,6 +136,21 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Bind(R.id.attach_button)
     ImageButton attachButton;
 
+    @Bind(R.id.chat_record_audio_button)
+    QBRecordAudioButton recordAudioButton;
+
+    @Bind(R.id.chat_audio_record_chronometer)
+    Chronometer recordChronometer;
+
+    @Bind(R.id.chat_audio_record_bucket_imageview)
+    ImageView bucketView;
+
+    @Bind(R.id.layout_chat_audio_container)
+    LinearLayout audioLayout;
+
+    @Bind(R.id.chat_audio_record_textview)
+    TextView audioRecordTextView;
+
     @Bind(R.id.send_button)
     ImageButton sendButton;
 
@@ -123,14 +160,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected QBChatDialog currentChatDialog;
     protected Resources resources;
     protected DataManager dataManager;
-    protected ImageUtils imageUtils;
     protected BaseChatMessagesAdapter messagesAdapter;
     protected List<CombinationMessage> combinationMessagesList;
-    protected ImagePickHelper imagePickHelper;
+    protected MediaPickHelper mediaPickHelper;
+    protected SingleMediaManager mediaManager;
+    protected AudioRecorder audioRecorder;
 
     private MessagesTextViewLinkClickListener messagesTextViewLinkClickListener;
     private LocationAttachClickListener locationAttachClickListener;
     private ImageAttachClickListener imageAttachClickListener;
+    private LinkPreviewClickListener linkPreviewClickListener;
+    private VideoAttachClickListener videoAttachClickListener;
+    private QBMediaRecordListenerImpl recordListener;
     private Handler mainThreadHandler;
     private View emojiconsFragment;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
@@ -148,21 +189,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private BlockingQueue<Runnable> threadQueue;
     private ThreadPoolExecutor threadPool;
     private boolean needUpdatePosition;
-
-    public static Intent makePrivateDialogIntent(Context context, QMUser user, QBChatDialog dialog){
-        Intent intent = new Intent(context, PrivateDialogActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, user);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-        return intent;
-    }
-
-    public static Intent makePGroupDialogIntent(Context context, QBChatDialog dialog){
-        Intent intent = new Intent(context, GroupDialogActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-        return intent;
-    }
+    private Vibrator vibro;
+    private int lastVisiblePosition;
+    private MessagesScrollListener messagesScrollListener;
 
 
     @Override
@@ -184,12 +213,16 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         initCustomUI();
         initCustomListeners();
         initThreads();
+        initAudioRecorder();
 
         addActions();
         addObservers();
         registerBroadcastReceivers();
 
+        initChatAdapter();
+
         initMessagesRecyclerView();
+        initMediaManager();
 
         hideSmileLayout();
 
@@ -227,7 +260,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_LOCATION_REQUEST_CODE);
+        mediaPickHelper.pickAnMedia(this, MediaUtils.IMAGE_VIDEO_LOCATION_REQUEST_CODE);
     }
 
     @Override
@@ -244,17 +277,26 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     protected void onStart() {
         super.onStart();
         addChatMessagesAdapterListeners();
+        addAudioRecorderListener();
         checkPermissionSaveFiles();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        checkLoginToChatOrShowError();
         restoreDefaultCanPerformLogout();
 
         loadNextPartMessagesAsync();
 
         checkMessageSendingPossibility();
+        resumeMediaPlayer();
+    }
+
+    private void checkLoginToChatOrShowError() {
+        if (!QBChatService.getInstance().isLoggedIn()){
+            showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE);
+        }
     }
 
     @Override
@@ -262,12 +304,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         super.onPause();
         hideSmileLayout();
         checkStartTyping();
+        suspendMediaPlayer();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         removeChatMessagesAdapterListeners();
+        clearAudioRecorder();
     }
 
     @Override
@@ -283,6 +327,8 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     @Override
     protected void onChatReconnected() {
         loadNextPartMessagesAsync();
+        initCurrentDialog();
+        checkMessageSendingPossibility();
     }
 
     @Override
@@ -322,7 +368,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    public void onImagePicked(int requestCode, Attachment.Type type, Object attachment) {
+    public void onMediaPicked(int requestCode, Attachment.Type type, Object attachment) {
         canPerformLogout.set(true);
         if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), type, attachment)){
             startLoadAttachFile(type, attachment, currentChatDialog.getDialogId());
@@ -330,12 +376,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     @Override
-    public void onImagePickClosed(int requestCode) {
+    public void onMediaPickClosed(int requestCode) {
         canPerformLogout.set(true);
     }
 
     @Override
-    public void onImagePickError(int requestCode, Exception e) {
+    public void onMediaPickError(int requestCode, Exception e) {
         canPerformLogout.set(true);
         ErrorUtils.logError(e);
     }
@@ -353,6 +399,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         } else {
             setActionBarTitle(title);
             updateActionBar();
+        }
+    }
+
+    private void resumeMediaPlayer() {
+        if(mediaManager.isMediaPlayerReady()) {
+            mediaManager.resumePlay();
+        }
+    }
+
+    private void suspendMediaPlayer() {
+        if(mediaManager.isMediaPlayerReady()) {
+            mediaManager.suspendPlay();
         }
     }
 
@@ -384,6 +442,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         threadPool.allowCoreThreadTimeOut(true);
     }
 
+    private void initAudioRecorder() {
+        audioRecorder = AudioRecorder.newBuilder()
+                // Required
+                .useInBuildFilePathGenerator(this)
+                .setDuration(ConstsCore.MAX_RECORD_DURATION_IN_SEC)
+                .build();
+    }
+
     private void restoreDefaultCanPerformLogout() {
         if (!canPerformLogout.get()) {
             canPerformLogout.set(true);
@@ -394,6 +460,12 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messagesAdapter.setMessageTextViewLinkClickListener(messagesTextViewLinkClickListener, false);
         messagesAdapter.setAttachLocationClickListener(locationAttachClickListener);
         messagesAdapter.setAttachImageClickListener(imageAttachClickListener);
+        messagesAdapter.setAttachVideoClickListener(videoAttachClickListener);
+        messagesAdapter.setLinkPreviewClickListener(linkPreviewClickListener, false);
+    }
+
+    private void addAudioRecorderListener() {
+        audioRecorder.setMediaRecordListener(recordListener);
     }
 
     private void removeChatMessagesAdapterListeners() {
@@ -401,6 +473,22 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
             messagesAdapter.removeMessageTextViewLinkClickListener();
             messagesAdapter.removeLocationImageClickListener(locationAttachClickListener);
             messagesAdapter.removeAttachImageClickListener(imageAttachClickListener);
+            messagesAdapter.removeAttachVideoClickListener(videoAttachClickListener);
+            messagesAdapter.removeLinkPreviewClickListener();
+        }
+    }
+
+    private void clearAudioRecorder() {
+        if(audioRecorder != null) {
+            audioRecorder.removeMediaRecordListener();
+            stopRecordIfNeed();
+        }
+    }
+
+    private void stopRecordIfNeed() {
+        if (audioRecorder.isRecording()) {
+            Log.d(TAG, "stopRecordIfNeed");
+            stopRecord();
         }
     }
 
@@ -416,7 +504,6 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         mainThreadHandler = new Handler(Looper.getMainLooper());
         resources = getResources();
         dataManager = DataManager.getInstance();
-        imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
@@ -426,13 +513,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         dialogNotificationObserver = new DialogNotificationObserver();
         updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
         appSharedHelper.saveNeedToOpenDialog(false);
-        imagePickHelper = new ImagePickHelper();
+        mediaPickHelper = new MediaPickHelper();
         systemPermissionHelper = new SystemPermissionHelper(this);
         messagesTextViewLinkClickListener = new MessagesTextViewLinkClickListener();
         locationAttachClickListener = new LocationAttachClickListener();
         imageAttachClickListener = new ImageAttachClickListener();
+        linkPreviewClickListener = new LinkPreviewClickListener();
+        videoAttachClickListener = new VideoAttachClickListener();
+        recordListener = new QBMediaRecordListenerImpl();
         currentChatDialog = (QBChatDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = new ArrayList<>();
+        vibro = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        messagesScrollListener = new MessagesScrollListener();
     }
 
     private void initCustomUI() {
@@ -441,11 +533,24 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void initCustomListeners() {
         messageSwipeRefreshLayout.setOnRefreshListener(new RefreshLayoutListener());
+        recordAudioButton.setRecordTouchListener(new RecordTouchListener());
+        recordChronometer.setOnChronometerTickListener(new ChronometerTickListener());
     }
 
+    protected abstract void initChatAdapter();
+
     protected void initMessagesRecyclerView() {
-        messagesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(this));
+        WrapContentLinearLayoutManager layoutManager = new WrapContentLinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        messagesRecyclerView.setLayoutManager(layoutManager);
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        //use deprecated listener for support old devices
+        messagesRecyclerView.setOnScrollListener(messagesScrollListener);
+    }
+
+    protected void initMediaManager() {
+        mediaManager = messagesAdapter.getMediaManagerInstance();
     }
 
     protected void addActions() {
@@ -548,13 +653,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
                         setActionBarIcon(
-                                ImageUtils.getRoundIconDrawable(BaseDialogActivity.this, loadedBitmap));
+                                MediaUtils.getRoundIconDrawable(BaseDialogActivity.this, loadedBitmap));
                     }
                 });
     }
 
     protected void setDefaultActionBarLogo(int drawableResId) {
-        setActionBarIcon(ImageUtils
+        setActionBarIcon(MediaUtils
                 .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
@@ -565,11 +670,13 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
-                        switch (type){
+                        switch (type) {
                             case LOCATION:
                                 sendMessageWithAttachment(dialogId, Attachment.Type.LOCATION, attachment, null);
                                 break;
                             case IMAGE:
+                            case AUDIO:
+                            case VIDEO:
                                 showProgress();
                                 QBLoadAttachFileCommand.start(BaseDialogActivity.this, (File) attachment, dialogId);
                                 break;
@@ -587,9 +694,11 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
             sendButton.setVisibility(View.GONE);
             attachButton.setVisibility(View.VISIBLE);
+            recordAudioButton.setVisibility(View.VISIBLE);
         } else {
             sendButton.setVisibility(View.VISIBLE);
             attachButton.setVisibility(View.GONE);
+            recordAudioButton.setVisibility(View.GONE);
         }
     }
 
@@ -620,14 +729,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         return emojiconsFragment.getVisibility() == View.VISIBLE;
     }
 
-    protected void checkForScrolling(int oldMessagesCount) {
-        if (oldMessagesCount != messagesAdapter.getItemCount()) {
-            scrollMessagesToBottom();
+    protected boolean needScrollBottom(int countAddedMessages) {
+        if (lastVisiblePosition + countAddedMessages < messagesAdapter.getItemCount() - 1){
+            return false;
         }
+
+        return true;
     }
 
-    protected void scrollMessagesToBottom() {
-        scrollMessagesWithDelay();
+    protected void scrollMessagesToBottom(int countAddedMessages) {
+        if (needScrollBottom(countAddedMessages)) {
+            scrollMessagesWithDelay();
+        }
     }
 
     private void scrollMessagesWithDelay() {
@@ -766,7 +879,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         if (isLoadOld) {
             messagesAdapter.notifyItemRangeInserted(0, partSize);
         } else {
-            scrollMessagesToBottom();
+            scrollMessagesToBottom(partSize);
         }
     }
 
@@ -784,6 +897,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         messageEditText.setEnabled(enable);
         smilePanelImageButton.setEnabled(enable);
         attachButton.setEnabled(enable);
+        recordAudioButton.setEnabled(enable);
     }
 
     private void replaceMessageInCurrentList(CombinationMessage combinationMessage){
@@ -805,13 +919,96 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     private void addMessageItemToAdapter(CombinationMessage combinationMessage){
         combinationMessagesList.add(combinationMessage);
         messagesAdapter.setList(combinationMessagesList, true);
-        scrollMessagesToBottom();
+        scrollMessagesToBottom(1);
     }
 
     private void afterLoadingMessagesActions(){
         messageSwipeRefreshLayout.setRefreshing(false);
         hideActionBarProgress();
         isLoadingMessages = false;
+    }
+
+    private boolean checkRecordPermission() {
+        if(systemPermissionHelper.isAllAudioRecordPermissionGranted()) {
+            return true;
+        } else {
+            systemPermissionHelper.requestAllPermissionForAudioRecord();
+            return false;
+        }
+    }
+
+    public void startRecord() {
+        setMessageAttachViewsEnable(false);
+        setRecorderViewsVisibility(View.VISIBLE);
+        audioViewVisibility(View.VISIBLE);
+        vibrate(DURATION_VIBRATE);
+        audioRecorder.startRecord();
+        startChronometer();
+    }
+
+    public void stopRecordByClick() {
+        setMessageAttachViewsEnable(true);
+        vibrate(DURATION_VIBRATE);
+        stopRecord();
+    }
+
+    private void stopRecord() {
+        audioViewVisibility(View.INVISIBLE);
+        stopChronometer();
+        audioRecorder.stopRecord();
+    }
+
+    public void cancelRecord() {
+        stopChronometer();
+        setMessageAttachViewsEnable(true);
+        setRecorderViewsVisibility(View.INVISIBLE);
+        animateCanceling();
+        vibrate(DURATION_VIBRATE);
+        audioViewPostDelayVisibility(View.INVISIBLE);
+        audioRecorder.cancelRecord();
+    }
+
+    private void startChronometer() {
+        recordChronometer.setBase(SystemClock.elapsedRealtime());
+        recordChronometer.start();
+    }
+
+    private void stopChronometer() {
+        recordChronometer.stop();
+    }
+
+    private void setRecorderViewsVisibility(int visibility) {
+        audioRecordTextView.setVisibility(visibility);
+        recordChronometer.setVisibility(visibility);
+    }
+
+    private void setMessageAttachViewsEnable(boolean enable) {
+        messageEditText.setFocusableInTouchMode(enable);
+        messageEditText.setFocusable(enable);
+        smilePanelImageButton.setEnabled(enable);
+        attachButton.setEnabled(enable);
+    }
+
+    private void audioViewPostDelayVisibility(final int visibility) {
+        audioLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                audioViewVisibility(visibility);
+            }
+        }, POST_DELAY_VIEW);
+    }
+
+    private void audioViewVisibility(int visibility) {
+        audioLayout.setVisibility(visibility);
+    }
+
+    private void vibrate(int duration) {
+        vibro.vibrate(duration);
+    }
+
+    private void animateCanceling() {
+        Animation shake = AnimationUtils.loadAnimation(this, R.anim.shake);
+        bucketView.startAnimation(shake);
     }
 
     protected abstract void updateActionBar();
@@ -852,13 +1049,14 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     if (action == MessageDataManager.UPDATE_ACTION) {
                         Log.d(TAG, "updated message = " + message);
                         updateMessageItemInAdapter(combinationMessage);
-                    } else if (action == MessageDataManager.CREATE_OR_UPDATE_ACTION) {
+                    } else if (action == MessageDataManager.CREATE_ACTION) {
                         Log.d(TAG, "created message = " + message);
                         addMessageItemToAdapter(combinationMessage);
                     }
                 }
 
-                if (action == MessageDataManager.DELETE_ACTION) {
+                if (action == MessageDataManager.DELETE_BY_ID_ACTION
+                    || action == MessageDataManager.DELETE_ACTION) {
                     combinationMessagesList.clear();
                     loadNextPartMessagesFromDb(false, true);
                 }
@@ -883,17 +1081,18 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
                     if (action == DialogNotificationDataManager.UPDATE_ACTION) {
                         Log.d(TAG, "updated dialogNotification = " + dialogNotification);
                         updateMessageItemInAdapter(combinationMessage);
-                    } else if (action == DialogNotificationDataManager.CREATE_OR_UPDATE_ACTION) {
+                    } else if (action == DialogNotificationDataManager.CREATE_ACTION) {
                         Log.d(TAG, "created dialogNotification = " + dialogNotification);
                         addMessageItemToAdapter(combinationMessage);
                         if (currentChatDialog != null && QBDialogType.PRIVATE.equals(currentChatDialog.getType())) {
                             updateMessagesList();
                             messagesAdapter.notifyDataSetChanged();
-                            scrollMessagesToBottom();
+                            scrollMessagesToBottom(1);
                         }
                     }
 
-                    if (action == DialogNotificationDataManager.DELETE_ACTION) {
+                    if (action == DialogNotificationDataManager.DELETE_BY_ID_ACTION
+                            ||action == DialogNotificationDataManager.DELETE_ACTION) {
                         combinationMessagesList.clear();
                         loadNextPartMessagesFromDb(false, true);
                     }
@@ -1056,19 +1255,140 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     }
 
-    protected class LocationAttachClickListener implements QBChatAttachLocationClickListener{
+    protected class LocationAttachClickListener implements QBChatAttachClickListener{
 
         @Override
-        public void onLinkClicked(QBAttachment qbAttachment, int i) {
+        public void onLinkClicked(QBAttachment qbAttachment, int position) {
             MapsActivity.startMapForResult(BaseDialogActivity.this, qbAttachment.getData());
         }
     }
 
-    protected class ImageAttachClickListener implements QBChatAttachImageClickListener{
+    protected class ImageAttachClickListener implements QBChatAttachClickListener {
 
         @Override
-        public void onLinkClicked(QBAttachment qbAttachment, int i) {
-            PreviewImageActivity.start(BaseDialogActivity.this, qbAttachment.getUrl());
+        public void onLinkClicked(QBAttachment qbAttachment, int position) {
+            PreviewImageActivity.start(BaseDialogActivity.this, QBFile.getPrivateUrlForUID(qbAttachment.getId()));
+        }
+    }
+
+    protected class VideoAttachClickListener implements QBChatAttachClickListener {
+
+        @Override
+        public void onLinkClicked(QBAttachment qbAttachment, int position) {
+            canPerformLogout.set(false);
+            VideoPlayerActivity.start(BaseDialogActivity.this, Uri.parse(QBFile.getPrivateUrlForUID(qbAttachment.getId())));
+        }
+    }
+
+    protected class RecordTouchListener implements QBRecordAudioButton.RecordTouchEventListener {
+
+        @Override
+        public void onStartClick(View v) {
+            if(checkRecordPermission()) {
+                startRecord();
+            }
+        }
+
+        @Override
+        public void onCancelClick(View v) {
+            cancelRecord();
+        }
+
+        @Override
+        public void onStopClick(View v) {
+            stopRecordByClick();
+        }
+    }
+
+    protected class ChronometerTickListener implements Chronometer.OnChronometerTickListener {
+        private long elapsedSecond;
+
+        @Override
+        public void onChronometerTick(Chronometer chronometer) {
+            setChronometerAppropriateColor();
+        }
+
+        private void setChronometerAppropriateColor() {
+            elapsedSecond = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - recordChronometer.getBase());
+            if (isStartSecond()) {
+                setChronometerBaseColor();
+            }
+            if (isAlarmSecond()) {
+                setChronometerAlarmColor();
+            }
+        }
+
+        private boolean isStartSecond() {
+            return elapsedSecond == 0;
+        }
+
+        private boolean isAlarmSecond() {
+            return elapsedSecond == ConstsCore.CHRONOMETER_ALARM_SECOND;
+        }
+
+        private void setChronometerAlarmColor() {
+            recordChronometer.setTextColor(ContextCompat.getColor(BaseDialogActivity.this, android.R.color.holo_red_light));
+        }
+
+        private void setChronometerBaseColor() {
+            recordChronometer.setTextColor(ContextCompat.getColor(BaseDialogActivity.this, android.R.color.black));
+        }
+    }
+
+    private class QBMediaRecordListenerImpl implements QBMediaRecordListener {
+
+        @Override
+        public void onMediaRecorded(File file) {
+            audioViewVisibility(View.INVISIBLE);
+            if(ValidationUtils.validateAttachment(getSupportFragmentManager(), getResources().getStringArray(R.array.supported_attachment_types), Attachment.Type.AUDIO, file)){
+                startLoadAttachFile(Attachment.Type.AUDIO, file, currentChatDialog.getDialogId());
+            } else {
+                audioRecordErrorAnimate();
+            }
+        }
+
+        @Override
+        public void onMediaRecordError(MediaRecorderException e) {
+            audioRecorder.releaseMediaRecorder();
+            audioRecordErrorAnimate();
+        }
+
+        @Override
+        public void onMediaRecordClosed() {
+        }
+
+        private void audioRecordErrorAnimate() {
+            Animation shake = AnimationUtils.loadAnimation(BaseDialogActivity.this, R.anim.shake_record_button);
+            recordAudioButton.startAnimation(shake);
+        }
+    }
+
+    protected class LinkPreviewClickListener implements QBLinkPreviewClickListener{
+
+        @Override
+        public void onLinkPreviewClicked(String link, QBLinkPreview linkPreview, int position) {
+
+        }
+
+        @Override
+        public void onLinkPreviewLongClicked(String link, QBLinkPreview linkPreview, int position) {
+            ClipboardUtils.copySimpleTextToClipboard(BaseDialogActivity.this, link);
+            ToastUtils.longToast(R.string.link_was_copied);
+            Log.v(TAG, linkPreview.toString());
+        }
+    }
+
+    protected class MessagesScrollListener extends RecyclerView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            WrapContentLinearLayoutManager layoutManager1  = (WrapContentLinearLayoutManager) recyclerView.getLayoutManager();
+            lastVisiblePosition = layoutManager1.findLastVisibleItemPosition();
         }
     }
 }

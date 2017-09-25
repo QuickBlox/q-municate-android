@@ -34,7 +34,6 @@ dependencies {
     compile ("com.quickblox:chat-message-adapter:$rootProject.qbMessageAdapterVersion"){
         exclude module: 'quickblox-android-sdk-chat'
         exclude module: 'quickblox-android-sdk-content'
-        exclude module: 'recyclerview-v7'
     }
     compile project(path: ':q-municate_user_service')
     compile project(path: ':q-municate_auth_service')

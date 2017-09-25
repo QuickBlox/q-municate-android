@@ -88,10 +88,6 @@ public class App extends MultiDexApplication {
         initDomains();
         initHTTPConfig();
 
-        QBChatService.ConfigurationBuilder configurationBuilder = new QBChatService.ConfigurationBuilder();
-        configurationBuilder.setAutojoinEnabled(true);
-
-        QBChatService.setConfigurationBuilder(configurationBuilder);
         QBChatService.setDebugEnabled(StringObfuscator.getDebugEnabled());
     }
 

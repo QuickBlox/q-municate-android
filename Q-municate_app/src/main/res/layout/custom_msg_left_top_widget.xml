@@ -8,14 +8,10 @@
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/opponent_name_text_view"
         style="@style/WrapContent"
+        android:layout_weight="1"
         android:paddingRight="8dp"
         android:textStyle="bold"
         tools:text="Oppponent Name" />
-
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/custom_msg_text_time_message"

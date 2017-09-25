@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.views.TouchImageView;
-import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.ToastUtils;
 
 import butterknife.Bind;
 
@@ -47,10 +50,26 @@ public class PreviewImageActivity extends BaseLoggableActivity {
     }
 
     private void displayImage() {
+        showActionBarProgress();
         String imageUrl = getIntent().getStringExtra(EXTRA_IMAGE_URL);
         if (!TextUtils.isEmpty(imageUrl)) {
-            ImageLoader.getInstance().displayImage(imageUrl, imageTouchImageView,
-                    ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS);
+            Glide.with(this)
+                    .load(imageUrl)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            ToastUtils.shortToast(R.string.preview_image_error);
+                            hideActionBarProgress();
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            hideActionBarProgress();
+                            return false;
+                        }
+                    })
+                    .into(imageTouchImageView);
         }
     }
 

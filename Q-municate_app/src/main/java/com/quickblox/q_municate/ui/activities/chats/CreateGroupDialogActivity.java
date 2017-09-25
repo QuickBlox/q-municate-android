@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBChatDialog ;
+import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
@@ -17,13 +17,13 @@ import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
-import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate.utils.helpers.MediaPickHelper;
+import com.quickblox.q_municate.utils.MediaUtils;
+import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate.utils.listeners.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -38,7 +38,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.OnClick;
 
-public class CreateGroupDialogActivity extends BaseFriendsListActivity implements OnImagePickedListener {
+public class CreateGroupDialogActivity extends BaseFriendsListActivity implements OnMediaPickedListener {
 
     private static final String EXTRA_FRIENDS_LIST = "friends_list";
 
@@ -53,7 +53,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
 
     private QBFile qbFile;
     private List<QMUser> friendsList;
-    private ImagePickHelper imagePickHelper;
+    private MediaPickHelper mediaPickHelper;
     private Uri imageUri;
 
     public static void start(Context context, List<QMUser> selectedFriendsList) {
@@ -100,7 +100,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
 
     @OnClick(R.id.photo_imageview)
     void selectPhoto(View view) {
-        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+        mediaPickHelper.pickAnMedia(this, MediaUtils.IMAGE_REQUEST_CODE);
     }
 
     @Override
@@ -129,22 +129,22 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     }
 
     @Override
-    public void onImagePicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
-        if (Attachment.Type.IMAGE.equals(attachmentType)){
+    public void onMediaPicked(int requestCode, Attachment.Type attachmentType, Object attachment) {
+        if (Attachment.Type.IMAGE.equals(attachmentType)) {
             canPerformLogout.set(true);
-            startCropActivity(Uri.fromFile((File) attachment));
+            startCropActivity(MediaUtils.getValidUri((File) attachment, this));
         }
 
     }
 
     @Override
-    public void onImagePickError(int requestCode, Exception e) {
+    public void onMediaPickError(int requestCode, Exception e) {
         canPerformLogout.set(true);
         ErrorUtils.showError(this, e);
     }
 
     @Override
-    public void onImagePickClosed(int requestCode) {
+    public void onMediaPickClosed(int requestCode) {
         canPerformLogout.set(true);
     }
 
@@ -152,7 +152,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         title = getString(R.string.create_group_title);
         friendsList = (List<QMUser>) getIntent().getExtras().getSerializable(EXTRA_FRIENDS_LIST);
         participantsCountTextView.setText(getString(R.string.create_group_participants, friendsList.size()));
-        imagePickHelper = new ImagePickHelper();
+        mediaPickHelper = new MediaPickHelper();
     }
 
     private void addActions() {
@@ -181,7 +181,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
                 showProgress();
 
                 if (imageUri != null) {
-                    QBLoadAttachFileCommand.start(CreateGroupDialogActivity.this, ImageUtils.getCreatedFileFromUri(imageUri), null);
+                    QBLoadAttachFileCommand.start(CreateGroupDialogActivity.this, MediaUtils.getCreatedFileFromUri(imageUri), null);
                 } else {
                     createGroupChat();
                 }
@@ -199,8 +199,8 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     private void startCropActivity(Uri originalUri) {
         canPerformLogout.set(false);
 
-        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf("."));
-        imageUri = Uri.fromFile(new File(getCacheDir(), extensionOriginalUri));
+        String extensionOriginalUri = originalUri.getPath().substring(originalUri.getPath().lastIndexOf(".")).toLowerCase();
+        imageUri = MediaUtils.getValidUri(new File(getCacheDir(), extensionOriginalUri), this);
         Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
@@ -229,7 +229,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            QBChatDialog  dialog = (QBChatDialog ) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            QBChatDialog dialog = (QBChatDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
             if (dialog != null) {
                 GroupDialogActivity.start(CreateGroupDialogActivity.this, dialog);

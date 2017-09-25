@@ -54,19 +54,28 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private final String TAG = PrivateDialogActivity.class.getSimpleName();
 
     public static void start(Context context, QMUser opponent, QBChatDialog chatDialog) {
-        Intent intent = new Intent(context, PrivateDialogActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
-        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+        Intent intent = getIntentWithExtra(context, opponent, chatDialog);
+        intent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+        context.startActivity(intent);
+    }
+
+    public static void startWithClearTop(Context context, QMUser opponent, QBChatDialog chatDialog) {
+        Intent intent = getIntentWithExtra(context, opponent, chatDialog);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         context.startActivity(intent);
     }
 
     public static void startForResult(Fragment fragment, QMUser opponent, QBChatDialog chatDialog,
                                       int requestCode) {
-        Intent intent = new Intent(fragment.getActivity(), PrivateDialogActivity.class);
+        Intent intent = getIntentWithExtra(fragment.getContext(), opponent, chatDialog);
+        fragment.startActivityForResult(intent, requestCode);
+    }
+
+    private static Intent getIntentWithExtra(Context context, QMUser opponent, QBChatDialog chatDialog) {
+        Intent intent = new Intent(context, PrivateDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, chatDialog);
-        fragment.startActivityForResult(intent, requestCode);
+        return intent;
     }
 
     @Override
@@ -103,15 +112,19 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     @Override
+    protected void initChatAdapter() {
+        messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, currentChatDialog);
+    }
+
+    @Override
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
-        messagesAdapter = new PrivateChatMessageAdapter(this, combinationMessagesList, friendOperationAction, currentChatDialog);
         messagesRecyclerView.addItemDecoration(
                 new StickyRecyclerHeadersDecoration(messagesAdapter));
         findLastFriendsRequest(true);
 
         messagesRecyclerView.setAdapter(messagesAdapter);
-        scrollMessagesToBottom();
+        scrollMessagesToBottom(0);
     }
 
     @Override
@@ -124,7 +137,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
         super.notifyChangedUserStatus(userId, online);
 
         if (opponentUser != null && opponentUser.getId() == userId) {
-            if (online){
+            if (online) {
                 //gets opponentUser from DB with updated field 'last_request_at'
                 actualizeOpponentUserFromDb();
             }
@@ -136,7 +149,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     private void actualizeOpponentUserFromDb() {
         QMUser opponentUserFromDb = QMUserService.getInstance().getUserCache().get((long) opponentUser.getId());
 
-        if (opponentUserFromDb != null){
+        if (opponentUserFromDb != null) {
             opponentUser = opponentUserFromDb;
         }
     }
@@ -277,7 +290,7 @@ public class PrivateDialogActivity extends BaseDialogActivity {
     }
 
     private void showRejectUserDialog(final int userId) {
-        QMUser user = QMUserService.getInstance().getUserCache().get((long)userId);
+        QMUser user = QMUserService.getInstance().getUserCache().get((long) userId);
         if (user == null) {
             return;
         }

@@ -30,7 +30,6 @@ public class ChatMessageReceiver extends BroadcastReceiver {
             String dialogId = intent.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID);
 
             chatNotificationHelper.saveOpeningDialogData(user.getId(), dialogId);
-            chatNotificationHelper.saveOpeningDialog(true);
             chatNotificationHelper.sendChatNotification(message, user.getId(), dialogId);
         }
     }

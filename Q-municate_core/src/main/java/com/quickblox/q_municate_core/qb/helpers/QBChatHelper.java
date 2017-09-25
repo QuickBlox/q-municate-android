@@ -43,6 +43,8 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.DbUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
+import com.quickblox.q_municate_core.utils.MediaUtils;
+import com.quickblox.q_municate_core.utils.MimeTypeAttach;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.DialogNotification;
@@ -58,13 +60,13 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -82,6 +84,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     private PrivateChatMessagesStatusListener privateChatMessagesStatusListener;
     private List<QBNotificationChatListener> notificationChatListeners = new CopyOnWriteArrayList<>();
     private final AllChatMessagesListener allChatMessagesListener;
+    private final SystemMessageListener systemMessagesListener;
     private QBSystemMessagesManager systemMessagesManager;
     private List<QBChatDialog> groupDialogsList;
     private QBChatDialogParticipantListener participantListener;
@@ -92,6 +95,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         super(context);
         participantListener = new ParticipantListener();
         allChatMessagesListener = new AllChatMessagesListener();
+        systemMessagesListener = new SystemMessageListener();
         typingListener = new TypingListener();
         privateChatMessagesStatusListener = new PrivateChatMessagesStatusListener();
 
@@ -124,6 +128,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
                 && currentDialog.getDialogId().equals(chatDialog.getDialogId())
                 && chatService != null
                 && chatService.isLoggedIn()) {
+            chatDialog.initForChat(chatService);
             if (QBDialogType.GROUP.equals(currentDialog.getType())) {
                 if (currentDialog.getParticipantListeners().contains(participantListener)) {
                     currentDialog.removeParticipantListener(participantListener);
@@ -141,6 +146,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
     public void initChatService() {
         Log.v(TAG, "initChatService()");
         this.chatService = QBChatService.getInstance();
+        chatService.addConnectionListener(chatConnectionListener);
     }
 
     public void init(QBUser chatCreator) {
@@ -149,20 +155,19 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
         initCurrentDialogForChatIfPossible();
 
+        initMainChatListeners();
+    }
+
+    private void initMainChatListeners() {
         chatService.getMessageStatusesManager().addMessageStatusListener(privateChatMessagesStatusListener);
         chatService.getIncomingMessagesManager().addDialogMessageListener(allChatMessagesListener);
 
-        chatService.addConnectionListener(chatConnectionListener);
         systemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
-        addSystemMessageListener(new SystemMessageListener());
+        systemMessagesManager.addSystemMessageListener(systemMessagesListener);
     }
 
     public boolean isLoggedInToChat(){
         return chatService != null && chatService.isLoggedIn();
-    }
-
-    protected void addSystemMessageListener(QBSystemMessageListener systemMessageListener) {
-        systemMessagesManager.addSystemMessageListener(systemMessageListener);
     }
 
     protected void addNotificationChatListener(QBNotificationChatListener notificationChatListener) {
@@ -180,15 +185,19 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         switch (attachmentType) {
             case IMAGE:
                 messageBody = context.getString(R.string.dlg_attached_last_message);
-                attachment = getAttachment((QBFile) attachmentObject, localPath);
+                attachment = getAttachmentImage((QBFile) attachmentObject, localPath);
                 break;
             case LOCATION:
                 messageBody = context.getString(R.string.dlg_location_last_message);
-                attachment = getAttachment((String) attachmentObject);
+                attachment = getAttachmentLocation((String) attachmentObject);
                 break;
             case VIDEO:
+                messageBody = context.getString(R.string.dlg_attached_video_last_message);
+                attachment = getAttachmentVideo((QBFile) attachmentObject, localPath);
                 break;
             case AUDIO:
+                messageBody = context.getString(R.string.dlg_attached_audio_last_message);
+                attachment = getAttachmentAudio((QBFile) attachmentObject, localPath);
                 break;
             case DOC:
                 break;
@@ -315,37 +324,56 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         return chatMessage;
     }
 
-    private QBAttachment getAttachment(QBFile file) {
-        return getAttachment(file, null);
-    }
-
-    private QBAttachment getAttachment(QBFile file, String localPath) {
-        // TODO temp value
-        String contentType = "image/jpeg";
-
-        QBAttachment attachment = new QBAttachment(QBAttachment.IMAGE_TYPE);
+    private QBAttachment getAttachment(QBFile file, String attachType, String contentType) {
+        QBAttachment attachment = new QBAttachment(attachType);
         attachment.setId(file.getUid());
         attachment.setName(file.getName());
         attachment.setContentType(contentType);
-        attachment.setUrl(file.getPublicUrl());
         attachment.setSize(file.getSize());
+        return attachment;
+    }
 
-        if(!TextUtils.isEmpty(localPath)){
+    private QBAttachment getAttachmentImage(QBFile file, String localPath) {
+        QBAttachment attachment = getAttachment(file, QBAttachment.IMAGE_TYPE, MimeTypeAttach.IMAGE_MIME);
+
+        if (!TextUtils.isEmpty(localPath)) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(localPath, options);
             attachment.setWidth(options.outWidth);
             attachment.setHeight(options.outHeight);
-       }
+        }
 
         return attachment;
     }
 
-    private QBAttachment getAttachment(String location) {
+    private QBAttachment getAttachmentLocation(String location) {
         QBAttachment attachment = new QBAttachment(Attachment.Type.LOCATION.toString().toLowerCase());
         attachment.setData(location);
         attachment.setId(String.valueOf(location.hashCode()));
 
+        return attachment;
+    }
+
+    private QBAttachment getAttachmentAudio(QBFile file, String localPath) {
+        QBAttachment attachment = getAttachment(file, QBAttachment.AUDIO_TYPE, MimeTypeAttach.AUDIO_MIME);
+
+        if (!TextUtils.isEmpty(localPath)) {
+            int durationSec = MediaUtils.getMetaData(localPath).durationSec();
+            attachment.setDuration(durationSec);
+        }
+        return attachment;
+    }
+
+    private QBAttachment getAttachmentVideo(QBFile file, String localPath) {
+        QBAttachment attachment = getAttachment(file, QBAttachment.VIDEO_TYPE, MimeTypeAttach.VIDEO_MIME);
+
+        if (!TextUtils.isEmpty(localPath)) {
+            MediaUtils.MetaData metaData = MediaUtils.getMetaData(localPath);
+            attachment.setHeight(metaData.videoHeight());
+            attachment.setWidth(metaData.videoWidth());
+            attachment.setDuration(metaData.durationSec());
+        }
         return attachment;
     }
 
@@ -384,8 +412,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
             return;
         }
 
-        sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE, qbChatMessage, user, dialogId,
-                isPrivateChat);
+        if (!ownMessage) {
+            sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE, qbChatMessage, user, dialogId, isPrivateChat);
+        }
 
         if (currentDialog != null) {
             if (!ownMessage && !currentDialog.getDialogId().equals(dialogId)) {
@@ -582,7 +611,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     public void joinRoomChat(QBChatDialog dialog, QBEntityCallback<Void> callback) {
         dialog.initForChat(chatService);
-        dialog.join(history(), callback); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
+        if (!dialog.isJoined()) { //join only to unjoined dialogs
+            dialog.join(history(), callback); //join asynchronously, this doesn't block current thread to enqueue join for next dialog
+        }
     }
 
     public void joinRoomChat(QBChatDialog dialog) throws XMPPException, SmackException {
@@ -824,7 +855,6 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         }
     }
 
-
     interface QBNotificationChatListener {
 
         void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
@@ -834,6 +864,12 @@ public class QBChatHelper extends BaseThreadPoolHelper{
         @Override
         public void reconnectionSuccessful() {
             tryJoinRoomChats();
+        }
+
+        @Override
+        public void authenticated(XMPPConnection connection, boolean resumed) {
+            chatCreator = AppSession.getSession().getUser();
+            initMainChatListeners();
         }
     }
 
@@ -944,7 +980,7 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
         @Override
         public void processPresence(String dialogId, QBPresence presence) {
-            boolean validData = currentDialog != null && presence.getUserId() != null;
+            boolean validData = currentDialog != null && presence.getUserId() != null && currentDialog.getRoomJid() != null;
             if (validData && currentDialog.getRoomJid().equals(JIDHelper.INSTANCE.getRoomJidByDialogId(dialogId))) {
                 notifyUpdatingDialogDetails(presence.getUserId(), QBPresence.Type.online.equals(presence.getType()));
             }

@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Bundle;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -13,6 +15,7 @@ import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUserColumns;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -284,7 +287,7 @@ public class MessageDataManager extends BaseManager<Message> {
 
             if (deleteBuilder.delete() > 0) {
                 //TODO VT need to think how to send IDs to observers
-                notifyObservers(null, DELETE_ACTION);
+                notifyObserversDeletedById(dialogOccupantsIdsList);
             }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
@@ -345,4 +348,8 @@ public class MessageDataManager extends BaseManager<Message> {
         return message;
     }
 
+    @Override
+    protected void addIdToNotification(Bundle bundle, Object id) {
+        bundle.putSerializable(EXTRA_OBJECT_ID, (Serializable) id);
+    }
 }

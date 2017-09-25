@@ -13,6 +13,7 @@
     <dimen name="padding_minimal_material">8dp</dimen>
     <dimen name="padding_medium">10dp</dimen>
     <dimen name="padding_large">15dp</dimen>
+    <dimen name="padding_extra_large">24dp</dimen>
 
     <dimen name="landing_button_height">40dp</dimen>
     <dimen name="landing_button_width">328dp</dimen>
@@ -86,5 +87,7 @@
 
     <dimen name="fab_margin_right">16dp</dimen>
     <dimen name="fab_margin_bottom">16dp</dimen>
+
+    <dimen name="link_preview_width">220dp</dimen>
 
 </resources>

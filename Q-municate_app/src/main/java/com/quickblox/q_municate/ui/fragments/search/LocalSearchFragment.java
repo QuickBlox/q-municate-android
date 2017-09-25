@@ -33,13 +33,14 @@ import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.DialogSearchWrapper;
 import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.utils.DialogTransformUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
 
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
 
     private final static int LOADER_ID = LocalSearchFragment.class.hashCode();
     private static final String TAG = LocalSearchFragment.class.getSimpleName();
+    private static final String RESULT_ACTION_NAME = "load_dialogs_for_local_search_screen";
 
     @Bind(R.id.dialogs_recyclerview)
     RecyclerView dialogsRecyclerView;
@@ -221,12 +223,14 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
     private void addObservers() {
         dataManager.getUserRequestDataManager().addObserver(commonObserver);
         dataManager.getFriendDataManager().addObserver(commonObserver);
+        dataManager.getQBChatDialogDataManager().addObserver(commonObserver);
     }
 
     private void deleteObservers() {
         if (dataManager != null) {
             dataManager.getUserRequestDataManager().deleteObserver(commonObserver);
             dataManager.getFriendDataManager().deleteObserver(commonObserver);
+            dataManager.getQBChatDialogDataManager().deleteObserver(commonObserver);
         }
     }
 
@@ -235,7 +239,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
             loadDialogsBroadcastReceiver = new  LoadDialogsBroadcastReceiver();
         }
 
-        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(loadDialogsBroadcastReceiver, new IntentFilter(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION));
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(loadDialogsBroadcastReceiver, new IntentFilter(RESULT_ACTION_NAME));
     }
 
     private void unregisterLoadDialogsReceiver(){
@@ -332,7 +336,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
                 return;
             }
 
-            DialogsUtils.loadAllDialogsFromCacheByPagesTask(getContext(), dialogsCount);
+            DialogsUtils.loadAllDialogsFromCacheByPagesTask(getContext(), dialogsCount, RESULT_ACTION_NAME);
         }
 
         @Override
@@ -366,8 +370,23 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<DialogSearchWra
         public void update(Observable observable, Object data) {
             if (data != null) {
                 String observerKey = ((Bundle) data).getString(BaseManager.EXTRA_OBSERVE_KEY);
-                if (observerKey.equals(dataManager.getUserRequestDataManager().getObserverKey()) || observerKey.equals(dataManager.getFriendDataManager().getObserverKey())) {
-                    updateList();
+                int action = ((Bundle) data).getInt(BaseManager.EXTRA_ACTION);
+                Log.v(TAG, "CommonObserver.update() observerKey = " + observerKey);
+                Log.v(TAG, "action = " + action);
+
+                if (observerKey.equals(dataManager.getQBChatDialogDataManager().getObserverKey())) {
+                    if (((Bundle) data).getSerializable(BaseManager.EXTRA_OBJECT) != null) {
+                        Dialog dialog = (Dialog) ((Bundle) data).getSerializable(BaseManager.EXTRA_OBJECT);
+                        QBChatDialog chatDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialog.getDialogId());
+                        DialogSearchWrapper wrappedChatDialog = new DialogSearchWrapper(baseActivity, dataManager, chatDialog);
+
+                        if (action == BaseManager.DELETE_ACTION) {
+                            localSearchAdapter.removeItem(wrappedChatDialog);
+                        }
+                    } else if (action == BaseManager.DELETE_BY_ID_ACTION) {
+                        String removedDialogId = ((Bundle) data).getString(BaseManager.EXTRA_OBJECT_ID);
+                        localSearchAdapter.removeItemByDialogId(removedDialogId);
+                    }
                 }
             }
         }
