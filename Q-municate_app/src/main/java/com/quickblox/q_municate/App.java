@@ -96,7 +96,7 @@ public class App extends MultiDexApplication {
         configurationBuilder.setAutojoinEnabled(true);
 
         QBChatService.setConfigurationBuilder(configurationBuilder);
-        QBChatService.setDebugEnabled(StringObfuscator.getDebugEnabled());
+        QBChatService.setDebugEnabled(true);
     }
 
     private void initDomains(){

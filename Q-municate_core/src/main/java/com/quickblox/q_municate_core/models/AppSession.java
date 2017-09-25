@@ -142,6 +142,8 @@ public class AppSession implements Serializable {
             loginType = LoginType.FACEBOOK;
         } else if (socialProvider.equals(QBProvider.FIREBASE_PHONE)){
             loginType = LoginType.FIREBASE_PHONE;
+        } else if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){ //for correct migration from TWITTER_DIGITS to FIREBASE_PHONE
+            loginType = LoginType.FIREBASE_PHONE;
         }
         return result;
     }

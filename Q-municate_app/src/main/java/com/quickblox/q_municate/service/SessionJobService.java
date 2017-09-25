@@ -59,7 +59,7 @@ public class SessionJobService extends JobService {
             Bundle jobExtras = jobParameters.getExtras();
             ServiceManager.getInstance().login(QBProvider.FIREBASE_PHONE,
                     jobExtras.getString(FirebaseAuthHelper.EXTRA_FIREBASE_ACCESS_TOKEN),
-                    jobExtras.getString(StringObfuscator.getFirebaseAuthProjectId()))
+                    StringObfuscator.getFirebaseAuthProjectId())
                     .subscribe( new JobObserver(this, jobParameters));
             return true;
         }

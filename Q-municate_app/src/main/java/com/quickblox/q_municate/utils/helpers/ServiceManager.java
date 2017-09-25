@@ -107,14 +107,14 @@ public class ServiceManager {
                 .map(new Func1<QBUser, QBUser>() {
                     @Override
                     public QBUser call(QBUser qbUser) {
-                        Log.d(TAG, "loginByPhone observer call " + qbUser);
+                        Log.d(TAG, "login observer call " + qbUser);
                         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
                         if (QBProvider.FACEBOOK.equals(socialProvider) && TextUtils.isEmpty(userCustomData.getAvatarUrl())) {
-                            //Actions for first loginByPhone via Facebook
+                            //Actions for first login via Facebook
                             CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
                             getFBUserWithAvatar(qbUser);
                         } else if (QBProvider.FIREBASE_PHONE.equals(socialProvider) && TextUtils.isEmpty(qbUser.getFullName())) {
-                            //Actions for first loginByPhone via Twitter Digits
+                            //Actions for first login via Firebase phone
                             CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
                             getUserWithFullNameAsPhone(qbUser);
                         }
@@ -333,7 +333,7 @@ public class ServiceManager {
     }
 
     private UserCustomData getUserCustomData(String avatarUrl) {
-        String isImport = "1"; // TODO: temp, first FB or TD loginByPhone (for correct work need use crossplatform)
+        String isImport = "1"; // TODO: temp, first FB or TD login (for correct work need use crossplatform)
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
 

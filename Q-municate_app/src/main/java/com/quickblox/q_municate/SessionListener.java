@@ -9,6 +9,7 @@ import com.quickblox.auth.session.QBSessionListenerImpl;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.auth.session.QBSessionParameters;
 import com.quickblox.q_municate.service.SessionJobService;
+import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.utils.helpers.FirebaseAuthHelper;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.users.model.QBUser;
@@ -50,6 +51,7 @@ public class SessionListener {
             FirebaseAuthHelper.getIdTokenForCurrentUser(new FirebaseAuthHelper.RequestFirebaseIdTokenCallback() {
                 @Override
                 public void onSuccess(String authToken) {
+                    Log.d(TAG, "onSuccess authToken: " + authToken);
                     Bundle bundle = new Bundle();
                     bundle.putString(FirebaseAuthHelper.EXTRA_FIREBASE_ACCESS_TOKEN, authToken);
                     SessionJobService.startSignInSocial(App.getInstance(), bundle);
@@ -57,7 +59,8 @@ public class SessionListener {
 
                 @Override
                 public void onError(Exception e) {
-
+                    Log.d(TAG, "onError error: " + e.getMessage());
+                    LandingActivity.start(App.getInstance());
                 }
             });
         }
