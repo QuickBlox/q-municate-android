@@ -27,8 +27,6 @@ android {
         versionCode rootProject.versionCode
         versionName rootProject.versionName
         multiDexEnabled = true
-        ext.betaDistrubutionGroupAliases=property('testers_group_name')
-        ext.betaDistributionEmails=property('testers_notification_e-mails')
     }
 
     signingConfigs {
@@ -95,13 +93,6 @@ android {
             buildConfigField "String", "APP_ID", devAppID
             buildConfigField "String", "AUTH_KEY", devAuthKey
             buildConfigField "String", "AUTH_SECRET", devAuthSecret
-        }
-
-        stage {
-
-            buildConfigField "String", "APP_ID", stageAppID
-            buildConfigField "String", "AUTH_KEY", stageAuthKey
-            buildConfigField "String", "AUTH_SECRET", stageAuthSecret
         }
     }
 }
