@@ -137,14 +137,19 @@ public class AppSession implements Serializable {
         }
         String socialProvider = sessionParameters.getSocialProvider();
         if(socialProvider == null){
-            loginType = LoginType.EMAIL;
+            result = LoginType.EMAIL;
         } else if (socialProvider.equals(QBProvider.FACEBOOK)){
-            loginType = LoginType.FACEBOOK;
+            result = LoginType.FACEBOOK;
         } else if (socialProvider.equals(QBProvider.FIREBASE_PHONE)){
-            loginType = LoginType.FIREBASE_PHONE;
+            result = LoginType.FIREBASE_PHONE;
         } else if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){ //for correct migration from TWITTER_DIGITS to FIREBASE_PHONE
-            loginType = LoginType.FIREBASE_PHONE;
+            result = LoginType.FIREBASE_PHONE;
         }
+
+        if (result != null) {
+            loginType = result;
+        }
+
         return result;
     }
 

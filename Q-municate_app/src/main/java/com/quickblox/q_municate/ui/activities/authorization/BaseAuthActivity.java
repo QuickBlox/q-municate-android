@@ -274,6 +274,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
         @Override
         public void onSuccess(String authToken) {
+            Log.d(TAG, "FirebaseAuthCallback onSuccess()");
             showProgress();
             serviceManager.login(QBProvider.FIREBASE_PHONE, authToken, StringObfuscator.getFirebaseAuthProjectId())
                     .subscribe(socialLoginObserver);
@@ -281,6 +282,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
         @Override
         public void onError(Exception e) {
+            Log.d(TAG, "FirebaseAuthCallback onError()");
             hideProgress();
         }
     }

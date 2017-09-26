@@ -44,25 +44,25 @@ public class SessionListener {
         public void onProviderSessionExpired(String provider) {
             Log.d(TAG, "onProviderSessionExpired :" +provider );
 
-            if (!QBProvider.FIREBASE_PHONE.equals(provider)){
-                return;
+            if (QBProvider.FIREBASE_PHONE.equals(provider)
+                    || QBProvider.TWITTER_DIGITS.equals(provider)) { //for correct migration from TWITTER_DIGITS to FIREBASE_PHONE
+
+                FirebaseAuthHelper.getIdTokenForCurrentUser(new FirebaseAuthHelper.RequestFirebaseIdTokenCallback() {
+                    @Override
+                    public void onSuccess(String authToken) {
+                        Log.d(TAG, "onSuccess authToken: " + authToken);
+                        Bundle bundle = new Bundle();
+                        bundle.putString(FirebaseAuthHelper.EXTRA_FIREBASE_ACCESS_TOKEN, authToken);
+                        SessionJobService.startSignInSocial(App.getInstance(), bundle);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.d(TAG, "onError error: " + e.getMessage());
+                        LandingActivity.start(App.getInstance());
+                    }
+                });
             }
-
-            FirebaseAuthHelper.getIdTokenForCurrentUser(new FirebaseAuthHelper.RequestFirebaseIdTokenCallback() {
-                @Override
-                public void onSuccess(String authToken) {
-                    Log.d(TAG, "onSuccess authToken: " + authToken);
-                    Bundle bundle = new Bundle();
-                    bundle.putString(FirebaseAuthHelper.EXTRA_FIREBASE_ACCESS_TOKEN, authToken);
-                    SessionJobService.startSignInSocial(App.getInstance(), bundle);
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.d(TAG, "onError error: " + e.getMessage());
-                    LandingActivity.start(App.getInstance());
-                }
-            });
         }
     }
 }

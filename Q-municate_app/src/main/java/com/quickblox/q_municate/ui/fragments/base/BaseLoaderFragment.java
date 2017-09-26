@@ -9,7 +9,7 @@ public abstract class BaseLoaderFragment<T> extends BaseFragment implements Load
     protected Loader<T> loader;
 
     protected void initDataLoader(int id) {
-        getLoaderManager().initLoader(id, null, this);
+        getLoaderManager().initLoader(id, null, this).forceLoad();
     }
 
     protected abstract Loader<T> createDataLoader();

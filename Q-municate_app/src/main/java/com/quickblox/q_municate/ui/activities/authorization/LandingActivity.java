@@ -24,6 +24,7 @@ public class LandingActivity extends BaseAuthActivity {
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LandingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
     }
 

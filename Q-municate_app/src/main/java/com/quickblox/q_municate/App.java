@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.google.firebase.FirebaseApp;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
@@ -48,7 +47,6 @@ public class App extends MultiDexApplication {
         super.onCreate();
         Log.i(TAG, "onCreate with update");
         initFabric();
-        initFirebase();
         initApplication();
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());
     }
@@ -65,10 +63,6 @@ public class App extends MultiDexApplication {
         Fabric.with(this,
                 crashlyticsKit,
                 new TwitterCore(authConfig));
-    }
-
-    private void initFirebase() {
-        FirebaseApp.initializeApp(getApplicationContext());
     }
 
     private void initApplication() {
@@ -92,7 +86,7 @@ public class App extends MultiDexApplication {
         initDomains();
         initHTTPConfig();
 
-        QBChatService.setDebugEnabled(StringObfuscator.getDebugEnabled());
+        QBChatService.setDebugEnabled(true);
     }
 
     private void initDomains(){
