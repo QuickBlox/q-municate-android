@@ -17,11 +17,15 @@
         {
           "client_id": "265299067289-kpedc35feo4pgo783lke9la3bct1ph78.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "265299067289.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": ""
+          "current_key": "AIzaSyAE_-1N8BR-ztypF9-aKBMY6xqT7AKKgs4"
         }
       ],
       "services": {
