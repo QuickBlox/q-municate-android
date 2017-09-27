@@ -10,6 +10,8 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.connections.tcp.QBTcpChatConnectionFabric;
+import com.quickblox.chat.connections.tcp.QBTcpConfigurationBuilder;
 import com.quickblox.core.QBHttpConnectionConfig;
 import com.quickblox.core.ServiceZone;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
@@ -85,6 +87,11 @@ public class App extends MultiDexApplication {
 
         initDomains();
         initHTTPConfig();
+
+        QBTcpConfigurationBuilder configurationBuilder = new QBTcpConfigurationBuilder();
+        configurationBuilder.setAutojoinEnabled(false);
+
+        QBChatService.setConnectionFabric(new QBTcpChatConnectionFabric(configurationBuilder));
 
         QBChatService.setDebugEnabled(true);
     }

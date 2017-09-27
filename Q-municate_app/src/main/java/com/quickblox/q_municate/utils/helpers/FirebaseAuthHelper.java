@@ -18,7 +18,7 @@ public class FirebaseAuthHelper {
 
     private static final String TAG = FirebaseAuthHelper.class.getSimpleName();
 
-    public static final int RC_SIGN_IN = 123;
+    public static final int RC_SIGN_IN = 456;
     public static final String EXTRA_FIREBASE_ACCESS_TOKEN = "extra_firebase_access_token";
 
     public void loginByPhone(Activity activity) {

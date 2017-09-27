@@ -99,6 +99,8 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
         long dialogsCount = DataManager.getInstance().getQBChatDialogDataManager().getAllCount();
         boolean isCacheEmpty = dialogsCount <= 0;
 
+        Log.d(TAG, "isCacheEmpty = " + isCacheEmpty);
+
         if(isCacheEmpty) {
             QBLoadDialogsCommand.start(getContext(), false);
             return;
@@ -109,6 +111,7 @@ public class DialogsListLoader extends BaseLoader<List<DialogWrapper>> {
 
     @Override
     public void loadData(){
+        Log.d(TAG, "loadData()");
         retrieveAllDialogsFromCacheByPages();
     }
 }
