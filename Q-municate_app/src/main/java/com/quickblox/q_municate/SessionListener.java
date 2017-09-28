@@ -1,6 +1,7 @@
 package com.quickblox.q_municate;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -59,7 +60,9 @@ public class SessionListener {
                     @Override
                     public void onError(Exception e) {
                         Log.d(TAG, "onError error: " + e.getMessage());
-                        LandingActivity.start(App.getInstance());
+                        Intent intent = new Intent(App.getInstance(), LandingActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        LandingActivity.start(App.getInstance(), intent);
                     }
                 });
             }

@@ -57,6 +57,7 @@
         <activity
             android:name=".ui.activities.authorization.LandingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.authorization.LoginActivity"

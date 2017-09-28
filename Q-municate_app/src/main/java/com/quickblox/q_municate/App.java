@@ -88,8 +88,9 @@ public class App extends MultiDexApplication {
         initDomains();
         initHTTPConfig();
 
-        QBTcpConfigurationBuilder configurationBuilder = new QBTcpConfigurationBuilder();
-        configurationBuilder.setAutojoinEnabled(false);
+        QBTcpConfigurationBuilder configurationBuilder = new QBTcpConfigurationBuilder()
+                .setAutojoinEnabled(false)
+                .setSocketTimeout(0);
 
         QBChatService.setConnectionFabric(new QBTcpChatConnectionFabric(configurationBuilder));
 
