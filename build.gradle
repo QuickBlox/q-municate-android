@@ -36,8 +36,8 @@ ext {
     buildToolsVersion = '26.0.1'
     minSdkVersion = 16
     targetSdkVersion = 26
-    versionName = '2.4.5'
-    versionCode = 245
+    versionName = '2.4.6'
+    versionCode = 246
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
@@ -84,5 +84,5 @@ ext {
     firebaseVersion = ext.googlePlayServicesVersion
     firebaseAuthVersion = ext.googlePlayServicesVersion
     firebaseUiAuthVersion = '2.3.0'
-    firebaseDispatcherVersion = '0.6.0'
+    firebaseDispatcherVersion = '0.8.2'
 }
