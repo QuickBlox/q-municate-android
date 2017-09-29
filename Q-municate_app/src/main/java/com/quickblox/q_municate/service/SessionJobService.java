@@ -12,8 +12,9 @@ import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.firebase.jobdispatcher.Trigger;
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.q_municate.utils.StringObfuscator;
+import com.quickblox.q_municate.utils.helpers.FirebaseAuthHelper;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
-import com.quickblox.q_municate.utils.helpers.TwitterDigitsHelper;
 import com.quickblox.users.model.QBUser;
 
 import rx.Observer;
@@ -56,9 +57,9 @@ public class SessionJobService extends JobService {
 
         if (SIGN_IN_SOCIAL_ACTION.equals(jobParameters.getTag())) {
             Bundle jobExtras = jobParameters.getExtras();
-            ServiceManager.getInstance().login(QBProvider.TWITTER_DIGITS,
-                    jobExtras.getString(TwitterDigitsHelper.PROVIDER),
-                    jobExtras.getString(TwitterDigitsHelper.CREDENTIALS))
+            ServiceManager.getInstance().login(QBProvider.FIREBASE_PHONE,
+                    jobExtras.getString(FirebaseAuthHelper.EXTRA_FIREBASE_ACCESS_TOKEN),
+                    StringObfuscator.getFirebaseAuthProjectId())
                     .subscribe( new JobObserver(this, jobParameters));
             return true;
         }

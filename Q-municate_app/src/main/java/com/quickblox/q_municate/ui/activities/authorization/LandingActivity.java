@@ -19,8 +19,8 @@ public class LandingActivity extends BaseAuthActivity {
     @Bind(R.id.app_version_textview)
     TextView appVersionTextView;
 
-    @Bind(R.id.twitter_digits_connect_button)
-    Button twitterDigitsConnectButton;
+    @Bind(R.id.phone_number_connect_button)
+    Button phoneNumberConnectButton;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LandingActivity.class);
@@ -49,10 +49,10 @@ public class LandingActivity extends BaseAuthActivity {
         finish();
     }
 
-    @OnClick(R.id.twitter_digits_connect_button)
-    void twitterDigitsConnect(View view) {
+    @OnClick(R.id.phone_number_connect_button)
+    void phoneNumberConnect(View view) {
         if (checkNetworkAvailableWithError()) {
-            loginType = LoginType.TWITTER_DIGITS;
+            loginType = LoginType.FIREBASE_PHONE;
             startSocialLogin();
         }
     }

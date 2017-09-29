@@ -5,15 +5,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSessionManager;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
+import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import rx.Subscriber;
 
 public class SplashActivity extends BaseAuthActivity  {
 
@@ -34,6 +39,16 @@ public class SplashActivity extends BaseAuthActivity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
+
+        //TODO VT temp code for correct migration from Twitter Digits to Firebase Phone Auth
+        //should be removed in next release
+        if(QBSessionManager.getInstance().getSessionParameters() != null
+                && QBProvider.TWITTER_DIGITS.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())){
+            restartAppWithFirebaseAuth();
+            return;
+        }
+        //TODO END
+
         appInitialized = true;
         AppSession.load();
 
@@ -79,5 +94,30 @@ public class SplashActivity extends BaseAuthActivity  {
         }
         Log.v(TAG, "start " + lastActivityClass.getSimpleName());
         startActivityByName(lastActivityClass, needCleanTask);
+    }
+
+    private void restartAppWithFirebaseAuth(){
+        ServiceManager.getInstance().logout(new Subscriber<Void>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Intent intent = new Intent(App.getInstance(), LandingActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                LandingActivity.start(App.getInstance(), intent);
+                finish();
+            }
+
+            @Override
+            public void onNext(Void aVoid) {
+                Intent intent = new Intent(App.getInstance(), LandingActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                LandingActivity.start(App.getInstance(), intent);
+                finish();
+            }
+        });
     }
 }

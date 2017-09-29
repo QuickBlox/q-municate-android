@@ -1,7 +1,6 @@
 package com.quickblox.q_municate_auth_service;
 
 
-import com.j256.ormlite.field.types.VoidType;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.server.Performer;
@@ -9,7 +8,6 @@ import com.quickblox.extensions.RxJavaPerformProcessor;
 import com.quickblox.q_municate_base_service.QMBaseService;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -65,6 +63,8 @@ public class QMAuthService extends QMBaseService {
         Performer<QBUser> performer = null;
         if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
             performer = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret);
+        } else if (socialProvider.equals(QBProvider.FIREBASE_PHONE)){
+            performer = QBUsers.signInUsingFirebase(accessTokenSecret, accessToken);
         } else {
             performer = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         }
@@ -84,6 +84,8 @@ public class QMAuthService extends QMBaseService {
         Performer<QBUser> performer = null;
         if (socialProvider.equals(QBProvider.TWITTER_DIGITS)){
             performer = QBUsers.signInUsingTwitterDigits(accessToken, accessTokenSecret);
+        } else if (socialProvider.equals(QBProvider.FIREBASE_PHONE)){
+            performer = QBUsers.signInUsingFirebase(accessTokenSecret, accessToken);
         } else {
             performer = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         }

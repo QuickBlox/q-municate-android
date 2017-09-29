@@ -32,12 +32,12 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 25
-    buildToolsVersion = '25.0.0'
-    minSdkVersion = 15
-    targetSdkVersion = 23
-    versionName = '2.4.3'
-    versionCode = 243
+    compileSdkVersion = 26
+    buildToolsVersion = '26.0.1'
+    minSdkVersion = 16
+    targetSdkVersion = 26
+    versionName = '2.5'
+    versionCode = 250
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
@@ -53,8 +53,8 @@ ext {
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
-    supportVersion = '25.4.0'
-    googlePlayServicesVersion = '11.0.2'
+    supportVersion = '26.0.1'
+    googlePlayServicesVersion = '11.0.4'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '5.0'
     ormliteCoreVersion = '5.0'
@@ -81,6 +81,8 @@ ext {
     robotoTextViewVersion = '2.4.3'
     stickersVersion = '0.7.3'
     crashlyticsVersion = '2.2.2'
-    firebaseVersion = '11.0.2'
-    firebaseDispatcherVersion = '0.6.0'
+    firebaseVersion = ext.googlePlayServicesVersion
+    firebaseAuthVersion = ext.googlePlayServicesVersion
+    firebaseUiAuthVersion = '2.3.0'
+    firebaseDispatcherVersion = '0.8.2'
 }

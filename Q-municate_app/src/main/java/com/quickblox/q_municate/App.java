@@ -7,10 +7,11 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.digits.sdk.android.Digits;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.connections.tcp.QBTcpChatConnectionFabric;
+import com.quickblox.chat.connections.tcp.QBTcpConfigurationBuilder;
 import com.quickblox.core.QBHttpConnectionConfig;
 import com.quickblox.core.ServiceZone;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
@@ -63,8 +64,7 @@ public class App extends MultiDexApplication {
 
         Fabric.with(this,
                 crashlyticsKit,
-                new TwitterCore(authConfig),
-                new Digits.Builder().withTheme(R.style.AppTheme).build());
+                new TwitterCore(authConfig));
     }
 
     private void initApplication() {
@@ -88,7 +88,13 @@ public class App extends MultiDexApplication {
         initDomains();
         initHTTPConfig();
 
-        QBChatService.setDebugEnabled(StringObfuscator.getDebugEnabled());
+        QBTcpConfigurationBuilder configurationBuilder = new QBTcpConfigurationBuilder()
+                .setAutojoinEnabled(false)
+                .setSocketTimeout(0);
+
+        QBChatService.setConnectionFabric(new QBTcpChatConnectionFabric(configurationBuilder));
+
+        QBChatService.setDebugEnabled(true);
     }
 
     private void initDomains(){

@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 public class DialogsUtils {
@@ -77,6 +77,7 @@ public class DialogsUtils {
         if (null != result) {
             intent.putExtras(result);
         }
+        Log.v("DialogsListFragment", "broadcast sent " + intent.getExtras());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }
