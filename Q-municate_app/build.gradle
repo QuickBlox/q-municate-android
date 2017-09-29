@@ -29,6 +29,7 @@ android {
         multiDexEnabled = true
         ext.betaDistrubutionGroupAliases=property('testers_group_name')
         ext.betaDistributionEmails=property('testers_notification_e-mails')
+        resConfigs "auto"
     }
 
     signingConfigs {
@@ -55,6 +56,7 @@ android {
             buildConfigField "String", "ACCOUNT_KEY", prodAccountKey
             buildConfigField "String", "TWITTER_KEY", prodTwitterDigitsConsumerKey
             buildConfigField "String", "TWITTER_SECRET", prodTwitterDigitsConsumerSecret
+            buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", devFirebaseAuthProjectId
             resValue "string", "twitterDigitsApiKey", prodTwittedDigitsApiKey
             resValue "string", "facebookAppId", prodFacebookAppID
             resValue "string", "sender_id", prodPushRegistrationAppID
@@ -66,6 +68,7 @@ android {
             buildConfigField "String", "ACCOUNT_KEY", devAccountKey
             buildConfigField "String", "TWITTER_KEY", devTwitterDigitsConsumerKey
             buildConfigField "String", "TWITTER_SECRET", devTwitterDigitsConsumerSecret
+            buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", prodFirebaseAuthProjectId
             resValue "string", "twitterDigitsApiKey", devTwittedDigitsApiKey
             resValue "string", "facebookAppId", devFacebookAppID
             resValue "string", "sender_id", devPushRegistrationAppID
@@ -120,6 +123,8 @@ dependencies {
     compile "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
 
     compile "com.firebase:firebase-jobdispatcher-with-gcm-dep:${rootProject.firebaseDispatcherVersion}"
+    compile "com.google.firebase:firebase-auth:${rootProject.firebaseAuthVersion}"
+    compile "com.firebaseui:firebase-ui-auth:${rootProject.firebaseUiAuthVersion}"
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile 'com.flurry.android:analytics:6.2.0'

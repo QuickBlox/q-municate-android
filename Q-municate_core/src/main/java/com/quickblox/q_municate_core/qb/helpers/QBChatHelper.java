@@ -618,7 +618,9 @@ public class QBChatHelper extends BaseThreadPoolHelper{
 
     public void joinRoomChat(QBChatDialog dialog) throws XMPPException, SmackException {
         dialog.initForChat(chatService);
-        dialog.join(history());
+        if (!dialog.isJoined()) { //join only to unjoined dialogs
+            dialog.join(history());
+        }
     }
 
     private DiscussionHistory history() {

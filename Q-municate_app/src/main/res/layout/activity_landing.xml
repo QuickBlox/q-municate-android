@@ -23,7 +23,7 @@
         android:src="@drawable/app_logo_label" />
 
     <Button
-        android:id="@+id/twitter_digits_connect_button"
+        android:id="@+id/phone_number_connect_button"
         style="@style/TextViewDrawableStyle.White"
         android:layout_width="@dimen/landing_button_width"
         android:layout_height="@dimen/landing_button_height"
