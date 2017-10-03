@@ -10,8 +10,13 @@ buildscript {
     }
 }
 
+plugins {
+    id 'net.saliman.properties' version '1.4.6'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'com.backelite.android.variantSelector'
 
 repositories {
     maven { url 'https://dl.bintray.com/drummer-aidan/maven' }
@@ -171,5 +176,4 @@ def changeApkFileName(variant) {
     }
 }
 
-apply plugin: 'com.backelite.android.variantSelector'
 apply plugin: 'com.google.gms.google-services'
