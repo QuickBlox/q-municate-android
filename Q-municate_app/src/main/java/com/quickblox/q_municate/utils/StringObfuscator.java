@@ -39,4 +39,12 @@ public class StringObfuscator {
     public static String getFirebaseAuthProjectId(){
         return BuildConfig.FIREBASE_AUTH_PROJECT_ID;
     }
+
+    public static String getApiEndpoint() {
+        return BuildConfig.API_ENDPOINT;
+    }
+
+    public static String getChatEndpoint() {
+        return BuildConfig.CHAT_ENDPOINT;
+    }
 }

@@ -2,7 +2,6 @@ package com.quickblox.q_municate;
 
 import android.content.Context;
 import android.support.multidex.MultiDexApplication;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -97,11 +96,9 @@ public class App extends MultiDexApplication {
         QBChatService.setDebugEnabled(true);
     }
 
-    private void initDomains(){
-        if (!TextUtils.isEmpty(getString(R.string.api_domain))) {
-            QBSettings.getInstance().setEndpoints(getString(R.string.api_domain), getString(R.string.chat_domain), ServiceZone.PRODUCTION);
-            QBSettings.getInstance().setZone(ServiceZone.PRODUCTION);
-        }
+    private void initDomains() {
+        QBSettings.getInstance().setEndpoints(StringObfuscator.getApiEndpoint(), StringObfuscator.getChatEndpoint(), ServiceZone.PRODUCTION);
+        QBSettings.getInstance().setZone(ServiceZone.PRODUCTION);
     }
 
     private void initHTTPConfig(){
