@@ -16,29 +16,49 @@ android {
 }
 
 dependencies {
+    compile project(':Q-municate_db')
+    compile project(path: ':q-municate_user_service')
+    compile project(path: ':q-municate_auth_service')
+
     //    QuickBlox libs
     compile "com.quickblox:quickblox-android-sdk-content:${rootProject.qbSdkVersion}"
     compile "com.quickblox:quickblox-android-sdk-customobjects:${rootProject.qbSdkVersion}"
-    compile "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
-    compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
+    compile ("com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"){
+        exclude group: 'com.google.firebase', module: 'firebase-analytics'
+        exclude group: 'com.google.firebase', module: 'firebase-analytics-impl'
+        exclude group: 'com.google.firebase', module: 'firebase-common'
+        exclude group: 'com.google.firebase', module: 'firebase-core'
+        exclude group: 'com.google.firebase', module: 'firebase-iid'
 
-    //    Other QuickBlox libs (core + chat) will be connected as transitive dependencies
+        exclude group: 'com.google.android.gms', module: 'play-services-gcm'
+        exclude group: 'com.google.android.gms', module: 'play-services-base'
+        exclude group: 'com.google.android.gms', module: 'play-services-basement'
+        exclude group: 'com.google.android.gms', module: 'play-services-iid'
+        exclude group: 'com.google.android.gms', module: 'play-services-tasks'
+    }
+    compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
+    compile ("com.quickblox:quickblox-android-sdk-core:${rootProject.qbSdkVersion}"){
+        exclude group: 'com.google.code.gson', module: 'gson'
+    }
+    compile ("com.quickblox:chat-message-adapter:$rootProject.qbMessageAdapterVersion"){
+        exclude module: 'quickblox-android-sdk-chat'
+        exclude module: 'quickblox-android-sdk-content'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
+
+    compile 'com.google.code.gson:gson:2.8.2'
 
     compile("com.digits.sdk.android:digits:${rootProject.twitterDigitsSdkVersion}@aar") {
         transitive = true;
     }
 
-    compile project(':Q-municate_db')
 
-    compile "com.facebook.android:facebook-android-sdk:$rootProject.facebookSdkVersoin"
+    compile ("com.facebook.android:facebook-android-sdk:$rootProject.facebookSdkVersoin"){
+        exclude group: 'com.android.support', module: 'cardview-v7'
+        exclude group: 'com.android.support', module: 'customtabs'
+    }
 
-    compile('com.android.support:cardview-v7:23.2.1') {
-        force = true
-    }
-    compile ("com.quickblox:chat-message-adapter:$rootProject.qbMessageAdapterVersion"){
-        exclude module: 'quickblox-android-sdk-chat'
-        exclude module: 'quickblox-android-sdk-content'
-    }
-    compile project(path: ':q-municate_user_service')
-    compile project(path: ':q-municate_auth_service')
+    compile "com.android.support:cardview-v7:${rootProject.supportVersion}"
+    compile "com.google.android.gms:play-services-gcm:${rootProject.googlePlayServicesVersion}"
 }
