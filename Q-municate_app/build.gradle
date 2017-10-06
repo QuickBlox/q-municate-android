@@ -29,7 +29,7 @@ android {
     buildToolsVersion rootProject.buildToolsVersion
 
     aaptOptions {
-        noCompress ''
+        ignoreAssetsPattern '!.9.png:!.svn:!.git:!.ds_store:!*.scc:.*:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
 
     defaultConfig {
