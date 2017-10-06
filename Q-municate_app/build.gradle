@@ -28,7 +28,9 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
 
-    aaptOptions.cruncherEnabled = false
+    aaptOptions {
+        noCompress ''
+    }
 
     defaultConfig {
         applicationId "com.quickblox.q_municate"
