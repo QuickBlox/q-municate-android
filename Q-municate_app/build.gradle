@@ -28,9 +28,7 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
 
-    aaptOptions {
-        ignoreAssetsPattern '!.9.png:!.svn:!.git:!.ds_store:!*.scc:.*:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~'
-    }
+    aaptOptions.cruncherProcesses 1
 
     defaultConfig {
         applicationId "com.quickblox.q_municate"
