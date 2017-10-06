@@ -10,7 +10,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
         android:layout_marginTop="@dimen/about_logo_margin_top"
-        android:src="@drawable/about_logo" />
+        android:src="@drawable/about_qb_logo" />
 
     <TextView
         android:id="@+id/app_version_textview"
