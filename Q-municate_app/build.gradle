@@ -39,6 +39,11 @@ android {
         ext.betaDistributionEmails=property('testers_notification_e-mails')
     }
 
+    aaptOptions {
+        cruncherEnabled = false
+        useNewCruncher false
+    }
+
     signingConfigs {
         debug {
 
@@ -81,6 +86,10 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
 
     lintOptions {
