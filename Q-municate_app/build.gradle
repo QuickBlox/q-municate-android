@@ -10,10 +10,6 @@ buildscript {
     }
 }
 
-plugins {
-    id 'net.saliman.properties' version '1.4.6'
-}
-
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'com.backelite.android.variantSelector'
@@ -37,11 +33,6 @@ android {
         multiDexEnabled = true
         ext.betaDistrubutionGroupAliases=property('testers_group_name')
         ext.betaDistributionEmails=property('testers_notification_e-mails')
-    }
-
-    aaptOptions {
-        cruncherEnabled = false
-        useNewCruncher false
     }
 
     signingConfigs {
