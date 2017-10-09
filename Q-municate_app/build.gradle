@@ -28,8 +28,6 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
 
-    aaptOptions.cruncherProcesses 1
-
     defaultConfig {
         applicationId "com.quickblox.q_municate"
         minSdkVersion rootProject.minSdkVersion
@@ -83,10 +81,6 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
-    }
-
-    dexOptions {
-        javaMaxHeapSize "4g"
     }
 
     lintOptions {
