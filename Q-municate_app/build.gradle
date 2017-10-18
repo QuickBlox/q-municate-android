@@ -59,10 +59,7 @@ android {
             buildConfigField "String", "ACCOUNT_KEY", prodAccountKey
             buildConfigField "String", "API_ENDPOINT", prodApiEndpoint
             buildConfigField "String", "CHAT_ENDPOINT", prodChatEndpoint
-            buildConfigField "String", "TWITTER_KEY", prodTwitterDigitsConsumerKey
-            buildConfigField "String", "TWITTER_SECRET", prodTwitterDigitsConsumerSecret
             buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", devFirebaseAuthProjectId
-            resValue "string", "twitterDigitsApiKey", prodTwittedDigitsApiKey
             resValue "string", "facebookAppId", prodFacebookAppID
             resValue "string", "sender_id", prodPushRegistrationAppID
             manifestPlaceholders = [fabricApiKey:prodFabricApiKey]
@@ -100,10 +97,7 @@ android {
             buildConfigField "String", "API_ENDPOINT", devApiEndpoint
             buildConfigField "String", "CHAT_ENDPOINT", devChatEndpoint
             buildConfigField "String", "ACCOUNT_KEY", devAccountKey
-            buildConfigField "String", "TWITTER_KEY", devTwitterDigitsConsumerKey
-            buildConfigField "String", "TWITTER_SECRET", devTwitterDigitsConsumerSecret
             buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", devFirebaseAuthProjectId
-            resValue "string", "twitterDigitsApiKey", devTwittedDigitsApiKey
             resValue "string", "facebookAppId", devFacebookAppID
             resValue "string", "sender_id", devPushRegistrationAppID
             manifestPlaceholders = [fabricApiKey:devFabricApiKey]
@@ -116,10 +110,7 @@ android {
             buildConfigField "String", "API_ENDPOINT", customApiEndpoint
             buildConfigField "String", "CHAT_ENDPOINT", customChatEndpoint
             buildConfigField "String", "ACCOUNT_KEY", customAccountKey
-            buildConfigField "String", "TWITTER_KEY", customTwitterDigitsConsumerKey
-            buildConfigField "String", "TWITTER_SECRET", customTwitterDigitsConsumerSecret
             buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", customFirebaseAuthProjectId
-            resValue "string", "twitterDigitsApiKey", customTwittedDigitsApiKey
             resValue "string", "facebookAppId", customFacebookAppID
             resValue "string", "sender_id", customPushRegistrationAppID
             manifestPlaceholders = [fabricApiKey:customFabricApiKey]

@@ -24,8 +24,6 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.cache.QMUserCache;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -57,13 +55,7 @@ public class App extends MultiDexApplication {
                 .core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
                 .build();
 
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(
-                StringObfuscator.getTwitterConsumerKey(),
-                StringObfuscator.getTwitterConsumerSecret());
-
-        Fabric.with(this,
-                crashlyticsKit,
-                new TwitterCore(authConfig));
+        Fabric.with(this, crashlyticsKit);
     }
 
     private void initApplication() {
