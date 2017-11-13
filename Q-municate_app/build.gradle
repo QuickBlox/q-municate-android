@@ -132,7 +132,9 @@ dependencies {
 
     compile "com.firebase:firebase-jobdispatcher-with-gcm-dep:${rootProject.firebaseDispatcherVersion}"
     compile "com.google.firebase:firebase-auth:${rootProject.firebaseAuthVersion}"
-    compile "com.firebaseui:firebase-ui-auth:${rootProject.firebaseUiAuthVersion}"
+    compile ("com.firebaseui:firebase-ui-auth:${rootProject.firebaseUiAuthVersion}"){
+        exclude group: 'com.google.android.gms'
+    }
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile 'com.flurry.android:analytics:6.2.0'

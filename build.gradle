@@ -10,7 +10,7 @@ buildscript {
     }
 }
 
-ext.isPrivateRepository = false
+ext.isPrivateRepository = true
 
 allprojects {
     repositories {
@@ -36,8 +36,8 @@ ext {
     buildToolsVersion = '26.0.1'
     minSdkVersion = 16
     targetSdkVersion = 26
-    versionName = '2.5'
-    versionCode = 250
+    versionName = '2.5.4b'
+    versionCode = 2534
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
@@ -46,15 +46,15 @@ ext {
     lintAbortOnError = false
 
 //    QuickBlox SDK version
-    qbSdkVersion = '3.3.5'
+    qbSdkVersion = '3.5.1'
     qbMessageAdapterVersion = '2.0'
 
     testRunnerVersion = "0.4.1"
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
-    supportVersion = '26.0.1'
-    googlePlayServicesVersion = '11.0.4'
+    supportVersion = '26.1.0'
+    googlePlayServicesVersion = '11.4.2'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '5.0'
     ormliteCoreVersion = '5.0'
