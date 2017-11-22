@@ -15,6 +15,8 @@ import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.helpers.FirebaseAuthHelper;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.users.model.QBUser;
 
 import rx.Observer;
@@ -73,7 +75,7 @@ public class SessionJobService extends JobService {
         return false;// Answers the question: "Should this job be retried?"
     }
 
-    private static class JobObserver implements Observer<QBUser> {
+    private class JobObserver implements Observer<QBUser> {
 
         private SessionJobService jobService;
         private JobParameters parameters;
@@ -97,6 +99,7 @@ public class SessionJobService extends JobService {
         @Override
         public void onNext(QBUser qbUser) {
             Log.i(TAG, "onNext " + qbUser.getLogin());
+            QBLoginChatCompositeCommand.start(SessionJobService.this);
             jobService.jobFinished(parameters, false);
         }
     }
