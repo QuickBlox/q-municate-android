@@ -29,6 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.quickblox.auth.model.QBProvider;
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.q_municate.App;
@@ -46,6 +48,7 @@ import com.quickblox.q_municate.utils.bridges.LoadingBridge;
 import com.quickblox.q_municate.utils.bridges.SnackbarBridge;
 import com.quickblox.q_municate.utils.broadcasts.NetworkChangeReceiver;
 import com.quickblox.q_municate.utils.helpers.ActivityUIHelper;
+import com.quickblox.q_municate.utils.helpers.FirebaseAuthHelper;
 import com.quickblox.q_municate.utils.helpers.LoginHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHelper;
@@ -650,7 +653,16 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void loginChat() {
         isDialogLoading = true;
         showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
+        if (QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
+                && !QBSessionManager.getInstance().isValidActiveSession()){
+            renewFirebaseToken();
+        }
+
         QBLoginChatCompositeCommand.start(this);
+    }
+
+    private void renewFirebaseToken() {
+        FirebaseAuthHelper.getIdTokenForCurrentUser();
     }
 
     protected boolean isAppInitialized() {

@@ -10,9 +10,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.quickblox.core.helper.StringUtils;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class FirebaseAuthHelper {
 
@@ -45,7 +49,7 @@ public class FirebaseAuthHelper {
             return;
         }
 
-        getCurrentFirebaseUser().getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        getCurrentFirebaseUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             public void onComplete(@NonNull Task<GetTokenResult> task) {
                 if (task.isSuccessful()) {
                     String accessToken = task.getResult().getToken();
@@ -58,6 +62,30 @@ public class FirebaseAuthHelper {
                 }
             }
         });
+    }
+
+    public static String getIdTokenForCurrentUser() {
+        final StringBuilder token = new StringBuilder() ;
+        final CountDownLatch countDownLatch = new CountDownLatch(1) ;
+        getIdTokenForCurrentUser(new RequestFirebaseIdTokenCallback() {
+            @Override
+            public void onSuccess(String accessToken) {
+                token.append(accessToken);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                countDownLatch.countDown();
+            }
+        });
+
+        try {
+            countDownLatch.await(ConstsCore.HTTP_TIMEOUT_IN_SECONDS, TimeUnit.MILLISECONDS);
+            return StringUtils.isEmpty(token.toString()) ? null : token.toString();
+        } catch (InterruptedException e) {
+            return null;
+        }
     }
 
     public void logout() {

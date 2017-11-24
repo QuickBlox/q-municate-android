@@ -3,11 +3,12 @@ package com.quickblox.q_municate_core.qb.helpers;
 import android.content.Context;
 
 import com.quickblox.auth.QBAuth;
-import com.quickblox.auth.session.QBSession;
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
@@ -46,6 +47,16 @@ public class QBChatRestHelper extends BaseHelper {
 
     public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
         if (!chatService.isLoggedIn() && user != null) {
+            if (QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
+                    && !QBSessionManager.getInstance().isValidActiveSession()){
+                CoreSharedHelper coreSharedHelper = new CoreSharedHelper(context);
+                String currentFirebaseAccessToken = coreSharedHelper.getFirebaseToken();
+                if (!QBSessionManager.getInstance().getSessionParameters().getAccessToken().equals(currentFirebaseAccessToken)) {
+                    QBAuth.createSessionUsingFirebase(coreSharedHelper.getFirebaseProjectId(), currentFirebaseAccessToken).perform();
+                    user.setPassword(QBSessionManager.getInstance().getToken());
+                    AppSession.getSession().updateUser(user);
+                }
+            }
             chatService.login(user);
             chatService.enableCarbons();
         }

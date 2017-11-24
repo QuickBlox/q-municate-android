@@ -22,7 +22,6 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.AuthUtils;
-import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
@@ -277,7 +276,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         public void onSuccess(String authToken) {
             Log.d(TAG, "FirebaseAuthCallback onSuccess()");
             showProgress();
-            serviceManager.login(QBProvider.FIREBASE_PHONE, authToken, StringObfuscator.getFirebaseAuthProjectId())
+            serviceManager.login(QBProvider.FIREBASE_PHONE, authToken, appSharedHelper.getFirebaseProjectId())
                     .subscribe(socialLoginObserver);
         }
 

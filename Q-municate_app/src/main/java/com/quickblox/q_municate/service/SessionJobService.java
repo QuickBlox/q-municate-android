@@ -12,10 +12,9 @@ import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.firebase.jobdispatcher.Trigger;
 import com.quickblox.auth.model.QBProvider;
-import com.quickblox.q_municate.utils.StringObfuscator;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.utils.helpers.FirebaseAuthHelper;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.users.model.QBUser;
 
@@ -61,7 +60,7 @@ public class SessionJobService extends JobService {
             Bundle jobExtras = jobParameters.getExtras();
             ServiceManager.getInstance().login(QBProvider.FIREBASE_PHONE,
                     jobExtras.getString(FirebaseAuthHelper.EXTRA_FIREBASE_ACCESS_TOKEN),
-                    StringObfuscator.getFirebaseAuthProjectId())
+                    App.getInstance().getAppSharedHelper().getFirebaseProjectId())
                     .subscribe( new JobObserver(this, jobParameters));
             return true;
         }

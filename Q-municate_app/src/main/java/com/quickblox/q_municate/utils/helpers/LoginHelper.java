@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.listeners.GlobalLoginListener;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -90,7 +89,7 @@ public class LoginHelper {
 
     private void loginPhoneNumber() {
         String firebaseAccessToken = appSharedHelper.getFirebaseToken();
-        ServiceManager.getInstance().login(QBProvider.FIREBASE_PHONE, firebaseAccessToken, StringObfuscator.getFirebaseAuthProjectId())
+        ServiceManager.getInstance().login(QBProvider.FIREBASE_PHONE, firebaseAccessToken, appSharedHelper.getFirebaseProjectId())
                 .subscribe(new Subscriber<QBUser>() {
                     @Override
                     public void onCompleted() {
