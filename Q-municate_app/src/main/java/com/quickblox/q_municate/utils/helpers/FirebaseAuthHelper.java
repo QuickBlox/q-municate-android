@@ -10,12 +10,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.quickblox.core.helper.StringUtils;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 public class FirebaseAuthHelper {
@@ -40,7 +41,6 @@ public class FirebaseAuthHelper {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
-
     public static void getIdTokenForCurrentUser(final RequestFirebaseIdTokenCallback callback) {
         if (getCurrentFirebaseUser() == null) {
             Log.v(TAG, "Getting Token error. ERROR = Current Firebse User is null");
@@ -64,27 +64,34 @@ public class FirebaseAuthHelper {
         });
     }
 
-    public static String getIdTokenForCurrentUser() {
-        final StringBuilder token = new StringBuilder() ;
-        final CountDownLatch countDownLatch = new CountDownLatch(1) ;
-        getIdTokenForCurrentUser(new RequestFirebaseIdTokenCallback() {
-            @Override
-            public void onSuccess(String accessToken) {
-                token.append(accessToken);
-                countDownLatch.countDown();
-            }
+    public static void refreshInternalFirebaseToken() {
+        Log.i(TAG, "refreshInternalFirebaseToken() synchronously start " + new Date(System.currentTimeMillis()));
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+        getCurrentFirebaseUser().getIdToken(false).addOnCompleteListener(new Executor(){
             @Override
-            public void onError(Exception e) {
+            public void execute(@NonNull Runnable command) {
+                command.run();
+            }
+        }, new OnCompleteListener<GetTokenResult>() {
+            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                if (task.isSuccessful()) {
+                    String accessToken = task.getResult().getToken();
+                    Log.v(TAG, "Token got successfully. TOKEN = " + accessToken);
+                    SharedHelper.getInstance().saveFirebaseToken(accessToken);
+                } else {
+                    Log.v(TAG, "Getting Token error. ERROR = " + task.getException().getMessage());
+                }
+
                 countDownLatch.countDown();
             }
         });
 
         try {
             countDownLatch.await(ConstsCore.HTTP_TIMEOUT_IN_SECONDS, TimeUnit.MILLISECONDS);
-            return StringUtils.isEmpty(token.toString()) ? null : token.toString();
+            Log.i(TAG, "refreshInternalFirebaseToken() synchronously DONE " + new Date(System.currentTimeMillis()));
         } catch (InterruptedException e) {
-            return null;
+            Log.i(TAG, "refreshInternalFirebaseToken() synchronously DONE " + new Date(System.currentTimeMillis()));
         }
     }
 

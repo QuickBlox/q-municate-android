@@ -77,7 +77,7 @@ public class DialogsUtils {
         if (null != result) {
             intent.putExtras(result);
         }
-        Log.v("DialogsListFragment", "broadcast sent " + intent.getExtras());
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        Log.v(DialogsUtils.class.getSimpleName(), "broadcast action " + resultAction + " sent " + intent.getExtras());
+        LocalBroadcastManager.getInstance(context).sendBroadcastSync(intent);
     }
 }

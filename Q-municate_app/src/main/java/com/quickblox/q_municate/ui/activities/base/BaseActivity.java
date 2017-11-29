@@ -662,7 +662,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void renewFirebaseToken() {
-        FirebaseAuthHelper.getIdTokenForCurrentUser();
+        FirebaseAuthHelper.refreshInternalFirebaseToken();
     }
 
     protected boolean isAppInitialized() {
