@@ -22,6 +22,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.AuthUtils;
+import com.quickblox.q_municate.utils.StringObfuscator;
 import com.quickblox.q_municate.utils.helpers.FlurryAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
@@ -174,6 +175,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (loginType.equals(LoginType.FACEBOOK)) {
             facebookHelper.login(new FacebookLoginCallback());
         } else if (loginType.equals(LoginType.FIREBASE_PHONE)) {
+            appSharedHelper.saveFerebaseProjectId(StringObfuscator.getFirebaseAuthProjectId());
             firebaseAuthHelper.loginByPhone(BaseAuthActivity.this);
         }
     }

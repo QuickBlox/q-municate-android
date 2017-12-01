@@ -653,7 +653,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void loginChat() {
         isDialogLoading = true;
         showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
-        if (QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
+        if (QBSessionManager.getInstance().getSessionParameters() != null
+                && QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
                 && !QBSessionManager.getInstance().isValidActiveSession()){
             renewFirebaseToken();
         }

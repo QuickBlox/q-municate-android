@@ -64,7 +64,6 @@ public class App extends MultiDexApplication {
         sessionListener = new SessionListener();
         getAppSharedHelper();
         initQb();
-        saveFirebaseProgectId();
         initDb();
         initImageLoader(this);
         initServices();
@@ -97,10 +96,6 @@ public class App extends MultiDexApplication {
     private void initHTTPConfig(){
         QBHttpConnectionConfig.setConnectTimeout(ConstsCore.HTTP_TIMEOUT_IN_SECONDS);
         QBHttpConnectionConfig.setReadTimeout(ConstsCore.HTTP_TIMEOUT_IN_SECONDS);
-    }
-
-    private void saveFirebaseProgectId(){
-        appSharedHelper.saveFerebaseProjectId(StringObfuscator.getFirebaseAuthProjectId());
     }
 
     private void initDb() {
