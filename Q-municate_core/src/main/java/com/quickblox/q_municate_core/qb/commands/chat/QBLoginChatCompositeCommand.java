@@ -35,10 +35,11 @@ public class QBLoginChatCompositeCommand extends CompositeServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        if (AppSession.ChatState.BACKGROUND == AppSession.getSession().getChatState()){
-            scheduleLogin();
-            return extras;
-        }
+        Log.d(TAG, "AMBRA perform getChatState= " + AppSession.getSession().getChatState());
+//        if (AppSession.ChatState.BACKGROUND == AppSession.getSession().getChatState()){
+//            scheduleLogin();
+//            return extras;
+//        }
         try {
             super.perform(extras);
         }

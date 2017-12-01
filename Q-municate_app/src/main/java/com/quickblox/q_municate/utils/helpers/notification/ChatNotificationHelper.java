@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.service.CallService;
 import com.quickblox.q_municate.utils.SystemUtils;
 import com.quickblox.q_municate.utils.helpers.PowerManagerHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
@@ -67,7 +68,7 @@ public class ChatNotificationHelper {
             saveOpeningDialog(true);
             sendChatNotification(message, userId, dialogId);
         } else if (callPush) {
-            PowerManagerHelper.wakeUpScreen(context);
+            CallService.start(context);
         } else {
             sendCommonNotification(message);
         }

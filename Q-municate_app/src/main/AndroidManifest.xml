@@ -231,6 +231,7 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
             </intent-filter>
         </service>
+        <service android:name=".service.CallService" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
