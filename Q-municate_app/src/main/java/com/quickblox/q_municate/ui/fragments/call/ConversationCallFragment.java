@@ -34,6 +34,7 @@ import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.AppRTCAudioManager;
@@ -253,7 +254,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
             if (!qbFriendListHelper.isUserOnline(qbUser.getId())) {
                 String callMsg = getString(R.string.dlg_offline_call,
                         AppSession.getSession().getUser().getFullName());
-                QBSendPushCommand.start(getActivity(), callMsg, qbUser.getId());
+                QBSendPushCommand.start(getActivity(), callMsg, qbUser.getId(), ConstsCore.PUSH_MESSAGE_TYPE_CALL);
             }
         }
     }

@@ -7,14 +7,17 @@ import android.text.TextUtils;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.SystemUtils;
+import com.quickblox.q_municate.utils.helpers.PowerManagerHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate_core.models.NotificationEvent;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 
 public class ChatNotificationHelper {
 
     public static final String MESSAGE = "message";
     public static final String DIALOG_ID = "dialog_id";
     public static final String USER_ID = "user_id";
+    public static final String MESSAGE_TYPE = "type";
 
     private Context context;
     private SharedHelper appSharedHelper;
@@ -22,6 +25,7 @@ public class ChatNotificationHelper {
     private int userId;
 
     private static String message;
+    private static String messageType;
     private static boolean isLoginNow;
 
     public ChatNotificationHelper(Context context) {
@@ -42,20 +46,28 @@ public class ChatNotificationHelper {
             dialogId = extras.getString(ChatNotificationHelper.DIALOG_ID);
         }
 
+        if (extras.getString(ChatNotificationHelper.MESSAGE_TYPE) != null) {
+            messageType = extras.getString(ChatNotificationHelper.MESSAGE_TYPE);
+        }
+
         if (SystemUtils.isAppRunningNow()) {
             return;
         }
 
-        if (isOwnMessage(userId)){
+        if (isOwnMessage(userId)) {
             return;
         }
 
         boolean chatPush = userId != 0 && !TextUtils.isEmpty(dialogId);
 
+        boolean callPush = TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
+
         if (chatPush) {
             saveOpeningDialogData(userId, dialogId);
             saveOpeningDialog(true);
             sendChatNotification(message, userId, dialogId);
+        } else if (callPush) {
+            PowerManagerHelper.wakeUpScreen(context);
         } else {
             sendCommonNotification(message);
         }

@@ -27,6 +27,8 @@ public class ConstsCore {
     public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 15 * 1000;
 
     public static final String PUSH_MESSAGE = "message";
+    public static final String PUSH_MESSAGE_TYPE = "message_type";
+    public static final String PUSH_MESSAGE_TYPE_CALL = "message_type_call";
 
     public static final int NOT_INITIALIZED_VALUE = -1;
     public static final int LOGIN_TIMEOUT = 40000;
