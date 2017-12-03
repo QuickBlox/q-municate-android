@@ -17,6 +17,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Chronometer;
 
 import com.quickblox.chat.QBChatService;
@@ -81,6 +83,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private boolean wifiEnabled = true;
     private RingtonePlayer ringtonePlayer;
     private boolean isStarted = false;
+    private boolean focusDuringOnPause;
 
     private QBRTCSessionUserCallback qbRtcSessionUserCallback;
     private QBCallChatHelper qbCallChatHelper;
@@ -90,6 +93,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private AudioStreamReceiver audioStreamReceiver;
     private String ACTION_ANSWER_CALL = "action_answer_call";
     private SystemPermissionHelper systemPermissionHelper;
+    private boolean isNeedInitCallFragment;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
             QBRTCSessionDescription qbRtcSessionDescription) {
@@ -137,6 +141,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        appInitialized = true;
         super.onCreate(savedInstanceState);
         canPerformLogout.set(false);
         initFields();
@@ -145,6 +150,13 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (ACTION_ANSWER_CALL.equals(getIntent().getAction())){
             checkPermissionsAndStartCall(StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
         }
+        initWindowKeyguardWakeup();
+    }
+
+    private void initWindowKeyguardWakeup() {
+        Window wind = this.getWindow();
+        wind.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        wind.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
     private void initCallFragment() {
@@ -165,6 +177,9 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     protected void onStop() {
         super.onStop();
+        if(!focusDuringOnPause) {
+            isNeedInitCallFragment = true;
+        }
         unregisterReceiver(wifiStateReceiver);
         unregisterReceiver(audioStreamReceiver);
     }
@@ -172,6 +187,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     protected void onPause() {
         isInFront = false;
+        focusDuringOnPause = hasWindowFocus();
         super.onPause();
         appSharedHelper.saveLastOpenActivity(getClass().getName());
     }
@@ -180,6 +196,10 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     protected void onResume() {
         isInFront = true;
         super.onResume();
+        if (isNeedInitCallFragment) {
+            isNeedInitCallFragment = false;
+            initCallFragment();
+        }
     }
 
     @Override

@@ -68,7 +68,8 @@ public class CallService extends Service {
         addAction(QBServiceConsts.LOGIN_CHAT_ACTION, new LoginChatSuccessAction());
         addAction(QBServiceConsts.LOGIN_CHAT_FAIL_ACTION, new LoginChatFailAction());
 
-        addAction(QBServiceConsts.INIT_CALL_CHAT_ACTION, new InitCallChatSuccessAction());
+        addAction(QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION, new InitCallChatSuccessAction());
+        addAction(QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION, new InitCallChatFailedAction());
 
         updateBroadcastActionList();
     }
@@ -130,7 +131,15 @@ public class CallService extends Service {
         @Override
         public void execute(Bundle bundle) {
             Log.d("AMBRA", "InitCallChatSuccessAction");
-            PowerManagerHelper.wakeUpScreen(CallService.this);
+//            PowerManagerHelper.wakeUpScreen(CallService.this);
+        }
+    }
+
+    public class InitCallChatFailedAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Log.d("AMBRA", "InitCallChatFailedAction");
         }
     }
 
