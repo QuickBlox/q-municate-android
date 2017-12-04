@@ -51,7 +51,9 @@ public class ChatNotificationHelper {
             messageType = extras.getString(ChatNotificationHelper.MESSAGE_TYPE);
         }
 
-        if (SystemUtils.isAppRunningNow()) {
+        boolean callPush = TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
+
+        if (SystemUtils.isAppRunningNow() && !callPush) {
             return;
         }
 
@@ -60,8 +62,6 @@ public class ChatNotificationHelper {
         }
 
         boolean chatPush = userId != 0 && !TextUtils.isEmpty(dialogId);
-
-        boolean callPush = TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
 
         if (chatPush) {
             saveOpeningDialogData(userId, dialogId);

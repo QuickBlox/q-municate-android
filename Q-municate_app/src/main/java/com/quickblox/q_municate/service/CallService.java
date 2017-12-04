@@ -13,12 +13,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
-import com.quickblox.q_municate.utils.helpers.PowerManagerHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBInitChatServiceCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
+import com.quickblox.q_municate_core.qb.commands.push.QBPushCallCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
@@ -43,30 +40,24 @@ public class CallService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG, "Service onCreate()");
         broadcastCommandMap = new HashMap<>();
         callBroadcastReceiver = new CallBroadcastReceiver();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         addActions();
-        Log.d(TAG, "Service onCreate()");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Service started");
-        QBLoginChatCompositeCommand.start(this);
-        return START_REDELIVER_INTENT;
+        QBPushCallCompositeCommand.start(this);
+        return START_NOT_STICKY;
     }
 
     private void addActions() {
-        Log.v(TAG, "AMBRA addActions()");
-        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatCompositeSuccessAction());
-        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, new LoginChatCompositeFailAction());
-
-        addAction(QBServiceConsts.INIT_CHAT_SERVICE_ACTION, new InitChatServiceSuccessAction());
-        addAction(QBServiceConsts.INIT_CHAT_SERVICE_FAIL_ACTION, new InitChatServiceFailAction());
-
-        addAction(QBServiceConsts.LOGIN_CHAT_ACTION, new LoginChatSuccessAction());
-        addAction(QBServiceConsts.LOGIN_CHAT_FAIL_ACTION, new LoginChatFailAction());
+        Log.v(TAG, "addActions()");
+        addAction(QBServiceConsts.PUSH_CALL_COMPOSITE_SUCCESS_ACTION, new PushCallCompositeSuccessAction());
+        addAction(QBServiceConsts.PUSH_CALL_COMPOSITE_FAIL_ACTION, new PushCallCompositeFailAction());
 
         addAction(QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION, new InitCallChatSuccessAction());
         addAction(QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION, new InitCallChatFailedAction());
@@ -92,45 +83,29 @@ public class CallService extends Service {
         localBroadcastManager.registerReceiver(callBroadcastReceiver, intentFilter);
     }
 
-    public class LoginChatCompositeSuccessAction implements Command {
+    public class PushCallCompositeSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            Log.d("AMBRA", "LoginChatCompositeSuccessAction");
+            Log.d(TAG, "PushCallCompositeSuccessAction");
             QBInitCallChatCommand.start(CallService.this, CallActivity.class);
         }
     }
 
-    public class LoginChatCompositeFailAction implements Command {
+    public class PushCallCompositeFailAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            Log.d("AMBRA", "LoginChatCompositeFailAction");
+            Log.d(TAG, "PushCallCompositeFailAction");
         }
     }
 
-    public class InitChatServiceSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Log.d("AMBRA", "InitChatServiceSuccessAction");
-
-        }
-    }
-
-    public class InitChatServiceFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Log.d("AMBRA", "InitChatServiceFailAction");
-        }
-    }
 
     public class InitCallChatSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            Log.d("AMBRA", "InitCallChatSuccessAction");
+            Log.d(TAG, "InitCallChatSuccessAction");
 //            PowerManagerHelper.wakeUpScreen(CallService.this);
         }
     }
@@ -139,23 +114,7 @@ public class CallService extends Service {
 
         @Override
         public void execute(Bundle bundle) {
-            Log.d("AMBRA", "InitCallChatFailedAction");
-        }
-    }
-
-    public class LoginChatSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Log.d("AMBRA", "LoginChatSuccessAction");
-        }
-    }
-
-    public class LoginChatFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Log.d("AMBRA", "LoginChatFailAction");
+            Log.d(TAG, "InitCallChatFailedAction");
         }
     }
 
@@ -163,10 +122,10 @@ public class CallService extends Service {
 
         @Override
         public void onReceive(Context context, final Intent intent) {
-            Log.d("AMBRA", "GlobalBroadcastReceiver onReceive");
+            Log.d(TAG, "GlobalBroadcastReceiver onReceive");
             String action = intent.getAction();
             if (action != null) {
-                Log.d("STEPS", "AMBRA executing " + action);
+                Log.d(TAG, "STEPS executing " + action);
                 final Set<Command> commandSet = broadcastCommandMap.get(action);
 
                 if (commandSet != null && !commandSet.isEmpty()) {

@@ -32,6 +32,7 @@ public class QBServiceConsts {
     public static final String LOGOUT_AND_DESTROY_CHAT_ACTION = "logout_and_destroy_chat_action";
     public static final String RESET_PASSWORD_ACTION = "reset_password_action";
     public static final String SIGNUP_ACTION = "signup_action";
+    public static final String PUSH_CALL_COMPOSITE_ACTION = "push_call_action";
 
 
 
@@ -117,6 +118,8 @@ public class QBServiceConsts {
     public static final String INIT_CHAT_SERVICE_FAIL_ACTION = "init_chat_service_fail_action";
     public static final String INIT_VIDEO_CHAT_SUCCESS_ACTION = "init_video_chat_success_action";
     public static final String INIT_VIDEO_CHAT_FAIL_ACTION = "init_video_chat_fail_action";
+    public static final String PUSH_CALL_COMPOSITE_SUCCESS_ACTION = "push_call_composite_success_action";
+    public static final String PUSH_CALL_COMPOSITE_FAIL_ACTION = "push_call_composite_fail_action";
     public static final String LOGOUT_AND_DESTROY_CHAT_SUCCESS_ACTION = "logout_and_destroy_chat_success_action";
     public static final String LOGOUT_AND_DESTROY_CHAT_FAIL_ACTION = "logout_and_destroy_chat_fail_action";
     public static final String LOGOUT_REST_SUCCESS_ACTION = "logout_rest_success_action";
