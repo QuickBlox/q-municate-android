@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
@@ -80,35 +81,37 @@ public class QBChatRestHelper extends BaseHelper {
 
         @Override
         public void connected(XMPPConnection connection) {
-
+            Log.e(TAG, "connected");
         }
 
         @Override
         public void authenticated(XMPPConnection xmppConnection, boolean b) {
+            Log.e(TAG, "authenticated");
         }
 
         @Override
         public void connectionClosed() {
-            Lo.g("connectionClosed");
+            Log.e(TAG, "connectionClosed");
         }
 
         @Override
         public void connectionClosedOnError(Exception e) {
-
+            Log.e(TAG, "connectionClosedOnError");
         }
 
         @Override
         public void reconnectingIn(int seconds) {
-            Lo.g("reconnectingIn(" + seconds + ")");
+            Log.e(TAG, "reconnectingIn(" + seconds + ")");
         }
 
         @Override
         public void reconnectionSuccessful() {
+            Log.e(TAG, "reconnectionSuccessful()");
         }
 
         @Override
         public void reconnectionFailed(Exception error) {
-            Lo.g("reconnectionFailed() " + error.getMessage());
+            Log.e(TAG, "reconnectionFailed() " + error.getMessage());
         }
     }
 }
