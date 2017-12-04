@@ -10,6 +10,7 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
@@ -43,6 +44,7 @@ public class QBChatRestHelper extends BaseHelper {
 
         chatService = QBChatService.getInstance();
 
+        chatService.removeConnectionListener(connectionListener);
         chatService.addConnectionListener(connectionListener);
     }
 
@@ -96,7 +98,20 @@ public class QBChatRestHelper extends BaseHelper {
 
         @Override
         public void connectionClosedOnError(Exception e) {
-            Log.e(TAG, "connectionClosedOnError");
+            Log.e(TAG, "connectionClosedOnError, error: " + e.getMessage());
+            //TODO VT temp solution before test in SDK
+            //need renew user password in QBChatService for user which was logged in
+            //via social provider
+            if (!chatService.isLoggedIn()
+                    && chatService.getUser() != null
+                    && QBSessionManager.getInstance().getSessionParameters() != null
+                    && QBSessionManager.getInstance().getSessionParameters().getSocialProvider() != null){
+                try {
+                    chatService.login(AppSession.getSession().getUser());
+                } catch (XMPPException | IOException | SmackException exception) {
+                    exception.printStackTrace();
+                }
+            }
         }
 
         @Override

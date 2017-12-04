@@ -316,6 +316,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         if (chatConnectionListener == null) {
             initChatConnectionListener();
         }
+
+        QBChatService.getInstance().removeConnectionListener(chatConnectionListener);
         QBChatService.getInstance().addConnectionListener(chatConnectionListener);
     }
 
