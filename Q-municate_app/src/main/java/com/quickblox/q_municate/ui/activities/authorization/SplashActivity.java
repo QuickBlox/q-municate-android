@@ -9,6 +9,7 @@ import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.utils.helpers.ServiceManager;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -82,7 +83,7 @@ public class SplashActivity extends BaseAuthActivity  {
         boolean needCleanTask = false;
         try {
             String lastActivityName = appSharedHelper.getLastOpenActivity();
-            if (lastActivityName != null) {
+            if (lastActivityName != null && !lastActivityName.equals(CallActivity.class.getName())) {
                 lastActivityClass = Class.forName(appSharedHelper.getLastOpenActivity());
             } else {
                 needCleanTask = true;

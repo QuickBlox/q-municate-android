@@ -93,10 +93,10 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private AudioStreamReceiver audioStreamReceiver;
     private String ACTION_ANSWER_CALL = "action_answer_call";
     private SystemPermissionHelper systemPermissionHelper;
-    private boolean isNeedInitCallFragment;
+    private boolean isCallByPush;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
-            QBRTCSessionDescription qbRtcSessionDescription) {
+                             QBRTCSessionDescription qbRtcSessionDescription) {
         Intent intent = new Intent(activity, CallActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENTS, (Serializable) qbUsersList);
         intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType);
@@ -121,19 +121,19 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     }
 
-    public void setCallActionBarTitle(String title){
+    public void setCallActionBarTitle(String title) {
         if (actionBar != null) {
             actionBar.setTitle(title);
         }
     }
 
-    public void hideCallActionBar(){
+    public void hideCallActionBar() {
         if (actionBar != null) {
             actionBar.hide();
         }
     }
 
-    public void showCallActionBar(){
+    public void showCallActionBar() {
         if (actionBar != null) {
             actionBar.show();
         }
@@ -147,7 +147,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         initFields();
         audioStreamReceiver = new AudioStreamReceiver();
         initWiFiManagerListener();
-        if (ACTION_ANSWER_CALL.equals(getIntent().getAction())){
+        if (ACTION_ANSWER_CALL.equals(getIntent().getAction())) {
             checkPermissionsAndStartCall(StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
         }
         initWindowKeyguardWakeup();
@@ -177,8 +177,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     protected void onStop() {
         super.onStop();
-        if(!focusDuringOnPause) {
-            isNeedInitCallFragment = true;
+        if (!focusDuringOnPause) {
+            isCallByPush = true;
         }
         unregisterReceiver(wifiStateReceiver);
         unregisterReceiver(audioStreamReceiver);
@@ -196,10 +196,15 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     protected void onResume() {
         isInFront = true;
         super.onResume();
-        if (isNeedInitCallFragment) {
-            isNeedInitCallFragment = false;
-            initCallFragment();
+        if (isCallByPush) {
+            initIncomingCallByPush();
         }
+    }
+
+    private void initIncomingCallByPush() {
+        isCallByPush = false;
+        canPerformLogout.set(true);
+        initCallFragment();
     }
 
     @Override
@@ -228,7 +233,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             qbCallChatHelper.removeRTCSessionUserCallback();
             qbCallChatHelper.releaseCurrentSession(CallActivity.this, CallActivity.this);
         }
-
+        Log.d(TAG, "AMBRA onDestroy");
         appSharedHelper.saveLastOpenActivity(null);
     }
 
@@ -417,7 +422,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         };
     }
 
-    public QMUser getOpponentAsUserFromDB(int opponentId){
+    public QMUser getOpponentAsUserFromDB(int opponentId) {
         DataManager dataManager = DataManager.getInstance();
         Friend friend = dataManager.getFriendDataManager().getByUserId(opponentId);
         return friend.getUser();
@@ -574,7 +579,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
     }
 
-    private void stopTimer(){
+    private void stopTimer() {
         if (timerChronometer != null) {
             timerChronometer.stop();
             isStarted = false;
@@ -605,7 +610,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         switch (requestCode) {
             case SystemPermissionHelper.PERMISSIONS_FOR_CALL_REQUEST: {
                 if (grantResults.length > 0) {
-                    if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)){
+                    if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)) {
                         showToastDeniedPermissions(permissions, grantResults);
                     }
                 }
@@ -622,7 +627,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void startConversationFragment(StartConversationReason startConversationReason) {
-        if(StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)){
+        if (StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)) {
             addConversationCallFragment();
         } else {
             addConversationFragmentReceiveCall();

@@ -157,6 +157,7 @@ public class CallService extends Service {
     public void onDestroy() {
         Log.d(TAG, "Service onDestroy()");
         super.onDestroy();
+        localBroadcastManager.unregisterReceiver(callBroadcastReceiver);
     }
 
     @Nullable
