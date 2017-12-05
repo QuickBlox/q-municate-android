@@ -75,10 +75,12 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         if (numberOfActivitiesInForeground == 0 && activity instanceof Loggable) {
             AppSession.getSession().updateState(AppSession.ChatState.BACKGROUND);
             boolean isLogedIn = isLoggedIn();
+            Log.d(TAG, "AMBRA isLogedIn= " + isLogedIn);
             if (!isLogedIn) {
                 return;
             }
             chatDestroyed = ((Loggable) activity).isCanPerformLogoutInOnStop();
+            Log.d(TAG, "AMBRA onDestroy chatDestroyed= " + chatDestroyed);
             if (chatDestroyed) {
                 QBLogoutAndDestroyChatCommand.start(activity, true);
             }

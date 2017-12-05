@@ -88,7 +88,7 @@ public class CallService extends Service {
         @Override
         public void execute(Bundle bundle) {
             Log.d(TAG, "PushCallCompositeSuccessAction");
-            QBInitCallChatCommand.start(CallService.this, CallActivity.class);
+            QBInitCallChatCommand.start(CallService.this, CallActivity.class, true);
         }
     }
 
@@ -106,7 +106,6 @@ public class CallService extends Service {
         @Override
         public void execute(Bundle bundle) {
             Log.d(TAG, "InitCallChatSuccessAction");
-//            PowerManagerHelper.wakeUpScreen(CallService.this);
         }
     }
 
@@ -122,7 +121,7 @@ public class CallService extends Service {
 
         @Override
         public void onReceive(Context context, final Intent intent) {
-            Log.d(TAG, "GlobalBroadcastReceiver onReceive");
+            Log.d(TAG, "CallBroadcastReceiver onReceive");
             String action = intent.getAction();
             if (action != null) {
                 Log.d(TAG, "STEPS executing " + action);

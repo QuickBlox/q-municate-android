@@ -22,9 +22,10 @@ public class QBInitCallChatCommand extends ServiceCommand {
         this.qbCallChatHelper = qbCallChatHelper;
     }
 
-    public static void start(Context context, Class<? extends Activity> callClass) {
+    public static void start(Context context, Class<? extends Activity> callClass, boolean isPushCall) {
         Intent intent = new Intent(QBServiceConsts.INIT_CALL_CHAT_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_CALL_ACTIVITY, callClass);
+        intent.putExtra(QBServiceConsts.EXTRA_PUSH_CALL, isPushCall);
         context.startService(intent);
     }
 
@@ -38,6 +39,7 @@ public class QBInitCallChatCommand extends ServiceCommand {
             Log.d("test_crash_1", "+++ perform 2 +++");
             qbCallChatHelper.initActivityClass((Class<? extends Activity>) extras.getSerializable(
                     QBServiceConsts.EXTRA_CALL_ACTIVITY));
+            qbCallChatHelper.setIsPushCall(extras.getBoolean(QBServiceConsts.EXTRA_PUSH_CALL));
         }
         return extras;
     }

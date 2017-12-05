@@ -220,6 +220,7 @@ public class QBServiceConsts {
     public static final String EXTRA_FRIEND_ALERT_MESSAGE = "alert_message";
     public static final String EXTRA_IS_TYPING = "is_typing";
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
+    public static final String EXTRA_PUSH_CALL = "push_call";
     public static final String EXTRA_PAGE = "load_elements";
     public static final String EXTRA_USER_STATUS = "user_status";
     public static final String EXTRA_OPPONENTS = "opponents";

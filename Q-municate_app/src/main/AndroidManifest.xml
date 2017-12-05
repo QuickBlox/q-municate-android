@@ -165,6 +165,10 @@
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.activities.others.ExitActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:autoRemoveFromRecents="true"/>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
