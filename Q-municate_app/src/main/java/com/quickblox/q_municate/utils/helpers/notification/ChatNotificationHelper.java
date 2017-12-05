@@ -51,11 +51,11 @@ public class ChatNotificationHelper {
             messageType = extras.getString(ChatNotificationHelper.MESSAGE_TYPE);
         }
 
-        boolean callPush = TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
-
-        if (SystemUtils.isAppRunningNow() && !callPush) {
+        if (SystemUtils.isAppRunningNow()) {
             return;
         }
+
+        boolean callPush = TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
 
         if (isOwnMessage(userId)) {
             return;

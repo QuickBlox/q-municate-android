@@ -677,7 +677,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     protected void performLoginChatSuccessAction(Bundle bundle) {
-        QBInitCallChatCommand.start(this, CallActivity.class, false);
+        QBInitCallChatCommand.start(this, CallActivity.class);
         hideProgress();
     }
 

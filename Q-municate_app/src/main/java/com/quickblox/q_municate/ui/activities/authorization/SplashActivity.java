@@ -83,7 +83,7 @@ public class SplashActivity extends BaseAuthActivity  {
         boolean needCleanTask = false;
         try {
             String lastActivityName = appSharedHelper.getLastOpenActivity();
-            if (lastActivityName != null && !lastActivityName.equals(CallActivity.class.getName())) {
+            if (lastActivityName != null) {
                 lastActivityClass = Class.forName(appSharedHelper.getLastOpenActivity());
             } else {
                 needCleanTask = true;

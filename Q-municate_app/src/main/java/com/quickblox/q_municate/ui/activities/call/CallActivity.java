@@ -17,8 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Chronometer;
 
 import com.quickblox.chat.QBChatService;
@@ -31,6 +29,7 @@ import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.PowerManagerHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
+import com.quickblox.q_municate_core.models.CallPushParams;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -95,8 +94,10 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private AudioStreamReceiver audioStreamReceiver;
     private String ACTION_ANSWER_CALL = "action_answer_call";
     private SystemPermissionHelper systemPermissionHelper;
-    private boolean isIncomingPushCall;
     private boolean isNeedInitCallFragment;
+    private CallPushParams callPushParams;
+    private boolean isIncomingPushCall;
+    private boolean isNewAppTask;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
                              QBRTCSessionDescription qbRtcSessionDescription) {
@@ -242,7 +243,9 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void closeAppIfNeed() {
-        if (isIncomingPushCall) {
+        Log.d(TAG, "AMBRA closeAppIfNeed isIncomingPushCall= " + isIncomingPushCall);
+        Log.d(TAG, "AMBRA closeAppIfNeed isNewAppTask= " + isNewAppTask);
+        if (isIncomingPushCall && isNewAppTask) {
             ExitActivity.exitApplication(this);
         }
     }
@@ -326,6 +329,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         Log.d(TAG, "Session " + session.getSessionID() + " start stop session");
 
         if (session.equals(getCurrentSession())) {
+            ringtonePlayer.stop();
 
             Fragment currentFragment = getCurrentFragment();
             if (isInComingCall) {
@@ -423,8 +427,13 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         qbConferenceType = (QBRTCTypes.QBConferenceType) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
         startConversationReason = (StartConversationReason) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE);
         qbRtcSessionDescription = (QBRTCSessionDescription) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION);
-        isIncomingPushCall = getIntent().getBooleanExtra(QBServiceConsts.EXTRA_PUSH_CALL, false);
+        callPushParams = (CallPushParams) getIntent().getSerializableExtra(QBServiceConsts.EXTRA_PUSH_CALL);
 
+        if(callPushParams != null) {
+            Log.d(TAG, "callPushParams= " + callPushParams);
+            isIncomingPushCall = callPushParams.isPushCall();
+            isNewAppTask = callPushParams.isNewTask();
+        }
         ringtonePlayer = new RingtonePlayer(this, R.raw.beep);
         // Add activity as callback to RTCClient
         qbRtcClient = QBRTCClient.getInstance(this);
