@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-//not very nice solution to remove activity from recent list, due to finishAndRemoveTask works >= 21
+//workaround to remove activity from recent list, due to finishAndRemoveTask works >= 21
 public class ExitActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,7 +16,7 @@ public class ExitActivity extends Activity {
         } else {
             finish();
         }
-//        hack to disable any transition animation
+//        to disable any transition animation
         overridePendingTransition(0, 0);
     }
 

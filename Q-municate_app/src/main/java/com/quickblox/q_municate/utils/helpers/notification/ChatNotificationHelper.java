@@ -10,6 +10,7 @@ import com.quickblox.q_municate.service.CallService;
 import com.quickblox.q_municate.utils.SystemUtils;
 import com.quickblox.q_municate.utils.helpers.PowerManagerHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.NotificationEvent;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
@@ -51,11 +52,16 @@ public class ChatNotificationHelper {
             messageType = extras.getString(ChatNotificationHelper.MESSAGE_TYPE);
         }
 
-        if (SystemUtils.isAppRunningNow()) {
+        boolean callPush = TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
+
+        if (callPush && shouldProceedCall()) {
+            CallService.start(context);
             return;
         }
 
-        boolean callPush = TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
+        if (SystemUtils.isAppRunningNow()) {
+            return;
+        }
 
         if (isOwnMessage(userId)) {
             return;
@@ -67,12 +73,14 @@ public class ChatNotificationHelper {
             saveOpeningDialogData(userId, dialogId);
             saveOpeningDialog(true);
             sendChatNotification(message, userId, dialogId);
-        } else if (callPush) {
-            CallService.start(context);
         } else {
             sendCommonNotification(message);
         }
 
+    }
+
+    private boolean shouldProceedCall() {
+        return !SystemUtils.isAppRunningNow() || AppSession.ChatState.BACKGROUND == AppSession.getSession().getChatState();
     }
 
     public void sendChatNotification(String message, int userId, String dialogId) {

@@ -133,7 +133,7 @@ public class CallService extends Service {
         @Override
         public void execute(Bundle bundle) {
             Log.d(TAG, "InitCallChatSuccessAction");
-//            stopSelf();!!!добавить
+            stopSelf();
         }
     }
 

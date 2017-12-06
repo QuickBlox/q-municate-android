@@ -243,8 +243,8 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void closeAppIfNeed() {
-        Log.d(TAG, "AMBRA closeAppIfNeed isIncomingPushCall= " + isIncomingPushCall);
-        Log.d(TAG, "AMBRA closeAppIfNeed isNewAppTask= " + isNewAppTask);
+        Log.d(TAG, "closeAppIfNeed isIncomingPushCall= " + isIncomingPushCall);
+        Log.d(TAG, "closeAppIfNeed isNewAppTask= " + isNewAppTask);
         if (isIncomingPushCall && isNewAppTask) {
             ExitActivity.exitApplication(this);
         }
