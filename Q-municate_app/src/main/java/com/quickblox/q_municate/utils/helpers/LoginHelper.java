@@ -14,7 +14,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.users.model.QBUser;
 
@@ -29,15 +28,9 @@ public class LoginHelper {
     private CommandBroadcastReceiver commandBroadcastReceiver;
     private GlobalLoginListener globalLoginListener;
 
-    private String userEmail;
-    private String userPassword;
-
     public LoginHelper(Context context) {
         this.context = context;
         appSharedHelper = App.getInstance().getAppSharedHelper();
-
-        userEmail = appSharedHelper.getUserEmail();
-        userPassword = appSharedHelper.getUserPassword();
     }
 
     public LoginType getCurrentLoginType() {
@@ -57,9 +50,7 @@ public class LoginHelper {
     public void loginQB() {
         Log.d(TAG, "loginQB()");
         appSharedHelper.saveUsersImportInitialized(true);
-        QBUser qbUser = new QBUser(null, userPassword, userEmail);
-        AppSession.getSession().closeAndClear();
-        QBLoginCompositeCommand.start(context, qbUser);
+        QBLoginChatCompositeCommand.start(context);
     }
 
     public void loginFB() {
