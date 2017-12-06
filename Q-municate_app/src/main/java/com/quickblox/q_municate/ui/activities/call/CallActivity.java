@@ -95,9 +95,9 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private String ACTION_ANSWER_CALL = "action_answer_call";
     private SystemPermissionHelper systemPermissionHelper;
     private boolean isNeedInitCallFragment;
-    private CallPushParams callPushParams;
     private boolean isIncomingPushCall;
     private boolean isNewAppTask;
+    private boolean isCallAlreadyInit;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
                              QBRTCSessionDescription qbRtcSessionDescription) {
@@ -209,9 +209,13 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     protected void onResume() {
         isInFront = true;
         super.onResume();
-        if (isNeedInitCallFragment) {
+        if (isNeedInitCallFragment()) {
             initIncomingCallByPush();
         }
+    }
+
+    private boolean isNeedInitCallFragment() {
+        return !isCallAlreadyInit && isNeedInitCallFragment;
     }
 
     private void initIncomingCallByPush() {
@@ -434,7 +438,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         qbConferenceType = (QBRTCTypes.QBConferenceType) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
         startConversationReason = (StartConversationReason) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE);
         qbRtcSessionDescription = (QBRTCSessionDescription) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION);
-        callPushParams = (CallPushParams) getIntent().getSerializableExtra(QBServiceConsts.EXTRA_PUSH_CALL);
+        CallPushParams callPushParams = (CallPushParams) getIntent().getSerializableExtra(QBServiceConsts.EXTRA_PUSH_CALL);
 
         if (callPushParams != null) {
             Log.d(TAG, "callPushParams= " + callPushParams);
@@ -546,6 +550,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             if (isIncomingPushCall) {
                 ringtonePlayer.stop();
             }
+            isCallAlreadyInit = true;
             setCurrentFragment(fragment);
         } else {
             Log.d(TAG, "SKIP addIncomingCallFragment method");
