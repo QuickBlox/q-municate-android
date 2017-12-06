@@ -149,7 +149,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         super.onCreate(savedInstanceState);
         canPerformLogout.set(false);
         initFields();
-        playRingtoneIfNeed();
+        initPushCallIfNeed();
         audioStreamReceiver = new AudioStreamReceiver();
         initWiFiManagerListener();
         if (ACTION_ANSWER_CALL.equals(getIntent().getAction())) {
@@ -157,12 +157,19 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
     }
 
-    private void playRingtoneIfNeed() {
+    private void initPushCallIfNeed() {
         if (isIncomingPushCall) {
-            ringtonePlayer = new RingtonePlayer(this);
-            ringtonePlayer.play(false);
-            PowerManagerHelper.wakeUpScreen(this);
+            playRingtone();
+            wakeUpScreen();
         }
+    }
+
+    private void playRingtone() {
+        ringtonePlayer.play(false);
+    }
+
+    private void wakeUpScreen() {
+        PowerManagerHelper.wakeUpScreen(this);
     }
 
     private void initCallFragment() {
@@ -429,14 +436,22 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         qbRtcSessionDescription = (QBRTCSessionDescription) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION);
         callPushParams = (CallPushParams) getIntent().getSerializableExtra(QBServiceConsts.EXTRA_PUSH_CALL);
 
-        if(callPushParams != null) {
+        if (callPushParams != null) {
             Log.d(TAG, "callPushParams= " + callPushParams);
             isIncomingPushCall = callPushParams.isPushCall();
             isNewAppTask = callPushParams.isNewTask();
         }
-        ringtonePlayer = new RingtonePlayer(this, R.raw.beep);
+        initRingtonePlayer();
         // Add activity as callback to RTCClient
         qbRtcClient = QBRTCClient.getInstance(this);
+    }
+
+    private void initRingtonePlayer() {
+        if (isIncomingPushCall) {
+            ringtonePlayer = new RingtonePlayer(this);
+        } else {
+            ringtonePlayer = new RingtonePlayer(this, R.raw.beep);
+        }
     }
 
     private void initWiFiManagerListener() {

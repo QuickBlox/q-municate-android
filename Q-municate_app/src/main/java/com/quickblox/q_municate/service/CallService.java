@@ -1,9 +1,7 @@
 package com.quickblox.q_municate.service;
 
-import android.app.ActivityManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,6 +13,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
+import com.quickblox.q_municate.utils.SystemUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.CallPushParams;
 import com.quickblox.q_municate_core.qb.commands.chat.QBInitCallChatCommand;
@@ -24,7 +23,6 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,21 +55,6 @@ public class CallService extends Service {
         Log.d(TAG, "Service started");
         QBPushCallCompositeCommand.start(this);
         return START_NOT_STICKY;
-    }
-
-    private boolean setIsAppNewTask(Context context) {
-        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        final List<ActivityManager.RecentTaskInfo> recentTasks = activityManager != null ? activityManager.getRecentTasks(Integer.MAX_VALUE, ActivityManager.RECENT_IGNORE_UNAVAILABLE) : null;
-        ActivityManager.RecentTaskInfo recentTaskInfo = null;
-
-        for (int i = 0; i < (recentTasks != null ? recentTasks.size() : 0); i++) {
-            ComponentName componentName = recentTasks.get(i).baseIntent.getComponent();
-            if (componentName != null && componentName.getPackageName().equals(context.getPackageName())) {
-                recentTaskInfo = recentTasks.get(i);
-                break;
-            }
-        }
-        return !(recentTaskInfo != null && recentTaskInfo.id > -1);
     }
 
     private void addActions() {
@@ -115,7 +98,7 @@ public class CallService extends Service {
 
     private void initCallParams() {
         callPushParams = new CallPushParams();
-        callPushParams.setNewTask(setIsAppNewTask(this));// consider to use SystemUtils.isAppRunningNow()
+        callPushParams.setIsNewTask(!SystemUtils.isAppRunning());
         callPushParams.setPushCall(true);
     }
 
@@ -152,7 +135,7 @@ public class CallService extends Service {
             Log.d(TAG, "CallBroadcastReceiver onReceive");
             String action = intent.getAction();
             if (action != null) {
-                Log.d(TAG, "STEPS executing " + action);
+                Log.d(TAG, "executing " + action);
                 final Set<Command> commandSet = broadcastCommandMap.get(action);
 
                 if (commandSet != null && !commandSet.isEmpty()) {

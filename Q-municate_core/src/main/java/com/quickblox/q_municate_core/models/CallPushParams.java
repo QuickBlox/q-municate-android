@@ -18,7 +18,7 @@ public class CallPushParams implements Serializable {
         return isNewTask;
     }
 
-    public void setNewTask(boolean newTask) {
+    public void setIsNewTask(boolean newTask) {
         isNewTask = newTask;
     }
 
