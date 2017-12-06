@@ -7,10 +7,11 @@ import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.connections.tcp.QBTcpChatConnectionFabric;
+import com.quickblox.chat.connections.tcp.QBTcpConfigurationBuilder;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.helper.Lo;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
@@ -37,10 +38,10 @@ public class QBChatRestHelper extends BaseHelper {
     public synchronized void initChatService() throws XMPPException, SmackException {
         QBChatService.setDefaultPacketReplyTimeout(ConstsCore.DEFAULT_PACKET_REPLY_TIMEOUT);
 
-        QBChatService.ConfigurationBuilder configurationBuilder = new QBChatService.ConfigurationBuilder();
-        configurationBuilder.setSocketTimeout(0);
-        QBChatService.setConfigurationBuilder(configurationBuilder);
+        QBTcpConfigurationBuilder configurationBuilder = new QBTcpConfigurationBuilder()
+                .setSocketTimeout(0);
 
+        QBChatService.setConnectionFabric(new QBTcpChatConnectionFabric(configurationBuilder));
 
         chatService = QBChatService.getInstance();
 
@@ -79,6 +80,16 @@ public class QBChatRestHelper extends BaseHelper {
         return chatService != null && chatService.isLoggedIn();
     }
 
+    private void tryReloginToChatUsingNewToken(){
+        if (!chatService.isLoggedIn()
+                && chatService.getUser() != null
+                && QBSessionManager.getInstance().getSessionParameters() != null
+                && QBSessionManager.getInstance().getSessionParameters().getSocialProvider() != null){
+
+            chatService.login(AppSession.getSession().getUser(), (QBEntityCallback) null);
+        }
+    }
+
     private class ChatConnectionListener implements ConnectionListener {
 
         @Override
@@ -102,16 +113,7 @@ public class QBChatRestHelper extends BaseHelper {
             //TODO VT temp solution before test in SDK
             //need renew user password in QBChatService for user which was logged in
             //via social provider
-            if (!chatService.isLoggedIn()
-                    && chatService.getUser() != null
-                    && QBSessionManager.getInstance().getSessionParameters() != null
-                    && QBSessionManager.getInstance().getSessionParameters().getSocialProvider() != null){
-                try {
-                    chatService.login(AppSession.getSession().getUser());
-                } catch (XMPPException | IOException | SmackException exception) {
-                    exception.printStackTrace();
-                }
-            }
+            tryReloginToChatUsingNewToken();
         }
 
         @Override
@@ -127,6 +129,10 @@ public class QBChatRestHelper extends BaseHelper {
         @Override
         public void reconnectionFailed(Exception error) {
             Log.e(TAG, "reconnectionFailed() " + error.getMessage());
+            //TODO VT temp solution before test in SDK
+            //need renew user password in QBChatService for user which was logged in
+            //via social provider
+            tryReloginToChatUsingNewToken();
         }
     }
 }

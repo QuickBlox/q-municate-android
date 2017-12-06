@@ -664,7 +664,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         QBLoginChatCompositeCommand.start(this);
     }
 
-    private void renewFirebaseToken() {
+    public void renewFirebaseToken() {
         FirebaseAuthHelper.refreshInternalFirebaseToken();
     }
 
