@@ -429,6 +429,11 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void initFields() {
+        if (getIntent().getExtras() == null) {
+            Log.d(TAG, "initFields getExtras is null");
+            finish();
+            return;
+        }
         opponentsList = (List<QBUser>) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENTS);
         qbConferenceType = (QBRTCTypes.QBConferenceType) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
         startConversationReason = (StartConversationReason) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE);
