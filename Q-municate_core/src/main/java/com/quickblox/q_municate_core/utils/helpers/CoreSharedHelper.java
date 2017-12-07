@@ -15,6 +15,7 @@ public class CoreSharedHelper {
         public static final String FIRST_AUTH = "first_auth";
         public static final String FB_TOKEN = "fb_token";
         public static final String FIREBASE_TOKEN = "firebase_token";
+        public static final String FIREBASE_PROJECT_ID = "firebase_project_id";
 
         public static final String USER_ID = "user_id";
         public static final String USER_EMAIL = "user_email";
@@ -132,6 +133,14 @@ public class CoreSharedHelper {
 
     public String getFirebaseToken(){
         return getPref(FIREBASE_TOKEN, null);
+    }
+
+    public void saveFerebaseProjectId(String firebaseProjectId){
+        savePref(FIREBASE_PROJECT_ID, firebaseProjectId);
+    }
+
+    public String getFirebaseProjectId(){
+        return getPref(FIREBASE_PROJECT_ID, null);
     }
 
     public int getUserId() {

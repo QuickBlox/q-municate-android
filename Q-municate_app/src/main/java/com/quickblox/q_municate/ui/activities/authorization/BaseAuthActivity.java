@@ -175,6 +175,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         if (loginType.equals(LoginType.FACEBOOK)) {
             facebookHelper.login(new FacebookLoginCallback());
         } else if (loginType.equals(LoginType.FIREBASE_PHONE)) {
+            appSharedHelper.saveFerebaseProjectId(StringObfuscator.getFirebaseAuthProjectId());
             firebaseAuthHelper.loginByPhone(BaseAuthActivity.this);
         }
     }
@@ -277,7 +278,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         public void onSuccess(String authToken) {
             Log.d(TAG, "FirebaseAuthCallback onSuccess()");
             showProgress();
-            serviceManager.login(QBProvider.FIREBASE_PHONE, authToken, StringObfuscator.getFirebaseAuthProjectId())
+            serviceManager.login(QBProvider.FIREBASE_PHONE, authToken, appSharedHelper.getFirebaseProjectId())
                     .subscribe(socialLoginObserver);
         }
 

@@ -4,13 +4,13 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'io.fabric.tools:gradle:1.+'
-        classpath 'com.google.gms:google-services:3.0.0'
+        classpath 'com.google.gms:google-services:3.1.1'
     }
 }
 
-ext.isPrivateRepository = false
+ext.isPrivateRepository = true
 
 allprojects {
     repositories {
@@ -36,8 +36,8 @@ ext {
     buildToolsVersion = '26.0.1'
     minSdkVersion = 16
     targetSdkVersion = 26
-    versionName = '2.5'
-    versionCode = 250
+    versionName = '2.5.10b'
+    versionCode = 2510
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
@@ -46,15 +46,15 @@ ext {
     lintAbortOnError = false
 
 //    QuickBlox SDK version
-    qbSdkVersion = '3.3.5'
+    qbSdkVersion = '3.5.2'
     qbMessageAdapterVersion = '2.0'
 
     testRunnerVersion = "0.4.1"
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
-    supportVersion = '26.0.1'
-    googlePlayServicesVersion = '11.0.4'
+    supportVersion = '26.1.0'
+    googlePlayServicesVersion = '11.4.2'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '5.0'
     ormliteCoreVersion = '5.0'
@@ -68,11 +68,11 @@ ext {
     twitterDigitsSdkVersion = '2.0.0'
 
     // Dependency versions
-    supportV4Version = '23.2.1'
-    appcompatV7Version = '23.2.1'
-    recyclerviewV7Version = '23.2.1'
-    supportAnnotationsVersion = '23.2.1'
-    designVersion = '23.2.1'
+    supportV4Version = ext.supportVersion
+    appcompatV7Version = ext.supportVersion
+    recyclerviewV7Version = ext.supportVersion
+    supportAnnotationsVersion = ext.supportVersion
+    designVersion = ext.supportVersion
 
     uilVersion = '1.9.0'
     glideVersion = '3.6.1'

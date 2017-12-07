@@ -2,7 +2,6 @@ package com.quickblox.q_municate;
 
 import android.content.Context;
 import android.support.multidex.MultiDexApplication;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -25,8 +24,6 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_user_cache.QMUserCacheImpl;
 import com.quickblox.q_municate_user_service.QMUserService;
 import com.quickblox.q_municate_user_service.cache.QMUserCache;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -58,13 +55,7 @@ public class App extends MultiDexApplication {
                 .core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
                 .build();
 
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(
-                StringObfuscator.getTwitterConsumerKey(),
-                StringObfuscator.getTwitterConsumerSecret());
-
-        Fabric.with(this,
-                crashlyticsKit,
-                new TwitterCore(authConfig));
+        Fabric.with(this, crashlyticsKit);
     }
 
     private void initApplication() {
@@ -97,11 +88,9 @@ public class App extends MultiDexApplication {
         QBChatService.setDebugEnabled(true);
     }
 
-    private void initDomains(){
-        if (!TextUtils.isEmpty(getString(R.string.api_domain))) {
-            QBSettings.getInstance().setEndpoints(getString(R.string.api_domain), getString(R.string.chat_domain), ServiceZone.PRODUCTION);
-            QBSettings.getInstance().setZone(ServiceZone.PRODUCTION);
-        }
+    private void initDomains() {
+        QBSettings.getInstance().setEndpoints(StringObfuscator.getApiEndpoint(), StringObfuscator.getChatEndpoint(), ServiceZone.PRODUCTION);
+        QBSettings.getInstance().setZone(ServiceZone.PRODUCTION);
     }
 
     private void initHTTPConfig(){

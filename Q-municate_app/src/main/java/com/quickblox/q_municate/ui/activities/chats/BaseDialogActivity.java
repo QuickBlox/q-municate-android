@@ -62,6 +62,7 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogMessagesCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -343,6 +344,7 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
 
     private void returnResult(){
         if (getCallingActivity() != null) {
+            Log.i(TAG, "return result to " + getCallingActivity().getShortClassName());
             Intent intent = new Intent();
             intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, currentChatDialog.getDialogId());
             intent.putExtra(QBServiceConsts.EXTRA_DIALOG_UPDATE_POSITION, needUpdatePosition);
@@ -686,8 +688,10 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadDialogMessages(QBChatDialog chatDialog, long lastDateLoad, boolean isLoadOldMessages) {
-        isLoadingMessages = true;
-        QBLoadDialogMessagesCommand.start(this, chatDialog, lastDateLoad, isLoadOldMessages);
+        if (!QBLoginChatCompositeCommand.isRunning()) {
+            isLoadingMessages = true;
+            QBLoadDialogMessagesCommand.start(this, chatDialog, lastDateLoad, isLoadOldMessages);
+        }
     }
 
     private void setActionButtonVisibility(CharSequence charSequence) {

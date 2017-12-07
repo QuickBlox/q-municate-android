@@ -6,6 +6,8 @@ import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.quickblox.auth.model.QBProvider;
+import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -40,6 +42,12 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
                 boolean networkAvailable = ((BaseActivity) activity).isNetworkAvailable();
                 Log.d(TAG, "networkAvailable" + networkAvailable);
                 if (canLogin) {
+                    if (QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
+                            && !QBSessionManager.getInstance().isValidActiveSession()){
+
+                        ((BaseActivity) activity).renewFirebaseToken();
+                    }
+
                     QBLoginChatCompositeCommand.start(activity);
                 }
             }
