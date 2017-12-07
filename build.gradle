@@ -10,7 +10,7 @@ buildscript {
     }
 }
 
-ext.isPrivateRepository = true
+ext.isPrivateRepository = false
 
 allprojects {
     repositories {
