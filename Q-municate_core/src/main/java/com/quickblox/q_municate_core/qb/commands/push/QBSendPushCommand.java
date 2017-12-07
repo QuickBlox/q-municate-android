@@ -21,17 +21,18 @@ public class QBSendPushCommand extends ServiceCommand {
         super(context, successAction, failAction);
     }
 
-    public static void start(Context context, String message, ArrayList<Integer> friendIdsList) {
+    public static void start(Context context, String message, ArrayList<Integer> friendIdsList, String messageType) {
         Intent intent = new Intent(QBServiceConsts.SEND_PUSH_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friendIdsList);
         intent.putExtra(ConstsCore.PUSH_MESSAGE, message);
+        intent.putExtra(ConstsCore.PUSH_MESSAGE_TYPE, messageType);
         context.startService(intent);
     }
 
-    public static void start(Context context, String message, Integer friendId) {
+    public static void start(Context context, String message, Integer friendId, String messageType) {
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
         friendIdsList.add(friendId);
-        start(context, message, friendIdsList);
+        start(context, message, friendIdsList, messageType);
     }
 
     @Override
@@ -39,8 +40,8 @@ public class QBSendPushCommand extends ServiceCommand {
         ArrayList<Integer> usersIdsList = (ArrayList<Integer>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
         String message = extras.getString(ConstsCore.PUSH_MESSAGE);
-        QBEvent pushEvent = CoreNotificationHelper.createPushEvent(usersIdsList, message, null);
-
+        String messageType = extras.getString(ConstsCore.PUSH_MESSAGE_TYPE);
+        QBEvent pushEvent = CoreNotificationHelper.createPushEvent(usersIdsList, message, messageType);
         try {
             QBPushNotifications.createEvent(pushEvent).perform();
         } catch (QBResponseException e) {

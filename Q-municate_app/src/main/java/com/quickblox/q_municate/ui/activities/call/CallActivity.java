@@ -22,11 +22,14 @@ import android.widget.Chronometer;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
+import com.quickblox.q_municate.ui.activities.others.ExitActivity;
 import com.quickblox.q_municate.ui.fragments.call.ConversationCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
 import com.quickblox.q_municate.utils.StringUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.helpers.PowerManagerHelper;
 import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
+import com.quickblox.q_municate_core.models.CallPushParams;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -90,9 +93,13 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private AudioStreamReceiver audioStreamReceiver;
     private String ACTION_ANSWER_CALL = "action_answer_call";
     private SystemPermissionHelper systemPermissionHelper;
+    private boolean isSkipInitCallFragment;
+    private boolean isIncomingPushCall;
+    private boolean isNewAppTask;
+    private boolean isCallAlreadyInit;
 
     public static void start(Activity activity, List<QBUser> qbUsersList, QBRTCTypes.QBConferenceType qbConferenceType,
-            QBRTCSessionDescription qbRtcSessionDescription) {
+                             QBRTCSessionDescription qbRtcSessionDescription) {
         Intent intent = new Intent(activity, CallActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENTS, (Serializable) qbUsersList);
         intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType);
@@ -117,19 +124,19 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     }
 
-    public void setCallActionBarTitle(String title){
+    public void setCallActionBarTitle(String title) {
         if (actionBar != null) {
             actionBar.setTitle(title);
         }
     }
 
-    public void hideCallActionBar(){
+    public void hideCallActionBar() {
         if (actionBar != null) {
             actionBar.hide();
         }
     }
 
-    public void showCallActionBar(){
+    public void showCallActionBar() {
         if (actionBar != null) {
             actionBar.show();
         }
@@ -137,14 +144,31 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        appInitialized = true;
         super.onCreate(savedInstanceState);
         canPerformLogout.set(false);
         initFields();
+        initPushCallIfNeed();
         audioStreamReceiver = new AudioStreamReceiver();
         initWiFiManagerListener();
-        if (ACTION_ANSWER_CALL.equals(getIntent().getAction())){
+        if (ACTION_ANSWER_CALL.equals(getIntent().getAction())) {
             checkPermissionsAndStartCall(StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
         }
+    }
+
+    private void initPushCallIfNeed() {
+        if (isIncomingPushCall) {
+            playRingtone();
+            wakeUpScreen();
+        }
+    }
+
+    private void playRingtone() {
+        ringtonePlayer.play(false);
+    }
+
+    private void wakeUpScreen() {
+        PowerManagerHelper.wakeUpScreen(this);
     }
 
     private void initCallFragment() {
@@ -180,6 +204,18 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     protected void onResume() {
         isInFront = true;
         super.onResume();
+        if (isNeedInitCallFragment()) {
+            initIncomingCallFragment();
+        }
+    }
+
+    private boolean isNeedInitCallFragment() {
+        return !isCallAlreadyInit && isSkipInitCallFragment;
+    }
+
+    private void initIncomingCallFragment() {
+        isSkipInitCallFragment = false;
+        initCallFragment();
     }
 
     @Override
@@ -208,8 +244,16 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             qbCallChatHelper.removeRTCSessionUserCallback();
             qbCallChatHelper.releaseCurrentSession(CallActivity.this, CallActivity.this);
         }
-
         appSharedHelper.saveLastOpenActivity(null);
+        closeAppIfNeed();
+    }
+
+    private void closeAppIfNeed() {
+        Log.d(TAG, "closeAppIfNeed isIncomingPushCall= " + isIncomingPushCall);
+        Log.d(TAG, "closeAppIfNeed isNewAppTask= " + isNewAppTask);
+        if (isIncomingPushCall && isNewAppTask) {
+            ExitActivity.exitApplication(this);
+        }
     }
 
     @Override
@@ -291,12 +335,14 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         Log.d(TAG, "Session " + session.getSessionID() + " start stop session");
 
         if (session.equals(getCurrentSession())) {
+            ringtonePlayer.stop();
 
             Fragment currentFragment = getCurrentFragment();
             if (isInComingCall) {
                 stopIncomeCallTimer();
                 if (currentFragment instanceof IncomingCallFragment) {
                     removeFragment();
+                    setValidStatePerformLogout();
                     finish();
                 }
             }
@@ -309,6 +355,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
 
             stopTimer();
             closeByWifiStateAllow = true;
+            setValidStatePerformLogout();
             finish();
         }
     }
@@ -347,6 +394,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             Intent returnIntent = new Intent();
             setResult(CALL_ACTIVITY_CLOSE_WIFI_DISABLED, returnIntent);
         }
+        setValidStatePerformLogout();
         finish();
     }
 
@@ -376,15 +424,33 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
     }
 
+    private void setValidStatePerformLogout() {
+        canPerformLogout.set(isIncomingPushCall);
+    }
+
     private void initFields() {
         opponentsList = (List<QBUser>) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENTS);
         qbConferenceType = (QBRTCTypes.QBConferenceType) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
         startConversationReason = (StartConversationReason) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE);
         qbRtcSessionDescription = (QBRTCSessionDescription) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_SESSION_DESCRIPTION);
+        CallPushParams callPushParams = (CallPushParams) getIntent().getSerializableExtra(QBServiceConsts.EXTRA_PUSH_CALL);
 
-        ringtonePlayer = new RingtonePlayer(this, R.raw.beep);
+        if (callPushParams != null) {
+            Log.d(TAG, "callPushParams= " + callPushParams);
+            isIncomingPushCall = callPushParams.isPushCall();
+            isNewAppTask = callPushParams.isNewTask();
+        }
+        initRingtonePlayer();
         // Add activity as callback to RTCClient
         qbRtcClient = QBRTCClient.getInstance(this);
+    }
+
+    private void initRingtonePlayer() {
+        if (isIncomingPushCall) {
+            ringtonePlayer = new RingtonePlayer(this);
+        } else {
+            ringtonePlayer = new RingtonePlayer(this, R.raw.beep);
+        }
     }
 
     private void initWiFiManagerListener() {
@@ -397,7 +463,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         };
     }
 
-    public QMUser getOpponentAsUserFromDB(int opponentId){
+    public QMUser getOpponentAsUserFromDB(int opponentId) {
         DataManager dataManager = DataManager.getInstance();
         Friend friend = dataManager.getFriendDataManager().getByUserId(opponentId);
         return friend.getUser();
@@ -476,8 +542,13 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             bundle.putSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE,
                     qbRtcSessionDescription.getConferenceType());
             fragment.setArguments(bundle);
+            if (isIncomingPushCall) {
+                ringtonePlayer.stop();
+            }
+            isCallAlreadyInit = true;
             setCurrentFragment(fragment);
         } else {
+            isSkipInitCallFragment = true;
             Log.d(TAG, "SKIP addIncomingCallFragment method");
         }
     }
@@ -538,6 +609,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
                         UserFriendUtils.getUserNameByID(session.getCallerID(), newOpponents),
                         session.getConferenceType(), StartConversationReason.INCOME_CALL_FOR_ACCEPTION,
                         session.getSessionID());
+                ringtonePlayer.stop();
                 // Start conversation fragment
                 setCurrentFragment(fragment);
             }
@@ -554,7 +626,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         }
     }
 
-    private void stopTimer(){
+    private void stopTimer() {
         if (timerChronometer != null) {
             timerChronometer.stop();
             isStarted = false;
@@ -585,7 +657,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         switch (requestCode) {
             case SystemPermissionHelper.PERMISSIONS_FOR_CALL_REQUEST: {
                 if (grantResults.length > 0) {
-                    if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)){
+                    if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)) {
                         showToastDeniedPermissions(permissions, grantResults);
                     }
                 }
@@ -602,7 +674,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void startConversationFragment(StartConversationReason startConversationReason) {
-        if(StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)){
+        if (StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)) {
             addConversationCallFragment();
         } else {
             addConversationFragmentReceiveCall();

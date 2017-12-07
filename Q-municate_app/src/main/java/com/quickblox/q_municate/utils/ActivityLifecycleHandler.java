@@ -32,7 +32,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         Log.d("ActivityLifecycleHandler", "onActivityStarted " + activity.getClass().getSimpleName());
         boolean activityLogeable = isActivityLogeable(activity);
         chatDestroyed = chatDestroyed && !isLoggedIn();
-        Log.d(TAG, "onActivityStarted , chatDestroyed=" + chatDestroyed + ", numberOfActivitiesInForeground= "+numberOfActivitiesInForeground);
+        Log.d(TAG, "onActivityStarted , chatDestroyed=" + chatDestroyed + ", numberOfActivitiesInForeground= " + numberOfActivitiesInForeground);
         if (numberOfActivitiesInForeground == 0 && activityLogeable) {
             AppSession.getSession().updateState(AppSession.ChatState.FOREGROUND);
             if (chatDestroyed) {
@@ -62,7 +62,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
     @SuppressLint("LongLogTag")
     public void onActivityResumed(Activity activity) {
-        Log.d("ActivityLifecycleHandler", "onActivityResumed " + activity.getClass().getSimpleName() + " count of activities = " +  numberOfActivitiesInForeground);
+        Log.d("ActivityLifecycleHandler", "onActivityResumed " + activity.getClass().getSimpleName() + " count of activities = " + numberOfActivitiesInForeground);
     }
 
     public boolean isActivityLogeable(Activity activity) {
@@ -82,11 +82,13 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
         if (numberOfActivitiesInForeground == 0 && activity instanceof Loggable) {
             AppSession.getSession().updateState(AppSession.ChatState.BACKGROUND);
-            boolean isLogedIn = isLoggedIn();
-            if (!isLogedIn) {
+            boolean isLoggedIn = isLoggedIn();
+            Log.d(TAG, "isLoggedIn= " + isLoggedIn);
+            if (!isLoggedIn) {
                 return;
             }
             chatDestroyed = ((Loggable) activity).isCanPerformLogoutInOnStop();
+            Log.d(TAG, "onDestroy chatDestroyed= " + chatDestroyed);
             if (chatDestroyed) {
                 QBLogoutAndDestroyChatCommand.start(activity, true);
             }

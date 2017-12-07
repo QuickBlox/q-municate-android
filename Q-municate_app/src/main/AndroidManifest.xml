@@ -168,6 +168,10 @@
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.activities.others.ExitActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:autoRemoveFromRecents="true"/>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -233,6 +237,7 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
             </intent-filter>
         </service>
+        <service android:name=".service.CallService" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

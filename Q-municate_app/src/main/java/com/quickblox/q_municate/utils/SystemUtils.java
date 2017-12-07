@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.utils;
 
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -20,6 +21,21 @@ public class SystemUtils {
         } else {
             return false;
         }
+    }
+
+    public static boolean isAppRunning() {
+        final ActivityManager activityManager = (ActivityManager) App.getInstance().getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RecentTaskInfo> recentTasks = activityManager != null ? activityManager.getRecentTasks(Integer.MAX_VALUE, ActivityManager.RECENT_IGNORE_UNAVAILABLE) : null;
+        ActivityManager.RecentTaskInfo recentTaskInfo = null;
+
+        for (int i = 0; i < (recentTasks != null ? recentTasks.size() : 0); i++) {
+            ComponentName componentName = recentTasks.get(i).baseIntent.getComponent();
+            if (componentName != null && componentName.getPackageName().equals(App.getInstance().getPackageName())) {
+                recentTaskInfo = recentTasks.get(i);
+                break;
+            }
+        }
+        return recentTaskInfo != null && recentTaskInfo.id > -1;
     }
 
     public static Intent getPreviousIntent(Context context) {
@@ -57,7 +73,7 @@ public class SystemUtils {
         }
     }
 
-    public static String getNameActivityOnTopStack(){
+    public static String getNameActivityOnTopStack() {
         ActivityManager activityManager = (ActivityManager) App.getInstance().getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> runningTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
         String ourPackageName = App.getInstance().getPackageName();
@@ -66,7 +82,7 @@ public class SystemUtils {
         if (runningTasks != null) {
             for (ActivityManager.RunningTaskInfo taskInfo : runningTasks) {
                 if (taskInfo.topActivity.getPackageName().equalsIgnoreCase(ourPackageName)) {
-                    topActivityName =  taskInfo.topActivity.getClassName();
+                    topActivityName = taskInfo.topActivity.getClassName();
                 }
             }
         }

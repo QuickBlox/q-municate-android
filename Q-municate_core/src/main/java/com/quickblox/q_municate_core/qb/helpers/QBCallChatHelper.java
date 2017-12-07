@@ -9,6 +9,7 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
+import com.quickblox.q_municate_core.models.CallPushParams;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
@@ -43,6 +44,7 @@ public class QBCallChatHelper extends BaseHelper {
 
     private QBRTCSession currentQbRtcSession;
     private QBRTCClientSessionCallbacks qbRtcClientSessionCallbacks;
+    private CallPushParams callPushParams;
 
     public QBCallChatHelper(Context context) {
         super(context);
@@ -65,6 +67,10 @@ public class QBCallChatHelper extends BaseHelper {
         Log.d(TAG, "initActivityClass()");
         this.activityClass = activityClass;
         Log.d("test_crash_1", "initActivityClass(), activityClass = " + activityClass);
+    }
+
+    public void setCallPushParams(CallPushParams callPushParams) {
+        this.callPushParams = callPushParams;
     }
 
     public QBRTCSession getCurrentRtcSession() {
@@ -121,6 +127,7 @@ public class QBCallChatHelper extends BaseHelper {
                     StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
             intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbRtcSession.getConferenceType());
             intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSession.getSessionDescription());
+            intent.putExtra(QBServiceConsts.EXTRA_PUSH_CALL, callPushParams);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.getApplicationContext().startActivity(intent);
         } else {

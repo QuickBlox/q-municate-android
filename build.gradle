@@ -33,11 +33,11 @@ allprojects {
 
 ext {
     compileSdkVersion = 26
-    buildToolsVersion = '26.0.1'
+    buildToolsVersion = '26.0.2'
     minSdkVersion = 16
     targetSdkVersion = 26
-    versionName = '2.5.10b'
-    versionCode = 2510
+    versionName = '2.6'
+    versionCode = 260
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
