@@ -146,6 +146,11 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     protected void onCreate(Bundle savedInstanceState) {
         appInitialized = true;
         super.onCreate(savedInstanceState);
+        if (!canProceedInit()) {
+            Log.d(TAG, "cannot proceed call initialization");
+            finish();
+            return;
+        }
         canPerformLogout.set(false);
         initFields();
         initPushCallIfNeed();
@@ -154,6 +159,10 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         if (ACTION_ANSWER_CALL.equals(getIntent().getAction())) {
             checkPermissionsAndStartCall(StartConversationReason.INCOME_CALL_FOR_ACCEPTION);
         }
+    }
+
+    private boolean canProceedInit() {
+        return getIntent().getExtras() != null;
     }
 
     private void initPushCallIfNeed() {
@@ -429,11 +438,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     }
 
     private void initFields() {
-        if (getIntent().getExtras() == null) {
-            Log.d(TAG, "initFields getExtras is null");
-            finish();
-            return;
-        }
         opponentsList = (List<QBUser>) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENTS);
         qbConferenceType = (QBRTCTypes.QBConferenceType) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CONFERENCE_TYPE);
         startConversationReason = (StartConversationReason) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE);
