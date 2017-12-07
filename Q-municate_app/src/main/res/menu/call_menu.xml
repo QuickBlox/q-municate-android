@@ -9,7 +9,7 @@
 
     <item
         android:id="@+id/switch_camera_toggle"
-        android:icon="@drawable/ic_camera_front_white"
+        android:icon="@drawable/ic_camera_front_white_24dp"
         android:title="@string/switch_camera"
         app:showAsAction="ifRoom" />
 

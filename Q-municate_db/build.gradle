@@ -10,6 +10,10 @@ android {
         versionCode rootProject.versionCode
         versionName rootProject.versionName
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {

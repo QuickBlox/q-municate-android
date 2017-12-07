@@ -1,13 +1,17 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.quickblox.auth.QBAuth;
-import com.quickblox.auth.session.QBSession;
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.auth.session.QBSessionManager;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.connections.tcp.QBTcpChatConnectionFabric;
+import com.quickblox.chat.connections.tcp.QBTcpConfigurationBuilder;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.helper.Lo;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
@@ -34,18 +38,29 @@ public class QBChatRestHelper extends BaseHelper {
     public synchronized void initChatService() throws XMPPException, SmackException {
         QBChatService.setDefaultPacketReplyTimeout(ConstsCore.DEFAULT_PACKET_REPLY_TIMEOUT);
 
-        QBChatService.ConfigurationBuilder configurationBuilder = new QBChatService.ConfigurationBuilder();
-        configurationBuilder.setSocketTimeout(0);
-        QBChatService.setConfigurationBuilder(configurationBuilder);
+        QBTcpConfigurationBuilder configurationBuilder = new QBTcpConfigurationBuilder()
+                .setSocketTimeout(0);
 
+        QBChatService.setConnectionFabric(new QBTcpChatConnectionFabric(configurationBuilder));
 
         chatService = QBChatService.getInstance();
 
+        chatService.removeConnectionListener(connectionListener);
         chatService.addConnectionListener(connectionListener);
     }
 
     public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
         if (!chatService.isLoggedIn() && user != null) {
+            if (QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
+                    && !QBSessionManager.getInstance().isValidActiveSession()){
+                CoreSharedHelper coreSharedHelper = new CoreSharedHelper(context);
+                String currentFirebaseAccessToken = coreSharedHelper.getFirebaseToken();
+                if (!QBSessionManager.getInstance().getSessionParameters().getAccessToken().equals(currentFirebaseAccessToken)) {
+                    QBAuth.createSessionUsingFirebase(coreSharedHelper.getFirebaseProjectId(), currentFirebaseAccessToken).perform();
+                    user.setPassword(QBSessionManager.getInstance().getToken());
+                    AppSession.getSession().updateUser(user);
+                }
+            }
             chatService.login(user);
             chatService.enableCarbons();
         }
@@ -65,39 +80,59 @@ public class QBChatRestHelper extends BaseHelper {
         return chatService != null && chatService.isLoggedIn();
     }
 
+    private void tryReloginToChatUsingNewToken(){
+        if (!chatService.isLoggedIn()
+                && chatService.getUser() != null
+                && QBSessionManager.getInstance().getSessionParameters() != null
+                && QBSessionManager.getInstance().getSessionParameters().getSocialProvider() != null){
+
+            chatService.login(AppSession.getSession().getUser(), (QBEntityCallback) null);
+        }
+    }
+
     private class ChatConnectionListener implements ConnectionListener {
 
         @Override
         public void connected(XMPPConnection connection) {
-
+            Log.e(TAG, "connected");
         }
 
         @Override
         public void authenticated(XMPPConnection xmppConnection, boolean b) {
+            Log.e(TAG, "authenticated");
         }
 
         @Override
         public void connectionClosed() {
-            Lo.g("connectionClosed");
+            Log.e(TAG, "connectionClosed");
         }
 
         @Override
         public void connectionClosedOnError(Exception e) {
-
+            Log.e(TAG, "connectionClosedOnError, error: " + e.getMessage());
+            //TODO VT temp solution before test in SDK
+            //need renew user password in QBChatService for user which was logged in
+            //via social provider
+            tryReloginToChatUsingNewToken();
         }
 
         @Override
         public void reconnectingIn(int seconds) {
-            Lo.g("reconnectingIn(" + seconds + ")");
+            Log.e(TAG, "reconnectingIn(" + seconds + ")");
         }
 
         @Override
         public void reconnectionSuccessful() {
+            Log.e(TAG, "reconnectionSuccessful()");
         }
 
         @Override
         public void reconnectionFailed(Exception error) {
-            Lo.g("reconnectionFailed() " + error.getMessage());
+            Log.e(TAG, "reconnectionFailed() " + error.getMessage());
+            //TODO VT temp solution before test in SDK
+            //need renew user password in QBChatService for user which was logged in
+            //via social provider
+            tryReloginToChatUsingNewToken();
         }
     }
 }

@@ -31,7 +31,7 @@
         android:layout_centerInParent="true"
         android:layout_marginBottom="16dp"
         android:background="@drawable/selector_button_green_oval"
-        android:text="@string/landing_connect_with_twitter_digits"
+        android:text="@string/landing_connect_with_phone_number"
         android:textAllCaps="true"
         android:textSize="@dimen/landing_button_text_size" />
 

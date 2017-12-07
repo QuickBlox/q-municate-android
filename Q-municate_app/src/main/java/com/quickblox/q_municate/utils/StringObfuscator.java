@@ -28,15 +28,15 @@ public class StringObfuscator {
         return BuildConfig.DEBUG;
     }
 
-    public static String getTwitterConsumerKey(){
-        return BuildConfig.TWITTER_KEY;
-    }
-
-    public static String getTwitterConsumerSecret(){
-        return BuildConfig.TWITTER_SECRET;
-    }
-
     public static String getFirebaseAuthProjectId(){
         return BuildConfig.FIREBASE_AUTH_PROJECT_ID;
+    }
+
+    public static String getApiEndpoint() {
+        return BuildConfig.API_ENDPOINT;
+    }
+
+    public static String getChatEndpoint() {
+        return BuildConfig.CHAT_ENDPOINT;
     }
 }

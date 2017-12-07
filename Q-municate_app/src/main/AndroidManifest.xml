@@ -20,21 +20,24 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
 
     <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false"
-        tools:node="replace" />
-    <uses-feature
-        android:name="android.hardware.camera.autofocus"
-        android:required="false"
-        tools:node="replace" />
-    <uses-feature
-        android:name="android.hardware.camera.flash"
-        android:required="false"
-        tools:node="replace" />
-
-    <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+    <supports-screens
+        android:largeScreens="true"
+        android:xlargeScreens="true" />
 
     <application
         android:name=".App"
@@ -165,6 +168,10 @@
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.activities.others.ExitActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:autoRemoveFromRecents="true"/>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -172,7 +179,7 @@
             tools:replace="android:value"/>
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="7aea78439bec41a9005c7488bb6751c5e33fe270"
+            android:value="${fabricApiKey}"
             tools:replace="android:value"/>
         <meta-data
             android:name="com.quickblox.messages.TYPE"
@@ -230,6 +237,7 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
             </intent-filter>
         </service>
+        <service android:name=".service.CallService" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

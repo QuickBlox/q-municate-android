@@ -100,6 +100,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     protected Handler handler = new Handler();
     private State updateDialogsProcess;
 
+    private LoginChatCompositeSuccessAction loginChatCompositeSuccessAction;
     private DeleteDialogSuccessAction deleteDialogSuccessAction;
     private DeleteDialogFailAction deleteDialogFailAction;
     private LoadChatsSuccessAction loadChatsSuccessAction;
@@ -404,7 +405,9 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
 //        startForResult load dialogs from REST when finished loading from cache
         if (dialogsListLoader.isLoadCacheFinished()) {
-            QBLoadDialogsCommand.start(getContext(), true);
+            if (!QBLoginChatCompositeCommand.isRunning()) {
+                QBLoadDialogsCommand.start(getContext(), true);
+            }
         }
     }
 
@@ -460,6 +463,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void removeActions() {
+        baseActivity.removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
         baseActivity.removeAction(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION);
@@ -470,6 +474,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void addActions() {
+        baseActivity.addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, loginChatCompositeSuccessAction);
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, deleteDialogSuccessAction);
         baseActivity.addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, deleteDialogFailAction);
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, loadChatsSuccessAction);
@@ -485,6 +490,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     }
 
     private void initActions() {
+        loginChatCompositeSuccessAction = new LoginChatCompositeSuccessAction();
         deleteDialogSuccessAction = new DeleteDialogSuccessAction();
         deleteDialogFailAction = new DeleteDialogFailAction();
         loadChatsSuccessAction = new LoadChatsSuccessAction();
@@ -609,6 +615,17 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             dialogsIdsToUpdate = new HashSet<>();
         }
         dialogsIdsToUpdate.add(dialogId);
+    }
+
+    private class LoginChatCompositeSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) throws Exception {
+            Log.i(TAG, "LoginChatCompositeSuccessAction bundle= " + bundle);
+            if (dialogsListLoader.isLoadCacheFinished()) {
+                QBLoadDialogsCommand.start(getContext(), true);
+            }
+        }
     }
 
     private class DeleteDialogSuccessAction implements Command {

@@ -8,16 +8,19 @@ import android.util.Log;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
+import com.quickblox.q_municate_core.models.CallPushParams;
 import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+
+import java.io.Serializable;
 
 public class QBInitCallChatCommand extends ServiceCommand {
 
     private QBCallChatHelper qbCallChatHelper;
 
     public QBInitCallChatCommand(Context context, QBCallChatHelper qbCallChatHelper, String successAction,
-            String failAction) {
+                                 String failAction) {
         super(context, successAction, failAction);
         this.qbCallChatHelper = qbCallChatHelper;
     }
@@ -25,6 +28,15 @@ public class QBInitCallChatCommand extends ServiceCommand {
     public static void start(Context context, Class<? extends Activity> callClass) {
         Intent intent = new Intent(QBServiceConsts.INIT_CALL_CHAT_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_CALL_ACTIVITY, callClass);
+        context.startService(intent);
+    }
+
+    public static void start(Context context, Class<? extends Activity> callClass, CallPushParams callPushParams) {
+        Intent intent = new Intent(QBServiceConsts.INIT_CALL_CHAT_ACTION, null, context, QBService.class);
+        intent.putExtra(QBServiceConsts.EXTRA_CALL_ACTIVITY, callClass);
+        if (callPushParams != null) {
+            intent.putExtra(QBServiceConsts.EXTRA_PUSH_CALL, callPushParams);
+        }
         context.startService(intent);
     }
 
@@ -38,6 +50,7 @@ public class QBInitCallChatCommand extends ServiceCommand {
             Log.d("test_crash_1", "+++ perform 2 +++");
             qbCallChatHelper.initActivityClass((Class<? extends Activity>) extras.getSerializable(
                     QBServiceConsts.EXTRA_CALL_ACTIVITY));
+            qbCallChatHelper.setCallPushParams((CallPushParams) extras.getSerializable(QBServiceConsts.EXTRA_PUSH_CALL));
         }
         return extras;
     }
