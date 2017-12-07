@@ -91,7 +91,7 @@ public class FirebaseAuthHelper {
             countDownLatch.await(ConstsCore.HTTP_TIMEOUT_IN_SECONDS, TimeUnit.MILLISECONDS);
             Log.i(TAG, "refreshInternalFirebaseToken() synchronously DONE " + new Date(System.currentTimeMillis()));
         } catch (InterruptedException e) {
-            Log.i(TAG, "refreshInternalFirebaseToken() synchronously DONE " + new Date(System.currentTimeMillis()));
+            Log.i(TAG, "refreshInternalFirebaseToken() synchronously DONE_BY_TIMEOUT " + new Date(System.currentTimeMillis()));
         }
     }
 
