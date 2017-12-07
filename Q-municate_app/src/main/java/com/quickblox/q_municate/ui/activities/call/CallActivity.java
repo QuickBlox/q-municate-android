@@ -84,7 +84,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private boolean wifiEnabled = true;
     private RingtonePlayer ringtonePlayer;
     private boolean isStarted = false;
-    private boolean focusDuringOnPause;
 
     private QBRTCSessionUserCallback qbRtcSessionUserCallback;
     private QBCallChatHelper qbCallChatHelper;
@@ -94,7 +93,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     private AudioStreamReceiver audioStreamReceiver;
     private String ACTION_ANSWER_CALL = "action_answer_call";
     private SystemPermissionHelper systemPermissionHelper;
-    private boolean isNeedInitCallFragment;
+    private boolean isSkipInitCallFragment;
     private boolean isIncomingPushCall;
     private boolean isNewAppTask;
     private boolean isCallAlreadyInit;
@@ -190,9 +189,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     protected void onStop() {
         super.onStop();
-        if (!focusDuringOnPause) {
-            isNeedInitCallFragment = true;
-        }
         unregisterReceiver(wifiStateReceiver);
         unregisterReceiver(audioStreamReceiver);
     }
@@ -200,7 +196,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
     @Override
     protected void onPause() {
         isInFront = false;
-        focusDuringOnPause = hasWindowFocus();
         super.onPause();
         appSharedHelper.saveLastOpenActivity(getClass().getName());
     }
@@ -210,16 +205,16 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         isInFront = true;
         super.onResume();
         if (isNeedInitCallFragment()) {
-            initIncomingCallByPush();
+            initIncomingCallFragment();
         }
     }
 
     private boolean isNeedInitCallFragment() {
-        return !isCallAlreadyInit && isNeedInitCallFragment;
+        return !isCallAlreadyInit && isSkipInitCallFragment;
     }
 
-    private void initIncomingCallByPush() {
-        isNeedInitCallFragment = false;
+    private void initIncomingCallFragment() {
+        isSkipInitCallFragment = false;
         initCallFragment();
     }
 
@@ -553,6 +548,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             isCallAlreadyInit = true;
             setCurrentFragment(fragment);
         } else {
+            isSkipInitCallFragment = true;
             Log.d(TAG, "SKIP addIncomingCallFragment method");
         }
     }

@@ -503,7 +503,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         if (((CallActivity) getActivity()).getCurrentSession() != null) {
             if (isVideoCall) {
                 if (isVideoEnabled()) {
-                    itemCameraToggle.setIcon(isFrontCameraSelected ? R.drawable.ic_camera_front_white : R.drawable.ic_camera_rear_white);
+                    itemCameraToggle.setIcon(isFrontCameraSelected ? R.drawable.ic_camera_front_white_24dp : R.drawable.ic_camera_rear_white_24dp);
                 }
 
                 itemCameraToggle.setVisible(isVideoEnabled());
