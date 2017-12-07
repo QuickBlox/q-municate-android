@@ -1,15 +1,18 @@
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        mavenCentral()
     }
 
     dependencies {
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.backelite:android-variantSelector-gradle-plugin:1.0'
     }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'com.backelite.android.variantSelector'
 
 repositories {
     maven { url 'https://dl.bintray.com/drummer-aidan/maven' }
@@ -22,6 +25,7 @@ android {
     buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
+        applicationId "com.quickblox.q_municate"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.versionCode
@@ -29,7 +33,6 @@ android {
         multiDexEnabled = true
         ext.betaDistrubutionGroupAliases=property('testers_group_name')
         ext.betaDistributionEmails=property('testers_notification_e-mails')
-        resConfigs "auto"
     }
 
     signingConfigs {
@@ -54,24 +57,17 @@ android {
             buildConfigField "String", "AUTH_KEY", prodAuthKey
             buildConfigField "String", "AUTH_SECRET", prodAuthSecret
             buildConfigField "String", "ACCOUNT_KEY", prodAccountKey
-            buildConfigField "String", "TWITTER_KEY", prodTwitterDigitsConsumerKey
-            buildConfigField "String", "TWITTER_SECRET", prodTwitterDigitsConsumerSecret
+            buildConfigField "String", "API_ENDPOINT", prodApiEndpoint
+            buildConfigField "String", "CHAT_ENDPOINT", prodChatEndpoint
             buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", devFirebaseAuthProjectId
-            resValue "string", "twitterDigitsApiKey", prodTwittedDigitsApiKey
             resValue "string", "facebookAppId", prodFacebookAppID
             resValue "string", "sender_id", prodPushRegistrationAppID
+            manifestPlaceholders = [fabricApiKey:prodFabricApiKey]
         }
 
         debug {
             debuggable true
             versionNameSuffix ' (debug)'
-            buildConfigField "String", "ACCOUNT_KEY", devAccountKey
-            buildConfigField "String", "TWITTER_KEY", devTwitterDigitsConsumerKey
-            buildConfigField "String", "TWITTER_SECRET", devTwitterDigitsConsumerSecret
-            buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", prodFirebaseAuthProjectId
-            resValue "string", "twitterDigitsApiKey", devTwittedDigitsApiKey
-            resValue "string", "facebookAppId", devFacebookAppID
-            resValue "string", "sender_id", devPushRegistrationAppID
         }
     }
 
@@ -94,17 +90,30 @@ android {
 
     productFlavors {
 
-        dev {
+        standard {
             buildConfigField "String", "APP_ID", devAppID
             buildConfigField "String", "AUTH_KEY", devAuthKey
             buildConfigField "String", "AUTH_SECRET", devAuthSecret
+            buildConfigField "String", "API_ENDPOINT", devApiEndpoint
+            buildConfigField "String", "CHAT_ENDPOINT", devChatEndpoint
+            buildConfigField "String", "ACCOUNT_KEY", devAccountKey
+            buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", devFirebaseAuthProjectId
+            resValue "string", "facebookAppId", devFacebookAppID
+            resValue "string", "sender_id", devPushRegistrationAppID
+            manifestPlaceholders = [fabricApiKey:devFabricApiKey]
         }
 
-        stage {
-
-            buildConfigField "String", "APP_ID", stageAppID
-            buildConfigField "String", "AUTH_KEY", stageAuthKey
-            buildConfigField "String", "AUTH_SECRET", stageAuthSecret
+        custom {
+            buildConfigField "String", "APP_ID", customAppID
+            buildConfigField "String", "AUTH_KEY", customAuthKey
+            buildConfigField "String", "AUTH_SECRET", customAuthSecret
+            buildConfigField "String", "API_ENDPOINT", customApiEndpoint
+            buildConfigField "String", "CHAT_ENDPOINT", customChatEndpoint
+            buildConfigField "String", "ACCOUNT_KEY", customAccountKey
+            buildConfigField "String", "FIREBASE_AUTH_PROJECT_ID", customFirebaseAuthProjectId
+            resValue "string", "facebookAppId", customFacebookAppID
+            resValue "string", "sender_id", customPushRegistrationAppID
+            manifestPlaceholders = [fabricApiKey:customFabricApiKey]
         }
     }
 }
@@ -117,14 +126,15 @@ dependencies {
     compile "com.android.support:design:${rootProject.supportVersion}"
 
     compile "com.google.android.gms:play-services-base:${rootProject.googlePlayServicesVersion}"
-    compile "com.google.android.gms:play-services-gcm:${rootProject.googlePlayServicesVersion}"
     compile "com.google.android.gms:play-services-maps:${rootProject.googlePlayServicesVersion}"
     compile "com.google.android.gms:play-services-location:${rootProject.googlePlayServicesVersion}"
     compile "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
 
     compile "com.firebase:firebase-jobdispatcher-with-gcm-dep:${rootProject.firebaseDispatcherVersion}"
     compile "com.google.firebase:firebase-auth:${rootProject.firebaseAuthVersion}"
-    compile "com.firebaseui:firebase-ui-auth:${rootProject.firebaseUiAuthVersion}"
+    compile ("com.firebaseui:firebase-ui-auth:${rootProject.firebaseUiAuthVersion}"){
+        exclude group: 'com.google.android.gms'
+    }
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile 'com.flurry.android:analytics:6.2.0'
@@ -135,9 +145,6 @@ dependencies {
     compile "com.timehop.stickyheadersrecyclerview:library:${rootProject.stickylistheadersRecyclerViewVersion}@aar"
     compile "com.rockerhieu.emojicon:library:${rootProject.emojiconVersion}"
     compile "com.soundcloud.android:android-crop:${rootProject.cropVersion}@aar"
-    compile('com.android.support:cardview-v7:23.2.1') {
-        force = true
-    }
     compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
     }
