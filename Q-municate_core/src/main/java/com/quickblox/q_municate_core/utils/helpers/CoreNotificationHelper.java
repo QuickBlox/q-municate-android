@@ -7,6 +7,9 @@ import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBEvent;
 import com.quickblox.messages.model.QBNotificationType;
 import com.quickblox.messages.model.QBPushType;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +23,6 @@ public class CoreNotificationHelper {
         event.setUserIds(userIds);
         event.setEnvironment(QBEnvironment.PRODUCTION);
         event.setNotificationType(QBNotificationType.PUSH);
-        event.setPushType(QBPushType.GCM);
         setMessage(event, message, messageType);
         return event;
     }
@@ -33,12 +35,31 @@ public class CoreNotificationHelper {
 
     private static boolean setMessageWithTypeIfNeed(QBEvent event, String message, String messageType) {
         if (!TextUtils.isEmpty(messageType)) {
-            HashMap<String, Object> data = new HashMap<>();
-            data.put("data.message", message);
-            data.put("data.type", messageType);
-            event.setMessage(data);
+            String eventMsg = customMessage(message, messageType);
+            event.setMessage(eventMsg);
             return true;
         }
         return false;
+    }
+
+    private static boolean isCallType(String messageType) {
+        return TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
+    }
+
+    private static String customMessage(String message, String messageType) {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("message", message);
+            // custom parameters
+            json.put("type", messageType);
+            if (isCallType(messageType)) {
+                json.put("ios_voip", "1");
+                json.put("VOIPCall", "1");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json.toString();
     }
 }
