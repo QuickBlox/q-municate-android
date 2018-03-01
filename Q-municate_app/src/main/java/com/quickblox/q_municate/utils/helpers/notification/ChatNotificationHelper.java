@@ -8,27 +8,22 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.service.CallService;
 import com.quickblox.q_municate.utils.SystemUtils;
-import com.quickblox.q_municate.utils.helpers.PowerManagerHelper;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.NotificationEvent;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+
+import static com.quickblox.q_municate_core.utils.ConstsCore.*;
 
 public class ChatNotificationHelper {
-
-    public static final String MESSAGE = "message";
-    public static final String DIALOG_ID = "dialog_id";
-    public static final String USER_ID = "user_id";
-    public static final String MESSAGE_TYPE = "type";
 
     private Context context;
     private SharedHelper appSharedHelper;
     private String dialogId;
     private int userId;
 
-    private static String message;
-    private static String messageType;
-    private static boolean isLoginNow;
+    private String message;
+    private String messageType;
+    private String messageTypeVOIP;
 
     public ChatNotificationHelper(Context context) {
         this.context = context;
@@ -36,23 +31,13 @@ public class ChatNotificationHelper {
     }
 
     public void parseChatMessage(Bundle extras) {
-        if (extras.getString(ChatNotificationHelper.MESSAGE) != null) {
-            message = extras.getString(ChatNotificationHelper.MESSAGE);
-        }
+        message = extras.getString(MESSAGE);
+        userId = extras.getString(MESSAGE_USER_ID) == null ? 0 : Integer.parseInt(extras.getString(MESSAGE_USER_ID));
+        dialogId = extras.getString(MESSAGE_DIALOG_ID);
+        messageType = extras.getString(MESSAGE_TYPE);
+        messageTypeVOIP = extras.getString(MESSAGE_VOIP_TYPE);
 
-        if (extras.getString(ChatNotificationHelper.USER_ID) != null) {
-            userId = Integer.parseInt(extras.getString(ChatNotificationHelper.USER_ID));
-        }
-
-        if (extras.getString(ChatNotificationHelper.DIALOG_ID) != null) {
-            dialogId = extras.getString(ChatNotificationHelper.DIALOG_ID);
-        }
-
-        if (extras.getString(ChatNotificationHelper.MESSAGE_TYPE) != null) {
-            messageType = extras.getString(ChatNotificationHelper.MESSAGE_TYPE);
-        }
-
-        boolean callPush = TextUtils.equals(messageType, ConstsCore.PUSH_MESSAGE_TYPE_CALL);
+        boolean callPush = TextUtils.equals(messageType, PUSH_MESSAGE_TYPE_CALL) || TextUtils.equals(messageTypeVOIP, PUSH_MESSAGE_TYPE_VOIP);
 
         if (callPush && shouldProceedCall()) {
             CallService.start(context);
