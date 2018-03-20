@@ -16,7 +16,6 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.models.CombinationMessage;
-import com.quickblox.q_municate_core.qb.commands.chat.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.State;
@@ -133,7 +132,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     @Override
     protected void onBindViewAttachLeftVideoHolder(VideoAttachHolder holder, CombinationMessage chatMessage, int position) {
         setViewVisibility(holder.avatar, View.GONE);
-        updateMessageState(chatMessage, chatDialog);
         super.onBindViewAttachLeftVideoHolder(holder, chatMessage, position);
     }
 
@@ -146,7 +144,6 @@ public class PrivateChatMessageAdapter extends BaseChatMessagesAdapter implement
     @Override
     protected void onBindViewAttachLeftAudioHolder(AudioAttachHolder holder, CombinationMessage chatMessage, int position) {
         setViewVisibility(holder.avatar, View.GONE);
-        updateMessageState(chatMessage, chatDialog);
         super.onBindViewAttachLeftAudioHolder(holder, chatMessage, position);
     }
 
