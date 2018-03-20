@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.activities.base;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -67,6 +69,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConnectivityUtils;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 import com.quickblox.q_municate_user_service.model.QMUser;
+import com.quickblox.videochat.webrtc.BaseClient;
 
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -660,21 +663,28 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         if (QBSessionManager.getInstance().getSessionParameters() != null
                 && QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
                 && !QBSessionManager.getInstance().isValidActiveSession()) {
-            renewFirebaseToken();
+            Log.d(TAG, "start refresh Firebase token");
+            new FirebaseAuthHelper(BaseActivity.this).refreshInternalFirebaseToken(new FirebaseAuthHelper.RequestFirebaseIdTokenCallback() {
+                @Override
+                public void onSuccess(String accessToken) {
+                    QBLoginChatCompositeCommand.start(BaseActivity.this);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    performLoginChatFailAction(null);
+                }
+            });
+        } else {
+            QBLoginChatCompositeCommand.start(this);
         }
-
-        QBLoginChatCompositeCommand.start(this);
-    }
-
-    public void renewFirebaseToken() {
-        FirebaseAuthHelper.refreshInternalFirebaseToken();
     }
 
     protected boolean isAppInitialized() {
         return AppSession.getSession().isSessionExist();
     }
 
-    protected boolean isChatInitializedAndUserLoggedIn() {
+    public boolean isChatInitializedAndUserLoggedIn() {
         return isAppInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
@@ -696,6 +706,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void performLoginChatSuccessAction(Bundle bundle) {
         QBInitCallChatCommand.start(this, CallActivity.class, null);
         hideProgress();
+    }
+
+    protected void performLoginChatFailAction(Bundle bundle) {
+        blockUI(true);
+        hideSnackBar(R.string.dialog_loading_dialogs);
+        showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
     }
 
     @Override
@@ -851,7 +867,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
-            QBLoginChatCompositeCommand.setIsRunning(false);
             performLoginChatSuccessAction(bundle);
         }
     }
@@ -860,10 +875,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
-            QBLoginChatCompositeCommand.setIsRunning(false);
-            blockUI(true);
-            hideSnackBar(R.string.dialog_loading_dialogs);
-            showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
+            performLoginChatFailAction(bundle);
         }
     }
 
