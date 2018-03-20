@@ -33,6 +33,7 @@ public class FirebaseAuthHelper extends BaseThreadPoolHelper {
                         .createSignInIntentBuilder()
                         .setAvailableProviders(Collections.singletonList(new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build()))
                         .setTheme(R.style.FirebaseStyle)
+                        .setIsSmartLockEnabled(false)
                         .build(),
                 RC_SIGN_IN);
     }
