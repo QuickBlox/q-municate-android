@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
+import android.text.Editable;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -38,6 +39,7 @@ import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.listeners.OnMediaPickedListener;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.utils.listeners.simple.SimpleActionModeCallback;
+import com.quickblox.q_municate.utils.listeners.simple.SimpleTextWatcher;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
@@ -125,6 +127,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         addActions();
         registerBroadcastManagers();
+        registerListeners();
     }
 
     @Override
@@ -143,7 +146,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            groupNameEditText.setText(qbDialog.getName());
+            groupNameEditText.setText(groupNameCurrent != null ? groupNameCurrent : qbDialog.getName());
             ((ActionMode) actionMode).finish();
             return true;
         }
@@ -261,7 +264,7 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     private void fillUIWithData() {
         updateDialog();
 
-        groupNameEditText.setText(qbDialog.getName());
+        groupNameEditText.setText(groupNameCurrent != null ? groupNameCurrent : qbDialog.getName());
 
         updateCountOnlineFriends();
 
@@ -276,7 +279,10 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
     }
 
     private void updateDialog() {
-        qbDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        if (qbDialog == null){
+            qbDialog = dataManager.getQBChatDialogDataManager().getByDialogId(dialogId);
+        }
+
         qbDialog.initForChat(QBChatService.getInstance());
         occupantsList = getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
         qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
@@ -320,6 +326,15 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
     public void changeAvatarOnClick(View view) {
         mediaPickHelper.pickAnMedia(this, MediaUtils.IMAGE_REQUEST_CODE);
+    }
+
+    private void registerListeners() {
+        groupNameEditText.addTextChangedListener(new SimpleTextWatcher(){
+            @Override
+            public void afterTextChanged(Editable s) {
+                groupNameCurrent = s.toString();
+            }
+        });
     }
 
     private void updateCountOnlineFriends() {
@@ -438,16 +453,16 @@ public class GroupDialogDetailsActivity extends BaseLoggableActivity implements 
 
         if (!qbDialog.getName().equals(groupNameCurrent)) {
             qbDialog.setName(groupNameCurrent);
-
             currentNotificationTypeList.add(DialogNotification.Type.NAME_DIALOG);
         }
 
+        File newAvatarFile = null;
         if (isNeedUpdateImage) {
+            newAvatarFile = MediaUtils.getCreatedFileFromUri(imageUri);
             currentNotificationTypeList.add(DialogNotification.Type.PHOTO_DIALOG);
-            updateGroupDialog(MediaUtils.getCreatedFileFromUri(imageUri));
-        } else {
-            updateGroupDialog(null);
         }
+
+        updateGroupDialog(newAvatarFile);
 
         showProgress();
     }
