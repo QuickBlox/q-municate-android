@@ -27,8 +27,9 @@ public class QBImportFriendsCommand extends ServiceCommand {
         this.friendListHelper = friendListHelper;
     }
 
-    public static void start(Context context, List<String> friendsFacebookList,
-            List<String> friendsContactsList) {
+    public static void start(Context context, ArrayList<String> friendsFacebookList,
+            ArrayList<String> friendsContactsList) {
+
         Intent intent = new Intent(QBServiceConsts.IMPORT_FRIENDS_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS_FACEBOOK, (java.io.Serializable) friendsFacebookList);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS_CONTACTS, (java.io.Serializable) friendsContactsList);

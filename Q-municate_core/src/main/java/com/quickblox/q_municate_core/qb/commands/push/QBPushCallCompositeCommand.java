@@ -36,6 +36,7 @@ public class QBPushCallCompositeCommand extends CompositeServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         try {
             super.perform(extras);
+            setIsRunning(false);
         } catch (XMPPException | IOException | SmackException e) {
             NetworkGCMTaskService.scheduleOneOff(context, "");
             throw e;
