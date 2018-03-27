@@ -127,6 +127,7 @@
     <string name="dialog_loading_dialogs">Updating dialogs list… Please wait</string>
     <string name="dialog_record_cancel">slide to cancel</string>
     <string name="dialog_record_canceled">Audio recording has been canceled</string>
+    <string name="dialog_count_unread">99+</string>
 
     <string-array name="dialog_attach_types_array">
         <item>Take Photo</item>

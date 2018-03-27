@@ -66,7 +66,7 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
         long totalCount = dialogWrapper.getTotalCount();
 
         if (totalCount > ConstsCore.ZERO_INT_VALUE) {
-            viewHolder.unreadMessagesTextView.setText(totalCount + ConstsCore.EMPTY_STRING);
+            viewHolder.unreadMessagesTextView.setText(totalCount >= 100 ? resources.getString(R.string.dialog_count_unread) : Long.toString(totalCount));
             viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);
         } else {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
@@ -80,9 +80,9 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
     public void updateItem(DialogWrapper dlgWrapper) {
         Log.i(TAG, "updateItem = " + dlgWrapper.getChatDialog().getUnreadMessageCount());
         int position = -1;
-        for (int i = 0; i < objectsList.size() ; i++) {
-            DialogWrapper dialogWrapper  = objectsList.get(i);
-            if (dialogWrapper.getChatDialog().getDialogId().equals(dlgWrapper.getChatDialog().getDialogId())){
+        for (int i = 0; i < objectsList.size(); i++) {
+            DialogWrapper dialogWrapper = objectsList.get(i);
+            if (dialogWrapper.getChatDialog().getDialogId().equals(dlgWrapper.getChatDialog().getDialogId())) {
                 position = i;
                 break;
             }
@@ -107,9 +107,9 @@ public class DialogsListAdapter extends BaseListAdapter<DialogWrapper> {
     public void removeItem(String dialogId) {
         Iterator<DialogWrapper> iterator = objectsList.iterator();
 
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             DialogWrapper dialogWrapper = iterator.next();
-            if (dialogWrapper.getChatDialog().getDialogId().equals(dialogId)){
+            if (dialogWrapper.getChatDialog().getDialogId().equals(dialogId)) {
                 iterator.remove();
                 notifyDataSetChanged();
                 break;
