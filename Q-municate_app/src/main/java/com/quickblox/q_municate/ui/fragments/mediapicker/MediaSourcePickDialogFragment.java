@@ -95,10 +95,10 @@ public class MediaSourcePickDialogFragment extends DialogFragment {
                         }
                         break;
                     case POSITION_CAMERA_PHOTO:
-                        if (systemPermissionHelper.isCameraPermissionGranted()) {
+                        if (systemPermissionHelper.isAllPermissionGrantedForCamera()) {
                             onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_PHOTO);
                         } else {
-                            systemPermissionHelper.requestPermissionsTakePhoto();
+                            systemPermissionHelper.requestAllPermissionForCamera();
                         }
                         break;
                     case POSITION_CAMERA_VIDEO:
@@ -172,6 +172,15 @@ public class MediaSourcePickDialogFragment extends DialogFragment {
             @Override
             public void run() {
                 switch (requestCode) {
+                    case (SystemPermissionHelper.PERMISSIONS_FOR_CAMERA_REQUEST):
+                        if (systemPermissionHelper.isAllPermissionGrantedForCamera()) {
+                            onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_PHOTO);
+                        } else if (!systemPermissionHelper.isCameraPermissionGranted()) {
+                            showPermissionSettingsDialog(R.string.dlg_permission_camera);
+                        } else if (!systemPermissionHelper.isStoragePermissionGranted()) {
+                            showPermissionSettingsDialog(R.string.dlg_permission_storage);
+                        }
+                        break;
                     case (SystemPermissionHelper.PERMISSIONS_FOR_TAKE_PHOTO_REQUEST):
                         if (systemPermissionHelper.isCameraPermissionGranted()) {
                             onImageSourcePickedListener.onImageSourcePicked(ImageSource.CAMERA_PHOTO);
