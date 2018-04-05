@@ -21,12 +21,14 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.quickblox.auth.model.QBProvider;
@@ -273,7 +275,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void hideSnackBar() {
-        Log.i(TAG, "hideSnackBar for:" );
+        Log.i(TAG, "hideSnackBar for:");
         if (snackbar != null && !isSnackBarHasMaxPriority()) {
             snackbar.dismiss();
         }
@@ -281,7 +283,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void hideSnackBar(int titleResId) {
-        Log.i(TAG, "hideSnackBar for:" +getString(titleResId) );
+        Log.i(TAG, "hideSnackBar for:" + getString(titleResId));
         snackbarClientPriority.remove(titleResId);
         hideSnackBar();
     }
@@ -348,7 +350,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("BaseActivity", "onActivityResult");
-        if(requestCode == CallActivity.CALL_ACTIVITY_CLOSE){
+        if (requestCode == CallActivity.CALL_ACTIVITY_CLOSE) {
             if (resultCode == CallActivity.CALL_ACTIVITY_CLOSE_WIFI_DISABLED) {
                 ToastUtils.longToast(R.string.wifi_disabled);
             }
@@ -394,7 +396,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         fragmentsStatusChangingSet.remove(fragmentUserStatusChangingListener);
     }
 
-    public void addFragmentServiceConnectionListener (
+    public void addFragmentServiceConnectionListener(
             ServiceConnectionListener fragmentServiceConnectionListener) {
         if (fragmentsServiceConnectionSet == null) {
             fragmentsServiceConnectionSet = new HashSet<>();
@@ -402,7 +404,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         fragmentsServiceConnectionSet.add(fragmentServiceConnectionListener);
     }
 
-    public void removeFragmentServiceConnectionListener (
+    public void removeFragmentServiceConnectionListener(
             ServiceConnectionListener fragmentServiceConnectionListener) {
         fragmentsServiceConnectionSet.remove(fragmentServiceConnectionListener);
     }
@@ -434,7 +436,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
         }
 
-        if (chatHelper == null){
+        if (chatHelper == null) {
             chatHelper = (QBChatHelper) service.getHelper(QBService.CHAT_HELPER);
         }
 
@@ -537,7 +539,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private void setCurrentFragment(Fragment fragment, String tag, boolean needAddToBackStack) {
         currentFragment = fragment;
         FragmentTransaction transaction = buildTransaction();
-        if(needAddToBackStack) {
+        if (needAddToBackStack) {
             transaction.addToBackStack(null);
         }
         transaction.replace(R.id.container_fragment, fragment, tag);
@@ -545,7 +547,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void removeFragment() {
-        if(!isFinishing()) {
+        if (!isFinishing()) {
             getSupportFragmentManager().beginTransaction().remove(
                     getSupportFragmentManager().findFragmentById(R.id.container_fragment)).commitAllowingStateLoss();
         }
@@ -569,11 +571,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void onFailAction(String action) {
     }
 
-    protected void onChatReconnected(){
+    protected void onChatReconnected() {
 
     }
 
-    protected void onChatDisconnected(Exception e){
+    protected void onChatDisconnected(Exception e) {
 
     }
 
@@ -593,12 +595,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void addAction(String action, Command command) {
-            Set<Command> commandSet = broadcastCommandMap.get(action);
-            if (commandSet == null) {
-                commandSet = new HashSet<Command>();
-                broadcastCommandMap.put(action, commandSet);
-            }
-            commandSet.add(command);
+        Set<Command> commandSet = broadcastCommandMap.get(action);
+        if (commandSet == null) {
+            commandSet = new HashSet<Command>();
+            broadcastCommandMap.put(action, commandSet);
+        }
+        commandSet.add(command);
     }
 
     public boolean hasAction(String action) {
@@ -639,7 +641,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return friendListHelper;
     }
 
-    public QBChatHelper getChatHelper(){
+    public QBChatHelper getChatHelper() {
         return chatHelper;
     }
 
@@ -657,7 +659,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         showSnackbar(R.string.dialog_loading_dialogs, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
         if (QBSessionManager.getInstance().getSessionParameters() != null
                 && QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
-                && !QBSessionManager.getInstance().isValidActiveSession()){
+                && !QBSessionManager.getInstance().isValidActiveSession()) {
             renewFirebaseToken();
         }
 
@@ -748,7 +750,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         };
     }
 
-    private void blockUI(boolean stopUserInteractions){
+    private void blockUI(boolean stopUserInteractions) {
         if (isUIDisabled == stopUserInteractions) {
             return;
         }
@@ -756,16 +758,29 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         disableEnableControls(!stopUserInteractions, root);
     }
 
-    private void disableEnableControls(boolean enable, ViewGroup vg){
-        if(vg instanceof Toolbar) {
+    private void disableEnableControls(boolean enable, ViewGroup vg) {
+        if (vg instanceof Toolbar) {
             return;
         }
 
-        for (int i = 0; i < vg.getChildCount(); i++){
+        for (int i = 0; i < vg.getChildCount(); i++) {
             View child = vg.getChildAt(i);
+            if (child instanceof ListView || child instanceof RecyclerView) {
+                float fullColor = 1.0f;
+                float semiTransparent = 0.75f;
+
+                child.setEnabled(enable);
+                if (enable) {
+                    child.setAlpha(fullColor);
+
+                } else {
+                    child.setAlpha(semiTransparent);
+                }
+                break;
+            }
             child.setEnabled(enable);
-            if (child instanceof ViewGroup){
-                disableEnableControls(enable, (ViewGroup)child);
+            if (child instanceof ViewGroup) {
+                disableEnableControls(enable, (ViewGroup) child);
             }
         }
     }
@@ -774,13 +789,13 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         ButterKnife.bind(this);
     }
 
-    private boolean isSnackBarHasMaxPriority(){
-        if (snackbarClientPriority.size() == 0){
+    private boolean isSnackBarHasMaxPriority() {
+        if (snackbarClientPriority.size() == 0) {
             return false;
         }
         for (int i = 0; i < snackbarClientPriority.size(); i++) {
-            Log.i(TAG, "snackbar["+i+")="+snackbarClientPriority.valueAt(i));
-            if (Priority.MAX == snackbarClientPriority.valueAt(i)){
+            Log.i(TAG, "snackbar[" + i + ")=" + snackbarClientPriority.valueAt(i));
+            if (Priority.MAX == snackbarClientPriority.valueAt(i)) {
                 return true;
             }
         }
@@ -788,11 +803,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     protected void performLoadChatsSuccessAction(Bundle bundle) {
-       // hideSnackBar();
+        // hideSnackBar();
         isDialogLoading = false;
     }
 
-    protected void startActivityByName (Class<?> activityName, boolean needClearTask){
+    protected void startActivityByName(Class<?> activityName, boolean needClearTask) {
         Intent intent = new Intent(this, activityName);
 
         if (needClearTask) {
