@@ -85,6 +85,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             boolean isLoggedIn = isLoggedIn();
             Log.d(TAG, "isLoggedIn= " + isLoggedIn);
             if (!isLoggedIn) {
+                chatDestroyed = true;
                 return;
             }
             chatDestroyed = ((Loggable) activity).isCanPerformLogoutInOnStop();

@@ -13,8 +13,6 @@ import com.quickblox.q_municate_core.qb.helpers.QBCallChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
-import java.io.Serializable;
-
 public class QBInitCallChatCommand extends ServiceCommand {
 
     private QBCallChatHelper qbCallChatHelper;
@@ -23,12 +21,6 @@ public class QBInitCallChatCommand extends ServiceCommand {
                                  String failAction) {
         super(context, successAction, failAction);
         this.qbCallChatHelper = qbCallChatHelper;
-    }
-
-    public static void start(Context context, Class<? extends Activity> callClass) {
-        Intent intent = new Intent(QBServiceConsts.INIT_CALL_CHAT_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_CALL_ACTIVITY, callClass);
-        context.startService(intent);
     }
 
     public static void start(Context context, Class<? extends Activity> callClass, CallPushParams callPushParams) {
