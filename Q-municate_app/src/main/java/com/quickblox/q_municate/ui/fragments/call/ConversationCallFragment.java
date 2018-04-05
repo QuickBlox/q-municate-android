@@ -1,7 +1,5 @@
 package com.quickblox.q_municate.ui.fragments.call;
 
-import android.graphics.Bitmap;
-import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -9,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,20 +26,19 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.StartConversationReason;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.utils.helpers.SystemPermissionHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_user_service.model.QMUser;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.AppRTCAudioManager;
 import com.quickblox.videochat.webrtc.BaseSession;
 import com.quickblox.videochat.webrtc.QBMediaStreamManager;
-import com.quickblox.videochat.webrtc.exception.QBRTCException;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
@@ -49,7 +47,6 @@ import com.quickblox.videochat.webrtc.view.QBRTCSurfaceView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 
 import org.webrtc.CameraVideoCapturer;
-import org.webrtc.EglRenderer;
 import org.webrtc.RendererCommon;
 import org.webrtc.VideoRenderer;
 
@@ -99,9 +96,9 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     private boolean isAllViewsInitialized = true;
 
     public static ConversationCallFragment newInstance(List<QBUser> opponents, String callerName,
-            QBRTCTypes.QBConferenceType qbConferenceType,
-            StartConversationReason reason,
-            String sessionId) {
+                                                       QBRTCTypes.QBConferenceType qbConferenceType,
+                                                       StartConversationReason reason,
+                                                       String sessionId) {
 
         ConversationCallFragment fragment = new ConversationCallFragment();
         Bundle bundle = new Bundle();
@@ -137,8 +134,8 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         systemPermissionHelper = new SystemPermissionHelper(getActivity());
 
         initViews(view);
-        ((CallActivity)getActivity()).initActionBar();
-        ((CallActivity)getActivity()).setCallActionBarTitle(StartConversationReason.INCOME_CALL_FOR_ACCEPTION
+        ((CallActivity) getActivity()).initActionBar();
+        ((CallActivity) getActivity()).setCallActionBarTitle(StartConversationReason.INCOME_CALL_FOR_ACCEPTION
                 .equals(startConversationReason) ? callerName : opponents.get(0).getFullName());
         initButtonsListener();
         initSessionListener();
@@ -167,14 +164,14 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         correctButtonsVisibilityByGrantedPermissions();
     }
 
-    private void correctButtonsVisibilityByGrantedPermissions (){
-        if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)){
-            if(!systemPermissionHelper.isMicrophonePermissionGranted()){
+    private void correctButtonsVisibilityByGrantedPermissions() {
+        if (!systemPermissionHelper.isAllPermissionsGrantedForCallByType(qbConferenceType)) {
+            if (!systemPermissionHelper.isMicrophonePermissionGranted()) {
                 micToggleVideoCall.setChecked(false);
                 micToggleVideoCall.setEnabled(false);
             }
 
-            if(!systemPermissionHelper.isCameraPermissionGranted()){
+            if (!systemPermissionHelper.isCameraPermissionGranted()) {
                 cameraToggle.setChecked(false);
                 cameraToggle.setEnabled(false);
             }
@@ -183,7 +180,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
 
     private void displayOpponentAvatar() {
         QMUser opponent = ((CallActivity) getActivity()).getOpponentAsUserFromDB(opponents.get(0).getId());
-        if (StartConversationReason.INCOME_CALL_FOR_ACCEPTION.equals(startConversationReason) && !isVideoCall){
+        if (StartConversationReason.INCOME_CALL_FOR_ACCEPTION.equals(startConversationReason) && !isVideoCall) {
             avatarAndNameView.setVisibility(View.VISIBLE);
             ImageLoader.getInstance().displayImage(opponent.getAvatar(), avatarImageview, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         } else if (StartConversationReason.OUTCOME_CALL_MADE.equals(startConversationReason)) {
@@ -194,7 +191,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     }
 
 
-    private void actionsByConnectedToUser(){
+    private void actionsByConnectedToUser() {
         actionButtonsEnabled(true);
         ((CallActivity) getActivity()).startTimer();
         getActivity().invalidateOptionsMenu();
@@ -210,11 +207,11 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     }
 
     public void actionButtonsEnabled(boolean enability) {
-        if (!isAllViewsInitialized){
+        if (!isAllViewsInitialized) {
             return;
         }
 
-        if (isVideoCall){
+        if (isVideoCall) {
             cameraToggle.setEnabled(enability);
         }
         micToggleVideoCall.setEnabled(enability);
@@ -373,11 +370,11 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         });
     }
 
-    void toggleFullScreen(){
-        if(isFullScreen){
+    void toggleFullScreen() {
+        if (isFullScreen) {
             setLocalVideoViewVisible(false);
             showSystemUI();
-            ((CallActivity)getActivity()).showCallActionBar();
+            ((CallActivity) getActivity()).showCallActionBar();
             elementSetVideoButtons.setVisibility(View.VISIBLE);
             isFullScreen = false;
         } else {
@@ -389,10 +386,10 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         }
     }
 
-    private void setLocalVideoViewVisible(boolean visible){
-        if (remoteVideoView != null && localVideoTrack != null){
+    private void setLocalVideoViewVisible(boolean visible) {
+        if (remoteVideoView != null && localVideoTrack != null) {
             if (visible) {
-                if (localVideoTrack.getRenderer() == null){
+                if (localVideoTrack.getRenderer() == null) {
                     fillVideoView(localVideoView, localVideoTrack, true);
                 }
 
@@ -442,6 +439,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
                         isFrontCameraSelected = b;
                         toggleCameraInternal();
                     }
+
                     @Override
                     public void onCameraSwitchError(String s) {
 
@@ -463,7 +461,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         if (!audioManager.getSelectedAudioDevice().equals(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
             audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
         } else {
-            if(audioManager.getAudioDevices().contains(AppRTCAudioManager.AudioDevice.WIRED_HEADSET)){
+            if (audioManager.getAudioDevices().contains(AppRTCAudioManager.AudioDevice.WIRED_HEADSET)) {
                 audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.WIRED_HEADSET);
             } else {
                 audioManager.setAudioDevice(AppRTCAudioManager.AudioDevice.EARPIECE);
@@ -484,12 +482,12 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem itemSpeakerToggle = menu.findItem(R.id.switch_speaker_toggle);
-        if (itemSpeakerToggle != null){
+        if (itemSpeakerToggle != null) {
             updateSpeakerToggleIcon(itemSpeakerToggle);
         }
 
         MenuItem itemCameraToggle = menu.findItem(R.id.switch_camera_toggle);
-        if (itemCameraToggle != null){
+        if (itemCameraToggle != null) {
             updateCameraToggleIcon(itemCameraToggle);
         }
     }
@@ -515,7 +513,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         }
     }
 
-    private boolean isVideoEnabled(){
+    private boolean isVideoEnabled() {
         QBRTCSession currentSession = ((CallActivity) getActivity()).getCurrentSession();
         QBMediaStreamManager mediaStreamManager;
         if (currentSession != null) {
@@ -524,21 +522,21 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
             return false;
         }
 
-        if (mediaStreamManager != null){
+        if (mediaStreamManager != null) {
             return mediaStreamManager.isVideoEnabled();
         } else {
             return false;
         }
     }
 
-    private void toggleCameraInternal(){
+    private void toggleCameraInternal() {
         getActivity().invalidateOptionsMenu();
         updateVideoView(remoteVideoTrack == null ? remoteVideoView : localVideoView, isFrontCameraSelected);
     }
 
     private void toggleCamera(boolean isNeedEnableCam) {
         QBRTCSession currentSession = ((CallActivity) getActivity()).getCurrentSession();
-        if (currentSession != null && currentSession.getMediaStreamManager() != null){
+        if (currentSession != null && currentSession.getMediaStreamManager() != null) {
             currentSession.getMediaStreamManager().setVideoEnabled(isNeedEnableCam);
             getActivity().invalidateOptionsMenu();
         }
@@ -552,7 +550,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         if (remoteVideoView != null && remoteVideoTrack == null) {
             fillVideoView(remoteVideoView, videoTrack, true);
         }
-        if(getActivity() != null) {
+        if (getActivity() != null) {
             getActivity().invalidateOptionsMenu();
         }
     }
@@ -563,7 +561,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
         remoteVideoTrack = videoTrack;
 
         if (remoteVideoView != null) {
-            if (localVideoTrack != null){
+            if (localVideoTrack != null) {
                 localVideoTrack.cleanUp();
             }
             fillVideoView(remoteVideoView, videoTrack, false);
@@ -603,7 +601,7 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     }
 
     @Override
-    public void onConnectedToUser(QBRTCSession qbrtcSession,final Integer userId) {
+    public void onConnectedToUser(QBRTCSession qbrtcSession, final Integer userId) {
         actionsByConnectedToUser();
     }
 
@@ -649,14 +647,13 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     }
 
 
-
     private enum CameraState {
         NONE,
         DISABLED_FROM_USER,
         ENABLED_FROM_USER
     }
 
-    class FragmentLifeCycleHandler extends Handler{
+    class FragmentLifeCycleHandler extends Handler {
 
         @Override
         public void dispatchMessage(Message msg) {

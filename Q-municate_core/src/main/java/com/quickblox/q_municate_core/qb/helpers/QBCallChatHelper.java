@@ -110,7 +110,7 @@ public class QBCallChatHelper extends BaseHelper {
     }
 
     private void startCallActivity(QBRTCSession qbRtcSession) {
-        QMUser user = QMUserService.getInstance().getUserCache().get((long)qbRtcSession.getSessionDescription().getCallerID());
+        QMUser user = QMUserService.getInstance().getUserCache().get((long) qbRtcSession.getSessionDescription().getCallerID());
 
         if (user != null) {
             Log.d(TAG, "startCallActivity(), user = " + user);

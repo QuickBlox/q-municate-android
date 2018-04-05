@@ -67,7 +67,8 @@
             android:paddingRight="10dp"
             android:paddingTop="1dp"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/text_size" />
+            android:textSize="@dimen/text_size"
+            tools:text="@string/dialog_count_unread"/>
 
     </RelativeLayout>
 
