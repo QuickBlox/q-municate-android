@@ -178,7 +178,8 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         globalSearchAdapter = new GlobalSearchAdapter(baseActivity, usersList);
         globalSearchAdapter.setFriendListHelper(friendListHelper);
         contactsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        contactsRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));;
+        contactsRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
+
         contactsRecyclerView.setAdapter(globalSearchAdapter);
         globalSearchAdapter.setUserOperationListener(userOperationAction);
     }
@@ -236,7 +237,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     }
 
     private void deleteObservers() {
-        if(dataManager != null) {
+        if (dataManager != null) {
             dataManager.getUserRequestDataManager().deleteObserver(commonObserver);
             dataManager.getFriendDataManager().deleteObserver(commonObserver);
         }
@@ -265,32 +266,32 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new rx.Observer<List<QMUser>>() {
 
-                @Override
-                public void onCompleted() {
-                    Log.d(TAG, "onCompleted()");
-                }
+                        @Override
+                        public void onCompleted() {
+                            Log.d(TAG, "onCompleted()");
+                        }
 
-                @Override
-                public void onError(Throwable e) {
-                    Log.d(TAG, "onError" + e.getMessage());
-                    swipyRefreshLayout.setRefreshing(false);
-                }
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.d(TAG, "onError: " + e.getMessage());
+                            swipyRefreshLayout.setRefreshing(false);
+                        }
 
-                @Override
-                public void onNext(List<QMUser> qbUsers) {
+                        @Override
+                        public void onNext(List<QMUser> qbUsers) {
 
-                    if (qbUsers != null && !qbUsers.isEmpty()) {
-                        checkForExcludeMe(qbUsers);
+                            if (qbUsers != null && !qbUsers.isEmpty()) {
+                                checkForExcludeMe(qbUsers);
 
-                        usersList.addAll(qbUsers);
+                                usersList.addAll(qbUsers);
 
-                        updateContactsList(usersList);
-                    }
+                                updateContactsList(usersList);
+                            }
 
-                    swipyRefreshLayout.setRefreshing(false);
-                    checkForEnablingRefreshLayout();
-                }
-            });
+                            swipyRefreshLayout.setRefreshing(false);
+                            checkForEnablingRefreshLayout();
+                        }
+                    });
         }
     }
 
@@ -335,6 +336,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
 
         @Override
         public void run() {
+            clearOldData();
             searchUsers();
         }
     }
@@ -376,7 +378,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         public void execute(Bundle bundle) {
             int userId = bundle.getInt(QBServiceConsts.EXTRA_FRIEND_ID);
 
-            QMUser addedUser = QMUserService.getInstance().getUserCache().get((long)userId);
+            QMUser addedUser = QMUserService.getInstance().getUserCache().get((long) userId);
             globalSearchAdapter.notifyDataSetChanged();
 
             baseActivity.hideProgress();
