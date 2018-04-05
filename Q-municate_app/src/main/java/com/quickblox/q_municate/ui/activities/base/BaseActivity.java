@@ -660,21 +660,28 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         if (QBSessionManager.getInstance().getSessionParameters() != null
                 && QBProvider.FIREBASE_PHONE.equals(QBSessionManager.getInstance().getSessionParameters().getSocialProvider())
                 && !QBSessionManager.getInstance().isValidActiveSession()) {
-            renewFirebaseToken();
+            Log.d(TAG, "start refresh Firebase token");
+            new FirebaseAuthHelper(BaseActivity.this).refreshInternalFirebaseToken(new FirebaseAuthHelper.RequestFirebaseIdTokenCallback() {
+                @Override
+                public void onSuccess(String accessToken) {
+                    QBLoginChatCompositeCommand.start(BaseActivity.this);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    performLoginChatFailAction(null);
+                }
+            });
+        } else {
+            QBLoginChatCompositeCommand.start(this);
         }
-
-        QBLoginChatCompositeCommand.start(this);
-    }
-
-    public void renewFirebaseToken() {
-        FirebaseAuthHelper.refreshInternalFirebaseToken();
     }
 
     protected boolean isAppInitialized() {
         return AppSession.getSession().isSessionExist();
     }
 
-    protected boolean isChatInitializedAndUserLoggedIn() {
+    public boolean isChatInitializedAndUserLoggedIn() {
         return isAppInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
@@ -696,6 +703,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void performLoginChatSuccessAction(Bundle bundle) {
         QBInitCallChatCommand.start(this, CallActivity.class, null);
         hideProgress();
+    }
+
+    protected void performLoginChatFailAction(Bundle bundle) {
+        blockUI(true);
+        hideSnackBar(R.string.dialog_loading_dialogs);
+        showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
     }
 
     @Override
@@ -851,7 +864,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
-            QBLoginChatCompositeCommand.setIsRunning(false);
             performLoginChatSuccessAction(bundle);
         }
     }
@@ -860,10 +872,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
-            QBLoginChatCompositeCommand.setIsRunning(false);
-            blockUI(true);
-            hideSnackBar(R.string.dialog_loading_dialogs);
-            showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
+            performLoginChatFailAction(bundle);
         }
     }
 

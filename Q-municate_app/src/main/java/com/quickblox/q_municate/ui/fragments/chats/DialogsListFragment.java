@@ -405,7 +405,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
 
 //        startForResult load dialogs from REST when finished loading from cache
         if (dialogsListLoader.isLoadCacheFinished()) {
-            if (!QBLoginChatCompositeCommand.isRunning()) {
+            if (baseActivity.isChatInitializedAndUserLoggedIn()) {
+                Log.v(TAG, " onLoadFinished --- !QBLoginChatCompositeCommand.isRunning()");
                 QBLoadDialogsCommand.start(getContext(), true);
             }
         }

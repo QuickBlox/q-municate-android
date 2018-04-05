@@ -166,7 +166,7 @@ public class SettingsActivity extends BaseLoggableActivity {
         title = getString(R.string.settings_title);
         user = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
         facebookHelper = new FacebookHelper(this);
-        firebaseAuthHelper = new FirebaseAuthHelper();
+        firebaseAuthHelper = new FirebaseAuthHelper(SettingsActivity.this);
     }
 
     private void fillUI() {
