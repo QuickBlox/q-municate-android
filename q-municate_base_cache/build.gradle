@@ -27,11 +27,11 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation "com.android.support:appcompat-v7:${rootProject.supportVersion}"
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
     api 'com.j256.ormlite:ormlite-android:5.0'
     api "com.quickblox:quickblox-android-sdk-core:${rootProject.qbSdkVersion}"
 }

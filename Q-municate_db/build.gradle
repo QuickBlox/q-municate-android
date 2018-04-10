@@ -17,8 +17,8 @@ android {
 }
 
 dependencies {
-    compile "com.j256.ormlite:ormlite-android:${rootProject.ormliteAndroidVersion}"
-    compile "com.j256.ormlite:ormlite-core:${rootProject.ormliteCoreVersion}"
-    compile "com.quickblox:quickblox-android-sdk-chat:${rootProject.qbSdkVersion}"
-    compile project(path: ':q-municate_user_service')
+    implementation "com.j256.ormlite:ormlite-android:${rootProject.ormliteAndroidVersion}"
+    implementation "com.j256.ormlite:ormlite-core:${rootProject.ormliteCoreVersion}"
+    implementation "com.quickblox:quickblox-android-sdk-chat:${rootProject.qbSdkVersion}"
+    implementation project(path: ':q-municate_user_service')
 }

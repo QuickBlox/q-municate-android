@@ -7,7 +7,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.0'
         classpath 'io.fabric.tools:gradle:1.25.2'
-        classpath 'com.google.gms:google-services:3.1.1'
+        classpath 'com.google.gms:google-services:3.2.0'
     }
 }
 
@@ -34,7 +34,7 @@ allprojects {
 
 ext {
     compileSdkVersion = 26
-    buildToolsVersion = '26.0.2'
+    buildToolsVersion = '27.0.3'
     minSdkVersion = 16
     targetSdkVersion = 26
     versionName = '2.6.1.1'
