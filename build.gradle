@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath 'com.android.tools.build:gradle:3.1.1'
         classpath 'io.fabric.tools:gradle:1.25.2'
         classpath 'com.google.gms:google-services:3.2.0'
     }
@@ -54,7 +54,7 @@ ext {
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
-    supportVersion = '26.1.0'
+    supportVersion = '27.1.1'
     googlePlayServicesVersion = '11.4.2'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '5.0'
@@ -65,7 +65,7 @@ ext {
     stickylistheadersRecyclerViewVersion = '0.4.2'
     emojiconVersion = '1.3.1'
     cropVersion = '1.0.1'
-    facebookSdkVersoin = '4.14.1'
+    facebookSdkVersion = '4.14.1'
     twitterDigitsSdkVersion = '2.0.0'
 
     // Dependency versions

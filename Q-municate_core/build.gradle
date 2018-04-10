@@ -23,15 +23,19 @@ dependencies {
     //    QuickBlox libs
     api "com.quickblox:quickblox-android-sdk-content:${rootProject.qbSdkVersion}"
     api "com.quickblox:quickblox-android-sdk-customobjects:${rootProject.qbSdkVersion}"
-    api "com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}"
+    api("com.quickblox:quickblox-android-sdk-messages:${rootProject.qbSdkVersion}") {
+        exclude group: 'com.android.support'
+    }
     api "com.quickblox:quickblox-android-sdk-videochat-webrtc:${rootProject.qbSdkVersion}"
     api "com.quickblox:quickblox-android-sdk-core:${rootProject.qbSdkVersion}"
-    api ("com.quickblox:chat-message-adapter:$rootProject.qbMessageAdapterVersion"){
+    api("com.quickblox:chat-message-adapter:$rootProject.qbMessageAdapterVersion") {
         exclude group: 'com.quickblox'
         exclude group: 'com.android.support'
     }
 
-    api "com.facebook.android:facebook-android-sdk:$rootProject.facebookSdkVersoin"
+    api("com.facebook.android:facebook-android-sdk:$rootProject.facebookSdkVersion") {
+        exclude group: 'com.android.support'
+    }
 
     api "com.android.support:cardview-v7:${rootProject.supportVersion}"
     api "com.android.support:customtabs:${rootProject.supportVersion}"

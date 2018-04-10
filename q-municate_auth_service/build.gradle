@@ -32,6 +32,6 @@ dependencies {
     })
     implementation "com.android.support:appcompat-v7:${rootProject.supportVersion}"
     testImplementation 'junit:junit:4.12'
-    api "com.quickblox:quickblox-android-sdk-core:${rootProject.qbSdkVersion}"
+    implementation "com.quickblox:quickblox-android-sdk-core:${rootProject.qbSdkVersion}"
     implementation project(path: ':q-municate_base_service')
 }
