@@ -31,8 +31,6 @@ android {
         versionCode rootProject.versionCode
         versionName rootProject.versionName
         multiDexEnabled = true
-        ext.betaDistrubutionGroupAliases=property('testers_group_name')
-        ext.betaDistributionEmails=property('testers_emails')
     }
 
     signingConfigs {
