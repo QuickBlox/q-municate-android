@@ -2,12 +2,8 @@ buildscript {
     repositories {
         mavenCentral()
     }
-    dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-    }
 }
 apply plugin: 'com.android.library'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -35,16 +31,16 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile "com.android.support:appcompat-v7:${rootProject.supportVersion}"
-    testCompile 'junit:junit:4.12'
-    compile 'com.annimon:stream:1.1.2'
-    compile project(path: ':q-municate_base_service')
-    compile 'com.google.dagger:dagger:2.0'
-    apt 'com.google.dagger:dagger-compiler:2.0'
-    provided 'org.glassfish:javax.annotation:10.0-b28'
-    compile 'org.jetbrains:annotations-java5:15.0'
+    implementation "com.android.support:appcompat-v7:${rootProject.supportVersion}"
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.annimon:stream:1.1.2'
+    api project(path: ':q-municate_base_service')
+    implementation 'com.google.dagger:dagger:2.0'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.0'
+    compileOnly 'org.glassfish:javax.annotation:10.0-b28'
+    implementation 'org.jetbrains:annotations-java5:15.0'
 }

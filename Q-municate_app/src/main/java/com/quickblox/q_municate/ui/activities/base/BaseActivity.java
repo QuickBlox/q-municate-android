@@ -864,6 +864,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
+            QBLoginChatCompositeCommand.setIsRunning(false);
             performLoginChatSuccessAction(bundle);
         }
     }
@@ -872,6 +873,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         @Override
         public void execute(Bundle bundle) {
+            QBLoginChatCompositeCommand.setIsRunning(false);
             performLoginChatFailAction(bundle);
         }
     }
