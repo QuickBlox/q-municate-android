@@ -47,6 +47,7 @@
     <string name="auth_full_name_field_is_too_short">Full Name is too short (minimum is 3 characters)</string>
     <string name="auth_full_name_field_is_too_long">Full Name is too long (maximum is 50 characters)</string>
     <string name="auth_full_name_has_impossible_characters">Full Name has impossible characters (not allowed: \'&gt;\', \'&lt;\', \';\')</string>
+    <string name="auth_full_name_should_contain_alphanumeric_characters">Full Name should contain alphanumeric characters only</string>
     <string name="auth_hint_full_name">Full Name</string>
     <string name="auth_choose_user_picture">Choose user picture</string>
 

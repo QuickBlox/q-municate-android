@@ -6,6 +6,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
+import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
@@ -149,6 +150,9 @@ public class ValidationUtils {
             } else if (newFullName.length() > FULL_NAME_MAX_LENGTH) {
                 valid = false;
                 fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_field_is_too_long));
+            } else if (!isEnteredTextValid(newFullName, 50)) {
+                valid = false;
+                fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_should_contain_alphanumeric_characters));
             }
         } else {
             valid = false;
@@ -156,6 +160,17 @@ public class ValidationUtils {
         }
 
         return valid;
+    }
+
+    private static boolean isEnteredTextValid(String str, int maxLength) {
+
+        boolean isValid;
+        Pattern p = Pattern.compile("^[a-zA-Z][a-zA-Z 0-9]{2," + (maxLength - 1) + "}+$");
+
+        Matcher m = p.matcher(str.trim());
+        isValid = m.matches();
+
+        return isValid;
     }
 
     public boolean isForgotPasswordDataValid(TextInputLayout emailTextInputLayout, String email) {
