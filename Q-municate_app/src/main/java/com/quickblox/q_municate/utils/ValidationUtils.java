@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 public class ValidationUtils {
 
     private static final int FULL_NAME_MIN_LENGTH = 3;
-    private static final int FULL_NAME_MAX_LENGTH = 50;
+    private static final int FULL_NAME_MAX_LENGTH = 200;
     private static final int PASSWORD_MIN_LENGTH = 8;
     private final static String NULL = "null";
 
@@ -150,9 +150,6 @@ public class ValidationUtils {
             } else if (newFullName.length() > FULL_NAME_MAX_LENGTH) {
                 valid = false;
                 fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_field_is_too_long));
-            } else if (!isEnteredTextValid(newFullName, 50)) {
-                valid = false;
-                fullNameTextInputLayout.setError(context.getString(R.string.auth_full_name_should_contain_alphanumeric_characters));
             }
         } else {
             valid = false;
@@ -160,17 +157,6 @@ public class ValidationUtils {
         }
 
         return valid;
-    }
-
-    private static boolean isEnteredTextValid(String str, int maxLength) {
-
-        boolean isValid;
-        Pattern p = Pattern.compile("^[a-zA-Z][a-zA-Z 0-9]{2," + (maxLength - 1) + "}+$");
-
-        Matcher m = p.matcher(str.trim());
-        isValid = m.matches();
-
-        return isValid;
     }
 
     public boolean isForgotPasswordDataValid(TextInputLayout emailTextInputLayout, String email) {
