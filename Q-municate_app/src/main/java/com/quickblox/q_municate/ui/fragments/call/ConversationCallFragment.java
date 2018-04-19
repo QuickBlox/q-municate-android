@@ -493,8 +493,12 @@ public class ConversationCallFragment extends Fragment implements Serializable, 
     }
 
     private void updateSpeakerToggleIcon(MenuItem itemSpeakerToggle) {
-        boolean speakerEnabled = audioManager.getSelectedAudioDevice().equals(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
-        itemSpeakerToggle.setIcon(speakerEnabled ? R.drawable.ic_phonelink_ring : R.drawable.ic_speaker_phone);
+        if(isVideoCall){
+            itemSpeakerToggle.setVisible(false);
+        } else {
+            boolean speakerEnabled = audioManager.getSelectedAudioDevice().equals(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
+            itemSpeakerToggle.setIcon(speakerEnabled ? R.drawable.ic_phonelink_ring : R.drawable.ic_speaker_phone);
+        }
     }
 
     private void updateCameraToggleIcon(MenuItem itemCameraToggle) {
