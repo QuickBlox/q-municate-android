@@ -34,6 +34,7 @@ public class QBLoginChatCompositeCommand extends CompositeServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
+        setIsRunning(false);
         if (AppSession.ChatState.FOREGROUND == AppSession.getSession().getChatState()) {
             try {
                 super.perform(extras);
