@@ -293,8 +293,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         super.onPause();
         Log.d("BaseActivity", "onPause");
         unregisterBroadcastReceivers();
-        removeActions();
         unregisterConnectionListener();
+        removeActions();
         hideSnackBar(R.string.error_disconnected);
     }
 
@@ -332,8 +332,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("BaseActivity", "onStart");
         connectToService();
+        blockUI(false);
     }
 
     @Override
@@ -701,6 +701,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     protected void performLoginChatSuccessAction(Bundle bundle) {
+        blockUI(false);
         QBInitCallChatCommand.start(this, CallActivity.class, null);
         hideProgress();
     }
@@ -749,6 +750,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                 Log.d(TAG, "chatConnectionListener reconnectionSuccessful");
                 hideSnackBar(R.string.error_disconnected);
                 blockUI(false);
+                checkShowingConnectionError();
             }
 
             @Override
