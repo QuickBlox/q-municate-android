@@ -730,6 +730,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                 Log.d(TAG, "chatConnectionListener authenticated");
                 hideSnackBar(R.string.error_disconnected);
                 blockUI(false);
+                checkShowingConnectionError();
             }
 
             @Override
@@ -741,7 +742,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             public void connectionClosedOnError(Exception e) {
                 onChatDisconnected(e);
                 blockUI(true);
-                showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE);
+                showSnackbar(R.string.error_disconnected, Snackbar.LENGTH_INDEFINITE, Priority.MAX);
             }
 
             @Override
