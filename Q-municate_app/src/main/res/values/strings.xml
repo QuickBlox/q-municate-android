@@ -45,7 +45,7 @@
     <string name="auth_password_field_is_too_short">Password is too short (minimum is 8 characters)</string>
     <string name="auth_full_name_field_not_entered">Please enter Full Name</string>
     <string name="auth_full_name_field_is_too_short">Full Name is too short (minimum is 3 characters)</string>
-    <string name="auth_full_name_field_is_too_long">Full Name is too long (maximum is 50 characters)</string>
+    <string name="auth_full_name_field_is_too_long">Full Name is too long (maximum is 200 characters)</string>
     <string name="auth_full_name_has_impossible_characters">Full Name has impossible characters (not allowed: \'&gt;\', \'&lt;\', \';\')</string>
     <string name="auth_hint_full_name">Full Name</string>
     <string name="auth_choose_user_picture">Choose user picture</string>
@@ -127,6 +127,7 @@
     <string name="dialog_loading_dialogs">Updating dialogs list… Please wait</string>
     <string name="dialog_record_cancel">slide to cancel</string>
     <string name="dialog_record_canceled">Audio recording has been canceled</string>
+    <string name="dialog_count_unread">99+</string>
 
     <string-array name="dialog_attach_types_array">
         <item>Take Photo</item>
@@ -193,7 +194,7 @@
     <!-- About -->
     <string name="about_title">About</string>
     <string name="about_version">Version %1$s</string>
-    <string name="about_vendor">&#169; 2017 QuickBlox</string>
+    <string name="about_vendor">&#169; 2018 QuickBlox</string>
     <string name="about_user_agreement">User Agreement</string>
 
 

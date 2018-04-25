@@ -15,6 +15,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.network.NetworkGCMTaskService;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogByIdsCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
@@ -543,13 +544,19 @@ public class QBService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        NetworkGCMTaskService.cancelAllScheduledTasks(this);
+    }
+
     public class QBServiceBinder extends Binder {
 
         public QBService getService() {
             return QBService.this;
         }
-    }
 
+    }
     private class LoginBroadcastReceiver extends BroadcastReceiver {
 
         @Override
@@ -561,5 +568,6 @@ public class QBService extends Service {
                 ((QBCallChatHelper) getHelper(CALL_CHAT_HELPER)).init(QBChatService.getInstance());
             }
         }
+
     }
 }

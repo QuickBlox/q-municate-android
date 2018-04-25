@@ -105,6 +105,7 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
         intent.putExtra(QBServiceConsts.EXTRA_CONFERENCE_TYPE, qbConferenceType);
         intent.putExtra(QBServiceConsts.EXTRA_START_CONVERSATION_REASON_TYPE, StartConversationReason.OUTCOME_CALL_MADE);
         intent.putExtra(QBServiceConsts.EXTRA_SESSION_DESCRIPTION, qbRtcSessionDescription);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         activity.startActivityForResult(intent, CALL_ACTIVITY_CLOSE);
     }
 
@@ -357,10 +358,6 @@ public class CallActivity extends BaseLoggableActivity implements QBRTCClientSes
             }
 
             Log.d(TAG, "Stop session");
-
-            if (qbCallChatHelper != null) {
-                qbCallChatHelper.releaseCurrentSession(CallActivity.this, CallActivity.this);
-            }
 
             stopTimer();
             closeByWifiStateAllow = true;

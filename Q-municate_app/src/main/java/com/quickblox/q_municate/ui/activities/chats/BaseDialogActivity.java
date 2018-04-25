@@ -62,7 +62,6 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogMessagesCommand;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -688,7 +687,9 @@ public abstract class BaseDialogActivity extends BaseLoggableActivity implements
     }
 
     protected void startLoadDialogMessages(QBChatDialog chatDialog, long lastDateLoad, boolean isLoadOldMessages) {
-        if (!QBLoginChatCompositeCommand.isRunning()) {
+        Log.v(TAG, "startLoadDialogMessages()");
+        if (isChatInitializedAndUserLoggedIn()) {
+            Log.v(TAG, "startLoadDialogMessages() --- isChatInitializedAndUserLoggedIn()");
             isLoadingMessages = true;
             QBLoadDialogMessagesCommand.start(this, chatDialog, lastDateLoad, isLoadOldMessages);
         }

@@ -113,7 +113,7 @@ public class IncomingCallFragment extends Fragment implements Serializable, View
         setOpponentAvatarAndName();
     }
 
-    private void setOpponentAvatarAndName(){
+    private void setOpponentAvatarAndName() {
         QMUser opponent = ((CallActivity) getActivity()).getOpponentAsUserFromDB(sessionDescription.getCallerID());
         ImageLoader.getInstance().displayImage(opponent.getAvatar(), avatarImageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         callerName.setText(opponent.getFullName());

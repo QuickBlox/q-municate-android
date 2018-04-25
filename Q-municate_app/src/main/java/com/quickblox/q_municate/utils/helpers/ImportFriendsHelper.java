@@ -42,11 +42,11 @@ public class ImportFriendsHelper {
         fiendsReceived();
     }
 
-    private List<String> getIdsList(List<InviteFriend> friendsList) {
+    private ArrayList<String> getIdsList(List<InviteFriend> friendsList) {
         if (friendsList.isEmpty()) {
             return new ArrayList<String>();
         }
-        List<String> idsList = new ArrayList<String>();
+        ArrayList<String> idsList = new ArrayList<String>();
         for (InviteFriend friend : friendsList) {
             idsList.add(friend.getId());
         }

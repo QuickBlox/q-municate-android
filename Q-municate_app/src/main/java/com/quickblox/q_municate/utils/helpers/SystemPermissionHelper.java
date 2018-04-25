@@ -33,6 +33,7 @@ public class SystemPermissionHelper {
     public static final int PERMISSIONS_FOR_TAKE_PHOTO_REQUEST = 19;
     public static final int PERMISSIONS_FOR_AUDIO_RECORD_REQUEST = 20;
     public static final int PERMISSIONS_FOR_VIDEO_RECORD_REQUEST = 21;
+    public static final int PERMISSIONS_FOR_CAMERA_REQUEST = 22;
 
     private Activity activity;
     private Fragment fragment;
@@ -46,7 +47,7 @@ public class SystemPermissionHelper {
     }
 
     public void requestPermission(int requestCode, String permission) {
-        if (fragment != null){
+        if (fragment != null) {
             fragment.requestPermissions(new String[]{permission}, requestCode);
         } else {
             ActivityCompat.requestPermissions(activity, new String[]{permission}, requestCode);
@@ -54,7 +55,7 @@ public class SystemPermissionHelper {
     }
 
     public void requestPermissions(int requestCode, String... permissions) {
-        if (fragment != null){
+        if (fragment != null) {
             Log.v("Permissions", "request Permissions for fragment " + fragment.getClass().getSimpleName());
             fragment.requestPermissions(permissions, requestCode);
         } else {
@@ -88,7 +89,7 @@ public class SystemPermissionHelper {
     }
 
     public boolean isPermissionGranted(String permission) {
-        if (fragment != null){
+        if (fragment != null) {
             return ContextCompat.checkSelfPermission(fragment.getContext(), permission) == PackageManager.PERMISSION_GRANTED;
         } else {
             return ContextCompat.checkSelfPermission(activity.getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED;
@@ -134,8 +135,16 @@ public class SystemPermissionHelper {
         return isPermissionGranted(Manifest.permission.CAMERA);
     }
 
+    public boolean isAllPermissionGrantedForCamera() {
+        return isAllPermissionGranted(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
     public boolean isMicrophonePermissionGranted() {
         return isPermissionGranted(Manifest.permission.RECORD_AUDIO);
+    }
+
+    public boolean isStoragePermissionGranted() {
+        return isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     public boolean isAllAudioRecordPermissionGranted() {
@@ -150,16 +159,20 @@ public class SystemPermissionHelper {
         }
     }
 
+    public void requestAllPermissionForCamera() {
+        checkAndRequestPermissions(PERMISSIONS_FOR_CAMERA_REQUEST, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
     public void requestAllPermissionForAudioRecord() {
         checkAndRequestPermissions(PERMISSIONS_FOR_AUDIO_RECORD_REQUEST, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     public void requestPermissionsTakePhoto() {
-            checkAndRequestPermissions(PERMISSIONS_FOR_TAKE_PHOTO_REQUEST, Manifest.permission.CAMERA);
+        checkAndRequestPermissions(PERMISSIONS_FOR_TAKE_PHOTO_REQUEST, Manifest.permission.CAMERA);
     }
 
     public void requestPermissionsTakeVideo() {
-            checkAndRequestPermissions(PERMISSIONS_FOR_VIDEO_RECORD_REQUEST, Manifest.permission.CAMERA);
+        checkAndRequestPermissions(PERMISSIONS_FOR_VIDEO_RECORD_REQUEST, Manifest.permission.CAMERA);
     }
 
     public boolean isAllPermissionsGrantedForImportFriends() {

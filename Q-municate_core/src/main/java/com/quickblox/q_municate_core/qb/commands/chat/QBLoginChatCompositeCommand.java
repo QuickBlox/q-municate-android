@@ -2,7 +2,6 @@ package com.quickblox.q_municate_core.qb.commands.chat;
 
 import android.content.Context;
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -35,17 +34,16 @@ public class QBLoginChatCompositeCommand extends CompositeServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        if (AppSession.ChatState.BACKGROUND == AppSession.getSession().getChatState()){
-            scheduleLogin();
-            return extras;
+        setIsRunning(false);
+        if (AppSession.ChatState.FOREGROUND == AppSession.getSession().getChatState()) {
+            try {
+                super.perform(extras);
+            } catch (XMPPException | IOException | SmackException e) {
+                scheduleLogin();
+                throw e;
+            }
         }
-        try {
-            super.perform(extras);
-        }
-        catch (XMPPException | IOException | SmackException e){
-            NetworkGCMTaskService.scheduleOneOff(context, "");
-            throw e;
-        }
+
         return extras;
     }
 

@@ -23,6 +23,7 @@ repositories {
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
+    flavorDimensions rootProject.dimensionDefault
 
     defaultConfig {
         applicationId "com.quickblox.q_municate"
@@ -89,6 +90,7 @@ android {
     productFlavors {
 
         standard {
+            dimension rootProject.dimensionDefault
             buildConfigField "String", "APP_ID", devAppID
             buildConfigField "String", "AUTH_KEY", devAuthKey
             buildConfigField "String", "AUTH_SECRET", devAuthSecret
@@ -102,6 +104,7 @@ android {
         }
 
         custom {
+            dimension rootProject.dimensionDefault
             buildConfigField "String", "APP_ID", customAppID
             buildConfigField "String", "AUTH_KEY", customAuthKey
             buildConfigField "String", "AUTH_SECRET", customAuthSecret
@@ -117,45 +120,45 @@ android {
 }
 
 dependencies {
-    compile project(':Q-municate_core')
+    implementation project(':Q-municate_core')
 
-    compile "com.android.support:multidex:${rootProject.multiDexVersion}"
-    compile "com.android.support:appcompat-v7:${rootProject.supportVersion}"
-    compile "com.android.support:design:${rootProject.supportVersion}"
+    implementation "com.android.support:multidex:${rootProject.multiDexVersion}"
+    implementation "com.android.support:appcompat-v7:${rootProject.supportVersion}"
+    implementation "com.android.support:design:${rootProject.supportVersion}"
 
-    compile "com.google.android.gms:play-services-base:${rootProject.googlePlayServicesVersion}"
-    compile "com.google.android.gms:play-services-maps:${rootProject.googlePlayServicesVersion}"
-    compile "com.google.android.gms:play-services-location:${rootProject.googlePlayServicesVersion}"
-    compile "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
+    implementation "com.google.android.gms:play-services-base:${rootProject.googlePlayServicesVersion}"
+    implementation "com.google.android.gms:play-services-maps:${rootProject.googlePlayServicesVersion}"
+    implementation "com.google.android.gms:play-services-location:${rootProject.googlePlayServicesVersion}"
+    implementation "com.google.android.gms:play-services-analytics:${rootProject.googlePlayServicesVersion}"
 
-    compile "com.firebase:firebase-jobdispatcher-with-gcm-dep:${rootProject.firebaseDispatcherVersion}"
-    compile "com.google.firebase:firebase-auth:${rootProject.firebaseAuthVersion}"
-    compile ("com.firebaseui:firebase-ui-auth:${rootProject.firebaseUiAuthVersion}"){
+    implementation "com.firebase:firebase-jobdispatcher-with-gcm-dep:${rootProject.firebaseDispatcherVersion}"
+    implementation "com.google.firebase:firebase-auth:${rootProject.firebaseAuthVersion}"
+    implementation ("com.firebaseui:firebase-ui-auth:${rootProject.firebaseUiAuthVersion}"){
         exclude group: 'com.google.android.gms'
     }
 
-    compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
-    compile 'com.flurry.android:analytics:6.2.0'
-    compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
-    compile "com.afollestad.material-dialogs:core:${rootProject.materialDialogsVersion}"
+    implementation "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
+    implementation 'com.flurry.android:analytics:6.2.0'
+    annotationProcessor "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
+    implementation "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
+    implementation "com.afollestad.material-dialogs:core:${rootProject.materialDialogsVersion}"
 
-    compile "com.github.orangegangsters:swipy:${rootProject.swipyRecyclerviewVersion}@aar"
-    compile "com.timehop.stickyheadersrecyclerview:library:${rootProject.stickylistheadersRecyclerViewVersion}@aar"
-    compile "com.rockerhieu.emojicon:library:${rootProject.emojiconVersion}"
-    compile "com.soundcloud.android:android-crop:${rootProject.cropVersion}@aar"
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
+    implementation "com.github.orangegangsters:swipy:${rootProject.swipyRecyclerviewVersion}@aar"
+    implementation "com.timehop.stickyheadersrecyclerview:library:${rootProject.stickylistheadersRecyclerViewVersion}@aar"
+    implementation "com.rockerhieu.emojicon:library:${rootProject.emojiconVersion}"
+    implementation "com.soundcloud.android:android-crop:${rootProject.cropVersion}@aar"
+    implementation('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
     }
-    compile project(path: ':q-municate_user_service')
-    compile project(path: ':q-municate_auth_service')
-    compile project(path: ':q-municate_user_cache')
+    implementation project(path: ':q-municate_user_service')
+    implementation project(path: ':q-municate_auth_service')
+    implementation project(path: ':q-municate_user_cache')
 }
 
 def changeApkFileName(variant) {
     variant.outputs.each { output ->
-        def file = output.outputFile
         def newName = 'QMUN_Android_v.' + rootProject.versionName + '_c.' + rootProject.versionCode + '-' + variant.buildType.name + '.apk'
-        output.outputFile = new File(file.parent, newName)
+        output.outputFileName = newName
     }
 }
 

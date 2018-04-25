@@ -112,8 +112,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
             // Successfully signed in
             if (resultCode == RESULT_OK) {
-                FirebaseAuthHelper.getIdTokenForCurrentUser(firebaseAuthCallback);
-                return;
+                firebaseAuthHelper.refreshInternalFirebaseToken(firebaseAuthCallback);
             } else {
                  //Sign in failed
                 if (response == null) {
@@ -124,7 +123,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
                 if (response.getErrorCode() == ErrorCodes.NO_NETWORK || response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
                     showSnackbar(R.string.dlg_internet_connection_error, Snackbar.LENGTH_INDEFINITE);
-                    return;
                 }
             }
     }
@@ -147,7 +145,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
             loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
         facebookHelper = new FacebookHelper(this);
-        firebaseAuthHelper = new FirebaseAuthHelper();
+        firebaseAuthHelper = new FirebaseAuthHelper(BaseAuthActivity.this);
         firebaseAuthCallback = new FirebaseAuthCallback();
         failAction = new FailAction();
         serviceManager = ServiceManager.getInstance();

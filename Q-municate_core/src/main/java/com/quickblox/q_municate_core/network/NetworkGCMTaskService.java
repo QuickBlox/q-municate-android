@@ -8,6 +8,7 @@ import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 
 
@@ -18,8 +19,12 @@ public class NetworkGCMTaskService extends GcmTaskService {
 
     @Override
     public int onRunTask(TaskParams taskParams) {
-        QBLoginChatCompositeCommand.start(this);
-        return GcmNetworkManager.RESULT_SUCCESS;
+        if (AppSession.ChatState.FOREGROUND == AppSession.getSession().getChatState()) {
+            QBLoginChatCompositeCommand.start(this);
+            return GcmNetworkManager.RESULT_SUCCESS;
+        } else {
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        }
     }
 
     public static void scheduleOneOff(Context context, String what) {
@@ -37,5 +42,9 @@ public class NetworkGCMTaskService extends GcmTaskService {
                 .build();
 
         GcmNetworkManager.getInstance(context).schedule(task);
+    }
+
+    public static void cancelAllScheduledTasks(Context context) {
+        GcmNetworkManager.getInstance(context).cancelAllTasks(NetworkGCMTaskService.class);
     }
 }

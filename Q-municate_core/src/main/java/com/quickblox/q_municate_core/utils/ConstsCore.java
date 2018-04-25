@@ -29,6 +29,14 @@ public class ConstsCore {
     public static final String PUSH_MESSAGE = "message";
     public static final String PUSH_MESSAGE_TYPE = "message_type";
     public static final String PUSH_MESSAGE_TYPE_CALL = "push_type_call";
+    public static final String PUSH_MESSAGE_TYPE_VOIP = "1";
+
+    public static final String MESSAGE = "message";
+    public static final String MESSAGE_TYPE = "type";
+    public static final String MESSAGE_VOIP_TYPE = "VOIPCall";
+    public static final String MESSAGE_IOS_VOIP = "ios_voip";
+    public static final String MESSAGE_DIALOG_ID = "dialog_id";
+    public static final String MESSAGE_USER_ID = "user_id";
 
     public static final int NOT_INITIALIZED_VALUE = -1;
     public static final int LOGIN_TIMEOUT = 40000;

@@ -48,7 +48,7 @@ public class SessionListener {
             if (QBProvider.FIREBASE_PHONE.equals(provider)
                     || QBProvider.TWITTER_DIGITS.equals(provider)) { //for correct migration from TWITTER_DIGITS to FIREBASE_PHONE
 
-                FirebaseAuthHelper.getIdTokenForCurrentUser(new FirebaseAuthHelper.RequestFirebaseIdTokenCallback() {
+                new FirebaseAuthHelper(App.getInstance()).refreshInternalFirebaseToken(new FirebaseAuthHelper.RequestFirebaseIdTokenCallback() {
                     @Override
                     public void onSuccess(String authToken) {
                         Log.d(TAG, "onSuccess authToken: " + authToken);
