@@ -43,4 +43,8 @@ public class NetworkGCMTaskService extends GcmTaskService {
 
         GcmNetworkManager.getInstance(context).schedule(task);
     }
+
+    public static void cancelAllScheduledTasks(Context context) {
+        GcmNetworkManager.getInstance(context).cancelAllTasks(NetworkGCMTaskService.class);
+    }
 }
