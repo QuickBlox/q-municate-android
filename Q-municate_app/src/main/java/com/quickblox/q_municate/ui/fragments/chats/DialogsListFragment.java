@@ -344,6 +344,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
                 break;
             }
         }
+        checkEmptyList(dialogsListAdapter.getCount());
     }
 
     @OnItemClick(R.id.chats_listview)
@@ -636,6 +637,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         public void execute(Bundle bundle) {
             baseActivity.hideProgress();
             dialogsListAdapter.removeItem(bundle.getString(QBServiceConsts.EXTRA_DIALOG_ID));
+            checkEmptyList(dialogsListAdapter.getCount());
         }
     }
 
