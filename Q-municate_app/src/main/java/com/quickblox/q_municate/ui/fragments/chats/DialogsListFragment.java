@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.fragments.chats;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.Loader;
@@ -19,12 +20,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.helper.CollectionsUtil;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.loaders.DialogsListLoader;
 import com.quickblox.q_municate.ui.activities.about.AboutActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
@@ -34,22 +37,27 @@ import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.fragments.search.SearchFragment;
+import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.DialogWrapper;
+import com.quickblox.q_municate_core.models.NotificationType;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogByIdsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
+import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
+import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
@@ -106,6 +114,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
     private LoadChatsSuccessAction loadChatsSuccessAction;
     private LoadChatsFailedAction loadChatsFailedAction;
     private UpdateDialogSuccessAction updateDialogSuccessAction;
+    private boolean isDeleteDialogAction = false;
 
     enum State {started, stopped, finished}
 
@@ -204,6 +213,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         switch (item.getItemId()) {
             case R.id.action_delete:
                 if (baseActivity.checkNetworkAvailableWithError() && checkDialogsLoadFinished()) {
+                    isDeleteDialogAction = true;
                     QBChatDialog chatDialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position).getChatDialog();
                     deleteDialog(chatDialog);
                 }
@@ -596,7 +606,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         if (chatDialog == null || chatDialog.getDialogId() == null) {
             return;
         }
-
+        rejectFriendsRequestIfDialogDelete(chatDialog);
         baseActivity.showProgress();
         QBDeleteChatCommand.start(baseActivity, chatDialog.getDialogId(), chatDialog.getType().getCode());
     }
@@ -620,6 +630,34 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         dialogsIdsToUpdate.add(dialogId);
     }
 
+    private void rejectFriendsRequestIfDialogDelete(@NonNull QBChatDialog chatDialog) {
+        if (!isDeleteDialogAction) {
+            return;
+        }
+        int requestSenderId = -1;
+        List<Integer> ids = new ArrayList<>(chatDialog.getOccupants());
+        for (Integer id : ids) {
+            if (chatDialog.getType().equals(QBDialogType.PRIVATE)
+                    && !id.equals(qbUser.getId())) {
+                requestSenderId = id;
+            }
+        }
+        List<DialogNotification> notifications = dataManager.getDialogNotificationDataManager().getDialogNotificationsByDialogId(chatDialog.getDialogId());
+        DialogNotification dialogNotification = null;
+        for (int i = 0; i < notifications.size(); i++) {
+            DialogNotification var = notifications.get(i);
+            if (var.getType().equals(DialogNotification.Type.FRIENDS_REQUEST) && i == notifications.size() - 1) {
+                dialogNotification = var;
+                break;
+            }
+        }
+        if (dialogNotification != null && dialogNotification.getType().equals(DialogNotification.Type.FRIENDS_REQUEST)
+                && requestSenderId != -1 && isDeleteDialogAction) {
+            QBRejectFriendCommand.start(getContext(), requestSenderId);
+            isDeleteDialogAction = false;
+        }
+    }
+
     private class LoginChatCompositeSuccessAction implements Command {
 
         @Override
@@ -638,6 +676,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
             baseActivity.hideProgress();
             dialogsListAdapter.removeItem(bundle.getString(QBServiceConsts.EXTRA_DIALOG_ID));
             checkEmptyList(dialogsListAdapter.getCount());
+            isDeleteDialogAction = false;
         }
     }
 
@@ -647,6 +686,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<DialogWrapper>>
         public void execute(Bundle bundle) {
             ToastUtils.longToast(R.string.dlg_internet_connection_error);
             baseActivity.hideProgress();
+            isDeleteDialogAction = false;
         }
     }
 
