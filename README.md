@@ -1,1 +1,1 @@
-# Source code removed from the public access, if you are interested in Q-municate please [contact us](https://communication.quickblox.com/q-municate#rec209621870)
+# Source code removed from the public access, if you are interested in Q-municate please [contact us](https://quickblox.com/enterprise/#get-enterprise)
