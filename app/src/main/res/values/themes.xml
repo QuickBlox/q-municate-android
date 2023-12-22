@@ -1,0 +1,40 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Theme.Q_municate" parent="Base.Theme.Q_municate" />
+
+    <style name="Base.Theme.Q_municate" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:textColor">#0B1B0F</item>
+        <item name="dividerColor">#E7EFFF</item>
+        <item name="colorPrimary">@color/main_color</item>
+        <item name="textInputStyle">@style/TextInputStyle</item>
+        <item name="colorTertiary">@color/hint_color</item>
+    </style>
+
+    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:textColorHint">@color/hint_color</item>
+        <item name="boxBackgroundColor">@color/background</item>
+        <item name="errorIconDrawable">@null</item>
+        <item name="endIconMode">clear_text</item>
+        <item name="hintTextColor">@color/main_color</item>
+        <item name="boxStrokeColor">#E7EFFF</item>
+        <item name="errorTextColor">#FF3B30</item>
+        <item name="boxStrokeErrorColor">#FF3B30</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="cursorColor">@android:color/black</item>
+    </style>
+
+    <style name="AuthFbTheme" parent="FirebaseUI">
+        <item name="colorPrimary">@color/main_color</item>
+        <item name="colorPrimaryVariant">@color/main_color</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/main_color</item>
+    </style>
+
+    <style name="RoundedCornersDialog" parent="@style/Theme.MaterialComponents.Dialog">
+        <item name="dialogCornerRadius">4dp</item>
+    </style>
+</resources>

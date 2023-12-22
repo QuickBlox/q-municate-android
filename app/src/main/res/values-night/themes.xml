@@ -1,0 +1,41 @@
+<resources>
+
+    <style name="Theme.Q_municate" parent="Base.Theme.Q_municate" />
+
+    <style name="Base.Theme.Q_municate" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/background_dark</item>
+        <item name="android:statusBarColor">@color/background_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="dividerColor">#414E5B</item>
+        <item name="colorPrimary">@color/main_dark_color</item>
+        <item name="colorTertiary">@color/hint_color</item>
+        <item name="textInputStyle">@style/TextInputStyle</item>
+    </style>
+
+    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:textColorHint">@color/hint_color</item>
+        <item name="boxBackgroundColor">@color/background_dark</item>
+        <item name="errorIconDrawable">@null</item>
+        <item name="endIconMode">clear_text</item>
+        <item name="hintTextColor">@color/main_dark_color</item>
+        <item name="boxStrokeColor">@color/main_dark_color</item>
+        <item name="errorTextColor">#FF766E</item>
+        <item name="boxStrokeErrorColor">#FF766E</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="cursorColor">@android:color/white</item>
+    </style>
+
+    <style name="AuthFbTheme" parent="FirebaseUI">
+        <item name="colorPrimary">@color/main_dark_color</item>
+        <item name="colorPrimaryVariant">@color/main_dark_color</item>
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="android:statusBarColor">@color/main_dark_color</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+    </style>
+
+    <style name="RoundedCornersDialog" parent="@style/Theme.MaterialComponents.Dialog">
+        <item name="dialogCornerRadius">4dp</item>
+    </style>
+</resources>
