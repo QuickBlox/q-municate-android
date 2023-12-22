@@ -1,0 +1,87 @@
+{
+  "project_info": {
+    "project_number": "Put here your value",
+    "firebase_url": "Put here your value",
+    "project_id": "Put here your value",
+    "storage_bucket": "Put here your value"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "Put here your value",
+        "android_client_info": {
+          "package_name": "com.quickblox.qb_qmunicate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "Put here your value",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quickblox.qb_qmunicate",
+            "certificate_hash": "Put here your value"
+          }
+        },
+        {
+          "client_id":"Put here your value",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quickblox.qb_qmunicate",
+            "certificate_hash": "Put here your value"
+          }
+        },
+        {
+          "client_id": "Put here your value",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quickblox.qb_qmunicate",
+            "certificate_hash": "Put here your value"
+          }
+        },
+        {
+          "client_id": "Put here your value",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quickblox.qb_qmunicate",
+            "certificate_hash": "Put here your value"
+          }
+        },
+        {
+          "client_id": "Put here your value",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quickblox.qb_qmunicate",
+            "certificate_hash": "Put here your value"
+          }
+        },
+        {
+          "client_id": "Put here your value",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "Put here your value"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "Put here your value",
+              "client_type": 3
+            },
+            {
+              "client_id": "Put here your value",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quickblox.qmunicate"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
