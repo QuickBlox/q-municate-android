@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Q-municate</string>
-    <string name="powered_by_quickblox">Powered by QuickBlox</string>
+    <string name="powered_by_quickblox">Powered by QuickBlox %s</string>
     <string name="fui_verify_phone_number_title">Enter phone number</string>
     <string name="fui_verify_phone_number">Get code</string>
     <string name="finish">Finish</string>
@@ -21,4 +21,5 @@
     <string name="change_photo">Change photo</string>
     <string name="do_you_want_to_continue_authorization">Do you want to continue authorization?</string>
     <string name="error_app_update_config">The in app update has wrong configuration</string>
+    <string name="user_name_hint">Start with a letter, use only a–z, A–Z, hyphens, underscores, and spaces. Length: 3–50 characters.</string>
 </resources>

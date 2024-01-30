@@ -123,7 +123,9 @@ class SettingsViewModel @Inject constructor(
         }
 
         user?.fullName = name
-        user?.avatarFileId = avatarFileId
+        avatarFileId?.let {
+            user?.avatarFileId = avatarFileId
+        }
 
         viewModelScope.launch {
             runCatching {
@@ -142,6 +144,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun clearAvatar() {
+        avatarFileId = null
+        uri = null
         user?.applyEmptyAvatar()
     }
 }

@@ -1,4 +1,4 @@
-package com.quickblox.qb_qmunicate.presentation.splash
+package com.quickblox.qb_qmunicate.presentation.start
 
 import android.app.Activity
 import android.content.Context
@@ -126,6 +126,8 @@ class StartActivity : BaseActivity() {
 
         QuickBloxUiKit.init(applicationContext)
 
+        val REGEX_USER_NAME = "^(?=[a-zA-Z])[-a-zA-Z_ ]{3,49}(?<! )\$"
+        QuickBloxUiKit.setRegexUserName(REGEX_USER_NAME)
         val uiKitTheme = ThemeManager.checkModeAndGetUIKitTheme(this)
         QuickBloxUiKit.setTheme(uiKitTheme)
     }
@@ -178,11 +180,7 @@ class StartActivity : BaseActivity() {
         }
 
     private fun updateAppVersionText() {
-        val versionCodeStringBuilder = StringBuilder()
-        versionCodeStringBuilder.append(binding.tvVersion.text.toString())
-        versionCodeStringBuilder.append(" ")
-        versionCodeStringBuilder.append("(${BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE})")
-
-        binding.tvVersion.text = versionCodeStringBuilder.toString()
+        val versionCode = "(${BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE})"
+        binding.tvVersion.text = getString(R.string.powered_by_quickblox, versionCode)
     }
 }

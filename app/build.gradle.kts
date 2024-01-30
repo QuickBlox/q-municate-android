@@ -16,8 +16,8 @@ android {
         applicationId = "com.quickblox.qb_qmunicate"
         minSdk = 24
         targetSdk = 33
-        versionCode = 300000
-        versionName = "3.0.0"
+        versionCode = 300017
+        versionName = "3.0.1"
 
         resourceConfigurations.addAll(listOf("en"))
 
@@ -103,7 +103,7 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.6.2")
 
     // QuickBlox UI-Kit
-    implementation("com.quickblox:android-ui-kit:0.8.0")
+    implementation("com.quickblox:android-ui-kit:0.9.0")
 
     // FireBase
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))

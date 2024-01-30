@@ -1,78 +1,78 @@
 {
   "project_info": {
-    "project_number": "Put here your value",
-    "firebase_url": "Put here your value",
-    "project_id": "Put here your value",
-    "storage_bucket": "Put here your value"
+    "project_number": "925980545669",
+    "firebase_url": "https://q-municate-d1527.firebaseio.com",
+    "project_id": "q-municate-d1527",
+    "storage_bucket": "q-municate-d1527.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "Put here your value",
+        "mobilesdk_app_id": "1:925980545669:android:723c711fb0c8c800",
         "android_client_info": {
           "package_name": "com.quickblox.qb_qmunicate"
         }
       },
       "oauth_client": [
         {
-          "client_id": "Put here your value",
+          "client_id": "925980545669-6kectvd4hbjgas65tevab6up1m42niti.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.quickblox.qb_qmunicate",
-            "certificate_hash": "Put here your value"
+            "certificate_hash": "bc08f97df4bf6324f71b0d08bca035dbef667871"
           }
         },
         {
-          "client_id":"Put here your value",
+          "client_id": "925980545669-9bjj4ml9gji62n4ectcldqbg2rm4u104.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.quickblox.qb_qmunicate",
-            "certificate_hash": "Put here your value"
+            "certificate_hash": "fdf0a69f35aa302165291e989563cd74699c2ceb"
           }
         },
         {
-          "client_id": "Put here your value",
+          "client_id": "925980545669-b6ni663i52mfn7127lqn059uaiih23k6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.quickblox.qb_qmunicate",
-            "certificate_hash": "Put here your value"
+            "certificate_hash": "2767502a86f19c1b4c16e441101d98944c78a4d4"
           }
         },
         {
-          "client_id": "Put here your value",
+          "client_id": "925980545669-bsihced5k2rijf50l2od2pkl6gcl4cn7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.quickblox.qb_qmunicate",
-            "certificate_hash": "Put here your value"
+            "certificate_hash": "4068d2abf43e5a7ba9e695bbcc8320ba21d9b0af"
           }
         },
         {
-          "client_id": "Put here your value",
+          "client_id": "925980545669-rkdb562eld1eket4o7a0ld3esmss8gqs.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.quickblox.qb_qmunicate",
-            "certificate_hash": "Put here your value"
+            "certificate_hash": "884dda6e3c43132823dbc3d029d37e1fd8c0de3e"
           }
         },
         {
-          "client_id": "Put here your value",
+          "client_id": "925980545669-7oru770avf2erti4kb041didj21tmeov.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "Put here your value"
+          "current_key": "AIzaSyBgYI8FDSKQq1Z0c8yhy_N2GN__GLyyMtU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "Put here your value",
+              "client_id": "925980545669-7oru770avf2erti4kb041didj21tmeov.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "Put here your value",
+              "client_id": "925980545669-85hofki94agos76vjmbcq6cail05rkib.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.quickblox.qmunicate"

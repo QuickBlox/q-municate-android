@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.text.InputFilter
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.quickblox.android_ui_kit.R
+import com.quickblox.android_ui_kit.presentation.checkStringByRegex
 import com.quickblox.android_ui_kit.presentation.dialogs.PositiveNegativeDialog
 import com.quickblox.android_ui_kit.presentation.makeClickableBackground
 import com.quickblox.android_ui_kit.presentation.screens.loadCircleImageFromUri
@@ -28,6 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 private const val CAMERA_PERMISSION = "android.permission.CAMERA"
+private const val REGEX_USER_NAME = "^(?=[a-zA-Z])[-a-zA-Z_ ]{3,49}(?<! )\$"
 
 @AndroidEntryPoint
 class CreateProfileActivity : BaseActivity() {
@@ -63,29 +64,27 @@ class CreateProfileActivity : BaseActivity() {
     private fun setListeners() {
         binding.btnFinish.setOnClick {
             val name = binding.etName.text.toString()
-            if (isNameValid(name) && isNotUploadingAvatar()) {
+            if (isNotUploadingAvatar()) {
                 binding.finishProgressBar.visibility = View.VISIBLE
                 viewModel.updateUser(name)
                 return@setOnClick
             }
         }
 
-        binding.etName.filters = arrayOf(InputFilter { source, start, end, dest, dstart, dend ->
-            if (dstart == 0 && end > 0) {
-                if (!Character.isLetter(source[start])) {
-                    return@InputFilter ""
-                }
-            }
-            null
-        })
-
         binding.etName.doAfterTextChanged {
-            binding.tilName.isErrorEnabled = false
+            val enteredUserName = it.toString()
+            val isValidName = enteredUserName.checkStringByRegex(REGEX_USER_NAME)
+
+            enableFinishButton(isValidName)
         }
 
         binding.ivAvatar.setOnClickListener {
             avatarPressed()
         }
+    }
+
+    private fun enableFinishButton(isEnable: Boolean) {
+        binding.btnFinish.isEnabled = isEnable
     }
 
     private fun isNotUploadingAvatar(): Boolean {
@@ -107,15 +106,6 @@ class CreateProfileActivity : BaseActivity() {
 
     private fun showMainScreen() {
         MainActivity.show(this)
-    }
-
-    private fun isNameValid(name: String): Boolean {
-        val isValidName = name.isNotBlank() && name.length > 2
-
-        if (!isValidName) {
-            binding.tilName.error = getString(com.quickblox.qb_qmunicate.R.string.min_3_symbols)
-        }
-        return isValidName
     }
 
     private fun avatarPressed() {

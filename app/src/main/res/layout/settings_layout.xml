@@ -28,8 +28,8 @@
         android:fontFamily="@font/roboto_500"
         android:padding="16dp"
         android:text="@string/save"
-        android:textColor="?attr/colorPrimary"
         android:textSize="14sp"
+        android:textColor="@color/text_color_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -87,12 +87,21 @@
             android:id="@+id/etName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ _-"
             android:imeOptions="actionNext"
             android:inputType="textCapWords"
             android:maxLength="50"
             android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/user_name_hint"
+        android:textColor="?attr/colorTertiary"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/tilName"
+        app:layout_constraintStart_toStartOf="@+id/tilName"
+        app:layout_constraintTop_toBottomOf="@+id/tilName" />
 
     <TextView
         android:id="@+id/tvLogout"

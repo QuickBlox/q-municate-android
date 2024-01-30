@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="deploymentTargetDropDown">
+    <value>
+      <entry key="Tests in 'com'">
+        <State />
+      </entry>
+      <entry key="app">
+        <State />
+      </entry>
+      <entry key="create2Users_loadUser_loadedFirstCreatedUser()">
+        <State />
+      </entry>
+      <entry key="repositoriesHaveData_execute_userCreated()">
+        <State />
+      </entry>
+      <entry key="userNotExist_execute_updatedUserExist()">
+        <State />
+      </entry>
+    </value>
+  </component>
+</project>

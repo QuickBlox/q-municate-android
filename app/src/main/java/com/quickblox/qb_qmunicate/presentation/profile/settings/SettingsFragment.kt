@@ -4,7 +4,6 @@ import android.Manifest.permission.CAMERA
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.quickblox.android_ui_kit.R
+import com.quickblox.android_ui_kit.presentation.checkStringByRegex
 import com.quickblox.android_ui_kit.presentation.dialogs.PositiveNegativeDialog
 import com.quickblox.android_ui_kit.presentation.makeClickableBackground
 import com.quickblox.android_ui_kit.presentation.screens.loadCircleImageFromUri
@@ -23,12 +23,13 @@ import com.quickblox.android_ui_kit.presentation.screens.setOnClick
 import com.quickblox.qb_qmunicate.databinding.SettingsLayoutBinding
 import com.quickblox.qb_qmunicate.presentation.base.BaseFragment
 import com.quickblox.qb_qmunicate.presentation.dialog.AvatarDialog
-import com.quickblox.qb_qmunicate.presentation.splash.StartActivity
+import com.quickblox.qb_qmunicate.presentation.start.StartActivity
 import com.quickblox.qb_qmunicate.presentation.theme_manager.ThemeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 private const val CAMERA_PERMISSION = "android.permission.CAMERA"
+private const val REGEX_USER_NAME = "^(?=[a-zA-Z])[-a-zA-Z_ ]{3,49}(?<! )\$"
 
 @AndroidEntryPoint
 class SettingsFragment : BaseFragment() {
@@ -73,7 +74,7 @@ class SettingsFragment : BaseFragment() {
         binding?.btnSave?.setOnClick {
             val name = binding?.etName?.text.toString()
 
-            if (isNameValid(name) && isNotUploadingAvatar()) {
+            if (isNotUploadingAvatar()) {
                 binding?.saveProgressBar?.visibility = View.VISIBLE
                 viewModel.updateUser(name)
                 binding?.tilName?.isEndIconVisible = false
@@ -86,22 +87,20 @@ class SettingsFragment : BaseFragment() {
             viewModel.signOut()
         }
 
-        binding?.etName?.filters = arrayOf(InputFilter { source, start, end, dest, dstart, dend ->
-            if (dstart == 0 && end > 0) {
-                if (!Character.isLetter(source[start])) {
-                    return@InputFilter ""
-                }
-            }
-            null
-        })
-
         binding?.etName?.doAfterTextChanged {
-            binding?.tilName?.isErrorEnabled = false
+            val enteredUserName = it.toString()
+            val isValidName = enteredUserName.checkStringByRegex(REGEX_USER_NAME)
+
+            enableSaveButton(isValidName)
         }
 
         binding?.ivAvatar?.setOnClickListener {
             avatarPressed()
         }
+    }
+
+    private fun enableSaveButton(isEnable: Boolean) {
+        binding?.btnSave?.isEnabled = isEnable
     }
 
     private fun isNotUploadingAvatar(): Boolean {
@@ -124,12 +123,18 @@ class SettingsFragment : BaseFragment() {
     private fun subscribeToLoadUser() {
         viewModel.loadUser.observe(viewLifecycleOwner) { user ->
             val isValidAvatarUrl = !user?.avatarFileUrl.isNullOrBlank()
+            val view = binding?.ivAvatar
             if (isValidAvatarUrl) {
-                val view = binding?.ivAvatar
                 view?.loadCircleImageFromUrl(user?.avatarFileUrl, R.drawable.user_avatar_holder)
+            } else {
+                view?.setImageResource(R.drawable.user_avatar_holder)
             }
 
-            binding?.etName?.setText(user?.fullName ?: "")
+            val userName = user?.fullName
+            binding?.etName?.setText(userName ?: "")
+
+            val isValidName = userName.toString().checkStringByRegex(REGEX_USER_NAME)
+            enableSaveButton(isValidName)
         }
     }
 
@@ -140,14 +145,6 @@ class SettingsFragment : BaseFragment() {
         }
     }
 
-    private fun isNameValid(name: String): Boolean {
-        val isValidName = name.isNotBlank() && name.length > 2
-
-        if (!isValidName) {
-            binding?.tilName?.error = getString(com.quickblox.qb_qmunicate.R.string.min_3_symbols)
-        }
-        return isValidName
-    }
 
     private fun avatarPressed() {
         val uiKitTheme = ThemeManager.checkModeAndGetUIKitTheme(requireContext())

@@ -1,14 +1,14 @@
-package com.quickblox.qb_qmunicate.presentation.splash
+package com.quickblox.qb_qmunicate.presentation.start
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.quickblox.qb_qmunicate.domain.entity.UserEntity
 import com.quickblox.qb_qmunicate.domain.use_case.user.CheckUserExistUseCase
 import com.quickblox.qb_qmunicate.domain.use_case.user.SignInUserUseCase
 import com.quickblox.qb_qmunicate.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,10 +43,16 @@ class StartViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val user = signInUserUseCase.execute(Unit)
-                if (user?.fullName.isNullOrEmpty()) {
-                    _showProfile.postValue(Unit)
-                } else {
+
+                val userName = user?.fullName
+
+                val regex = Pattern.compile("^(?=[a-zA-Z])[-a-zA-Z_ ]{3,49}(?<! )\$")
+                val matcher = regex.matcher(user?.fullName.toString())
+
+                if (userName != null && matcher.find()) {
                     _showUiKit.postValue(Unit)
+                } else {
+                    _showProfile.postValue(Unit)
                 }
             }.onFailure {
                 showError(it.message.toString())

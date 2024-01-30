@@ -2,7 +2,7 @@ package com.quickblox.qb_qmunicate
 
 import android.app.Application
 import com.quickblox.qb_qmunicate.domain.use_case.auth.SessionUpdateUseCase
-import com.quickblox.qb_qmunicate.presentation.splash.StartActivity
+import com.quickblox.qb_qmunicate.presentation.start.StartActivity
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
