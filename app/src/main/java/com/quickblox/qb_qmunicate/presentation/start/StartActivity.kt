@@ -19,8 +19,10 @@ import com.google.android.play.core.ktx.isImmediateUpdateAllowed
 import com.quickblox.android_ui_kit.QuickBloxUiKit
 import com.quickblox.android_ui_kit.presentation.dialogs.PositiveNegativeDialog
 import com.quickblox.qb_qmunicate.BuildConfig
+import com.quickblox.qb_qmunicate.BuildConfig.PRIVACY_POLICY_URL
 import com.quickblox.qb_qmunicate.BuildConfig.QB_AI_PROXY_SERVER_URL
 import com.quickblox.qb_qmunicate.BuildConfig.QB_OPEN_AI_TOKEN
+import com.quickblox.qb_qmunicate.BuildConfig.TOS_URL
 import com.quickblox.qb_qmunicate.R
 import com.quickblox.qb_qmunicate.databinding.StartLayoutBinding
 import com.quickblox.qb_qmunicate.presentation.base.BaseActivity
@@ -108,9 +110,7 @@ class StartActivity : BaseActivity() {
         selectedProviders.add(AuthUI.IdpConfig.PhoneBuilder().build())
         val builder: AuthUI.SignInIntentBuilder =
             AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(selectedProviders)
-                .setTheme(R.style.AuthFbTheme).setTosAndPrivacyPolicyUrls(
-                    "https://quickblox.com/terms-of-service/", "https://quickblox.com/privacy-policy/"
-                )
+                .setTheme(R.style.AuthFbTheme).setTosAndPrivacyPolicyUrls(TOS_URL, PRIVACY_POLICY_URL)
 
         return builder.build()
     }

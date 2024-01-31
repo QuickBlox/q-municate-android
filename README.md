@@ -133,6 +133,10 @@ quickblox_chat_endpoint="chat.endpoint.com"
 ### QuickBlox AI
 quickblox_open_ai_token="qwerty123qwedsfjHDSJHdjhqkldsqjdsaklja"
 quickblox_ai_proxy_server_url="https://proxy.url"
+#
+### Terms of Service and Privacy Policy
+tos_url="https://tos.url"
+privacy_policy_url="https://privacy_policy.url"
 ```
 
 ## Step 3

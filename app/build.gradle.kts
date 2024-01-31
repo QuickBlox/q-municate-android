@@ -16,8 +16,8 @@ android {
         applicationId = "com.quickblox.qb_qmunicate"
         minSdk = 24
         targetSdk = 33
-        versionCode = 300017
-        versionName = "3.0.1"
+        versionCode = 300018
+        versionName = "3.0.2"
 
         resourceConfigurations.addAll(listOf("en"))
 
@@ -59,6 +59,8 @@ android {
             type.buildConfigField("String", "QB_OPEN_AI_TOKEN", getLocalProperty("quickblox_open_ai_token"))
             type.buildConfigField("String", "QB_AI_PROXY_SERVER_URL", getLocalProperty("quickblox_ai_proxy_server_url"))
             type.buildConfigField("String", "FIREBASE_APP_ID", getLocalProperty("firebase_app_id"))
+            type.buildConfigField("String", "TOS_URL", getLocalProperty("tos_url"))
+            type.buildConfigField("String", "PRIVACY_POLICY_URL", getLocalProperty("privacy_policy_url"))
         }
 
         debug {
